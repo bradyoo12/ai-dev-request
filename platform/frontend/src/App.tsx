@@ -7,9 +7,11 @@ import { getTokenOverview, checkTokens } from './api/settings'
 import type { TokenCheck } from './api/settings'
 import LanguageSelector from './components/LanguageSelector'
 import SettingsPage from './pages/SettingsPage'
+import UsagePage from './pages/UsagePage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
 type PageState = 'main' | 'settings'
+type SettingsTab = 'tokens' | 'usage'
 
 function App() {
   const { t, i18n } = useTranslation()
@@ -23,6 +25,7 @@ function App() {
   const [proposalResult, setProposalResult] = useState<ProposalResponse | null>(null)
   const [productionResult, setProductionResult] = useState<ProductionResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('tokens')
   const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
 
@@ -253,7 +256,26 @@ function App() {
               </button>
               <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
             </div>
-            <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />
+            <div className="flex gap-1 mb-6 bg-gray-800 rounded-lg p-1">
+              <button
+                onClick={() => setSettingsTab('tokens')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  settingsTab === 'tokens' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {t('settings.tabs.tokens')}
+              </button>
+              <button
+                onClick={() => setSettingsTab('usage')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  settingsTab === 'usage' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {t('settings.tabs.usage')}
+              </button>
+            </div>
+            {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
+            {settingsTab === 'usage' && <UsagePage />}
           </section>
         )}
 

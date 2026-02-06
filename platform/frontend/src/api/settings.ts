@@ -172,3 +172,89 @@ export async function deductTokens(
 
   return response.json()
 }
+
+// Usage Types
+export interface UsageSummary {
+  balance: number
+  balanceValueUsd: number
+  usedThisMonth: number
+  addedThisMonth: number
+  projectsThisMonth: number
+}
+
+export interface UsageTransaction {
+  id: number
+  type: string
+  amount: number
+  action: string
+  referenceId?: string
+  description: string
+  balanceAfter: number
+  createdAt: string
+}
+
+export interface UsageTransactionsResult {
+  transactions: UsageTransaction[]
+  totalCount: number
+  page: number
+  pageSize: number
+}
+
+export interface ProjectUsage {
+  projectId: string
+  analysis: number
+  proposal: number
+  build: number
+  total: number
+}
+
+// Usage API Functions
+export async function getUsageSummary(): Promise<UsageSummary> {
+  const response = await fetch(`${API_BASE_URL}/api/settings/usage/summary`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new Error(t('api.error.usageFailed'))
+  return response.json()
+}
+
+export async function getUsageTransactions(params: {
+  page?: number
+  pageSize?: number
+  type?: string
+  action?: string
+  projectId?: string
+  from?: string
+  to?: string
+}): Promise<UsageTransactionsResult> {
+  const searchParams = new URLSearchParams()
+  if (params.page) searchParams.set('page', String(params.page))
+  if (params.pageSize) searchParams.set('pageSize', String(params.pageSize))
+  if (params.type) searchParams.set('type', params.type)
+  if (params.action) searchParams.set('action', params.action)
+  if (params.projectId) searchParams.set('projectId', params.projectId)
+  if (params.from) searchParams.set('from', params.from)
+  if (params.to) searchParams.set('to', params.to)
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/settings/usage/transactions?${searchParams.toString()}`,
+    { headers: authHeaders() }
+  )
+  if (!response.ok) throw new Error(t('api.error.usageFailed'))
+  return response.json()
+}
+
+export async function getUsageByProject(): Promise<ProjectUsage[]> {
+  const response = await fetch(`${API_BASE_URL}/api/settings/usage/by-project`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new Error(t('api.error.usageFailed'))
+  return response.json()
+}
+
+export function getUsageExportUrl(from?: string, to?: string): string {
+  const params = new URLSearchParams()
+  if (from) params.set('from', from)
+  if (to) params.set('to', to)
+  const query = params.toString()
+  return `${API_BASE_URL}/api/settings/usage/export${query ? `?${query}` : ''}`
+}

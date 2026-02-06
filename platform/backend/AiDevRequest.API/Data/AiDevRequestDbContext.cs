@@ -20,6 +20,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<Deployment> Deployments => Set<Deployment>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<AutoTopUpConfig> AutoTopUpConfigs => Set<AutoTopUpConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -232,6 +233,17 @@ public class AiDevRequestDbContext : DbContext
 
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.AnonymousUserId);
+        });
+
+        modelBuilder.Entity<AutoTopUpConfig>(entity =>
+        {
+            entity.ToTable("auto_topup_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.MonthlyLimitUsd).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.MonthlySpentUsd).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.FailureReason).HasMaxLength(500);
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
     }
 }

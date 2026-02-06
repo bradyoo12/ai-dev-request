@@ -8,9 +8,10 @@ import type { TokenCheck } from './api/settings'
 import LanguageSelector from './components/LanguageSelector'
 import SettingsPage from './pages/SettingsPage'
 import UsagePage from './pages/UsagePage'
+import MySitesPage from './pages/MySitesPage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
-type PageState = 'main' | 'settings'
+type PageState = 'main' | 'settings' | 'sites'
 type SettingsTab = 'tokens' | 'usage'
 
 function App() {
@@ -235,6 +236,7 @@ function App() {
               </button>
             )}
             <nav className="space-x-4">
+              <button onClick={() => setPage('sites')} className="hover:text-blue-400">{t('header.mySites')}</button>
               <a href="#pricing" className="hover:text-blue-400">{t('header.pricing')}</a>
               <button onClick={() => setPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
@@ -276,6 +278,21 @@ function App() {
             </div>
             {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
             {settingsTab === 'usage' && <UsagePage />}
+          </section>
+        )}
+
+        {page === 'sites' && (
+          <section>
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => setPage('main')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                &larr;
+              </button>
+              <h2 className="text-2xl font-bold">{t('header.mySites')}</h2>
+            </div>
+            <MySitesPage />
           </section>
         )}
 

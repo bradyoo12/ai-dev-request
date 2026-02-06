@@ -11,6 +11,8 @@ public class AiDevRequestDbContext : DbContext
     }
 
     public DbSet<DevRequest> DevRequests => Set<DevRequest>();
+    public DbSet<Language> Languages => Set<Language>();
+    public DbSet<Translation> Translations => Set<Translation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +60,56 @@ public class AiDevRequestDbContext : DbContext
 
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<Language>(entity =>
+        {
+            entity.ToTable("languages");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Code)
+                .IsRequired()
+                .HasMaxLength(10);
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.NativeName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasIndex(e => e.Code).IsUnique();
+
+            entity.HasData(
+                new Language { Id = 1, Code = "ko", Name = "Korean", NativeName = "\ud55c\uad6d\uc5b4", IsDefault = true, IsActive = true, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new Language { Id = 2, Code = "en", Name = "English", NativeName = "English", IsDefault = false, IsActive = true, CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), UpdatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+            );
+        });
+
+        modelBuilder.Entity<Translation>(entity =>
+        {
+            entity.ToTable("translations");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.LanguageCode)
+                .IsRequired()
+                .HasMaxLength(10);
+
+            entity.Property(e => e.Namespace)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Key)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Value)
+                .IsRequired();
+
+            entity.HasIndex(e => new { e.LanguageCode, e.Namespace, e.Key }).IsUnique();
         });
     }
 }

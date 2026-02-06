@@ -78,7 +78,7 @@ If merge fails: add `on hold` label and move to next ticket.
    ```
 
 2. **Add a detailed "How to Test" comment** with:
-   - Staging URL(s)
+   - Staging URL: `https://icy-desert-07c08ba00.2.azurestaticapps.net`
    - Step-by-step test instructions (beginner-friendly)
    - Expected results for each step
    - Visual verification checklist

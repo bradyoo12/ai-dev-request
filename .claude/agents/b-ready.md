@@ -98,6 +98,7 @@ gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id P
 ### Step 6: Run Local Tests (Full Regression Gate)
 
 **ALL tests must pass — not just tests related to this ticket.**
+**Tests run LOCALLY (against Vite preview server on localhost:4173), NOT against staging.**
 
 #### Step 6a: Build the Frontend
 ```bash
@@ -108,14 +109,14 @@ npm run build
 
 If the build fails, fix the build errors before proceeding.
 
-#### Step 6b: Run ALL Playwright E2E Tests
+#### Step 6b: Run ALL Playwright E2E Tests (Local)
 ```bash
 cd platform/frontend
 npx playwright install chromium
 npm test
 ```
 
-The Playwright config auto-starts `npm run preview` (Vite preview server on port 4173) as a web server, so no manual server startup is needed.
+This runs tests against the local Vite preview server (port 4173), auto-started by `playwright.config.ts`. Do NOT use `npm run test:staging` here — staging tests happen later in the `b-review` step after the code is merged and deployed.
 
 **CRITICAL: Run the FULL test suite. If ANY test fails, it must be fixed before creating the PR.**
 

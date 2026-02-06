@@ -48,43 +48,33 @@ From the response, filter issues that:
 
 If no eligible tickets found, log "No tickets ready for staging verification. Waiting 5 seconds..." and wait 5 seconds, then restart from Step 1.
 
-### Step 2: Build and Start Local Staging
+### Step 2: Prepare for Staging Tests
 
-Since no remote staging environment is provisioned yet, run a **local staging build** to test the latest main branch:
+Pull the latest main to ensure test files are up to date:
 
-1. Pull latest main:
-   ```bash
-   cd platform/frontend
-   git checkout main && git pull
-   ```
+```bash
+cd platform/frontend
+git checkout main && git pull
+npm install
+```
 
-2. Install dependencies and build:
-   ```bash
-   npm install
-   npm run build
-   ```
+The staging site is deployed automatically via GitHub Actions on push to main:
+- **Staging URL**: `https://icy-desert-07c08ba00.2.azurestaticapps.net`
 
-3. **If the build fails**, the ticket fails verification — go to Step 4 (failure).
-
-4. The Playwright config auto-starts `npm run preview` (Vite preview on port 4173) as a web server, so no manual server startup is needed.
-
-**If a remote staging URL is configured** (via `PLAYWRIGHT_BASE_URL` env var), use that instead of the local build. The Playwright config will skip the local web server when `PLAYWRIGHT_BASE_URL` is set.
+No local build or preview server is needed — tests run directly against the live staging site.
 
 ### Step 3: Run Tests (Full Regression Suite)
 
 Run ALL available tests against the local staging build (or remote staging).
 
-#### Step 3a: Run FULL Playwright E2E Test Suite
+#### Step 3a: Run FULL Playwright E2E Test Suite Against Staging
 ```bash
 cd platform/frontend
 npx playwright install chromium
-
-# Tests run against local preview server (auto-started by playwright.config.ts)
-npx playwright test
-
-# OR if remote staging URL is available:
-# PLAYWRIGHT_BASE_URL=https://staging.ai-dev-request.kr npx playwright test
+npm run test:staging
 ```
+
+This runs all Playwright tests against the live staging site (`https://icy-desert-07c08ba00.2.azurestaticapps.net`). The Playwright config skips the local web server when `PLAYWRIGHT_BASE_URL` is set.
 
 **CRITICAL: Run the ENTIRE test suite.** If ANY test fails, the ticket fails verification.
 
@@ -135,7 +125,7 @@ Perform AI-simulated human testing:
 ## Important Notes
 - **This command runs in an infinite loop** - keep processing until Ctrl+C
 - Only process tickets in "In Review" WITHOUT `on hold` label
-- Tests run against a local Vite preview build (or remote staging if `PLAYWRIGHT_BASE_URL` is set)
+- Tests run against the staging site: `https://icy-desert-07c08ba00.2.azurestaticapps.net`
 - If tests pass: move to "Done" and close the issue
 - If tests fail: add comment + `on hold` label
 - If staging is unavailable: do NOT add `on hold` — just skip and retry next cycle

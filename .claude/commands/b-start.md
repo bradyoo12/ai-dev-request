@@ -1,0 +1,232 @@
+---
+description: Master orchestrator that runs the full automated development pipeline continuously.
+allowed-prompts:
+  - tool: Bash
+    prompt: run gh commands for GitHub operations
+  - tool: Bash
+    prompt: run git commands
+  - tool: Bash
+    prompt: run echo commands
+---
+
+Master orchestrator that runs the full automated development pipeline continuously.
+
+## Usage
+`/b-start`
+
+## Project Configuration
+
+Project settings are defined in `.claude/policy.md` under "Project Settings" section.
+
+**IMPORTANT:** This orchestrator ONLY processes tickets from the GitHub Project defined in policy.md (Project 26 - AI Dev Request). Use `gh project item-list <PROJECT_ID> --owner <OWNER>` to fetch tickets.
+
+## Prerequisites (MUST RUN FIRST)
+
+**Before starting the pipeline, ensure the correct GitHub account is active:**
+
+```bash
+gh auth switch -u bradyoo12
+```
+
+## Overview
+
+This command orchestrates the entire development workflow:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        b-start (Orchestrator)                    │
+├─────────────────────────────────────────────────────────────────┤
+│  1. Check policy.md & design.md                                  │
+│  2. Audit all tickets for alignment                              │
+│  3. Run b-ready → implements, local tests & creates PR           │
+│  4. Run b-progress → merges PR to main, moves to In Review       │
+│  5. Run b-review → tests on staging, moves to Done or on hold    │
+│  6. Run b-modernize → web search for new tech, create suggestions │
+│  7. Report status & loop back to step 1                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Main Loop
+
+Execute this workflow in sequence, then loop:
+
+### Step 1: Load Policy and Design Documents
+
+Read and internalize the project guidelines:
+
+1. **Read Policy** (`.claude/policy.md`):
+   - Understand ticket management rules
+   - Know when to add `on hold` label
+   - Learn blocking scenarios
+   - Understand code quality requirements
+
+2. **Read Design** (`.claude/design.md`):
+   - Understand overall architecture
+   - Know system components
+   - Understand data flow
+   - Learn technology stack
+
+### Step 2: Audit All Tickets for Alignment
+
+Check all tickets in the project to ensure they align with policy and design:
+
+1. Get all items from the project:
+   ```bash
+   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   ```
+
+2. For each ticket in the project (filter by `type: "Issue"`):
+   - Analyze if the ticket aligns with `.claude/policy.md` rules
+   - Analyze if the ticket aligns with `.claude/design.md` architecture
+   - Check for conflicts or inconsistencies
+
+3. **If a ticket is OUT OF ALIGNMENT, classify the block:**
+
+   **Hard Block** (needs human action) → add `on hold` label:
+   - Security concerns, production-critical changes, unclear requirements, repeated test failures
+   - Add `on hold` label:
+     ```bash
+     gh issue edit <issue_number> --repo bradyoo12/ai-dev-request --add-label "on hold"
+     ```
+   - Add a comment explaining the concern
+
+   **Soft Block** (prerequisites not yet met) → skip WITHOUT labeling:
+   - Prerequisite PRs not yet merged, dependent tickets incomplete, blocked by in-progress work
+   - Do NOT add `on hold` label — just skip the ticket this cycle
+   - Log: "Skipping #<number>: <reason> — will retry next cycle"
+
+4. Log summary of audit results
+
+### Step 3: Run b-ready Agent
+
+Implement and locally test Ready tickets:
+
+1. Log "Starting b-ready agent..."
+2. Execute the b-ready workflow (refer to `.claude/agents/b-ready.md`):
+   - Find tickets with "Ready" status (no `on hold` label)
+   - Move to "In Progress"
+   - Create branch from main (branch name starts with ticket number)
+   - Implement the ticket
+   - Run local tests (unit tests + Playwright)
+   - If problem: add `on hold` label, move to next ticket
+   - If success: create PR (ticket stays "In Progress")
+
+3. Process ONE ticket, then proceed to Step 4
+
+### Step 4: Run b-progress Agent
+
+Merge PRs to main and deploy to staging:
+
+1. Log "Starting b-progress agent..."
+2. Execute the b-progress workflow (refer to `.claude/agents/b-progress.md`):
+   - Find "In Progress" tickets with open PRs (no `on hold` label)
+   - Verify PR is mergeable
+   - Merge PR to main, delete branch
+   - Move ticket to "In Review" (now on staging)
+   - **CRITICAL: Add a detailed "How to Test" comment**
+
+3. Process ONE ticket, then proceed to Step 5
+
+### Step 5: Run b-review Agent (Staging Verification)
+
+Verify changes on staging:
+
+1. Log "Starting b-review agent..."
+2. Execute the b-review workflow (refer to `.claude/commands/b-review.md`):
+   - Find tickets in "In Review" WITHOUT `on hold` label
+   - Run Playwright tests and all available tools against staging
+   - If tests PASS: set project status to "Done", close issue
+   - If tests FAIL: add comment explaining failure + add `on hold` label
+
+3. Process ONE ticket, then proceed to Step 6
+
+### Step 6: Run b-modernize Agent (Technology Scout)
+
+Search for recent technologies and create suggestion tickets:
+
+1. Log "Starting b-modernize agent..."
+2. Execute the b-modernize workflow (refer to `.claude/commands/b-modernize.md`):
+   - Web search for recent technologies relevant to the platform
+   - Evaluate relevance, impact, and effort scores
+   - Create suggestion tickets for qualifying technologies (max 3 per cycle)
+   - Add tickets to project board with NO status (human triage required)
+
+3. Proceed to Step 7
+
+### Step 7: Report Cycle Status
+
+Log the current status of the project board:
+
+1. Get counts for each status:
+   ```bash
+   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   ```
+
+2. Report:
+   - Ready count (excluding `on hold`)
+   - In Progress count (with and without open PRs)
+   - In Review count (with and without `on hold`)
+   - Done count
+   - Tickets with `on hold` label
+   - Backlog tickets awaiting triage
+
+### Step 8: Loop
+1. Log "Waiting 120 seconds before next cycle..."
+2. Wait 120 seconds
+3. Go back to Step 1
+
+## Ticket Flow Summary
+
+```
+┌──────────┐   b-ready    ┌─────────────┐  b-progress   ┌───────────┐  b-review   ┌──────┐
+│  Ready   │ ──────────→ │ In Progress │ ───────────→ │ In Review │ ─────────→ │ Done │
+└──────────┘              └─────────────┘              └───────────┘             └──────┘
+                          (implement,          (merge PR,          (test on staging,
+                           local tests,         deploy to           close issue)
+                           create PR)           staging)
+     │                          │                            │
+     └─── on hold ──────────────┴─── on hold (test fail) ────┘
+           (needs human attention)
+```
+
+## Label Meanings
+
+| Label | Meaning |
+|-------|---------|
+| `on hold` | Requires human attention - do not auto-process |
+
+## Important Notes
+
+- **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
+- **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
+- Each agent processes ONE ticket per cycle to maintain balance
+- 120-second delay between full cycles to avoid API rate limiting
+- Always check policy.md and design.md at the start of each cycle
+- Tickets out of alignment get `on hold` label automatically
+- Human removes `on hold` label to signal approval/readiness
+
+## Self-Update Protocol (MANDATORY)
+
+**After EVERY run** of this command, update this file:
+
+### When to Update
+- After encountering an error that took multiple attempts to resolve
+- After discovering a missing prerequisite or undocumented dependency
+- After finding a workaround for an environment or tooling issue
+- After a successful run if you noticed something that could be improved
+
+### How to Update
+1. Append a new entry to the `## Lessons Learned` section below
+2. Use this format:
+   ```
+   ### [YYYY-MM-DD] <Short Title>
+   - **Problem**: What went wrong or was time-consuming
+   - **Solution**: What fixed it or the workaround used
+   - **Prevention**: What to do differently next time
+   ```
+
+---
+
+## Lessons Learned
+
+_(No entries yet - this section will be populated as the pipeline runs)_

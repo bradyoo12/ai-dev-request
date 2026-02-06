@@ -1,0 +1,107 @@
+# AI Dev Request Architecture
+
+## Overview
+
+AI Dev Request is a SaaS platform that automates the software development lifecycle:
+1. **Request** - Users submit development requests in natural language
+2. **Analysis** - AI analyzes requests and derives technical requirements
+3. **Proposal** - AI proposes implementation plan, tech stack, and cost/time estimates
+4. **Build** - Upon approval, AI generates code and deploys automatically
+
+## System Components
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Frontend (React)                       │
+│           React + Vite + shadcn/ui + Zustand             │
+│    Request Form → Analysis View → Proposal → Dashboard    │
+└──────────────────────┬──────────────────────────────────┘
+                       │ REST API
+┌──────────────────────▼──────────────────────────────────┐
+│                 Backend (.NET 9)                          │
+│              AiDevRequest.API + BradYoo.Core              │
+│    Auth │ Request CRUD │ Project Mgmt │ Billing           │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│                   AI Engine                               │
+│              Claude API Integration                       │
+│    Requirement Analysis │ Code Generation │ Deployment    │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│                   Database                                │
+│                   PostgreSQL                              │
+│    Users │ Requests │ Projects │ Billing │ Conversations  │
+└───────────────────────────────────────────────────────────┘
+```
+
+## Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18 + Vite + TypeScript + shadcn/ui + Zustand + Tailwind CSS |
+| Backend | .NET 9 + BradYoo.Core (shared auth, AI, data) |
+| AI Engine | Claude API (analysis, code generation, deployment automation) |
+| Database | PostgreSQL |
+| Infrastructure | Azure Container Apps |
+| CI/CD | GitHub Actions |
+
+## Data Flow
+
+```
+User Request (natural language)
+        │
+        ▼
+  AI Analysis Engine
+  (Claude API: requirement extraction)
+        │
+        ▼
+  Technical Proposal
+  (stack, timeline, cost estimate)
+        │
+        ▼ (user approval)
+  Code Generation
+  (Claude Code / Agentic workflow)
+        │
+        ▼
+  Auto Deployment
+  (templates → project scaffolding → deploy)
+```
+
+## Key Entities
+
+| Entity | Description |
+|--------|-------------|
+| User | Platform user (OAuth via BradYoo.Core) |
+| DevRequest | A development request from user |
+| Proposal | AI-generated implementation proposal |
+| Project | Generated project (code + deployment) |
+| Conversation | Chat history for request refinement |
+
+## Directory Structure
+
+```
+platform/
+├── backend/
+│   └── AiDevRequest.API/    # .NET 9 API
+├── frontend/
+│   └── src/                 # React app
+└── ai-engine/               # AI analysis & code generation
+
+projects/                    # Generated customer projects
+├── proj-001-name/
+└── proj-002-name/
+
+templates/                   # Project scaffolding templates
+├── web-app/
+├── api-server/
+└── automation/
+```
+
+## Integration with BradYoo Core
+
+This project uses bradyoo-core for shared infrastructure:
+- **Auth**: Google/Kakao OAuth, JWT via BradYoo.Core.Auth
+- **AI**: Claude API client via BradYoo.Core.AI
+- **Data**: Base DbContext, shared entities via BradYoo.Core.Data

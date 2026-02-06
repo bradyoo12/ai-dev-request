@@ -1,3 +1,5 @@
+import i18n from '../i18n'
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export interface CreateDevRequestDto {
@@ -201,6 +203,8 @@ export interface CostEstimate {
   note: string;
 }
 
+const t = (key: string) => i18n.t(key);
+
 // API Functions
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests`, {
@@ -213,7 +217,7 @@ export async function createRequest(data: CreateDevRequestDto): Promise<DevReque
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || '요청 생성에 실패했습니다.');
+    throw new Error(error.message || t('api.error.createFailed'));
   }
 
   return response.json();
@@ -223,7 +227,7 @@ export async function getRequest(id: string): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}`);
 
   if (!response.ok) {
-    throw new Error('요청을 찾을 수 없습니다.');
+    throw new Error(t('api.error.notFound'));
   }
 
   return response.json();
@@ -235,7 +239,7 @@ export async function getRequests(page = 1, pageSize = 20): Promise<DevRequestRe
   );
 
   if (!response.ok) {
-    throw new Error('요청 목록을 불러올 수 없습니다.');
+    throw new Error(t('api.error.listFailed'));
   }
 
   return response.json();
@@ -248,7 +252,7 @@ export async function analyzeRequest(id: string): Promise<AnalysisResponse> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || '분석에 실패했습니다.');
+    throw new Error(error.error || t('api.error.analysisFailed'));
   }
 
   return response.json();
@@ -258,7 +262,7 @@ export async function getAnalysis(id: string): Promise<AnalysisResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/analysis`);
 
   if (!response.ok) {
-    throw new Error('분석 결과를 불러올 수 없습니다.');
+    throw new Error(t('api.error.analysisLoadFailed'));
   }
 
   return response.json();
@@ -271,7 +275,7 @@ export async function generateProposal(id: string): Promise<ProposalResponse> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || '제안서 생성에 실패했습니다.');
+    throw new Error(error.error || t('api.error.proposalFailed'));
   }
 
   return response.json();
@@ -281,7 +285,7 @@ export async function getProposal(id: string): Promise<ProposalResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal`);
 
   if (!response.ok) {
-    throw new Error('제안서를 불러올 수 없습니다.');
+    throw new Error(t('api.error.proposalLoadFailed'));
   }
 
   return response.json();
@@ -294,7 +298,7 @@ export async function approveProposal(id: string): Promise<DevRequestResponse> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || '제안서 승인에 실패했습니다.');
+    throw new Error(error.error || t('api.error.approveFailed'));
   }
 
   return response.json();
@@ -307,7 +311,7 @@ export async function startBuild(id: string): Promise<ProductionResponse> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || '빌드 시작에 실패했습니다.');
+    throw new Error(error.error || t('api.error.buildStartFailed'));
   }
 
   return response.json();
@@ -317,7 +321,7 @@ export async function getBuildStatus(id: string): Promise<BuildStatusResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/build`);
 
   if (!response.ok) {
-    throw new Error('빌드 상태를 불러올 수 없습니다.');
+    throw new Error(t('api.error.buildStatusFailed'));
   }
 
   return response.json();
@@ -330,7 +334,7 @@ export async function completeRequest(id: string): Promise<DevRequestResponse> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || '완료 처리에 실패했습니다.');
+    throw new Error(error.error || t('api.error.completeFailed'));
   }
 
   return response.json();
@@ -341,7 +345,7 @@ export async function getPricingPlans(): Promise<PricingPlan[]> {
   const response = await fetch(`${API_BASE_URL}/api/pricing/plans`);
 
   if (!response.ok) {
-    throw new Error('요금제를 불러올 수 없습니다.');
+    throw new Error(t('api.error.pricingFailed'));
   }
 
   return response.json();
@@ -357,7 +361,7 @@ export async function getCostEstimate(complexity: string, category: string): Pro
   });
 
   if (!response.ok) {
-    throw new Error('견적 계산에 실패했습니다.');
+    throw new Error(t('api.error.estimateFailed'));
   }
 
   return response.json();

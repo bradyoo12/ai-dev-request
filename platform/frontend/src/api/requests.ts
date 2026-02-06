@@ -49,6 +49,91 @@ export interface AnalysisResponse {
   suggestedStack: TechStackInfo;
 }
 
+// Proposal Types
+export interface ScopeInfo {
+  included: string[];
+  excluded: string[];
+}
+
+export interface ComponentInfo {
+  name: string;
+  description: string;
+  technology: string;
+}
+
+export interface ArchitectureInfo {
+  overview: string;
+  components: ComponentInfo[];
+  dataFlow: string;
+}
+
+export interface MilestoneInfo {
+  phase: number;
+  name: string;
+  description: string;
+  deliverables: string[];
+  durationDays: number;
+}
+
+export interface CostBreakdown {
+  item: string;
+  amount: number;
+}
+
+export interface DevelopmentCost {
+  amount: number;
+  currency: string;
+  breakdown: CostBreakdown[];
+}
+
+export interface MonthlyCost {
+  hosting: number;
+  maintenance: number;
+  apiCosts: number;
+  total: number;
+}
+
+export interface PricingInfo {
+  development: DevelopmentCost;
+  monthly: MonthlyCost;
+}
+
+export interface PhaseInfo {
+  name: string;
+  duration: string;
+  description: string;
+}
+
+export interface TimelineInfo {
+  totalDays: number;
+  startDate: string;
+  phases: PhaseInfo[];
+}
+
+export interface TermsInfo {
+  payment: string;
+  warranty: string;
+  support: string;
+}
+
+export interface ProposalResult {
+  title: string;
+  summary: string;
+  scope: ScopeInfo;
+  architecture: ArchitectureInfo;
+  milestones: MilestoneInfo[];
+  pricing: PricingInfo;
+  timeline: TimelineInfo;
+  terms: TermsInfo;
+  nextSteps: string[];
+}
+
+export interface ProposalResponse {
+  requestId: string;
+  proposal: ProposalResult;
+}
+
+// API Functions
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests`, {
     method: 'POST',
@@ -106,6 +191,42 @@ export async function getAnalysis(id: string): Promise<AnalysisResponse> {
 
   if (!response.ok) {
     throw new Error('분석 결과를 불러올 수 없습니다.');
+  }
+
+  return response.json();
+}
+
+export async function generateProposal(id: string): Promise<ProposalResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || '제안서 생성에 실패했습니다.');
+  }
+
+  return response.json();
+}
+
+export async function getProposal(id: string): Promise<ProposalResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal`);
+
+  if (!response.ok) {
+    throw new Error('제안서를 불러올 수 없습니다.');
+  }
+
+  return response.json();
+}
+
+export async function approveProposal(id: string): Promise<DevRequestResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal/approve`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || '제안서 승인에 실패했습니다.');
   }
 
   return response.json();

@@ -14,15 +14,18 @@ public class RequestsController : ControllerBase
 {
     private readonly AiDevRequestDbContext _context;
     private readonly IAnalysisService _analysisService;
+    private readonly IProposalService _proposalService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
         AiDevRequestDbContext context,
         IAnalysisService analysisService,
+        IProposalService proposalService,
         ILogger<RequestsController> logger)
     {
         _context = context;
         _analysisService = analysisService;
+        _proposalService = proposalService;
         _logger = logger;
     }
 
@@ -243,6 +246,130 @@ public class RequestsController : ControllerBase
 
         return Ok(entity.ToResponseDto());
     }
+
+    /// <summary>
+    /// Generate a proposal for a development request
+    /// </summary>
+    [HttpPost("{id:guid}/proposal")]
+    [ProducesResponseType(typeof(ProposalResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ProposalResponseDto>> GenerateProposal(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrEmpty(entity.AnalysisResultJson))
+        {
+            return BadRequest(new { error = "먼저 분석을 완료해주세요." });
+        }
+
+        _logger.LogInformation("Generating proposal for request {RequestId}", id);
+
+        try
+        {
+            var analysisResult = JsonSerializer.Deserialize<AnalysisResult>(
+                entity.AnalysisResultJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            if (analysisResult == null)
+            {
+                return BadRequest(new { error = "분석 결과를 불러올 수 없습니다." });
+            }
+
+            var proposalResult = await _proposalService.GenerateProposalAsync(entity.Description, analysisResult);
+
+            // Save proposal to entity
+            entity.ProposalJson = JsonSerializer.Serialize(proposalResult);
+            entity.Status = RequestStatus.ProposalReady;
+            entity.ProposedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Proposal generated for request {RequestId}", id);
+
+            return Ok(new ProposalResponseDto
+            {
+                RequestId = id,
+                Proposal = proposalResult
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Proposal generation failed for request {RequestId}", id);
+            return StatusCode(500, new { error = "제안서 생성 중 오류가 발생했습니다.", details = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get the proposal for a development request
+    /// </summary>
+    [HttpGet("{id:guid}/proposal")]
+    [ProducesResponseType(typeof(ProposalResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProposalResponseDto>> GetProposal(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrEmpty(entity.ProposalJson))
+        {
+            return NotFound(new { error = "아직 제안서가 생성되지 않았습니다." });
+        }
+
+        var proposalResult = JsonSerializer.Deserialize<ProposalResult>(
+            entity.ProposalJson,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+
+        if (proposalResult == null)
+        {
+            return NotFound(new { error = "제안서를 불러올 수 없습니다." });
+        }
+
+        return Ok(new ProposalResponseDto
+        {
+            RequestId = id,
+            Proposal = proposalResult
+        });
+    }
+
+    /// <summary>
+    /// Approve a proposal
+    /// </summary>
+    [HttpPost("{id:guid}/proposal/approve")]
+    [ProducesResponseType(typeof(DevRequestResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<DevRequestResponseDto>> ApproveProposal(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrEmpty(entity.ProposalJson))
+        {
+            return BadRequest(new { error = "승인할 제안서가 없습니다." });
+        }
+
+        entity.Status = RequestStatus.Approved;
+        entity.ApprovedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Proposal approved for request {RequestId}", id);
+
+        return Ok(entity.ToResponseDto());
+    }
 }
 
 public record UpdateStatusDto
@@ -260,4 +387,10 @@ public record AnalysisResponseDto
     public FeasibilityInfo Feasibility { get; init; } = new();
     public int EstimatedDays { get; init; }
     public TechStackInfo SuggestedStack { get; init; } = new();
+}
+
+public record ProposalResponseDto
+{
+    public Guid RequestId { get; init; }
+    public ProposalResult Proposal { get; init; } = new();
 }

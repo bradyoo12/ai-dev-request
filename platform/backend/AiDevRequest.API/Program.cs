@@ -8,8 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// Add AI Analysis Service
+// Add AI Services
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
+builder.Services.AddSingleton<IProposalService, ProposalService>();
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

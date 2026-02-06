@@ -40,6 +40,7 @@ coverage/
 *.dll
 *.exe
 *.pdb
+appsettings.Local.json
 
 # Python
 __pycache__/

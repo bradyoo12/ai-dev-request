@@ -5,7 +5,7 @@ import { createRequest, analyzeRequest, generateProposal, approveProposal, start
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
 import { getTokenOverview, checkTokens } from './api/settings'
 import type { TokenCheck } from './api/settings'
-import { getStoredUser, isAuthenticated, logout } from './api/auth'
+import { getStoredUser, logout } from './api/auth'
 import type { AuthUser } from './api/auth'
 import LanguageSelector from './components/LanguageSelector'
 import SettingsPage from './pages/SettingsPage'

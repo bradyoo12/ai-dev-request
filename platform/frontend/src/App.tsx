@@ -12,11 +12,12 @@ import SettingsPage from './pages/SettingsPage'
 import UsagePage from './pages/UsagePage'
 import MySitesPage from './pages/MySitesPage'
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
+import BillingPage from './pages/BillingPage'
 import LoginPage from './pages/LoginPage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
 type PageState = 'main' | 'settings' | 'sites'
-type SettingsTab = 'tokens' | 'usage' | 'payments'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments'
 
 function App() {
   const { t, i18n } = useTranslation()
@@ -317,6 +318,14 @@ function App() {
                 {t('settings.tabs.usage')}
               </button>
               <button
+                onClick={() => setSettingsTab('billing')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  settingsTab === 'billing' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {t('settings.tabs.billing')}
+              </button>
+              <button
                 onClick={() => setSettingsTab('payments')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   settingsTab === 'payments' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
@@ -327,6 +336,7 @@ function App() {
             </div>
             {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
             {settingsTab === 'usage' && <UsagePage />}
+            {settingsTab === 'billing' && <BillingPage />}
             {settingsTab === 'payments' && <PaymentHistoryPage />}
           </section>
         )}

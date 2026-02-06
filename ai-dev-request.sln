@@ -1,0 +1,32 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "platform", "platform", "{E54149B9-7F22-367F-9CC5-FD829E3AA07B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{C8B60CDC-715E-6B3F-2518-C7F3E0B99C24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiDevRequest.API", "platform\backend\AiDevRequest.API\AiDevRequest.API.csproj", "{CE3090C3-C824-0CC3-33B1-3CCF39D5F292}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE3090C3-C824-0CC3-33B1-3CCF39D5F292}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE3090C3-C824-0CC3-33B1-3CCF39D5F292}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE3090C3-C824-0CC3-33B1-3CCF39D5F292}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE3090C3-C824-0CC3-33B1-3CCF39D5F292}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C8B60CDC-715E-6B3F-2518-C7F3E0B99C24} = {E54149B9-7F22-367F-9CC5-FD829E3AA07B}
+		{CE3090C3-C824-0CC3-33B1-3CCF39D5F292} = {C8B60CDC-715E-6B3F-2518-C7F3E0B99C24}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE646736-1DAF-46C9-97D4-A63ADDAA197D}
+	EndGlobalSection
+EndGlobal

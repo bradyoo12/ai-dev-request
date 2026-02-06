@@ -102,16 +102,30 @@ Check all tickets in the project to ensure they align with policy and design:
 Implement and locally test Ready tickets:
 
 1. Log "Starting b-ready agent..."
-2. Execute the b-ready workflow (refer to `.claude/agents/b-ready.md`):
-   - Find tickets with "Ready" status (no `on hold` label)
-   - Move to "In Progress"
+
+2. **Claim the ticket BEFORE delegating to b-ready (prevents race conditions):**
+   - Find the top Ready ticket (no `on hold` label) from the project:
+     ```bash
+     gh project item-list 26 --owner bradyoo12 --format json --limit 200
+     ```
+   - Filter for issues with "Ready" status and no `on hold` label
+   - If no ticket found, skip to Step 4
+   - **Immediately move the ticket to "In Progress"** to prevent other Claude Code instances from picking it up:
+     ```bash
+     gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+     ```
+   - Log: "Claimed ticket #<number> — moved to In Progress"
+
+3. **Pass the claimed ticket number to b-ready** so it skips auto-discovery:
+   - Execute the b-ready workflow with the specific ticket: `/b-ready <issue_number>`
+   - b-ready will skip its own Step 1 (auto-discover) and Step 2 (move to In Progress) since both are already done
    - Create branch from main (branch name starts with ticket number)
    - Implement the ticket
    - Run local tests (unit tests + Playwright)
    - If problem: add `on hold` label, move to next ticket
    - If success: create PR (ticket stays "In Progress")
 
-3. Process ONE ticket, then proceed to Step 4
+4. Process ONE ticket, then proceed to Step 4
 
 ### Step 4: Run b-progress Agent
 

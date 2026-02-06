@@ -120,7 +120,11 @@ Perform AI-simulated human testing:
 ### Step 6: Loop
 1. Log "Cycle complete. Waiting 5 seconds before next iteration..."
 2. Wait 5 seconds
-3. Go back to Step 1
+3. Pull latest changes before starting the next iteration:
+   ```bash
+   git checkout main && git pull
+   ```
+4. Go back to Step 1
 
 ## Important Notes
 - **This command runs in an infinite loop** - keep processing until Ctrl+C

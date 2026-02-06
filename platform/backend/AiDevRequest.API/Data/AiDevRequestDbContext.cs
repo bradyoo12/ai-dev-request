@@ -17,6 +17,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TokenTransaction> TokenTransactions => Set<TokenTransaction>();
     public DbSet<TokenPackage> TokenPackages => Set<TokenPackage>();
     public DbSet<TokenPricing> TokenPricings => Set<TokenPricing>();
+    public DbSet<Deployment> Deployments => Set<Deployment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -164,6 +165,30 @@ public class AiDevRequestDbContext : DbContext
                 new TokenPricing { Id = 3, ActionType = "build", TokenCost = 300, Description = "Project Build" },
                 new TokenPricing { Id = 4, ActionType = "staging", TokenCost = 50, Description = "Staging Deploy" }
             );
+        });
+
+        modelBuilder.Entity<Deployment>(entity =>
+        {
+            entity.ToTable("deployments");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SiteName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ResourceGroupName).HasMaxLength(200);
+            entity.Property(e => e.PreviewUrl).HasMaxLength(500);
+            entity.Property(e => e.ContainerAppName).HasMaxLength(100);
+            entity.Property(e => e.ContainerImageTag).HasMaxLength(200);
+            entity.Property(e => e.Region).HasMaxLength(50);
+            entity.Property(e => e.ProjectType).HasMaxLength(50);
+            entity.Property(e => e.DeploymentLogJson).HasColumnType("jsonb");
+
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Status);
         });
     }
 }

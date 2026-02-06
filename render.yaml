@@ -1,0 +1,40 @@
+# Render.com Blueprint
+# This file defines the infrastructure for the AI Dev Request Platform
+
+services:
+  # Backend API
+  - type: web
+    name: ai-dev-request-api
+    runtime: docker
+    dockerfilePath: platform/backend/AiDevRequest.API/Dockerfile
+    dockerContext: platform/backend/AiDevRequest.API
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: ai-dev-request-db
+          property: connectionString
+    healthCheckPath: /health
+
+  # Frontend Static Site
+  - type: web
+    name: ai-dev-request-web
+    runtime: static
+    buildCommand: cd platform/frontend && npm install && npm run build
+    staticPublishPath: platform/frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://ai-dev-request-api.onrender.com
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+
+databases:
+  - name: ai-dev-request-db
+    plan: free
+    databaseName: ai_dev_request
+    user: postgres

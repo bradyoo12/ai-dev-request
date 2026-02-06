@@ -13,6 +13,7 @@ import UsagePage from './pages/UsagePage'
 import MySitesPage from './pages/MySitesPage'
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
 import BillingPage from './pages/BillingPage'
+import PlanSelectionDialog from './components/PlanSelectionDialog'
 import LoginPage from './pages/LoginPage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
@@ -36,6 +37,7 @@ function App() {
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('tokens')
   const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
+  const [showPlanSelection, setShowPlanSelection] = useState(false)
 
   const handleLogin = (user: AuthUser) => {
     setAuthUser(user)
@@ -132,6 +134,33 @@ function App() {
     }
   }
 
+  const executeBuild = async () => {
+    if (!submittedRequest) return
+    setViewState('approving')
+    try {
+      await approveProposal(submittedRequest.id)
+      setViewState('building')
+      const production = await startBuild(submittedRequest.id)
+      setProductionResult(production)
+      if (production.newBalance != null) setTokenBalance(production.newBalance)
+      setViewState('completed')
+    } catch (err) {
+      if (err instanceof InsufficientTokensError) {
+        setInsufficientDialog(err)
+        setViewState('proposal')
+        return
+      }
+      console.error('Failed to build:', err)
+      setErrorMessage(err instanceof Error ? err.message : t('error.buildFailed'))
+      setViewState('error')
+    }
+  }
+
+  const handlePlanSelected = (_planId: number) => {
+    setShowPlanSelection(false)
+    executeBuild()
+  }
+
   const handleApproveAndBuild = async () => {
     if (!submittedRequest) return
 
@@ -144,42 +173,14 @@ function App() {
       setConfirmDialog({
         action: 'build',
         tokenCheck: check,
-        onConfirm: async () => {
+        onConfirm: () => {
           setConfirmDialog(null)
-          setViewState('approving')
-          try {
-            await approveProposal(submittedRequest.id)
-            setViewState('building')
-            const production = await startBuild(submittedRequest.id)
-            setProductionResult(production)
-            if (production.newBalance != null) setTokenBalance(production.newBalance)
-            setViewState('completed')
-          } catch (err) {
-            if (err instanceof InsufficientTokensError) {
-              setInsufficientDialog(err)
-              setViewState('proposal')
-              return
-            }
-            console.error('Failed to build:', err)
-            setErrorMessage(err instanceof Error ? err.message : t('error.buildFailed'))
-            setViewState('error')
-          }
+          setShowPlanSelection(true)
         }
       })
     } catch {
-      setViewState('approving')
-      try {
-        await approveProposal(submittedRequest.id)
-        setViewState('building')
-        const production = await startBuild(submittedRequest.id)
-        setProductionResult(production)
-        if (production.newBalance != null) setTokenBalance(production.newBalance)
-        setViewState('completed')
-      } catch (err) {
-        console.error('Failed to build:', err)
-        setErrorMessage(err instanceof Error ? err.message : t('error.buildFailed'))
-        setViewState('error')
-      }
+      // If token check fails, show plan selection directly
+      setShowPlanSelection(true)
     }
   }
 
@@ -740,6 +741,16 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Plan Selection Dialog */}
+      {showPlanSelection && analysisResult && (
+        <PlanSelectionDialog
+          complexity={analysisResult.complexity}
+          tokenCost={300}
+          onSelect={handlePlanSelected}
+          onCancel={() => setShowPlanSelection(false)}
+        />
       )}
 
       {/* Insufficient Tokens Dialog */}

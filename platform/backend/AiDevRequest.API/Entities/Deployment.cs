@@ -24,6 +24,8 @@ public class Deployment
 
     public string? ProjectType { get; set; }
 
+    public int? HostingPlanId { get; set; }
+
     public string? DeploymentLogJson { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

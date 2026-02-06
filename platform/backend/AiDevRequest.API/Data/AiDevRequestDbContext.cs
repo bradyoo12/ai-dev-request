@@ -21,6 +21,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<User> Users => Set<User>();
     public DbSet<AutoTopUpConfig> AutoTopUpConfigs => Set<AutoTopUpConfig>();
+    public DbSet<HostingPlan> HostingPlans => Set<HostingPlan>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -244,6 +245,27 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MonthlySpentUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.FailureReason).HasMaxLength(500);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<HostingPlan>(entity =>
+        {
+            entity.ToTable("hosting_plans");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.MonthlyCostUsd).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Vcpu).HasMaxLength(20);
+            entity.Property(e => e.MemoryGb).HasMaxLength(20);
+            entity.Property(e => e.AzureSku).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.BestFor).HasMaxLength(500);
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.HasData(
+                new HostingPlan { Id = 1, Name = "free", DisplayName = "Free", MonthlyCostUsd = 0, Vcpu = "Shared", MemoryGb = "0.25", StorageGb = 1, BandwidthGb = 5, SupportsCustomDomain = false, SupportsAutoscale = false, SupportsSla = false, MaxInstances = 1, AzureSku = "Consumption-Free", Description = "Perfect for testing and preview. 7-day expiry.", BestFor = "Testing, previews, prototypes", SortOrder = 1 },
+                new HostingPlan { Id = 2, Name = "basic", DisplayName = "Basic", MonthlyCostUsd = 5.00m, Vcpu = "1", MemoryGb = "0.5", StorageGb = 1, BandwidthGb = 50, SupportsCustomDomain = true, SupportsAutoscale = false, SupportsSla = false, MaxInstances = 1, AzureSku = "Consumption-Basic", Description = "Always-on hosting with custom domain support.", BestFor = "Personal projects, small business sites", SortOrder = 2 },
+                new HostingPlan { Id = 3, Name = "standard", DisplayName = "Standard", MonthlyCostUsd = 25.00m, Vcpu = "2", MemoryGb = "2", StorageGb = 5, BandwidthGb = 200, SupportsCustomDomain = true, SupportsAutoscale = true, SupportsSla = true, MaxInstances = 3, AzureSku = "Dedicated-D4", Description = "Auto-scaling with SLA guarantee.", BestFor = "Business apps, medium-traffic sites", SortOrder = 3 },
+                new HostingPlan { Id = 4, Name = "premium", DisplayName = "Premium", MonthlyCostUsd = 70.00m, Vcpu = "4", MemoryGb = "4", StorageGb = 20, BandwidthGb = 500, SupportsCustomDomain = true, SupportsAutoscale = true, SupportsSla = true, MaxInstances = 10, AzureSku = "Dedicated-D8", Description = "High-performance with 99.9% SLA.", BestFor = "Enterprise apps, high-traffic platforms", SortOrder = 4 }
+            );
         });
     }
 }

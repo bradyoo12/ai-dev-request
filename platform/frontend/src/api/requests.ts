@@ -1,5 +1,5 @@
 import i18n from '../i18n'
-import { getUserId } from './settings'
+import { getAuthHeaders } from './auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -20,10 +20,7 @@ export class InsufficientTokensError extends Error {
 }
 
 function authHeaders(): Record<string, string> {
-  return {
-    'Content-Type': 'application/json',
-    'X-User-Id': getUserId(),
-  }
+  return getAuthHeaders()
 }
 
 export interface CreateDevRequestDto {

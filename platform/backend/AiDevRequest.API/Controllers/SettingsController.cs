@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,8 @@ public class SettingsController : ControllerBase
 
     private string GetUserId()
     {
+        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
         return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
     }
 

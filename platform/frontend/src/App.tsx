@@ -5,11 +5,14 @@ import { createRequest, analyzeRequest, generateProposal, approveProposal, start
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
 import { getTokenOverview, checkTokens } from './api/settings'
 import type { TokenCheck } from './api/settings'
+import { getStoredUser, isAuthenticated, logout } from './api/auth'
+import type { AuthUser } from './api/auth'
 import LanguageSelector from './components/LanguageSelector'
 import SettingsPage from './pages/SettingsPage'
 import UsagePage from './pages/UsagePage'
 import MySitesPage from './pages/MySitesPage'
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
+import LoginPage from './pages/LoginPage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
 type PageState = 'main' | 'settings' | 'sites'
@@ -17,6 +20,8 @@ type SettingsTab = 'tokens' | 'usage' | 'payments'
 
 function App() {
   const { t, i18n } = useTranslation()
+  const [authUser, setAuthUser] = useState<AuthUser | null>(getStoredUser())
+  const [showLogin, setShowLogin] = useState(false)
   const [page, setPage] = useState<PageState>('main')
   const [request, setRequest] = useState('')
   const [email, setEmail] = useState('')
@@ -30,6 +35,23 @@ function App() {
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('tokens')
   const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
+
+  const handleLogin = (user: AuthUser) => {
+    setAuthUser(user)
+    setShowLogin(false)
+    loadTokenBalance()
+  }
+
+  const handleLogout = () => {
+    logout()
+    setAuthUser(null)
+    setTokenBalance(null)
+    loadTokenBalance()
+  }
+
+  if (showLogin) {
+    return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -243,6 +265,24 @@ function App() {
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
             </nav>
             <LanguageSelector />
+            {authUser ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-300">{authUser.displayName || authUser.email}</span>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  {t('auth.logout')}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLogin(true)}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+              >
+                {t('auth.login')}
+              </button>
+            )}
           </div>
         </div>
       </header>

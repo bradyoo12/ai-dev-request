@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.DTOs;
@@ -37,6 +38,8 @@ public class RequestsController : ControllerBase
 
     private string GetUserId()
     {
+        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
         return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
     }
 

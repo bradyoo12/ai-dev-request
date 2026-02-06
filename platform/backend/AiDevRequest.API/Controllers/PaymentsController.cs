@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,8 @@ public class PaymentsController : ControllerBase
 
     private string GetUserId()
     {
+        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
         return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
     }
 

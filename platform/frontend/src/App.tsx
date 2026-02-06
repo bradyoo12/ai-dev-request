@@ -1,22 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import './App.css'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild } from './api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, InsufficientTokensError } from './api/requests'
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
+import { getTokenOverview, checkTokens } from './api/settings'
+import type { TokenCheck } from './api/settings'
 import LanguageSelector from './components/LanguageSelector'
+import SettingsPage from './pages/SettingsPage'
+import UsagePage from './pages/UsagePage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
+type PageState = 'main' | 'settings'
+type SettingsTab = 'tokens' | 'usage'
 
 function App() {
   const { t, i18n } = useTranslation()
+  const [page, setPage] = useState<PageState>('main')
   const [request, setRequest] = useState('')
   const [email, setEmail] = useState('')
   const [viewState, setViewState] = useState<ViewState>('form')
+  const [tokenBalance, setTokenBalance] = useState<number | null>(null)
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [proposalResult, setProposalResult] = useState<ProposalResponse | null>(null)
   const [productionResult, setProductionResult] = useState<ProductionResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('tokens')
+  const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
+  const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,8 +46,14 @@ function App() {
       setViewState('analyzing')
       const analysis = await analyzeRequest(result.id)
       setAnalysisResult(analysis)
+      if (analysis.newBalance != null) setTokenBalance(analysis.newBalance)
       setViewState('analyzed')
     } catch (error) {
+      if (error instanceof InsufficientTokensError) {
+        setInsufficientDialog(error)
+        setViewState('form')
+        return
+      }
       console.error('Failed to process request:', error)
       setErrorMessage(error instanceof Error ? error.message : t('error.requestFailed'))
       setViewState('error')
@@ -46,39 +63,119 @@ function App() {
   const handleGenerateProposal = async () => {
     if (!submittedRequest) return
 
-    setViewState('generatingProposal')
     try {
-      const proposal = await generateProposal(submittedRequest.id)
-      setProposalResult(proposal)
-      setViewState('proposal')
-    } catch (error) {
-      console.error('Failed to generate proposal:', error)
-      setErrorMessage(error instanceof Error ? error.message : t('error.proposalFailed'))
-      setViewState('error')
+      const check = await checkTokens('proposal')
+      if (!check.hasEnough) {
+        setInsufficientDialog({ required: check.tokenCost, balance: check.currentBalance, shortfall: check.shortfall, action: 'proposal' })
+        return
+      }
+      setConfirmDialog({
+        action: 'proposal',
+        tokenCheck: check,
+        onConfirm: async () => {
+          setConfirmDialog(null)
+          setViewState('generatingProposal')
+          try {
+            const proposal = await generateProposal(submittedRequest.id)
+            setProposalResult(proposal)
+            if (proposal.newBalance != null) setTokenBalance(proposal.newBalance)
+            setViewState('proposal')
+          } catch (err) {
+            if (err instanceof InsufficientTokensError) {
+              setInsufficientDialog(err)
+              setViewState('analyzed')
+              return
+            }
+            console.error('Failed to generate proposal:', err)
+            setErrorMessage(err instanceof Error ? err.message : t('error.proposalFailed'))
+            setViewState('error')
+          }
+        }
+      })
+    } catch {
+      setViewState('generatingProposal')
+      try {
+        const proposal = await generateProposal(submittedRequest.id)
+        setProposalResult(proposal)
+        if (proposal.newBalance != null) setTokenBalance(proposal.newBalance)
+        setViewState('proposal')
+      } catch (err) {
+        console.error('Failed to generate proposal:', err)
+        setErrorMessage(err instanceof Error ? err.message : t('error.proposalFailed'))
+        setViewState('error')
+      }
     }
   }
 
   const handleApproveAndBuild = async () => {
     if (!submittedRequest) return
 
-    setViewState('approving')
     try {
-      await approveProposal(submittedRequest.id)
-      setViewState('building')
-      const production = await startBuild(submittedRequest.id)
-      setProductionResult(production)
-      setViewState('completed')
-    } catch (error) {
-      console.error('Failed to build:', error)
-      setErrorMessage(error instanceof Error ? error.message : t('error.buildFailed'))
-      setViewState('error')
+      const check = await checkTokens('build')
+      if (!check.hasEnough) {
+        setInsufficientDialog({ required: check.tokenCost, balance: check.currentBalance, shortfall: check.shortfall, action: 'build' })
+        return
+      }
+      setConfirmDialog({
+        action: 'build',
+        tokenCheck: check,
+        onConfirm: async () => {
+          setConfirmDialog(null)
+          setViewState('approving')
+          try {
+            await approveProposal(submittedRequest.id)
+            setViewState('building')
+            const production = await startBuild(submittedRequest.id)
+            setProductionResult(production)
+            if (production.newBalance != null) setTokenBalance(production.newBalance)
+            setViewState('completed')
+          } catch (err) {
+            if (err instanceof InsufficientTokensError) {
+              setInsufficientDialog(err)
+              setViewState('proposal')
+              return
+            }
+            console.error('Failed to build:', err)
+            setErrorMessage(err instanceof Error ? err.message : t('error.buildFailed'))
+            setViewState('error')
+          }
+        }
+      })
+    } catch {
+      setViewState('approving')
+      try {
+        await approveProposal(submittedRequest.id)
+        setViewState('building')
+        const production = await startBuild(submittedRequest.id)
+        setProductionResult(production)
+        if (production.newBalance != null) setTokenBalance(production.newBalance)
+        setViewState('completed')
+      } catch (err) {
+        console.error('Failed to build:', err)
+        setErrorMessage(err instanceof Error ? err.message : t('error.buildFailed'))
+        setViewState('error')
+      }
     }
   }
+
+  const loadTokenBalance = useCallback(async () => {
+    try {
+      const overview = await getTokenOverview()
+      setTokenBalance(overview.balance)
+    } catch {
+      // Silently fail - header balance is optional
+    }
+  }, [])
+
+  useEffect(() => {
+    loadTokenBalance()
+  }, [loadTokenBalance])
 
   const handleReset = () => {
     setRequest('')
     setEmail('')
     setViewState('form')
+    setPage('main')
     setSubmittedRequest(null)
     setAnalysisResult(null)
     setProposalResult(null)
@@ -128,8 +225,18 @@ function App() {
             🚀 AI Dev Request
           </h1>
           <div className="flex items-center gap-4">
+            {tokenBalance !== null && (
+              <button
+                onClick={() => setPage('settings')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+              >
+                <span className="text-yellow-400">&#9679;</span>
+                <span>{t('settings.tokens.headerBalance', { count: tokenBalance })}</span>
+              </button>
+            )}
             <nav className="space-x-4">
               <a href="#pricing" className="hover:text-blue-400">{t('header.pricing')}</a>
+              <button onClick={() => setPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
             </nav>
             <LanguageSelector />
@@ -138,14 +245,48 @@ function App() {
       </header>
 
       <main className="max-w-4xl mx-auto p-6">
-        {viewState === 'form' && (
+        {page === 'settings' && (
+          <section>
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => setPage('main')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                &larr;
+              </button>
+              <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
+            </div>
+            <div className="flex gap-1 mb-6 bg-gray-800 rounded-lg p-1">
+              <button
+                onClick={() => setSettingsTab('tokens')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  settingsTab === 'tokens' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {t('settings.tabs.tokens')}
+              </button>
+              <button
+                onClick={() => setSettingsTab('usage')}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  settingsTab === 'usage' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {t('settings.tabs.usage')}
+              </button>
+            </div>
+            {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
+            {settingsTab === 'usage' && <UsagePage />}
+          </section>
+        )}
+
+        {page === 'main' && viewState === 'form' && (
           <section className="text-center py-12">
             <h2 className="text-4xl font-bold mb-4">{t('hero.title')}</h2>
             <p className="text-xl text-gray-400 mb-8">{t('hero.subtitle')}</p>
           </section>
         )}
 
-        <section className="bg-gray-800 rounded-2xl p-8 shadow-xl">
+        {page === 'main' && <section className="bg-gray-800 rounded-2xl p-8 shadow-xl">
           {viewState === 'form' && (
             <form onSubmit={handleSubmit}>
               <label className="block text-lg font-medium mb-4">{t('form.label')}</label>
@@ -221,6 +362,12 @@ function App() {
                   <div className="font-bold">{Math.round(analysisResult.feasibility.score * 100)}%</div>
                 </div>
               </div>
+
+              {analysisResult.tokensUsed != null && (
+                <div className="bg-gray-900/50 rounded-lg p-3 mb-4 text-sm text-gray-400 text-center">
+                  {t('tokens.used', { count: analysisResult.tokensUsed })} &bull; {t('tokens.remaining', { count: analysisResult.newBalance ?? 0 })}
+                </div>
+              )}
 
               <div className="flex gap-4">
                 <button onClick={handleReset}
@@ -443,9 +590,9 @@ function App() {
               </button>
             </div>
           )}
-        </section>
+        </section>}
 
-        {viewState === 'form' && (
+        {page === 'main' && viewState === 'form' && (
           <>
             <section className="py-12 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-gray-800 p-6 rounded-xl">
@@ -487,6 +634,68 @@ function App() {
       <footer className="border-t border-gray-700 p-6 text-center text-gray-500">
         <p>{t('footer.copyright')}</p>
       </footer>
+
+      {/* Token Confirmation Dialog */}
+      {confirmDialog && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4">{t(`tokens.confirm.${confirmDialog.action}.title`)}</h3>
+            <p className="text-gray-400 mb-4">{t(`tokens.confirm.${confirmDialog.action}.description`)}</p>
+            <div className="bg-gray-900 rounded-lg p-4 mb-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-400">{t('tokens.confirm.cost')}</span>
+                <span className="font-bold">{confirmDialog.tokenCheck.tokenCost} {t('settings.tokens.tokensUnit')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">{t('tokens.confirm.balance')}</span>
+                <span>{confirmDialog.tokenCheck.currentBalance} &rarr; {confirmDialog.tokenCheck.currentBalance - confirmDialog.tokenCheck.tokenCost} {t('settings.tokens.tokensUnit')}</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmDialog(null)}
+                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                {t('tokens.confirm.cancel')}
+              </button>
+              <button onClick={confirmDialog.onConfirm}
+                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors">
+                {t(`tokens.confirm.${confirmDialog.action}.button`)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Insufficient Tokens Dialog */}
+      {insufficientDialog && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4 text-orange-400">{t('tokens.insufficient.title')}</h3>
+            <p className="text-gray-400 mb-4">
+              {t(`tokens.confirm.${insufficientDialog.action}.title`)} {t('tokens.insufficient.requires', { count: insufficientDialog.required })}
+            </p>
+            <div className="bg-gray-900 rounded-lg p-4 mb-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-400">{t('tokens.insufficient.yourBalance')}</span>
+                <span className="font-bold">{insufficientDialog.balance} {t('settings.tokens.tokensUnit')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">{t('tokens.insufficient.needed')}</span>
+                <span className="text-orange-400 font-bold">+{insufficientDialog.shortfall} {t('settings.tokens.tokensUnit')}</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setInsufficientDialog(null)}
+                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                {t('tokens.confirm.cancel')}
+              </button>
+              <button onClick={() => { setInsufficientDialog(null); setPage('settings') }}
+                className="flex-1 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition-colors">
+                {t('settings.tokens.buyTokens')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

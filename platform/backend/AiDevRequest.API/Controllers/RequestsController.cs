@@ -16,6 +16,7 @@ public class RequestsController : ControllerBase
     private readonly IAnalysisService _analysisService;
     private readonly IProposalService _proposalService;
     private readonly IProductionService _productionService;
+    private readonly ITokenService _tokenService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -23,13 +24,20 @@ public class RequestsController : ControllerBase
         IAnalysisService analysisService,
         IProposalService proposalService,
         IProductionService productionService,
+        ITokenService tokenService,
         ILogger<RequestsController> logger)
     {
         _context = context;
         _analysisService = analysisService;
         _proposalService = proposalService;
         _productionService = productionService;
+        _tokenService = tokenService;
         _logger = logger;
+    }
+
+    private string GetUserId()
+    {
+        return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
     }
 
     /// <summary>
@@ -114,6 +122,21 @@ public class RequestsController : ControllerBase
             return NotFound();
         }
 
+        // Token gating: check balance before executing
+        var userId = GetUserId();
+        var (hasEnough, cost, balance) = await _tokenService.CheckBalance(userId, "analysis");
+        if (!hasEnough)
+        {
+            return StatusCode(402, new
+            {
+                error = "Insufficient tokens.",
+                required = cost,
+                balance,
+                shortfall = cost - balance,
+                action = "analysis"
+            });
+        }
+
         // Update status to analyzing
         entity.Status = RequestStatus.Analyzing;
         await _context.SaveChangesAsync();
@@ -138,6 +161,9 @@ public class RequestsController : ControllerBase
 
             await _context.SaveChangesAsync();
 
+            // Deduct tokens only after successful completion
+            var transaction = await _tokenService.DebitTokens(userId, "analysis", id.ToString());
+
             _logger.LogInformation("Analysis completed for request {RequestId}: {Category}, {Complexity}",
                 id, entity.Category, entity.Complexity);
 
@@ -150,7 +176,9 @@ public class RequestsController : ControllerBase
                 Requirements = analysisResult.Requirements,
                 Feasibility = analysisResult.Feasibility,
                 EstimatedDays = analysisResult.EstimatedDays,
-                SuggestedStack = analysisResult.SuggestedStack
+                SuggestedStack = analysisResult.SuggestedStack,
+                TokensUsed = transaction.Amount,
+                NewBalance = transaction.BalanceAfter
             });
         }
         catch (Exception ex)
@@ -271,6 +299,21 @@ public class RequestsController : ControllerBase
             return BadRequest(new { error = "먼저 분석을 완료해주세요." });
         }
 
+        // Token gating: check balance before executing
+        var userId = GetUserId();
+        var (hasEnough, cost, balance) = await _tokenService.CheckBalance(userId, "proposal");
+        if (!hasEnough)
+        {
+            return StatusCode(402, new
+            {
+                error = "Insufficient tokens.",
+                required = cost,
+                balance,
+                shortfall = cost - balance,
+                action = "proposal"
+            });
+        }
+
         _logger.LogInformation("Generating proposal for request {RequestId}", id);
 
         try
@@ -293,12 +336,17 @@ public class RequestsController : ControllerBase
             entity.ProposedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
+            // Deduct tokens only after successful completion
+            var transaction = await _tokenService.DebitTokens(userId, "proposal", id.ToString());
+
             _logger.LogInformation("Proposal generated for request {RequestId}", id);
 
             return Ok(new ProposalResponseDto
             {
                 RequestId = id,
-                Proposal = proposalResult
+                Proposal = proposalResult,
+                TokensUsed = transaction.Amount,
+                NewBalance = transaction.BalanceAfter
             });
         }
         catch (Exception ex)
@@ -400,6 +448,21 @@ public class RequestsController : ControllerBase
             return BadRequest(new { error = "제안서가 없습니다." });
         }
 
+        // Token gating: check balance before executing
+        var userId = GetUserId();
+        var (hasEnough, cost, balance) = await _tokenService.CheckBalance(userId, "build");
+        if (!hasEnough)
+        {
+            return StatusCode(402, new
+            {
+                error = "Insufficient tokens.",
+                required = cost,
+                balance,
+                shortfall = cost - balance,
+                action = "build"
+            });
+        }
+
         _logger.LogInformation("Starting build for request {RequestId}", id);
 
         entity.Status = RequestStatus.Building;
@@ -437,12 +500,17 @@ public class RequestsController : ControllerBase
 
             await _context.SaveChangesAsync();
 
+            // Deduct tokens only after successful completion
+            var transaction = await _tokenService.DebitTokens(userId, "build", id.ToString());
+
             _logger.LogInformation("Build completed for request {RequestId}: {Status}", id, result.Status);
 
             return Ok(new ProductionResponseDto
             {
                 RequestId = id,
-                Production = result
+                Production = result,
+                TokensUsed = transaction.Amount,
+                NewBalance = transaction.BalanceAfter
             });
         }
         catch (Exception ex)
@@ -525,18 +593,24 @@ public record AnalysisResponseDto
     public FeasibilityInfo Feasibility { get; init; } = new();
     public int EstimatedDays { get; init; }
     public TechStackInfo SuggestedStack { get; init; } = new();
+    public int? TokensUsed { get; init; }
+    public int? NewBalance { get; init; }
 }
 
 public record ProposalResponseDto
 {
     public Guid RequestId { get; init; }
     public ProposalResult Proposal { get; init; } = new();
+    public int? TokensUsed { get; init; }
+    public int? NewBalance { get; init; }
 }
 
 public record ProductionResponseDto
 {
     public Guid RequestId { get; init; }
     public ProductionResult Production { get; init; } = new();
+    public int? TokensUsed { get; init; }
+    public int? NewBalance { get; init; }
 }
 
 public record BuildStatusDto

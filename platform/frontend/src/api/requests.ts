@@ -1,6 +1,30 @@
 import i18n from '../i18n'
+import { getUserId } from './settings'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+export class InsufficientTokensError extends Error {
+  required: number
+  balance: number
+  shortfall: number
+  action: string
+
+  constructor(data: { required: number; balance: number; shortfall: number; action: string }) {
+    super(`Insufficient tokens. Required: ${data.required}, Balance: ${data.balance}`)
+    this.name = 'InsufficientTokensError'
+    this.required = data.required
+    this.balance = data.balance
+    this.shortfall = data.shortfall
+    this.action = data.action
+  }
+}
+
+function authHeaders(): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    'X-User-Id': getUserId(),
+  }
+}
 
 export interface CreateDevRequestDto {
   description: string;
@@ -49,6 +73,8 @@ export interface AnalysisResponse {
   feasibility: FeasibilityInfo;
   estimatedDays: number;
   suggestedStack: TechStackInfo;
+  tokensUsed?: number;
+  newBalance?: number;
 }
 
 // Proposal Types
@@ -133,6 +159,8 @@ export interface ProposalResult {
 export interface ProposalResponse {
   requestId: string;
   proposal: ProposalResult;
+  tokensUsed?: number;
+  newBalance?: number;
 }
 
 // Production Types
@@ -165,6 +193,8 @@ export interface ProductionResult {
 export interface ProductionResponse {
   requestId: string;
   production: ProductionResult;
+  tokensUsed?: number;
+  newBalance?: number;
 }
 
 export interface BuildStatusResponse {
@@ -248,7 +278,13 @@ export async function getRequests(page = 1, pageSize = 20): Promise<DevRequestRe
 export async function analyzeRequest(id: string): Promise<AnalysisResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/analyze`, {
     method: 'POST',
+    headers: authHeaders(),
   });
+
+  if (response.status === 402) {
+    const data = await response.json();
+    throw new InsufficientTokensError(data);
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
@@ -271,7 +307,13 @@ export async function getAnalysis(id: string): Promise<AnalysisResponse> {
 export async function generateProposal(id: string): Promise<ProposalResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal`, {
     method: 'POST',
+    headers: authHeaders(),
   });
+
+  if (response.status === 402) {
+    const data = await response.json();
+    throw new InsufficientTokensError(data);
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
@@ -307,7 +349,13 @@ export async function approveProposal(id: string): Promise<DevRequestResponse> {
 export async function startBuild(id: string): Promise<ProductionResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/build`, {
     method: 'POST',
+    headers: authHeaders(),
   });
+
+  if (response.status === 402) {
+    const data = await response.json();
+    throw new InsufficientTokensError(data);
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));

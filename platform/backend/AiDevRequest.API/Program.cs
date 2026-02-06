@@ -12,6 +12,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();
 builder.Services.AddSingleton<IProductionService, ProductionService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

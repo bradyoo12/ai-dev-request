@@ -1,17 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import './App.css'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild } from './api/requests'
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
+import { getTokenOverview } from './api/settings'
 import LanguageSelector from './components/LanguageSelector'
+import SettingsPage from './pages/SettingsPage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
+type PageState = 'main' | 'settings'
 
 function App() {
   const { t, i18n } = useTranslation()
+  const [page, setPage] = useState<PageState>('main')
   const [request, setRequest] = useState('')
   const [email, setEmail] = useState('')
   const [viewState, setViewState] = useState<ViewState>('form')
+  const [tokenBalance, setTokenBalance] = useState<number | null>(null)
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [proposalResult, setProposalResult] = useState<ProposalResponse | null>(null)
@@ -75,10 +80,24 @@ function App() {
     }
   }
 
+  const loadTokenBalance = useCallback(async () => {
+    try {
+      const overview = await getTokenOverview()
+      setTokenBalance(overview.balance)
+    } catch {
+      // Silently fail - header balance is optional
+    }
+  }, [])
+
+  useEffect(() => {
+    loadTokenBalance()
+  }, [loadTokenBalance])
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
     setViewState('form')
+    setPage('main')
     setSubmittedRequest(null)
     setAnalysisResult(null)
     setProposalResult(null)
@@ -128,8 +147,18 @@ function App() {
             🚀 AI Dev Request
           </h1>
           <div className="flex items-center gap-4">
+            {tokenBalance !== null && (
+              <button
+                onClick={() => setPage('settings')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+              >
+                <span className="text-yellow-400">&#9679;</span>
+                <span>{t('settings.tokens.headerBalance', { count: tokenBalance })}</span>
+              </button>
+            )}
             <nav className="space-x-4">
               <a href="#pricing" className="hover:text-blue-400">{t('header.pricing')}</a>
+              <button onClick={() => setPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
             </nav>
             <LanguageSelector />
@@ -138,14 +167,29 @@ function App() {
       </header>
 
       <main className="max-w-4xl mx-auto p-6">
-        {viewState === 'form' && (
+        {page === 'settings' && (
+          <section>
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => setPage('main')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                &larr;
+              </button>
+              <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
+            </div>
+            <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />
+          </section>
+        )}
+
+        {page === 'main' && viewState === 'form' && (
           <section className="text-center py-12">
             <h2 className="text-4xl font-bold mb-4">{t('hero.title')}</h2>
             <p className="text-xl text-gray-400 mb-8">{t('hero.subtitle')}</p>
           </section>
         )}
 
-        <section className="bg-gray-800 rounded-2xl p-8 shadow-xl">
+        {page === 'main' && <section className="bg-gray-800 rounded-2xl p-8 shadow-xl">
           {viewState === 'form' && (
             <form onSubmit={handleSubmit}>
               <label className="block text-lg font-medium mb-4">{t('form.label')}</label>
@@ -443,9 +487,9 @@ function App() {
               </button>
             </div>
           )}
-        </section>
+        </section>}
 
-        {viewState === 'form' && (
+        {page === 'main' && viewState === 'form' && (
           <>
             <section className="py-12 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-gray-800 p-6 rounded-xl">

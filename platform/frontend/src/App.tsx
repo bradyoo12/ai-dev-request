@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import './App.css'
-import { createRequest, analyzeRequest, generateProposal } from './api/requests'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse } from './api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild } from './api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
 
-type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'error'
+type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
 
 function App() {
   const [request, setRequest] = useState('')
@@ -12,6 +12,7 @@ function App() {
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [proposalResult, setProposalResult] = useState<ProposalResponse | null>(null)
+  const [productionResult, setProductionResult] = useState<ProductionResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,6 +55,23 @@ function App() {
     }
   }
 
+  const handleApproveAndBuild = async () => {
+    if (!submittedRequest) return
+
+    setViewState('approving')
+    try {
+      await approveProposal(submittedRequest.id)
+      setViewState('building')
+      const production = await startBuild(submittedRequest.id)
+      setProductionResult(production)
+      setViewState('completed')
+    } catch (error) {
+      console.error('Failed to build:', error)
+      setErrorMessage(error instanceof Error ? error.message : '빌드 중 오류가 발생했습니다.')
+      setViewState('error')
+    }
+  }
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
@@ -61,6 +79,7 @@ function App() {
     setSubmittedRequest(null)
     setAnalysisResult(null)
     setProposalResult(null)
+    setProductionResult(null)
     setErrorMessage('')
   }
 
@@ -307,8 +326,99 @@ function App() {
                   className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
                   새 요청 작성
                 </button>
-                <button className="flex-1 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors">
-                  ✅ 제안서 승인
+                <button onClick={handleApproveAndBuild}
+                  className="flex-1 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-medium transition-colors">
+                  ✅ 승인 및 제작 시작
+                </button>
+              </div>
+            </div>
+          )}
+
+          {viewState === 'approving' && (
+            <div className="text-center py-12">
+              <div className="animate-spin w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+              <h3 className="text-2xl font-bold mb-2">제안서를 승인하고 있습니다...</h3>
+            </div>
+          )}
+
+          {viewState === 'building' && (
+            <div className="text-center py-12">
+              <div className="animate-pulse"><div className="text-6xl mb-6">🔨</div></div>
+              <h3 className="text-2xl font-bold mb-2">프로젝트를 생성하고 있습니다...</h3>
+              <p className="text-gray-400">AI가 코드를 작성하고 있습니다. 잠시만 기다려주세요.</p>
+              <div className="mt-6 flex justify-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+            </div>
+          )}
+
+          {viewState === 'completed' && productionResult && (
+            <div className="py-4">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="text-4xl">🎉</div>
+                <div>
+                  <h3 className="text-2xl font-bold">프로젝트 생성 완료!</h3>
+                  <p className="text-gray-400">{productionResult.production.message}</p>
+                </div>
+              </div>
+
+              <div className="bg-green-900/30 border border-green-700 rounded-xl p-6 mb-6">
+                <h4 className="font-bold mb-4 text-green-400">📁 프로젝트 정보</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="text-gray-400">프로젝트 ID</div>
+                    <div className="font-mono">{productionResult.production.projectId}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">프로젝트 타입</div>
+                    <div>{productionResult.production.projectType}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">생성된 파일</div>
+                    <div>{productionResult.production.filesGenerated}개</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-400">상태</div>
+                    <div className="text-green-400">{productionResult.production.status}</div>
+                  </div>
+                </div>
+              </div>
+
+              {productionResult.production.setupCommands.length > 0 && (
+                <div className="bg-gray-900 rounded-xl p-4 mb-4">
+                  <h4 className="font-bold mb-3">⚙️ 설정 명령어</h4>
+                  <div className="bg-black rounded-lg p-3 font-mono text-sm overflow-x-auto">
+                    {productionResult.production.setupCommands.map((cmd, i) => (
+                      <div key={i} className="text-green-400">$ {cmd}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {productionResult.production.envVariables.length > 0 && (
+                <div className="bg-gray-900 rounded-xl p-4 mb-6">
+                  <h4 className="font-bold mb-3">🔐 필요한 환경 변수</h4>
+                  <div className="space-y-2">
+                    {productionResult.production.envVariables.map((env, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm">
+                        <code className="bg-gray-800 px-2 py-1 rounded">{env.name}</code>
+                        <span className="text-gray-400">{env.description}</span>
+                        {env.required && <span className="text-red-400 text-xs">(필수)</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-4">
+                <button onClick={handleReset}
+                  className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
+                  새 요청 작성
+                </button>
+                <button className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors">
+                  📥 프로젝트 다운로드
                 </button>
               </div>
             </div>

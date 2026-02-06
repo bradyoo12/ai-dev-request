@@ -15,17 +15,20 @@ public class RequestsController : ControllerBase
     private readonly AiDevRequestDbContext _context;
     private readonly IAnalysisService _analysisService;
     private readonly IProposalService _proposalService;
+    private readonly IProductionService _productionService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
         AiDevRequestDbContext context,
         IAnalysisService analysisService,
         IProposalService proposalService,
+        IProductionService productionService,
         ILogger<RequestsController> logger)
     {
         _context = context;
         _analysisService = analysisService;
         _proposalService = proposalService;
+        _productionService = productionService;
         _logger = logger;
     }
 
@@ -370,6 +373,141 @@ public class RequestsController : ControllerBase
 
         return Ok(entity.ToResponseDto());
     }
+
+    /// <summary>
+    /// Start building a project from an approved proposal
+    /// </summary>
+    [HttpPost("{id:guid}/build")]
+    [ProducesResponseType(typeof(ProductionResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ProductionResponseDto>> StartBuild(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        if (entity.Status != RequestStatus.Approved)
+        {
+            return BadRequest(new { error = "제안서가 승인된 후에만 빌드를 시작할 수 있습니다." });
+        }
+
+        if (string.IsNullOrEmpty(entity.ProposalJson))
+        {
+            return BadRequest(new { error = "제안서가 없습니다." });
+        }
+
+        _logger.LogInformation("Starting build for request {RequestId}", id);
+
+        entity.Status = RequestStatus.Building;
+        await _context.SaveChangesAsync();
+
+        try
+        {
+            var proposal = JsonSerializer.Deserialize<ProposalResult>(
+                entity.ProposalJson,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+            );
+
+            if (proposal == null)
+            {
+                return BadRequest(new { error = "제안서를 불러올 수 없습니다." });
+            }
+
+            var result = await _productionService.GenerateProjectAsync(
+                id.ToString(),
+                entity.Description,
+                proposal
+            );
+
+            entity.ProjectId = result.ProjectId;
+            entity.ProjectPath = result.ProjectPath;
+
+            if (result.Status == "generated")
+            {
+                entity.Status = RequestStatus.Staging;
+            }
+            else
+            {
+                entity.Status = RequestStatus.Approved; // Reset on failure
+            }
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Build completed for request {RequestId}: {Status}", id, result.Status);
+
+            return Ok(new ProductionResponseDto
+            {
+                RequestId = id,
+                Production = result
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Build failed for request {RequestId}", id);
+            entity.Status = RequestStatus.Approved;
+            await _context.SaveChangesAsync();
+            return StatusCode(500, new { error = "빌드 중 오류가 발생했습니다.", details = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get build status for a request
+    /// </summary>
+    [HttpGet("{id:guid}/build")]
+    [ProducesResponseType(typeof(BuildStatusDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<BuildStatusDto>> GetBuildStatus(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        string buildStatus = "not_started";
+        if (!string.IsNullOrEmpty(entity.ProjectId))
+        {
+            buildStatus = await _productionService.GetBuildStatusAsync(entity.ProjectId);
+        }
+
+        return Ok(new BuildStatusDto
+        {
+            RequestId = id,
+            ProjectId = entity.ProjectId,
+            ProjectPath = entity.ProjectPath,
+            Status = entity.Status.ToString(),
+            BuildStatus = buildStatus
+        });
+    }
+
+    /// <summary>
+    /// Complete a request (mark as done)
+    /// </summary>
+    [HttpPost("{id:guid}/complete")]
+    [ProducesResponseType(typeof(DevRequestResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<DevRequestResponseDto>> CompleteRequest(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        entity.Status = RequestStatus.Completed;
+        entity.CompletedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Request {RequestId} marked as completed", id);
+
+        return Ok(entity.ToResponseDto());
+    }
 }
 
 public record UpdateStatusDto
@@ -393,4 +531,19 @@ public record ProposalResponseDto
 {
     public Guid RequestId { get; init; }
     public ProposalResult Proposal { get; init; } = new();
+}
+
+public record ProductionResponseDto
+{
+    public Guid RequestId { get; init; }
+    public ProductionResult Production { get; init; } = new();
+}
+
+public record BuildStatusDto
+{
+    public Guid RequestId { get; init; }
+    public string? ProjectId { get; init; }
+    public string? ProjectPath { get; init; }
+    public string Status { get; init; } = "";
+    public string BuildStatus { get; init; } = "";
 }

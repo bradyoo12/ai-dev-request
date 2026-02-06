@@ -133,6 +133,46 @@ export interface ProposalResponse {
   proposal: ProposalResult;
 }
 
+// Production Types
+export interface DeployConfigInfo {
+  platform: string;
+  settings: Record<string, unknown>;
+}
+
+export interface EnvVariableInfo {
+  name: string;
+  description: string;
+  required: boolean;
+}
+
+export interface ProductionResult {
+  projectId: string;
+  projectPath: string;
+  projectName: string;
+  projectType: string;
+  filesGenerated: number;
+  setupCommands: string[];
+  buildCommands: string[];
+  deployConfig: DeployConfigInfo;
+  envVariables: EnvVariableInfo[];
+  status: string;
+  stagingUrl?: string;
+  message: string;
+}
+
+export interface ProductionResponse {
+  requestId: string;
+  production: ProductionResult;
+}
+
+export interface BuildStatusResponse {
+  requestId: string;
+  projectId?: string;
+  projectPath?: string;
+  status: string;
+  buildStatus: string;
+}
+
 // API Functions
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests`, {
@@ -227,6 +267,42 @@ export async function approveProposal(id: string): Promise<DevRequestResponse> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.error || '제안서 승인에 실패했습니다.');
+  }
+
+  return response.json();
+}
+
+export async function startBuild(id: string): Promise<ProductionResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/build`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || '빌드 시작에 실패했습니다.');
+  }
+
+  return response.json();
+}
+
+export async function getBuildStatus(id: string): Promise<BuildStatusResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/build`);
+
+  if (!response.ok) {
+    throw new Error('빌드 상태를 불러올 수 없습니다.');
+  }
+
+  return response.json();
+}
+
+export async function completeRequest(id: string): Promise<DevRequestResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/complete`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || '완료 처리에 실패했습니다.');
   }
 
   return response.json();

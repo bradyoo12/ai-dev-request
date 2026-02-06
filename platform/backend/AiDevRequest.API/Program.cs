@@ -11,6 +11,7 @@ builder.Services.AddOpenApi();
 // Add AI Services
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();
+builder.Services.AddSingleton<IProductionService, ProductionService>();
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

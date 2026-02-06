@@ -48,45 +48,57 @@ From the response, filter issues that:
 
 If no eligible tickets found, log "No tickets ready for staging verification. Waiting 5 seconds..." and wait 5 seconds, then restart from Step 1.
 
-### Step 2: Verify Staging Deployment
+### Step 2: Build and Start Local Staging
 
-Ensure the main branch (with the merged changes) is deployed to staging:
+Since no remote staging environment is provisioned yet, run a **local staging build** to test the latest main branch:
 
-1. Check that the staging environment is running with the latest main branch
-2. Verify the staging site is accessible and responding
+1. Pull latest main:
+   ```bash
+   cd platform/frontend
+   git checkout main && git pull
+   ```
 
-**If staging is NOT available** (down, not yet provisioned, temporarily unreachable):
-- Do NOT add `on hold` label — this is a temporary issue
-- Log "Staging unavailable — skipping ticket #<number>, will retry next cycle"
-- Skip this ticket and move to the next one (or loop back to Step 1)
+2. Install dependencies and build:
+   ```bash
+   npm install
+   npm run build
+   ```
 
-### Step 3: Run Staging Tests (Full Regression Suite)
+3. **If the build fails**, the ticket fails verification — go to Step 4 (failure).
 
-Run ALL available tests against the staging environment.
+4. The Playwright config auto-starts `npm run preview` (Vite preview on port 4173) as a web server, so no manual server startup is needed.
 
-#### Step 3a: Run FULL Playwright E2E Test Suite Against Staging
+**If a remote staging URL is configured** (via `PLAYWRIGHT_BASE_URL` env var), use that instead of the local build. The Playwright config will skip the local web server when `PLAYWRIGHT_BASE_URL` is set.
+
+### Step 3: Run Tests (Full Regression Suite)
+
+Run ALL available tests against the local staging build (or remote staging).
+
+#### Step 3a: Run FULL Playwright E2E Test Suite
 ```bash
 cd platform/frontend
-npm install
-npx playwright install --with-deps
+npx playwright install chromium
 
-# Run ALL Playwright tests against the staging URL
-PLAYWRIGHT_BASE_URL=<staging-url> npx playwright test
+# Tests run against local preview server (auto-started by playwright.config.ts)
+npx playwright test
+
+# OR if remote staging URL is available:
+# PLAYWRIGHT_BASE_URL=https://staging.ai-dev-request.kr npx playwright test
 ```
 
 **CRITICAL: Run the ENTIRE test suite.** If ANY test fails, the ticket fails verification.
 
 #### Step 3b: AI-Assisted Verification
-Perform AI-simulated human testing on staging:
+Perform AI-simulated human testing:
 1. Analyze the ticket requirements
 2. Identify key user flows affected by changes
-3. Verify UI changes are correct on staging
+3. Use Playwright to navigate and verify UI changes
 4. Verify business logic works as expected
 
 #### Step 3c: Additional Checks
-- API endpoints respond correctly
 - No console errors on key pages
 - Performance is acceptable
+- Build output size is reasonable
 
 ### Step 4: Handle Test Results
 
@@ -123,7 +135,7 @@ Perform AI-simulated human testing on staging:
 ## Important Notes
 - **This command runs in an infinite loop** - keep processing until Ctrl+C
 - Only process tickets in "In Review" WITHOUT `on hold` label
-- Tests run against **staging** (not locally)
+- Tests run against a local Vite preview build (or remote staging if `PLAYWRIGHT_BASE_URL` is set)
 - If tests pass: move to "Done" and close the issue
 - If tests fail: add comment + `on hold` label
 - If staging is unavailable: do NOT add `on hold` — just skip and retry next cycle

@@ -99,21 +99,23 @@ gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id P
 
 **ALL tests must pass — not just tests related to this ticket.**
 
-#### Step 6a: Run Unit Tests
-```bash
-cd platform/frontend
-npm test
-```
-
-#### Step 6b: Run ALL Playwright Tests Locally
+#### Step 6a: Build the Frontend
 ```bash
 cd platform/frontend
 npm install
-npx playwright install --with-deps
 npm run build
-npm run dev &
-npx playwright test
 ```
+
+If the build fails, fix the build errors before proceeding.
+
+#### Step 6b: Run ALL Playwright E2E Tests
+```bash
+cd platform/frontend
+npx playwright install chromium
+npm test
+```
+
+The Playwright config auto-starts `npm run preview` (Vite preview server on port 4173) as a web server, so no manual server startup is needed.
 
 **CRITICAL: Run the FULL test suite. If ANY test fails, it must be fixed before creating the PR.**
 

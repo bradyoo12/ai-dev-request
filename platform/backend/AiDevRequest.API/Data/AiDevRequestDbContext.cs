@@ -22,6 +22,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<AutoTopUpConfig> AutoTopUpConfigs => Set<AutoTopUpConfig>();
     public DbSet<HostingPlan> HostingPlans => Set<HostingPlan>();
+    public DbSet<BuildVerification> BuildVerifications => Set<BuildVerification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -245,6 +246,17 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MonthlySpentUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.FailureReason).HasMaxLength(500);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<BuildVerification>(entity =>
+        {
+            entity.ToTable("build_verifications");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            entity.Property(e => e.ResultJson).HasColumnType("jsonb");
+            entity.HasIndex(e => e.DevRequestId);
         });
 
         modelBuilder.Entity<HostingPlan>(entity =>

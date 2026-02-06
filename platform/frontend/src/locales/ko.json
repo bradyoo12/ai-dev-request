@@ -291,5 +291,10 @@
   "hosting.monthlyCost": "호스팅 (월간)",
   "hosting.billingNote": "호스팅은 결제 수단으로 매월 청구됩니다. 사이트 설정에서 언제든지 플랜을 변경할 수 있습니다.",
   "hosting.buildAndDeploy": "빌드 및 배포",
-  "api.error.hostingPlansFailed": "호스팅 플랜을 불러올 수 없습니다."
+  "api.error.hostingPlansFailed": "호스팅 플랜을 불러올 수 없습니다.",
+  "status.verifying": "코드 품질 검증 중...",
+  "status.verifyingDetail": "AI가 생성된 코드를 검토하고 문제를 자동 수정하고 있습니다.",
+  "verification.title": "AI 품질 검증",
+  "verification.passed": "검증 완료",
+  "verification.needsReview": "검토 필요"
 }

@@ -16,7 +16,7 @@ import BillingPage from './pages/BillingPage'
 import PlanSelectionDialog from './components/PlanSelectionDialog'
 import LoginPage from './pages/LoginPage'
 
-type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'completed' | 'error'
+type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 type PageState = 'main' | 'settings' | 'sites'
 type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments'
 
@@ -143,6 +143,11 @@ function App() {
       const production = await startBuild(submittedRequest.id)
       setProductionResult(production)
       if (production.newBalance != null) setTokenBalance(production.newBalance)
+      if (production.production.verificationScore != null) {
+        setViewState('verifying')
+        // Brief pause to show verification state
+        await new Promise(resolve => setTimeout(resolve, 1500))
+      }
       setViewState('completed')
     } catch (err) {
       if (err instanceof InsufficientTokensError) {
@@ -587,6 +592,19 @@ function App() {
             </div>
           )}
 
+          {viewState === 'verifying' && (
+            <div className="text-center py-12">
+              <div className="animate-pulse"><div className="text-6xl mb-6">🔍</div></div>
+              <h3 className="text-2xl font-bold mb-2">{t('status.verifying')}</h3>
+              <p className="text-gray-400">{t('status.verifyingDetail')}</p>
+              <div className="mt-6 flex justify-center gap-2">
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce"></div>
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+            </div>
+          )}
+
           {viewState === 'completed' && productionResult && (
             <div className="py-4">
               <div className="flex items-center gap-3 mb-6">
@@ -618,6 +636,34 @@ function App() {
                   </div>
                 </div>
               </div>
+
+              {productionResult.production.verificationScore != null && (
+                <div className={`rounded-xl p-4 mb-4 ${
+                  productionResult.production.verificationPassed
+                    ? 'bg-purple-900/30 border border-purple-700'
+                    : 'bg-orange-900/30 border border-orange-700'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-bold text-purple-400">{t('verification.title')}</h4>
+                    <div className={`text-2xl font-bold ${
+                      productionResult.production.verificationScore >= 80 ? 'text-green-400' :
+                      productionResult.production.verificationScore >= 60 ? 'text-yellow-400' : 'text-red-400'
+                    }`}>
+                      {productionResult.production.verificationScore}/100
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-400">{productionResult.production.verificationSummary}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      productionResult.production.verificationPassed
+                        ? 'bg-green-600 text-white'
+                        : 'bg-orange-600 text-white'
+                    }`}>
+                      {productionResult.production.verificationPassed ? t('verification.passed') : t('verification.needsReview')}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {productionResult.production.setupCommands.length > 0 && (
                 <div className="bg-gray-900 rounded-xl p-4 mb-4">

@@ -291,5 +291,10 @@
   "hosting.monthlyCost": "Hosting (monthly)",
   "hosting.billingNote": "Hosting is billed monthly to your payment method. You can change plans anytime from Site Settings.",
   "hosting.buildAndDeploy": "Build & Deploy",
-  "api.error.hostingPlansFailed": "Failed to load hosting plans."
+  "api.error.hostingPlansFailed": "Failed to load hosting plans.",
+  "status.verifying": "Verifying code quality...",
+  "status.verifyingDetail": "AI is reviewing generated code for issues and auto-fixing problems.",
+  "verification.title": "AI Quality Verification",
+  "verification.passed": "Verified",
+  "verification.needsReview": "Needs Review"
 }

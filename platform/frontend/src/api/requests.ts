@@ -173,6 +173,34 @@ export interface BuildStatusResponse {
   buildStatus: string;
 }
 
+// Pricing Types
+export interface PricingPlan {
+  id: string;
+  name: string;
+  nameKorean: string;
+  priceMonthly: number;
+  priceYearly: number;
+  currency: string;
+  projectLimit: number;
+  features: string[];
+  isPopular: boolean;
+}
+
+export interface MonthlyCostBreakdown {
+  hosting: number;
+  maintenance: number;
+  apiCosts: number;
+  total: number;
+}
+
+export interface CostEstimate {
+  developmentCost: number;
+  estimatedDays: number;
+  monthlyCosts: MonthlyCostBreakdown;
+  currency: string;
+  note: string;
+}
+
 // API Functions
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests`, {
@@ -303,6 +331,33 @@ export async function completeRequest(id: string): Promise<DevRequestResponse> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
     throw new Error(error.error || '완료 처리에 실패했습니다.');
+  }
+
+  return response.json();
+}
+
+// Pricing API
+export async function getPricingPlans(): Promise<PricingPlan[]> {
+  const response = await fetch(`${API_BASE_URL}/api/pricing/plans`);
+
+  if (!response.ok) {
+    throw new Error('요금제를 불러올 수 없습니다.');
+  }
+
+  return response.json();
+}
+
+export async function getCostEstimate(complexity: string, category: string): Promise<CostEstimate> {
+  const response = await fetch(`${API_BASE_URL}/api/pricing/estimate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ complexity, category }),
+  });
+
+  if (!response.ok) {
+    throw new Error('견적 계산에 실패했습니다.');
   }
 
   return response.json();

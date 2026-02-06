@@ -1,4 +1,5 @@
 using AiDevRequest.API.Data;
+using AiDevRequest.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+// Add AI Analysis Service
+builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

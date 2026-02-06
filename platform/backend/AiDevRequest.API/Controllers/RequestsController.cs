@@ -1,6 +1,8 @@
+using System.Text.Json;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.DTOs;
 using AiDevRequest.API.Entities;
+using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +13,16 @@ namespace AiDevRequest.API.Controllers;
 public class RequestsController : ControllerBase
 {
     private readonly AiDevRequestDbContext _context;
+    private readonly IAnalysisService _analysisService;
     private readonly ILogger<RequestsController> _logger;
 
-    public RequestsController(AiDevRequestDbContext context, ILogger<RequestsController> logger)
+    public RequestsController(
+        AiDevRequestDbContext context,
+        IAnalysisService analysisService,
+        ILogger<RequestsController> logger)
     {
         _context = context;
+        _analysisService = analysisService;
         _logger = logger;
     }
 
@@ -87,6 +94,114 @@ public class RequestsController : ControllerBase
     }
 
     /// <summary>
+    /// Analyze a development request using AI
+    /// </summary>
+    [HttpPost("{id:guid}/analyze")]
+    [ProducesResponseType(typeof(AnalysisResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AnalysisResponseDto>> AnalyzeRequest(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        // Update status to analyzing
+        entity.Status = RequestStatus.Analyzing;
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Starting analysis for request {RequestId}", id);
+
+        try
+        {
+            // Call AI analysis service
+            var analysisResult = await _analysisService.AnalyzeRequestAsync(entity.Description);
+
+            // Update entity with analysis results
+            entity.AnalysisResultJson = JsonSerializer.Serialize(analysisResult);
+            entity.Category = Enum.TryParse<RequestCategory>(analysisResult.Category, true, out var cat)
+                ? cat
+                : RequestCategory.Other;
+            entity.Complexity = Enum.TryParse<RequestComplexity>(analysisResult.Complexity, true, out var comp)
+                ? comp
+                : RequestComplexity.Unknown;
+            entity.Status = RequestStatus.Analyzed;
+            entity.AnalyzedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Analysis completed for request {RequestId}: {Category}, {Complexity}",
+                id, entity.Category, entity.Complexity);
+
+            return Ok(new AnalysisResponseDto
+            {
+                RequestId = id,
+                Category = analysisResult.Category,
+                Complexity = analysisResult.Complexity,
+                Summary = analysisResult.Summary,
+                Requirements = analysisResult.Requirements,
+                Feasibility = analysisResult.Feasibility,
+                EstimatedDays = analysisResult.EstimatedDays,
+                SuggestedStack = analysisResult.SuggestedStack
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Analysis failed for request {RequestId}", id);
+
+            entity.Status = RequestStatus.Submitted; // Reset status
+            await _context.SaveChangesAsync();
+
+            return StatusCode(500, new { error = "분석 중 오류가 발생했습니다.", details = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get analysis result for a request
+    /// </summary>
+    [HttpGet("{id:guid}/analysis")]
+    [ProducesResponseType(typeof(AnalysisResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AnalysisResponseDto>> GetAnalysis(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+
+        if (entity == null)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrEmpty(entity.AnalysisResultJson))
+        {
+            return NotFound(new { error = "아직 분석이 완료되지 않았습니다." });
+        }
+
+        var analysisResult = JsonSerializer.Deserialize<AnalysisResult>(
+            entity.AnalysisResultJson,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+        );
+
+        if (analysisResult == null)
+        {
+            return NotFound(new { error = "분석 결과를 불러올 수 없습니다." });
+        }
+
+        return Ok(new AnalysisResponseDto
+        {
+            RequestId = id,
+            Category = analysisResult.Category,
+            Complexity = analysisResult.Complexity,
+            Summary = analysisResult.Summary,
+            Requirements = analysisResult.Requirements,
+            Feasibility = analysisResult.Feasibility,
+            EstimatedDays = analysisResult.EstimatedDays,
+            SuggestedStack = analysisResult.SuggestedStack
+        });
+    }
+
+    /// <summary>
     /// Update a development request status
     /// </summary>
     [HttpPatch("{id:guid}/status")]
@@ -133,4 +248,16 @@ public class RequestsController : ControllerBase
 public record UpdateStatusDto
 {
     public RequestStatus Status { get; init; }
+}
+
+public record AnalysisResponseDto
+{
+    public Guid RequestId { get; init; }
+    public string Category { get; init; } = "";
+    public string Complexity { get; init; } = "";
+    public string Summary { get; init; } = "";
+    public RequirementsInfo Requirements { get; init; } = new();
+    public FeasibilityInfo Feasibility { get; init; } = new();
+    public int EstimatedDays { get; init; }
+    public TechStackInfo SuggestedStack { get; init; } = new();
 }

@@ -18,6 +18,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TokenPackage> TokenPackages => Set<TokenPackage>();
     public DbSet<TokenPricing> TokenPricings => Set<TokenPricing>();
     public DbSet<Deployment> Deployments => Set<Deployment>();
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -165,6 +166,33 @@ public class AiDevRequestDbContext : DbContext
                 new TokenPricing { Id = 3, ActionType = "build", TokenCost = 300, Description = "Project Build" },
                 new TokenPricing { Id = 4, ActionType = "staging", TokenCost = 50, Description = "Staging Deploy" }
             );
+        });
+
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.ToTable("payments");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.StripePaymentIntentId).HasMaxLength(200);
+            entity.Property(e => e.StripeCheckoutSessionId).HasMaxLength(200);
+            entity.Property(e => e.AmountUsd).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Currency).HasMaxLength(10);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.MetadataJson).HasColumnType("jsonb");
+
+            entity.Property(e => e.Type)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.StripePaymentIntentId);
+            entity.HasIndex(e => e.StripeCheckoutSessionId);
+            entity.HasIndex(e => e.Status);
         });
 
         modelBuilder.Entity<Deployment>(entity =>

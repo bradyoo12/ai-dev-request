@@ -4,13 +4,13 @@ import {
   getTokenOverview,
   getTokenHistory,
   getTokenPackages,
-  purchaseTokens,
 } from '../api/settings'
 import type {
   TokenOverview,
   TokenTransaction,
   TokenPackage,
 } from '../api/settings'
+import { createCheckout } from '../api/payments'
 
 interface SettingsPageProps {
   onBalanceChange?: (balance: number) => void
@@ -68,10 +68,14 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
   const handleBuyTokens = async (pkg: TokenPackage) => {
     try {
       setPurchasing(true)
-      const result = await purchaseTokens(pkg.id)
-      if (result.success) {
+      const result = await createCheckout(pkg.id)
+      if (result.isSimulation) {
+        // Simulation mode - tokens credited immediately
         setShowBuyDialog(false)
         await loadData()
+      } else {
+        // Redirect to Stripe Checkout
+        window.location.href = result.checkoutUrl
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('error.requestFailed'))

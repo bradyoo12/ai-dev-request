@@ -17,6 +17,7 @@ builder.Services.AddSingleton<IProposalService, ProposalService>();
 builder.Services.AddSingleton<IProductionService, ProductionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<IDeploymentService, AzureDeploymentService>();
+builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

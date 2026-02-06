@@ -69,7 +69,7 @@ Soft-blocked tickets are left unlabeled so the pipeline can automatically pick t
 
 ## Human Review Required
 
-These situations always require `on hold` label for human review:
+These situations DO NOT require `on hold` label for human review:
 - Database schema changes
 - Authentication/authorization changes
 - External API integration changes

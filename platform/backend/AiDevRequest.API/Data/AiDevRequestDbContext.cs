@@ -19,6 +19,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TokenPricing> TokenPricings => Set<TokenPricing>();
     public DbSet<Deployment> Deployments => Set<Deployment>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -217,6 +218,20 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("users");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.DisplayName).HasMaxLength(100);
+            entity.Property(e => e.AnonymousUserId).HasMaxLength(100);
+
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.AnonymousUserId);
         });
     }
 }

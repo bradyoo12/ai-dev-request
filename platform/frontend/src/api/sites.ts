@@ -1,15 +1,12 @@
 import i18n from '../i18n'
-import { getUserId } from './settings'
+import { getAuthHeaders } from './auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 const t = (key: string) => i18n.t(key)
 
 function authHeaders(): Record<string, string> {
-  return {
-    'Content-Type': 'application/json',
-    'X-User-Id': getUserId(),
-  }
+  return getAuthHeaders()
 }
 
 export interface SiteResponse {

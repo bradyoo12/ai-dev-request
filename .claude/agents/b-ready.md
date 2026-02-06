@@ -62,6 +62,10 @@ Filter to issues with "Ready" status and no `on hold` label. If none found, wait
 
 ### Step 2: Move Ticket to In Progress
 
+**Skip this step if the ticket was passed as an argument from b-start** (it was already moved to "In Progress" by the orchestrator to prevent race conditions with other Claude Code instances).
+
+Only run this if b-ready auto-discovered the ticket in Step 1:
+
 ```bash
 gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
 ```

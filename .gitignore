@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+bin/
+obj/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.user
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# .NET
+*.dll
+*.exe
+*.pdb
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Project secrets (각 프로젝트의 민감 정보)
+projects/*/.env
+projects/*/secrets/
+projects/*/*.key
+
+# Temporary files
+tmp/
+temp/
+.cache/

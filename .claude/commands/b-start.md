@@ -185,8 +185,8 @@ Log the current status of the project board:
    - Backlog tickets awaiting triage
 
 ### Step 8: Loop
-1. Log "Waiting 120 seconds before next cycle..."
-2. Wait 120 seconds
+1. Log "Waiting 5 seconds before next cycle..."
+2. Wait 5 seconds
 3. Go back to Step 1
 
 ## Ticket Flow Summary
@@ -214,7 +214,7 @@ Log the current status of the project board:
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
 - Each agent processes ONE ticket per cycle to maintain balance
-- 120-second delay between full cycles to avoid API rate limiting
+- 5-second delay between full cycles to avoid API rate limiting
 - Always check policy.md and design.md at the start of each cycle
 - Tickets out of alignment get `on hold` label automatically
 - Human removes `on hold` label to signal approval/readiness

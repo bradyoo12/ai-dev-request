@@ -1,21 +1,44 @@
 import { useState } from 'react'
 import './App.css'
+import { createRequest } from './api/requests'
+import type { DevRequestResponse } from './api/requests'
+
+type ViewState = 'form' | 'submitting' | 'success' | 'error'
 
 function App() {
   const [request, setRequest] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [email, setEmail] = useState('')
+  const [viewState, setViewState] = useState<ViewState>('form')
+  const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!request.trim()) return
 
-    setIsSubmitting(true)
-    // TODO: Connect to backend API
-    console.log('Submitting request:', request)
-    setTimeout(() => {
-      setIsSubmitting(false)
-      alert('요청이 접수되었습니다! (데모)')
-    }, 1000)
+    setViewState('submitting')
+    setErrorMessage('')
+
+    try {
+      const result = await createRequest({
+        description: request,
+        contactEmail: email || undefined,
+      })
+      setSubmittedRequest(result)
+      setViewState('success')
+    } catch (error) {
+      console.error('Failed to submit request:', error)
+      setErrorMessage(error instanceof Error ? error.message : '요청 처리 중 오류가 발생했습니다.')
+      setViewState('error')
+    }
+  }
+
+  const handleReset = () => {
+    setRequest('')
+    setEmail('')
+    setViewState('form')
+    setSubmittedRequest(null)
+    setErrorMessage('')
   }
 
   const exampleRequests = [
@@ -30,16 +53,19 @@ function App() {
       {/* Header */}
       <header className="p-6 border-b border-gray-700">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold">🚀 AI Dev Request</h1>
+          <h1 className="text-2xl font-bold cursor-pointer" onClick={handleReset}>
+            🚀 AI Dev Request
+          </h1>
           <nav className="space-x-4">
-            <a href="#" className="hover:text-blue-400">요금제</a>
+            <a href="#pricing" className="hover:text-blue-400">요금제</a>
             <a href="#" className="hover:text-blue-400">문의</a>
           </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Main Content */}
       <main className="max-w-4xl mx-auto p-6">
+        {/* Hero Section */}
         <section className="text-center py-12">
           <h2 className="text-4xl font-bold mb-4">
             아이디어만 있으면 됩니다
@@ -49,41 +75,105 @@ function App() {
           </p>
         </section>
 
-        {/* Request Form */}
+        {/* Request Form / Success / Error States */}
         <section className="bg-gray-800 rounded-2xl p-8 shadow-xl">
-          <form onSubmit={handleSubmit}>
-            <label className="block text-lg font-medium mb-4">
-              어떤 것을 만들고 싶으신가요?
-            </label>
-            <textarea
-              value={request}
-              onChange={(e) => setRequest(e.target.value)}
-              placeholder="예: 고객 예약을 받을 수 있는 미용실 웹사이트가 필요해요. 예약 시간 선택, 스타일리스트 선택, 카카오페이 결제가 가능했으면 좋겠어요..."
-              className="w-full h-40 p-4 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            />
+          {viewState === 'form' && (
+            <form onSubmit={handleSubmit}>
+              <label className="block text-lg font-medium mb-4">
+                어떤 것을 만들고 싶으신가요?
+              </label>
+              <textarea
+                value={request}
+                onChange={(e) => setRequest(e.target.value)}
+                placeholder="예: 고객 예약을 받을 수 있는 미용실 웹사이트가 필요해요. 예약 시간 선택, 스타일리스트 선택, 카카오페이 결제가 가능했으면 좋겠어요..."
+                className="w-full h-40 p-4 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
 
-            {/* Quick Examples */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              {exampleRequests.map((example) => (
-                <button
-                  key={example}
-                  type="button"
-                  onClick={() => setRequest(example)}
-                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-full text-sm transition-colors"
-                >
-                  {example}
-                </button>
-              ))}
+              {/* Quick Examples */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {exampleRequests.map((example) => (
+                  <button
+                    key={example}
+                    type="button"
+                    onClick={() => setRequest(example)}
+                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-full text-sm transition-colors"
+                  >
+                    {example}
+                  </button>
+                ))}
+              </div>
+
+              {/* Email Input */}
+              <div className="mt-6">
+                <label className="block text-sm font-medium mb-2 text-gray-400">
+                  연락받으실 이메일 (선택)
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="email@example.com"
+                  className="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!request.trim()}
+                className="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl font-medium text-lg transition-colors"
+              >
+                🔍 AI 분석 시작
+              </button>
+            </form>
+          )}
+
+          {viewState === 'submitting' && (
+            <div className="text-center py-12">
+              <div className="animate-spin w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+              <h3 className="text-2xl font-bold mb-2">요청을 분석하고 있습니다...</h3>
+              <p className="text-gray-400">잠시만 기다려 주세요</p>
             </div>
+          )}
 
-            <button
-              type="submit"
-              disabled={isSubmitting || !request.trim()}
-              className="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl font-medium text-lg transition-colors"
-            >
-              {isSubmitting ? '분석 중...' : '🔍 AI 분석 시작'}
-            </button>
-          </form>
+          {viewState === 'success' && submittedRequest && (
+            <div className="text-center py-8">
+              <div className="text-6xl mb-6">✅</div>
+              <h3 className="text-2xl font-bold mb-4">요청이 접수되었습니다!</h3>
+              <p className="text-gray-400 mb-6">
+                AI가 요청을 분석하고 곧 제안서를 준비해드리겠습니다.
+              </p>
+              <div className="bg-gray-900 rounded-xl p-4 text-left mb-6">
+                <div className="text-sm text-gray-400 mb-1">요청 ID</div>
+                <div className="font-mono text-blue-400">{submittedRequest.id}</div>
+                <div className="text-sm text-gray-400 mt-3 mb-1">요청 내용</div>
+                <div className="text-gray-200">{submittedRequest.description}</div>
+                <div className="text-sm text-gray-400 mt-3 mb-1">상태</div>
+                <div className="inline-block px-3 py-1 bg-yellow-600 rounded-full text-sm">
+                  {submittedRequest.status}
+                </div>
+              </div>
+              <button
+                onClick={handleReset}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors"
+              >
+                새 요청 작성
+              </button>
+            </div>
+          )}
+
+          {viewState === 'error' && (
+            <div className="text-center py-8">
+              <div className="text-6xl mb-6">❌</div>
+              <h3 className="text-2xl font-bold mb-4">오류가 발생했습니다</h3>
+              <p className="text-red-400 mb-6">{errorMessage}</p>
+              <button
+                onClick={() => setViewState('form')}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Features */}
@@ -112,7 +202,7 @@ function App() {
         </section>
 
         {/* Pricing Preview */}
-        <section className="py-12 text-center">
+        <section id="pricing" className="py-12 text-center">
           <h3 className="text-2xl font-bold mb-6">합리적인 가격</h3>
           <div className="flex justify-center gap-4 flex-wrap">
             <div className="bg-gray-800 p-6 rounded-xl w-64">

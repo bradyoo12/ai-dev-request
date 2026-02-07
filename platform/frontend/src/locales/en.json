@@ -296,5 +296,18 @@
   "status.verifyingDetail": "AI is reviewing generated code for issues and auto-fixing problems.",
   "verification.title": "AI Quality Verification",
   "verification.passed": "Verified",
-  "verification.needsReview": "Needs Review"
+  "verification.needsReview": "Needs Review",
+  "refinement.title": "Refine Your Project",
+  "refinement.costPerMessage": "10 tokens/message",
+  "refinement.emptyTitle": "Chat with AI to refine your project",
+  "refinement.emptyDescription": "Ask for changes, add features, or fix issues in your generated project.",
+  "refinement.suggestion1": "Change the color scheme to dark blue",
+  "refinement.suggestion2": "Add a contact form to the homepage",
+  "refinement.suggestion3": "Make the navigation responsive for mobile",
+  "refinement.placeholder": "Describe the changes you'd like...",
+  "refinement.send": "Send",
+  "refinement.thinking": "AI is thinking...",
+  "refinement.sendFailed": "Failed to send message. Please try again.",
+  "refinement.insufficientTokens": "Insufficient tokens for this message.",
+  "settings.tokens.action.refinement": "Chat Refinement"
 }

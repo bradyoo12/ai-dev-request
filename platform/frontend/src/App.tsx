@@ -14,6 +14,7 @@ import MySitesPage from './pages/MySitesPage'
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
 import BillingPage from './pages/BillingPage'
 import PlanSelectionDialog from './components/PlanSelectionDialog'
+import RefinementChat from './components/RefinementChat'
 import LoginPage from './pages/LoginPage'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
@@ -688,6 +689,18 @@ function App() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Refinement Chat */}
+              {submittedRequest && (
+                <div className="mb-6">
+                  <RefinementChat
+                    requestId={submittedRequest.id}
+                    onTokensUsed={(_tokensUsed, newBalance) => {
+                      setTokenBalance(newBalance)
+                    }}
+                  />
                 </div>
               )}
 

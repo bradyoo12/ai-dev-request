@@ -14,7 +14,34 @@ Analyze the requirement and gather codebase context:
 2. Identify relevant files and patterns
 3. Target repository: `bradyoo12/ai-dev-request`
 
-## Step 2: Create Ticket Content
+## Step 2: Detect Attached Files and Images
+
+Check if the user's original request (`$ARGUMENTS`) references any files or images:
+
+1. **Scan for file paths**: Look for any file paths, image references, or attachments mentioned in `$ARGUMENTS` or provided in the conversation context (e.g., screenshots, mockups, design files, code snippets, logs)
+2. **Classify each file**:
+   - **Images** (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`): Will be uploaded and embedded
+   - **Text/Code files** (`.ts`, `.js`, `.json`, `.md`, `.txt`, `.log`, `.csv`, etc.): Content will be included inline
+   - **Other binary files**: Will be noted in the ticket with instructions to attach manually
+
+3. **If images are found**, upload each to the repository:
+   ```powershell
+   # Generate a unique filename with timestamp to avoid collisions
+   $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+   $filename = "{timestamp}-{original-filename}"
+
+   # Base64 encode the image
+   $base64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("{local-file-path}"))
+
+   # Upload to repo via GitHub Contents API
+   gh api --method PUT "repos/bradyoo12/ai-dev-request/contents/.github/issue-assets/$filename" -f message="Add issue asset: $filename" -f content="$base64"
+   ```
+   The raw URL for referencing will be:
+   `https://raw.githubusercontent.com/bradyoo12/ai-dev-request/main/.github/issue-assets/{filename}`
+
+4. **If text/code files are found**, read their content for inclusion in the ticket body.
+
+## Step 3: Create Ticket Content
 
 Create a ticket with the following sections:
 
@@ -26,17 +53,41 @@ Create a ticket with the following sections:
 - **Out of Scope**: Explicit boundaries
 - **Dependencies**: Related or blocking issues
 
+### Attachments Section (When Files/Images Exist)
+
+If any files or images were detected in Step 2, add an **Attachments** section:
+
+- **For images**: Embed using markdown image syntax:
+  ```markdown
+  ## Attachments
+
+  ### {descriptive-name}
+  ![{descriptive-alt-text}](https://raw.githubusercontent.com/bradyoo12/ai-dev-request/main/.github/issue-assets/{filename})
+  ```
+
+- **For text/code files**: Include content in fenced code blocks:
+  ```markdown
+  ## Attachments
+
+  ### {filename}
+  ```{language}
+  {file-content}
+  ```
+  ```
+
+- **For multiple attachments**: List all under the same Attachments section with sub-headings.
+
 ### Visual Mockups (When Applicable)
 
-For UI/UX related tickets, include ASCII art mockups.
+For UI/UX related tickets, include ASCII art mockups (in addition to any uploaded image mockups).
 
-## Step 3: Create GitHub Issue
+## Step 4: Create GitHub Issue
 
 ```bash
 gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body-file {draft-file}
 ```
 
-## Step 4: Add to AI Dev Request Project and Set Status to Ready
+## Step 5: Add to AI Dev Request Project and Set Status to Ready
 
 ```bash
 # Add issue to project and capture the item ID
@@ -55,3 +106,7 @@ Report the created issue URL and confirm it was added to the project with **Read
 - All tickets go to `bradyoo12/ai-dev-request` repository
 - Create the ticket immediately without asking for confirmation
 - **Always include ASCII mockups for UI/UX tickets**
+- **Always check for attached files/images** in the user's request before creating the ticket
+- Images are uploaded to `.github/issue-assets/` in the repo and referenced via raw URLs
+- Text/code file contents are included inline in the ticket body using fenced code blocks
+- If an image upload fails (e.g., file not found, API error), note it in the ticket body and continue

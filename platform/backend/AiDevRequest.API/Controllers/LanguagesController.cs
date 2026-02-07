@@ -24,20 +24,33 @@ public class LanguagesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<LanguageDto>>> GetLanguages()
     {
-        var languages = await _context.Languages
-            .Where(l => l.IsActive)
-            .OrderByDescending(l => l.IsDefault)
-            .ThenBy(l => l.Name)
-            .Select(l => new LanguageDto
-            {
-                Code = l.Code,
-                Name = l.Name,
-                NativeName = l.NativeName,
-                IsDefault = l.IsDefault
-            })
-            .ToListAsync();
+        try
+        {
+            var languages = await _context.Languages
+                .Where(l => l.IsActive)
+                .OrderByDescending(l => l.IsDefault)
+                .ThenBy(l => l.Name)
+                .Select(l => new LanguageDto
+                {
+                    Code = l.Code,
+                    Name = l.Name,
+                    NativeName = l.NativeName,
+                    IsDefault = l.IsDefault
+                })
+                .ToListAsync();
 
-        return Ok(languages);
+            return Ok(languages);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load languages");
+            // Return default languages so the frontend can still function
+            return Ok(new List<LanguageDto>
+            {
+                new() { Code = "ko", Name = "Korean", NativeName = "\ud55c\uad6d\uc5b4", IsDefault = true },
+                new() { Code = "en", Name = "English", NativeName = "English", IsDefault = false }
+            });
+        }
     }
 
     /// <summary>

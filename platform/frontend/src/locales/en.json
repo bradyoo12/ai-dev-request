@@ -309,5 +309,16 @@
   "refinement.thinking": "AI is thinking...",
   "refinement.sendFailed": "Failed to send message. Please try again.",
   "refinement.insufficientTokens": "Insufficient tokens for this message.",
-  "settings.tokens.action.refinement": "Chat Refinement"
+  "settings.tokens.action.refinement": "Chat Refinement",
+  "analysis.platformMobile": "Mobile App",
+  "analysis.platformFullstack": "Web + Mobile",
+  "mobile.qrPreview": "Mobile Preview",
+  "mobile.qrPlaceholder": "QR Code",
+  "mobile.qrDescription": "Scan with Expo Go to preview the app on your device.",
+  "mobile.qrStep1": "Install Expo Go on your phone",
+  "mobile.qrStep2": "Run the setup commands on your computer",
+  "mobile.qrStep3": "Scan the QR code shown in the terminal",
+  "mobile.ios": "iOS",
+  "mobile.android": "Android",
+  "form.example.mobileApp": "Build me a fitness tracking app"
 }

@@ -486,10 +486,23 @@ public class RequestsController : ControllerBase
                 return BadRequest(new { error = "제안서를 불러올 수 없습니다." });
             }
 
+            // Detect platform from analysis
+            var platform = "web";
+            if (!string.IsNullOrEmpty(entity.AnalysisResultJson))
+            {
+                var analysis = JsonSerializer.Deserialize<AnalysisResult>(
+                    entity.AnalysisResultJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+                if (analysis != null && !string.IsNullOrEmpty(analysis.Platform))
+                    platform = analysis.Platform;
+            }
+
             var result = await _productionService.GenerateProjectAsync(
                 id.ToString(),
                 entity.Description,
-                proposal
+                proposal,
+                platform
             );
 
             entity.ProjectId = result.ProjectId;

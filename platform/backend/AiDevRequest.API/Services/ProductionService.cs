@@ -6,7 +6,7 @@ namespace AiDevRequest.API.Services;
 
 public interface IProductionService
 {
-    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal);
+    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web");
     Task<string> GetBuildStatusAsync(string projectId);
 }
 
@@ -27,14 +27,40 @@ public class ProductionService : IProductionService
         _projectsBasePath = configuration["Projects:BasePath"] ?? "./projects";
     }
 
-    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal)
+    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web")
     {
         var projectId = $"proj_{requestId[..8]}_{DateTime.UtcNow:yyyyMMdd}";
         var projectPath = Path.Combine(_projectsBasePath, projectId);
 
-        _logger.LogInformation("Starting project generation: {ProjectId}", projectId);
+        _logger.LogInformation("Starting project generation: {ProjectId} (platform: {Platform})", projectId, platform);
 
         var proposalJson = JsonSerializer.Serialize(proposal);
+
+        var isMobile = platform == "mobile" || platform == "fullstack";
+
+        var projectTypeOptions = isMobile
+            ? "react-native|expo"
+            : "react|nextjs|dotnet|python";
+
+        var fileGuidance = isMobile
+            ? @"핵심 파일들만 생성하세요:
+- package.json (React Native + Expo 의존성)
+- app.json (Expo 설정)
+- App.tsx (메인 진입점)
+- 스크린 파일들 (screens/ 디렉토리, 3-5개)
+- 네비게이션 설정 (navigation/)
+- 핵심 컴포넌트 (components/ 디렉토리)
+- README.md
+
+React Native + Expo (managed workflow) 기반으로 생성하세요.
+React Navigation을 사용하세요.
+NativeWind (Tailwind for RN) 또는 React Native Paper를 UI에 사용하세요."
+            : @"핵심 파일들만 생성하세요:
+- package.json / .csproj (의존성)
+- 메인 진입점 파일
+- 핵심 컴포넌트/서비스 파일 (3-5개)
+- 설정 파일 (환경변수, 빌드 설정)
+- README.md";
 
         var prompt = $@"당신은 소프트웨어 프로젝트를 생성하는 전문 개발자입니다.
 
@@ -50,7 +76,7 @@ public class ProductionService : IProductionService
 
 {{
   ""projectName"": ""프로젝트 이름 (영문, 케밥케이스)"",
-  ""projectType"": ""react|nextjs|dotnet|python"",
+  ""projectType"": ""{projectTypeOptions}"",
   ""files"": [
     {{
       ""path"": ""상대 파일 경로"",
@@ -61,7 +87,7 @@ public class ProductionService : IProductionService
   ""setupCommands"": [""초기 설정 명령어 목록""],
   ""buildCommands"": [""빌드 명령어 목록""],
   ""deployConfig"": {{
-    ""platform"": ""azure|vercel|docker"",
+    ""platform"": ""azure|vercel|docker|expo"",
     ""settings"": {{}}
   }},
   ""envVariables"": [
@@ -69,12 +95,7 @@ public class ProductionService : IProductionService
   ]
 }}
 
-핵심 파일들만 생성하세요:
-- package.json / .csproj (의존성)
-- 메인 진입점 파일
-- 핵심 컴포넌트/서비스 파일 (3-5개)
-- 설정 파일 (환경변수, 빌드 설정)
-- README.md
+{fileGuidance}
 
 JSON만 응답하세요.";
 

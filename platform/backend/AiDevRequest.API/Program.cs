@@ -91,81 +91,68 @@ if (app.Environment.IsDevelopment())
 
     try
     {
-        // Check if this is a database created by EnsureCreatedAsync() (tables exist but no migration history).
-        // If so, we need special handling because EnsureCreatedAsync may have created only SOME tables
-        // (based on the model at the time it was first run), not ALL tables in the InitialCreate migration.
-        var pendingMigrations = (await dbContext.Database.GetPendingMigrationsAsync()).ToList();
-        var appliedMigrations = (await dbContext.Database.GetAppliedMigrationsAsync()).ToList();
+        string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
+            "dev_requests", "hosting_plans", "languages", "payments", "refinement_messages",
+            "token_balances", "token_packages", "token_pricing", "token_transactions",
+            "translations", "users" };
 
-        if (!appliedMigrations.Any() && pendingMigrations.Any())
+        // Verify actual table state regardless of what migration history says.
+        // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and
+        // corrupted state (migration history says applied but tables are missing).
+        var conn = dbContext.Database.GetDbConnection();
+        await conn.OpenAsync();
+
+        HashSet<string> existingTables;
+        try
         {
-            // No migrations applied. Check if the database has ANY tables from the old EnsureCreatedAsync.
-            var conn = dbContext.Database.GetDbConnection();
-            await conn.OpenAsync();
-            try
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ANY(@tables)";
+            var param = cmd.CreateParameter();
+            param.ParameterName = "tables";
+            param.Value = allTables;
+            cmd.Parameters.Add(param);
+
+            existingTables = new HashSet<string>();
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+                existingTables.Add(reader.GetString(0));
+        }
+        finally
+        {
+            await conn.CloseAsync();
+        }
+
+        logger.LogInformation("Database table check: {Existing}/{Total} tables exist",
+            existingTables.Count, allTables.Length);
+
+        if (existingTables.Count > 0 && existingTables.Count < allTables.Length)
+        {
+            // PARTIAL database: some tables exist, some don't.
+            // This happens with legacy EnsureCreatedAsync or corrupted migration state.
+            // Drop and recreate for a clean state (safe for staging).
+            var missingTables = allTables.Where(t => !existingTables.Contains(t)).ToList();
+            logger.LogInformation("Partial database detected. Missing tables: {Missing}. Recreating...",
+                string.Join(", ", missingTables));
+            await dbContext.Database.EnsureDeletedAsync();
+            // MigrateAsync below will create everything from scratch
+        }
+        else if (existingTables.Count == allTables.Length)
+        {
+            // All tables exist. Ensure migration history is correct.
+            var appliedMigrations = (await dbContext.Database.GetAppliedMigrationsAsync()).ToList();
+            var pendingMigrations = (await dbContext.Database.GetPendingMigrationsAsync()).ToList();
+
+            if (!appliedMigrations.Any() && pendingMigrations.Any())
             {
-                // Check which tables from InitialCreate actually exist in the database
-                string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
-                    "dev_requests", "hosting_plans", "languages", "payments", "refinement_messages",
-                    "token_balances", "token_packages", "token_pricing", "token_transactions",
-                    "translations", "users" };
-
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ANY(@tables)";
-                var param = cmd.CreateParameter();
-                param.ParameterName = "tables";
-                param.Value = allTables;
-                cmd.Parameters.Add(param);
-
-                var existingTables = new HashSet<string>();
-                using (var reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                        existingTables.Add(reader.GetString(0));
-                }
-
-                if (existingTables.Count > 0 && existingTables.Count < allTables.Length)
-                {
-                    // PARTIAL legacy database: some tables exist, some don't.
-                    // Create the missing tables directly, then mark InitialCreate as applied.
-                    var missingTables = allTables.Where(t => !existingTables.Contains(t)).ToList();
-                    logger.LogInformation("Detected partial legacy database. Existing: {Existing}, Missing: {Missing}",
-                        string.Join(", ", existingTables), string.Join(", ", missingTables));
-
-                    // Use EnsureCreatedAsync to create missing tables, then switch to migrations
-                    // Actually, we'll just drop and recreate if there's no important data,
-                    // or create missing tables individually via raw SQL.
-                    // The safest approach: let MigrateAsync handle it by NOT marking InitialCreate as applied,
-                    // but first drop the existing tables so InitialCreate can recreate everything cleanly.
-                    // Since this is staging with no critical user data, we recreate for a clean state.
-                    logger.LogInformation("Recreating database for clean migration state...");
-                    await dbContext.Database.EnsureDeletedAsync();
-                    await conn.CloseAsync();
-                    // MigrateAsync below will create everything from scratch
-                }
-                else if (existingTables.Count == allTables.Length)
-                {
-                    // ALL tables exist (legacy database is complete). Mark InitialCreate as applied.
-                    logger.LogInformation("Detected complete legacy database. Bootstrapping migration history...");
-                    var historyRepository = dbContext.GetService<IHistoryRepository>();
-
-                    var createScript = historyRepository.GetCreateIfNotExistsScript();
-                    await dbContext.Database.ExecuteSqlRawAsync(createScript);
-
-                    var insertScript = historyRepository.GetInsertScript(new HistoryRow(
-                        pendingMigrations.First(),
-                        ProductInfo.GetVersion()));
-                    await dbContext.Database.ExecuteSqlRawAsync(insertScript);
-                    logger.LogInformation("Migration history bootstrapped. InitialCreate marked as applied.");
-                }
-                // else: existingTables.Count == 0 means fresh database, MigrateAsync handles it
-            }
-            finally
-            {
-                if (conn.State == System.Data.ConnectionState.Open)
-                    await conn.CloseAsync();
+                logger.LogInformation("Complete database without migration history. Bootstrapping...");
+                var historyRepository = dbContext.GetService<IHistoryRepository>();
+                await dbContext.Database.ExecuteSqlRawAsync(historyRepository.GetCreateIfNotExistsScript());
+                await dbContext.Database.ExecuteSqlRawAsync(historyRepository.GetInsertScript(new HistoryRow(
+                    pendingMigrations.First(), ProductInfo.GetVersion())));
+                logger.LogInformation("Migration history bootstrapped.");
             }
         }
+        // else: existingTables.Count == 0 means fresh database, MigrateAsync handles it
 
         await dbContext.Database.MigrateAsync();
         logger.LogInformation("Database migration completed successfully.");

@@ -185,6 +185,9 @@ public class ProductionResult
     public string Status { get; set; } = "";
     public string? StagingUrl { get; set; }
     public string Message { get; set; } = "";
+    public int? VerificationScore { get; set; }
+    public bool? VerificationPassed { get; set; }
+    public string? VerificationSummary { get; set; }
 }
 
 public class GeneratedProject

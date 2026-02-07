@@ -185,6 +185,9 @@ export interface ProductionResult {
   status: string;
   stagingUrl?: string;
   message: string;
+  verificationScore?: number;
+  verificationPassed?: boolean;
+  verificationSummary?: string;
 }
 
 export interface ProductionResponse {

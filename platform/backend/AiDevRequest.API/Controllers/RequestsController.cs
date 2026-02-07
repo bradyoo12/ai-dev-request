@@ -18,6 +18,7 @@ public class RequestsController : ControllerBase
     private readonly IProposalService _proposalService;
     private readonly IProductionService _productionService;
     private readonly ITokenService _tokenService;
+    private readonly IBuildVerificationService _verificationService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -26,6 +27,7 @@ public class RequestsController : ControllerBase
         IProposalService proposalService,
         IProductionService productionService,
         ITokenService tokenService,
+        IBuildVerificationService verificationService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -33,6 +35,7 @@ public class RequestsController : ControllerBase
         _proposalService = proposalService;
         _productionService = productionService;
         _tokenService = tokenService;
+        _verificationService = verificationService;
         _logger = logger;
     }
 
@@ -494,6 +497,17 @@ public class RequestsController : ControllerBase
 
             if (result.Status == "generated")
             {
+                // Run AI build verification
+                entity.Status = RequestStatus.Verifying;
+                await _context.SaveChangesAsync();
+
+                var verificationResult = await _verificationService.VerifyProjectAsync(
+                    id, result.ProjectPath, result.ProjectType);
+
+                result.VerificationScore = verificationResult.QualityScore;
+                result.VerificationPassed = verificationResult.Passed;
+                result.VerificationSummary = verificationResult.Summary;
+
                 entity.Status = RequestStatus.Staging;
             }
             else
@@ -553,6 +567,37 @@ public class RequestsController : ControllerBase
             ProjectPath = entity.ProjectPath,
             Status = entity.Status.ToString(),
             BuildStatus = buildStatus
+        });
+    }
+
+    /// <summary>
+    /// Get verification results for a request
+    /// </summary>
+    [HttpGet("{id:guid}/verification")]
+    [ProducesResponseType(typeof(VerificationResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<VerificationResponseDto>> GetVerification(Guid id)
+    {
+        var verifications = await _context.BuildVerifications
+            .Where(v => v.DevRequestId == id)
+            .OrderByDescending(v => v.Iteration)
+            .ToListAsync();
+
+        if (verifications.Count == 0)
+        {
+            return NotFound(new { error = "No verification results found." });
+        }
+
+        var latest = verifications.First();
+
+        return Ok(new VerificationResponseDto
+        {
+            RequestId = id,
+            QualityScore = latest.QualityScore,
+            Status = latest.Status.ToString(),
+            IssuesFound = verifications.Sum(v => v.IssuesFound),
+            FixesApplied = verifications.Sum(v => v.FixesApplied),
+            Iterations = verifications.Count
         });
     }
 
@@ -623,4 +668,14 @@ public record BuildStatusDto
     public string? ProjectPath { get; init; }
     public string Status { get; init; } = "";
     public string BuildStatus { get; init; } = "";
+}
+
+public record VerificationResponseDto
+{
+    public Guid RequestId { get; init; }
+    public int QualityScore { get; init; }
+    public string Status { get; init; } = "";
+    public int IssuesFound { get; init; }
+    public int FixesApplied { get; init; }
+    public int Iterations { get; init; }
 }

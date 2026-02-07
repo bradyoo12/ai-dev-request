@@ -75,6 +75,7 @@ public enum RequestStatus
     ProposalReady,  // 제안서 준비됨
     Approved,       // 고객 승인
     Building,       // 제작 중
+    Verifying,      // AI 품질 검증 중
     Staging,        // 스테이징 배포됨
     Completed,      // 완료
     Cancelled       // 취소됨

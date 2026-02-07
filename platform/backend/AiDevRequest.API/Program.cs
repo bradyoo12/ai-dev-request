@@ -3,6 +3,8 @@ using AiDevRequest.API.Data;
 using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,6 +63,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:5173",  // Vite dev server
                 "http://localhost:3000",  // Alternative port
+                "https://icy-desert-07c08ba00.2.azurestaticapps.net", // Azure Static Web Apps staging
                 "https://ai-dev-request.kr" // Production (future)
             )
             .AllowAnyHeader()
@@ -74,11 +77,62 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
 
-    // Auto-migrate in development
+// Auto-migrate database on startup (applies pending EF Core migrations)
+// This runs in all environments so staging/production schemas stay up to date
+{
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AiDevRequestDbContext>();
-    await dbContext.Database.EnsureCreatedAsync();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        // Check if this is a database created by EnsureCreatedAsync() (tables exist but no migration history).
+        // If so, we need to mark the InitialCreate migration as already applied before running MigrateAsync(),
+        // otherwise it will try to create tables that already exist and fail.
+        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+        var appliedMigrations = await dbContext.Database.GetAppliedMigrationsAsync();
+
+        if (appliedMigrations.Any() == false && pendingMigrations.Any())
+        {
+            // No migrations have ever been applied. Check if the database already has tables
+            // (created by the old EnsureCreatedAsync approach).
+            var conn = dbContext.Database.GetDbConnection();
+            await conn.OpenAsync();
+            try
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'languages')";
+                var exists = (bool)(await cmd.ExecuteScalarAsync())!;
+
+                if (exists)
+                {
+                    // Database was created by EnsureCreatedAsync — tables exist but no migration history.
+                    // Record the InitialCreate migration as already applied so MigrateAsync skips it.
+                    logger.LogInformation("Detected existing database without migration history. Bootstrapping migration state...");
+                    var historyRepository = dbContext.GetService<IHistoryRepository>();
+                    var insertScript = historyRepository.GetInsertScript(new HistoryRow(
+                        pendingMigrations.First(), // The InitialCreate migration ID
+                        ProductInfo.GetVersion()));
+                    await dbContext.Database.ExecuteSqlRawAsync(insertScript);
+                    logger.LogInformation("Migration history bootstrapped. InitialCreate marked as applied.");
+                }
+            }
+            finally
+            {
+                await conn.CloseAsync();
+            }
+        }
+
+        await dbContext.Database.MigrateAsync();
+        logger.LogInformation("Database migration completed successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Database migration failed. The application may not function correctly.");
+        throw;
+    }
 }
 
 app.UseHttpsRedirection();

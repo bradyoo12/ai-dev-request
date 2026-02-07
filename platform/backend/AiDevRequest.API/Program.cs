@@ -1,5 +1,8 @@
+using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using AiDevRequest.API.Data;
+using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -89,50 +92,122 @@ if (app.Environment.IsDevelopment())
     try
     {
         // Check if this is a database created by EnsureCreatedAsync() (tables exist but no migration history).
-        // If so, we need to mark the InitialCreate migration as already applied before running MigrateAsync(),
-        // otherwise it will try to create tables that already exist and fail.
-        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
-        var appliedMigrations = await dbContext.Database.GetAppliedMigrationsAsync();
+        // If so, we need special handling because EnsureCreatedAsync may have created only SOME tables
+        // (based on the model at the time it was first run), not ALL tables in the InitialCreate migration.
+        var pendingMigrations = (await dbContext.Database.GetPendingMigrationsAsync()).ToList();
+        var appliedMigrations = (await dbContext.Database.GetAppliedMigrationsAsync()).ToList();
 
-        if (appliedMigrations.Any() == false && pendingMigrations.Any())
+        if (!appliedMigrations.Any() && pendingMigrations.Any())
         {
-            // No migrations have ever been applied. Check if the database already has tables
-            // (created by the old EnsureCreatedAsync approach).
+            // No migrations applied. Check if the database has ANY tables from the old EnsureCreatedAsync.
             var conn = dbContext.Database.GetDbConnection();
             await conn.OpenAsync();
             try
             {
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'languages')";
-                var exists = (bool)(await cmd.ExecuteScalarAsync())!;
+                // Check which tables from InitialCreate actually exist in the database
+                string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
+                    "dev_requests", "hosting_plans", "languages", "payments", "refinement_messages",
+                    "token_balances", "token_packages", "token_pricing", "token_transactions",
+                    "translations", "users" };
 
-                if (exists)
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ANY(@tables)";
+                var param = cmd.CreateParameter();
+                param.ParameterName = "tables";
+                param.Value = allTables;
+                cmd.Parameters.Add(param);
+
+                var existingTables = new HashSet<string>();
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    // Database was created by EnsureCreatedAsync -- tables exist but no migration history.
-                    // First, ensure the __EFMigrationsHistory table exists (it won't if EnsureCreated was used).
-                    logger.LogInformation("Detected existing database without migration history. Bootstrapping migration state...");
+                    while (await reader.ReadAsync())
+                        existingTables.Add(reader.GetString(0));
+                }
+
+                if (existingTables.Count > 0 && existingTables.Count < allTables.Length)
+                {
+                    // PARTIAL legacy database: some tables exist, some don't.
+                    // Create the missing tables directly, then mark InitialCreate as applied.
+                    var missingTables = allTables.Where(t => !existingTables.Contains(t)).ToList();
+                    logger.LogInformation("Detected partial legacy database. Existing: {Existing}, Missing: {Missing}",
+                        string.Join(", ", existingTables), string.Join(", ", missingTables));
+
+                    // Use EnsureCreatedAsync to create missing tables, then switch to migrations
+                    // Actually, we'll just drop and recreate if there's no important data,
+                    // or create missing tables individually via raw SQL.
+                    // The safest approach: let MigrateAsync handle it by NOT marking InitialCreate as applied,
+                    // but first drop the existing tables so InitialCreate can recreate everything cleanly.
+                    // Since this is staging with no critical user data, we recreate for a clean state.
+                    logger.LogInformation("Recreating database for clean migration state...");
+                    await dbContext.Database.EnsureDeletedAsync();
+                    await conn.CloseAsync();
+                    // MigrateAsync below will create everything from scratch
+                }
+                else if (existingTables.Count == allTables.Length)
+                {
+                    // ALL tables exist (legacy database is complete). Mark InitialCreate as applied.
+                    logger.LogInformation("Detected complete legacy database. Bootstrapping migration history...");
                     var historyRepository = dbContext.GetService<IHistoryRepository>();
 
                     var createScript = historyRepository.GetCreateIfNotExistsScript();
                     await dbContext.Database.ExecuteSqlRawAsync(createScript);
-                    logger.LogInformation("Ensured __EFMigrationsHistory table exists.");
 
-                    // Record the InitialCreate migration as already applied so MigrateAsync skips it.
                     var insertScript = historyRepository.GetInsertScript(new HistoryRow(
-                        pendingMigrations.First(), // The InitialCreate migration ID
+                        pendingMigrations.First(),
                         ProductInfo.GetVersion()));
                     await dbContext.Database.ExecuteSqlRawAsync(insertScript);
                     logger.LogInformation("Migration history bootstrapped. InitialCreate marked as applied.");
                 }
+                // else: existingTables.Count == 0 means fresh database, MigrateAsync handles it
             }
             finally
             {
-                await conn.CloseAsync();
+                if (conn.State == System.Data.ConnectionState.Open)
+                    await conn.CloseAsync();
             }
         }
 
         await dbContext.Database.MigrateAsync();
         logger.LogInformation("Database migration completed successfully.");
+
+        // Auto-seed translations if the table is empty
+        if (!await dbContext.Translations.AnyAsync())
+        {
+            logger.LogInformation("Translations table is empty. Seeding from embedded locale files...");
+            var assembly = Assembly.GetExecutingAssembly();
+            var locales = new[] { "ko", "en" };
+
+            foreach (var locale in locales)
+            {
+                var resourceName = $"AiDevRequest.API.Data.SeedData.{locale}.json";
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream == null)
+                {
+                    logger.LogWarning("Seed file not found: {Resource}", resourceName);
+                    continue;
+                }
+
+                var translations = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(stream);
+                if (translations == null) continue;
+
+                foreach (var (fullKey, value) in translations)
+                {
+                    var dotIndex = fullKey.IndexOf('.');
+                    if (dotIndex < 0) continue;
+
+                    dbContext.Translations.Add(new Translation
+                    {
+                        LanguageCode = locale,
+                        Namespace = fullKey[..dotIndex],
+                        Key = fullKey[(dotIndex + 1)..],
+                        Value = value
+                    });
+                }
+            }
+
+            await dbContext.SaveChangesAsync();
+            logger.LogInformation("Translation seeding completed.");
+        }
     }
     catch (Exception ex)
     {

@@ -1,16 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh issue create:*)",
-      "Bash(gh project item-add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: add settings page with token-based pricing \\(#13\\)\n\n- Add token entities \\(TokenBalance, TokenTransaction, TokenPackage, TokenPricing\\)\n- Add SettingsController with token balance, history, purchase, and deduction APIs\n- Add Settings page with token balance overview, usage history, and buy tokens dialog\n- Add token balance indicator in header navigation\n- Seed token packages and per-action pricing data\n- New users receive 1,000 free welcome bonus tokens\n- Add i18n translations for all settings UI \\(ko/en\\)\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(gh issue list:*)",
-      "Bash(git commit:*)",
-      "Bash(gh pr list:*)",
-      "Bash(gh label list:*)",
-      "Bash(gh auth switch:*)",
-      "Bash(npx playwright install:*)",
-      "Bash(npx playwright test:*)"
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(dotnet:*)",
+      "Bash(python:*)",
+      "Bash(cd:*)",
+      "Bash(cross-env:*)",
+      "Read",
+      "Edit",
+      "Write",
+      "Task"
     ]
   }
 }

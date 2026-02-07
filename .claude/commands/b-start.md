@@ -257,3 +257,18 @@ Log the current status of the project board:
 - **Problem**: Tickets #41 and #43 both described the same staging 500 error from different angles. Both were in Ready status.
 - **Solution**: Treated #41 as the primary ticket (migration fix) and #43 as a follow-up (startup crash fix + error handling). Both ended up being processed sequentially.
 - **Prevention**: During audit, identify duplicates early and close/merge them before entering the b-ready phase.
+
+### [2026-02-07] Azure App Service Free tier (F1) quota exceeded blocks all deployments
+- **Problem**: The Free F1 App Service Plan has a 60 CPU-minutes/day quota. Repeated startup crashes burned through the quota, causing "QuotaExceeded" state and 403 "Site Disabled" on all deployment attempts. Quota resets at midnight UTC (~19 hours away).
+- **Solution**: Scaled the App Service Plan from F1 (Free) to B1 (Basic, ~$13/month) using `az appservice plan update --sku B1`. This immediately lifted the quota restriction.
+- **Prevention**: Use at least B1 tier for staging environments. F1 is only suitable for static sites or minimal testing.
+
+### [2026-02-07] No database configured for Azure deployment
+- **Problem**: The backend had no database connection string configured in Azure App Settings. It fell back to `Host=localhost` which doesn't work on Azure. The error handling in controllers returned default/empty data, masking the real issue (no database).
+- **Solution**: Created an `ai_dev_request` database on the existing `db-bradyoo-staging` PostgreSQL Flexible Server. Configured the connection string via Azure REST API (to avoid bash escaping issues with special characters in the password).
+- **Prevention**: Always verify database infrastructure exists BEFORE deploying a new service. Add connection string configuration to the deployment workflow or IaC. Consider adding a startup check that logs a clear warning if the database is unreachable.
+
+### [2026-02-07] Bash escaping mangles special characters in Azure CLI settings
+- **Problem**: Setting `ConnectionStrings__DefaultConnection` via `az webapp config appsettings set --settings "..."` mangled the password — `!` was escaped to `\!` by bash history expansion, even with single quotes.
+- **Solution**: Used `az rest --method PUT --body @file.json` with the connection string in a JSON file to bypass all shell escaping.
+- **Prevention**: For Azure App Settings containing special characters, always use `az rest` with a JSON body file instead of `az webapp config appsettings set`.

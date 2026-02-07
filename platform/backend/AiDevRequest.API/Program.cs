@@ -24,6 +24,7 @@ builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>();
+builder.Services.AddScoped<IRefinementService, RefinementService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "dev-secret-key-change-in-production-min-32-chars!!";

@@ -23,6 +23,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AutoTopUpConfig> AutoTopUpConfigs => Set<AutoTopUpConfig>();
     public DbSet<HostingPlan> HostingPlans => Set<HostingPlan>();
     public DbSet<BuildVerification> BuildVerifications => Set<BuildVerification>();
+    public DbSet<RefinementMessage> RefinementMessages => Set<RefinementMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -168,7 +169,8 @@ public class AiDevRequestDbContext : DbContext
                 new TokenPricing { Id = 1, ActionType = "analysis", TokenCost = 50, Description = "AI Analysis" },
                 new TokenPricing { Id = 2, ActionType = "proposal", TokenCost = 100, Description = "Proposal Generation" },
                 new TokenPricing { Id = 3, ActionType = "build", TokenCost = 300, Description = "Project Build" },
-                new TokenPricing { Id = 4, ActionType = "staging", TokenCost = 50, Description = "Staging Deploy" }
+                new TokenPricing { Id = 4, ActionType = "staging", TokenCost = 50, Description = "Staging Deploy" },
+                new TokenPricing { Id = 5, ActionType = "refinement", TokenCost = 10, Description = "Chat Refinement" }
             );
         });
 
@@ -257,6 +259,16 @@ public class AiDevRequestDbContext : DbContext
                 .HasMaxLength(50);
             entity.Property(e => e.ResultJson).HasColumnType("jsonb");
             entity.HasIndex(e => e.DevRequestId);
+        });
+
+        modelBuilder.Entity<RefinementMessage>(entity =>
+        {
+            entity.ToTable("refinement_messages");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Content).IsRequired();
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.CreatedAt);
         });
 
         modelBuilder.Entity<HostingPlan>(entity =>

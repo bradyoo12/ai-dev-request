@@ -309,5 +309,16 @@
   "refinement.thinking": "AI가 생각하고 있습니다...",
   "refinement.sendFailed": "메시지 전송에 실패했습니다. 다시 시도해주세요.",
   "refinement.insufficientTokens": "토큰이 부족합니다.",
-  "settings.tokens.action.refinement": "채팅 수정"
+  "settings.tokens.action.refinement": "채팅 수정",
+  "analysis.platformMobile": "모바일 앱",
+  "analysis.platformFullstack": "웹 + 모바일",
+  "mobile.qrPreview": "모바일 미리보기",
+  "mobile.qrPlaceholder": "QR 코드",
+  "mobile.qrDescription": "Expo Go로 스캔하여 기기에서 앱을 미리 볼 수 있습니다.",
+  "mobile.qrStep1": "핸드폰에 Expo Go를 설치하세요",
+  "mobile.qrStep2": "컴퓨터에서 설정 명령어를 실행하세요",
+  "mobile.qrStep3": "터미널에 표시된 QR 코드를 스캔하세요",
+  "mobile.ios": "iOS",
+  "mobile.android": "Android",
+  "form.example.mobileApp": "피트니스 트래킹 앱을 만들어주세요"
 }

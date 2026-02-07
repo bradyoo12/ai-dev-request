@@ -33,6 +33,7 @@ public class AnalysisService : IAnalysisService
 
 {{
   ""category"": ""WebApp|MobileApp|Api|Automation|AiSolution|LandingPage|Dashboard|Chatbot|Other"",
+  ""platform"": ""web|mobile|fullstack"",
   ""complexity"": ""Simple|Medium|Complex|Enterprise"",
   ""summary"": ""요청 내용 한 줄 요약"",
   ""requirements"": {{
@@ -109,6 +110,7 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
 public class AnalysisResult
 {
     public string Category { get; set; } = "Unknown";
+    public string Platform { get; set; } = "web";
     public string Complexity { get; set; } = "Unknown";
     public string Summary { get; set; } = "";
     public RequirementsInfo Requirements { get; set; } = new();

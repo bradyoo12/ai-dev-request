@@ -64,6 +64,7 @@ export interface TechStackInfo {
 export interface AnalysisResponse {
   requestId: string;
   category: string;
+  platform?: string;
   complexity: string;
   summary: string;
   requirements: RequirementsInfo;

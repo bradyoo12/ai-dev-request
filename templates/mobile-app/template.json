@@ -1,0 +1,32 @@
+{
+  "name": "mobile-app",
+  "displayName": "Mobile App (React Native + Expo)",
+  "description": "Cross-platform mobile app using React Native and Expo managed workflow",
+  "platform": "mobile",
+  "framework": "react-native",
+  "runtime": "expo",
+  "features": [
+    "React Navigation (stack + bottom tabs)",
+    "NativeWind (Tailwind CSS for React Native)",
+    "Zustand state management",
+    "Expo managed workflow",
+    "QR code preview via Expo Go"
+  ],
+  "tokenCost": {
+    "analysis": 10,
+    "proposal": 20,
+    "build": 60
+  },
+  "scaffoldFiles": [
+    "package.json",
+    "app.json",
+    "App.tsx",
+    "babel.config.js",
+    "tsconfig.json",
+    "screens/HomeScreen.tsx",
+    "screens/SettingsScreen.tsx",
+    "navigation/AppNavigator.tsx",
+    "components/Button.tsx",
+    "components/Card.tsx"
+  ]
+}

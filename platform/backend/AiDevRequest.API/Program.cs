@@ -108,10 +108,16 @@ if (app.Environment.IsDevelopment())
 
                 if (exists)
                 {
-                    // Database was created by EnsureCreatedAsync — tables exist but no migration history.
-                    // Record the InitialCreate migration as already applied so MigrateAsync skips it.
+                    // Database was created by EnsureCreatedAsync -- tables exist but no migration history.
+                    // First, ensure the __EFMigrationsHistory table exists (it won't if EnsureCreated was used).
                     logger.LogInformation("Detected existing database without migration history. Bootstrapping migration state...");
                     var historyRepository = dbContext.GetService<IHistoryRepository>();
+
+                    var createScript = historyRepository.GetCreateIfNotExistsScript();
+                    await dbContext.Database.ExecuteSqlRawAsync(createScript);
+                    logger.LogInformation("Ensured __EFMigrationsHistory table exists.");
+
+                    // Record the InitialCreate migration as already applied so MigrateAsync skips it.
                     var insertScript = historyRepository.GetInsertScript(new HistoryRow(
                         pendingMigrations.First(), // The InitialCreate migration ID
                         ProductInfo.GetVersion()));
@@ -130,8 +136,9 @@ if (app.Environment.IsDevelopment())
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "Database migration failed. The application may not function correctly.");
-        throw;
+        // Log but do NOT crash the app. The endpoints will return errors individually,
+        // but the health check and logs will remain accessible for debugging.
+        logger.LogError(ex, "Database migration failed. The application will start but database-dependent endpoints may not work.");
     }
 }
 

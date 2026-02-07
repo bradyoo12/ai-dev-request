@@ -21,18 +21,42 @@ public class TranslationsController : ControllerBase
     /// <summary>
     /// Get all translations for a locale (used by i18next-http-backend)
     /// Returns flat key-value JSON: { "hero.title": "...", "hero.subtitle": "..." }
+    /// Supports locale fallback: en-AU -> en, ko-KR -> ko
     /// </summary>
     [HttpGet("{locale}")]
     public async Task<ActionResult<Dictionary<string, string>>> GetTranslations(string locale)
     {
-        var translations = await _context.Translations
-            .Where(t => t.LanguageCode == locale)
-            .ToDictionaryAsync(
-                t => $"{t.Namespace}.{t.Key}",
-                t => t.Value
-            );
+        try
+        {
+            var translations = await _context.Translations
+                .Where(t => t.LanguageCode == locale)
+                .ToDictionaryAsync(
+                    t => $"{t.Namespace}.{t.Key}",
+                    t => t.Value
+                );
 
-        return Ok(translations);
+            // If no translations found and the locale has a region code (e.g., en-AU),
+            // fall back to the base language (e.g., en)
+            if (translations.Count == 0 && locale.Contains('-'))
+            {
+                var baseLang = locale.Split('-')[0];
+                _logger.LogInformation("No translations for '{Locale}', falling back to '{BaseLang}'", locale, baseLang);
+                translations = await _context.Translations
+                    .Where(t => t.LanguageCode == baseLang)
+                    .ToDictionaryAsync(
+                        t => $"{t.Namespace}.{t.Key}",
+                        t => t.Value
+                    );
+            }
+
+            return Ok(translations);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load translations for locale '{Locale}'", locale);
+            // Return empty translations instead of 500 so i18next can fall back gracefully
+            return Ok(new Dictionary<string, string>());
+        }
     }
 
     /// <summary>

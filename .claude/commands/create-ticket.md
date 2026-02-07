@@ -36,13 +36,19 @@ For UI/UX related tickets, include ASCII art mockups.
 gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body-file {draft-file}
 ```
 
-## Step 4: Add to AI Dev Request Project
+## Step 4: Add to AI Dev Request Project and Set Status to Ready
 
 ```bash
-gh project item-add 26 --owner bradyoo12 --url {issue-url}
+# Add issue to project and capture the item ID
+ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format json --jq '.id')
+
+# Get the Status field ID and "Ready" option ID, then set it
+STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
+READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
+gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
 ```
 
-Report the created issue URL and confirm it was added to the project.
+Report the created issue URL and confirm it was added to the project with **Ready** status.
 
 ## Important Notes
 

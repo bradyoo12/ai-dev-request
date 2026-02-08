@@ -32,6 +32,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();
+builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "dev-secret-key-change-in-production-min-32-chars!!";
@@ -94,9 +95,9 @@ if (app.Environment.IsDevelopment())
     try
     {
         string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
-            "dev_requests", "hosting_plans", "languages", "payments", "refinement_messages",
-            "token_balances", "token_packages", "token_pricing", "token_transactions",
-            "translations", "users" };
+            "dev_requests", "domains", "domain_transactions", "hosting_plans", "languages",
+            "payments", "refinement_messages", "token_balances", "token_packages",
+            "token_pricing", "token_transactions", "translations", "users" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

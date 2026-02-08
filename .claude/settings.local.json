@@ -12,7 +12,16 @@
       "Read",
       "Edit",
       "Write",
-      "Task"
+      "Task",
+      "Bash(az keyvault secret set:*)",
+      "Bash(az keyvault list:*)",
+      "Bash(az group list:*)",
+      "Bash(az keyvault create:*)",
+      "Bash(az role assignment create:*)",
+      "Bash(az ad signed-in-user show:*)",
+      "Bash(az account show:*)",
+      "Bash(az account set:*)",
+      "Bash(az login:*)"
     ]
   }
 }

@@ -63,3 +63,5 @@ tmp/
 temp/
 .cache/
 nul
+oauth/cloudflare
+oauth/client_secret_700841454591-ub3ga4a9pnorje2o1tbsfloqalhssf3l.apps.googleusercontent.com.json

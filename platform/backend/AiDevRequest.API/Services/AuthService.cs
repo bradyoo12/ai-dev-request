@@ -69,7 +69,7 @@ public class AuthService : IAuthService
         var normalizedEmail = email.Trim().ToLowerInvariant();
 
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        if (user == null || string.IsNullOrEmpty(user.PasswordHash) || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
         {
             throw new InvalidOperationException("Invalid email or password.");
         }

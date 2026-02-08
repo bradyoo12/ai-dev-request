@@ -27,6 +27,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<IDeploymentService, AzureDeploymentService>();
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISocialAuthService, SocialAuthService>();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();

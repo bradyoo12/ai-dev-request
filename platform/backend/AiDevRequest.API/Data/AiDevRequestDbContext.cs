@@ -236,12 +236,22 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
-            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.PasswordHash).HasMaxLength(500);
             entity.Property(e => e.DisplayName).HasMaxLength(100);
+            entity.Property(e => e.ProfileImageUrl).HasMaxLength(500);
             entity.Property(e => e.AnonymousUserId).HasMaxLength(100);
+            entity.Property(e => e.GoogleId).HasMaxLength(100);
+            entity.Property(e => e.AppleId).HasMaxLength(100);
+            entity.Property(e => e.LineId).HasMaxLength(100);
+            entity.Property(e => e.KakaoId).HasMaxLength(100);
+            entity.Property(e => e.CountryCode).HasMaxLength(10);
 
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.AnonymousUserId);
+            entity.HasIndex(e => e.GoogleId);
+            entity.HasIndex(e => e.KakaoId);
+            entity.HasIndex(e => e.LineId);
+            entity.HasIndex(e => e.AppleId);
         });
 
         modelBuilder.Entity<AutoTopUpConfig>(entity =>

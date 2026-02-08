@@ -11,6 +11,7 @@ export interface AuthUser {
   id: string
   email: string
   displayName?: string
+  profileImageUrl?: string
   createdAt: string
 }
 
@@ -18,6 +19,8 @@ export interface AuthResponse {
   token: string
   user: AuthUser
 }
+
+export type SocialProvider = 'google' | 'apple' | 'line' | 'kakao'
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
@@ -108,6 +111,57 @@ export async function login(
   return data
 }
 
+export async function socialLogin(
+  provider: SocialProvider,
+  code: string,
+  redirectUri: string
+): Promise<AuthResponse> {
+  const anonymousUserId = localStorage.getItem('ai-dev-user-id') || undefined
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/${provider}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code, redirectUri, anonymousUserId }),
+  })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('auth.error.loginFailed'))
+  }
+
+  const data: AuthResponse = await response.json()
+  setAuth(data.token, data.user)
+  return data
+}
+
+export async function getProviders(): Promise<SocialProvider[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/providers`)
+    if (!response.ok) return ['google', 'apple', 'kakao', 'line']
+    const data = await response.json()
+    return data.providers
+  } catch {
+    return ['google', 'apple', 'kakao', 'line']
+  }
+}
+
+export async function getAuthUrl(provider: SocialProvider, redirectUri: string): Promise<string> {
+  const state = crypto.randomUUID()
+  localStorage.setItem('oauth-state', state)
+  localStorage.setItem('oauth-provider', provider)
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/auth/${provider}/url?redirectUri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}`
+  )
+
+  if (!response.ok) {
+    throw new Error(`Failed to get auth URL for ${provider}`)
+  }
+
+  const data = await response.json()
+  return data.url
+}
+
 export async function getMe(): Promise<AuthUser> {
   const token = getToken()
   if (!token) throw new Error('Not authenticated')
@@ -129,4 +183,8 @@ export async function getMe(): Promise<AuthUser> {
 
 export function logout(): void {
   clearAuth()
+}
+
+export function getOAuthCallbackUrl(provider: SocialProvider): string {
+  return `${window.location.origin}/auth/callback/${provider}`
 }

@@ -269,6 +269,6 @@ Log the current status of the project board:
 - **Prevention**: Always verify database infrastructure exists BEFORE deploying a new service. Add connection string configuration to the deployment workflow or IaC. Consider adding a startup check that logs a clear warning if the database is unreachable.
 
 ### [2026-02-07] Bash escaping mangles special characters in Azure CLI settings
-- **Problem**: Setting `ConnectionStrings__DefaultConnection` via `az webapp config appsettings set --settings "..."` mangled the password — `!` was escaped to `\!` by bash history expansion, even with single quotes.
+- **Problem**: Setting ConnectionStrings__DefaultConnection via "az webapp config appsettings set" mangled the password — the "!" character was escaped to "\!" by bash history expansion, even with single quotes.
 - **Solution**: Used `az rest --method PUT --body @file.json` with the connection string in a JSON file to bypass all shell escaping.
 - **Prevention**: For Azure App Settings containing special characters, always use `az rest` with a JSON body file instead of `az webapp config appsettings set`.

@@ -24,6 +24,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HostingPlan> HostingPlans => Set<HostingPlan>();
     public DbSet<BuildVerification> BuildVerifications => Set<BuildVerification>();
     public DbSet<RefinementMessage> RefinementMessages => Set<RefinementMessage>();
+    public DbSet<Suggestion> Suggestions => Set<Suggestion>();
+    public DbSet<SuggestionVote> SuggestionVotes => Set<SuggestionVote>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -269,6 +271,29 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Content).IsRequired();
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<Suggestion>(entity =>
+        {
+            entity.ToTable("suggestions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<SuggestionVote>(entity =>
+        {
+            entity.ToTable("suggestion_votes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => new { e.SuggestionId, e.UserId }).IsUnique();
+            entity.HasIndex(e => e.SuggestionId);
         });
 
         modelBuilder.Entity<HostingPlan>(entity =>

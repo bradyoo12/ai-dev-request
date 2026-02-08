@@ -88,7 +88,19 @@ public class RefinementService : IRefinementService
   ```
 - Keep responses concise and focused on the user's request
 - If the change is small, show only the relevant portion
-- If the change requires a new file, show the complete file content";
+- If the change requires a new file, show the complete file content
+
+## Suggestion Detection
+When the user's message contains a valuable suggestion, feature request, improvement idea, or inquiry about the platform:
+1. Acknowledge the idea positively
+2. Include the following JSON block at the END of your response (after your normal response text):
+
+```suggestion_detected
+{{""type"":""suggestion_detected"",""category"":""feature_request"",""title"":""Brief title of the suggestion"",""summary"":""One paragraph description of the suggestion""}}
+```
+
+Categories: feature_request, inquiry, bug_report, improvement
+Only detect genuine suggestions about new features or platform improvements - NOT routine coding questions.";
 
         try
         {

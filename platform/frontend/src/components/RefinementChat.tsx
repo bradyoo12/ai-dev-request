@@ -2,10 +2,37 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getChatHistory, sendChatMessage } from '../api/refinement'
 import type { ChatMessage } from '../api/refinement'
+import { createSuggestion } from '../api/suggestions'
+
+interface SuggestionDetected {
+  type: 'suggestion_detected'
+  category: string
+  title: string
+  summary: string
+}
 
 interface RefinementChatProps {
   requestId: string
   onTokensUsed?: (tokensUsed: number, newBalance: number) => void
+}
+
+function parseSuggestionFromContent(content: string): { cleanContent: string; suggestion: SuggestionDetected | null } {
+  const regex = /```suggestion_detected\n([\s\S]*?)\n```/
+  const match = content.match(regex)
+
+  if (!match) return { cleanContent: content, suggestion: null }
+
+  try {
+    const suggestion = JSON.parse(match[1]) as SuggestionDetected
+    if (suggestion.type === 'suggestion_detected') {
+      const cleanContent = content.replace(regex, '').trim()
+      return { cleanContent, suggestion }
+    }
+  } catch {
+    // Parse failed, not a valid suggestion block
+  }
+
+  return { cleanContent: content, suggestion: null }
 }
 
 export default function RefinementChat({ requestId, onTokensUsed }: RefinementChatProps) {
@@ -14,6 +41,8 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
+  const [pendingSuggestion, setPendingSuggestion] = useState<{ suggestion: SuggestionDetected; messageId: number } | null>(null)
+  const [registering, setRegistering] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -40,6 +69,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     setInput('')
     setError('')
     setSending(true)
+    setPendingSuggestion(null)
 
     // Optimistic add user message
     const tempMsg: ChatMessage = {
@@ -61,12 +91,21 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
         return
       }
 
+      // Check for suggestion detection in assistant response
+      const { cleanContent, suggestion } = parseSuggestionFromContent(response.message.content)
+
+      const cleanMessage = { ...response.message, content: cleanContent }
+
       // Replace temp message and add assistant response
       setMessages(prev => [
         ...prev.filter(m => m.id !== tempMsg.id),
         { ...tempMsg, id: response.message.id - 1 },
-        response.message,
+        cleanMessage,
       ])
+
+      if (suggestion) {
+        setPendingSuggestion({ suggestion, messageId: response.message.id })
+      }
 
       onTokensUsed?.(response.tokensUsed, response.newBalance)
     } catch {
@@ -75,6 +114,45 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     } finally {
       setSending(false)
     }
+  }
+
+  const handleRegisterSuggestion = async () => {
+    if (!pendingSuggestion || registering) return
+    setRegistering(true)
+
+    try {
+      const result = await createSuggestion(
+        pendingSuggestion.suggestion.title,
+        pendingSuggestion.suggestion.summary,
+        pendingSuggestion.suggestion.category,
+        requestId
+      )
+
+      // Add a confirmation message
+      const confirmMsg: ChatMessage = {
+        id: Date.now(),
+        role: 'assistant',
+        content: t('suggestions.registered', {
+          id: result.suggestion.id,
+          title: result.suggestion.title,
+          tokens: result.tokensAwarded,
+        }),
+        tokensUsed: null,
+        createdAt: new Date().toISOString(),
+      }
+      setMessages(prev => [...prev, confirmMsg])
+
+      onTokensUsed?.(0, result.newBalance)
+      setPendingSuggestion(null)
+    } catch {
+      setError(t('suggestions.registerFailed'))
+    } finally {
+      setRegistering(false)
+    }
+  }
+
+  const handleDeclineSuggestion = () => {
+    setPendingSuggestion(null)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -138,6 +216,41 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
             </div>
           </div>
         ))}
+
+        {/* Suggestion Confirmation Prompt */}
+        {pendingSuggestion && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] bg-gradient-to-r from-yellow-900/40 to-orange-900/40 border border-yellow-700/50 rounded-2xl px-4 py-3">
+              <div className="text-sm font-medium text-yellow-300 mb-2">
+                💡 {t('suggestions.confirmPrompt')}
+              </div>
+              <div className="text-sm text-gray-300 mb-1">
+                <strong>{pendingSuggestion.suggestion.title}</strong>
+              </div>
+              <div className="text-xs text-gray-400 mb-3">
+                {pendingSuggestion.suggestion.summary}
+              </div>
+              <div className="text-xs text-yellow-400 mb-3">
+                🎁 {t('suggestions.rewardPrompt', { tokens: 50 })}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRegisterSuggestion}
+                  disabled={registering}
+                  className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  {registering ? t('suggestions.registering') : t('suggestions.confirmYes')}
+                </button>
+                <button
+                  onClick={handleDeclineSuggestion}
+                  className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+                >
+                  {t('suggestions.confirmNo')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {sending && (
           <div className="flex justify-start">

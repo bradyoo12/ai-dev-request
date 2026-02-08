@@ -23,4 +23,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Data\SeedData\ko.json" />
+    <EmbeddedResource Include="Data\SeedData\en.json" />
+  </ItemGroup>
+
 </Project>

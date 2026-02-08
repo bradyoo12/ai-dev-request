@@ -10,6 +10,7 @@ public interface ITokenService
     Task<TokenBalance> GetOrCreateBalance(string userId);
     Task<(bool HasEnough, int Cost, int Balance)> CheckBalance(string userId, string actionType);
     Task<TokenTransaction> DebitTokens(string userId, string actionType, string? referenceId = null);
+    Task<TokenTransaction> CreditTokens(string userId, int amount, string action, string? referenceId = null, string? description = null);
 }
 
 public class TokenService : ITokenService
@@ -101,6 +102,35 @@ public class TokenService : ITokenService
         _logger.LogInformation(
             "User {UserId} spent {Tokens} tokens on {Action}. Balance: {Balance}",
             userId, pricing.TokenCost, actionType, balance.Balance);
+
+        return transaction;
+    }
+
+    public async Task<TokenTransaction> CreditTokens(string userId, int amount, string action, string? referenceId = null, string? description = null)
+    {
+        var balance = await GetOrCreateBalance(userId);
+
+        balance.Balance += amount;
+        balance.TotalEarned += amount;
+        balance.UpdatedAt = DateTime.UtcNow;
+
+        var transaction = new TokenTransaction
+        {
+            UserId = userId,
+            Type = "credit",
+            Amount = amount,
+            Action = action,
+            ReferenceId = referenceId,
+            Description = description ?? action,
+            BalanceAfter = balance.Balance
+        };
+        _context.TokenTransactions.Add(transaction);
+
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "User {UserId} earned {Tokens} tokens for {Action}. Balance: {Balance}",
+            userId, amount, action, balance.Balance);
 
         return transaction;
     }

@@ -16,9 +16,11 @@ import BillingPage from './pages/BillingPage'
 import PlanSelectionDialog from './components/PlanSelectionDialog'
 import RefinementChat from './components/RefinementChat'
 import LoginPage from './pages/LoginPage'
+import SuggestionBoardPage from './pages/SuggestionBoardPage'
+import ChurnDashboard from './pages/admin/ChurnDashboard'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
-type PageState = 'main' | 'settings' | 'sites'
+type PageState = 'main' | 'settings' | 'sites' | 'suggestions' | 'admin-churn'
 type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments'
 
 function App() {
@@ -268,6 +270,8 @@ function App() {
             )}
             <nav className="space-x-4">
               <button onClick={() => setPage('sites')} className="hover:text-blue-400">{t('header.mySites')}</button>
+              <button onClick={() => setPage('suggestions')} className="hover:text-blue-400">{t('header.suggestions')}</button>
+              <button onClick={() => setPage('admin-churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
               <a href="#pricing" className="hover:text-blue-400">{t('header.pricing')}</a>
               <button onClick={() => setPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
@@ -360,6 +364,36 @@ function App() {
               <h2 className="text-2xl font-bold">{t('header.mySites')}</h2>
             </div>
             <MySitesPage />
+          </section>
+        )}
+
+        {page === 'suggestions' && (
+          <section>
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => setPage('main')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                &larr;
+              </button>
+              <h2 className="text-2xl font-bold">{t('header.suggestions')}</h2>
+            </div>
+            <SuggestionBoardPage onBalanceChange={(b) => setTokenBalance(b)} />
+          </section>
+        )}
+
+        {page === 'admin-churn' && (
+          <section>
+            <div className="flex items-center gap-3 mb-6">
+              <button
+                onClick={() => setPage('main')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                &larr;
+              </button>
+              <h2 className="text-2xl font-bold">{t('header.adminChurn')}</h2>
+            </div>
+            <ChurnDashboard />
           </section>
         )}
 

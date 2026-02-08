@@ -60,29 +60,45 @@ public class SettingsController : ControllerBase
     [HttpGet("tokens")]
     public async Task<ActionResult<TokenOverviewDto>> GetTokenOverview()
     {
-        var userId = GetUserId();
-        var balance = await GetOrCreateBalance(userId);
-
-        var pricing = await _context.TokenPricings
-            .Where(p => p.IsActive)
-            .OrderBy(p => p.Id)
-            .Select(p => new TokenCostDto
-            {
-                ActionType = p.ActionType,
-                TokenCost = p.TokenCost,
-                Description = p.Description ?? p.ActionType,
-                ApproxUsd = Math.Round(p.TokenCost * 0.01m, 2)
-            })
-            .ToListAsync();
-
-        return Ok(new TokenOverviewDto
+        try
         {
-            Balance = balance.Balance,
-            TotalEarned = balance.TotalEarned,
-            TotalSpent = balance.TotalSpent,
-            BalanceValueUsd = Math.Round(balance.Balance * 0.01m, 2),
-            Pricing = pricing
-        });
+            var userId = GetUserId();
+            var balance = await GetOrCreateBalance(userId);
+
+            var pricing = await _context.TokenPricings
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.Id)
+                .Select(p => new TokenCostDto
+                {
+                    ActionType = p.ActionType,
+                    TokenCost = p.TokenCost,
+                    Description = p.Description ?? p.ActionType,
+                    ApproxUsd = Math.Round(p.TokenCost * 0.01m, 2)
+                })
+                .ToListAsync();
+
+            return Ok(new TokenOverviewDto
+            {
+                Balance = balance.Balance,
+                TotalEarned = balance.TotalEarned,
+                TotalSpent = balance.TotalSpent,
+                BalanceValueUsd = Math.Round(balance.Balance * 0.01m, 2),
+                Pricing = pricing
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load token overview");
+            // Return a default response so the frontend doesn't break
+            return Ok(new TokenOverviewDto
+            {
+                Balance = 0,
+                TotalEarned = 0,
+                TotalSpent = 0,
+                BalanceValueUsd = 0,
+                Pricing = new List<TokenCostDto>()
+            });
+        }
     }
 
     /// <summary>
@@ -446,19 +462,27 @@ public class SettingsController : ControllerBase
     [HttpGet("/api/pricing/token-costs")]
     public async Task<ActionResult<IEnumerable<TokenCostDto>>> GetTokenCosts()
     {
-        var costs = await _context.TokenPricings
-            .Where(p => p.IsActive)
-            .OrderBy(p => p.Id)
-            .Select(p => new TokenCostDto
-            {
-                ActionType = p.ActionType,
-                TokenCost = p.TokenCost,
-                Description = p.Description ?? p.ActionType,
-                ApproxUsd = Math.Round(p.TokenCost * 0.01m, 2)
-            })
-            .ToListAsync();
+        try
+        {
+            var costs = await _context.TokenPricings
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.Id)
+                .Select(p => new TokenCostDto
+                {
+                    ActionType = p.ActionType,
+                    TokenCost = p.TokenCost,
+                    Description = p.Description ?? p.ActionType,
+                    ApproxUsd = Math.Round(p.TokenCost * 0.01m, 2)
+                })
+                .ToListAsync();
 
-        return Ok(costs);
+            return Ok(costs);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load token costs");
+            return Ok(Array.Empty<TokenCostDto>());
+        }
     }
 }
 

@@ -24,6 +24,11 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HostingPlan> HostingPlans => Set<HostingPlan>();
     public DbSet<BuildVerification> BuildVerifications => Set<BuildVerification>();
     public DbSet<RefinementMessage> RefinementMessages => Set<RefinementMessage>();
+    public DbSet<Suggestion> Suggestions => Set<Suggestion>();
+    public DbSet<SuggestionVote> SuggestionVotes => Set<SuggestionVote>();
+    public DbSet<SubscriptionRecord> SubscriptionRecords => Set<SubscriptionRecord>();
+    public DbSet<SubscriptionEvent> SubscriptionEvents => Set<SubscriptionEvent>();
+    public DbSet<ChurnMetricSnapshot> ChurnMetricSnapshots => Set<ChurnMetricSnapshot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -269,6 +274,65 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Content).IsRequired();
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<Suggestion>(entity =>
+        {
+            entity.ToTable("suggestions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<SuggestionVote>(entity =>
+        {
+            entity.ToTable("suggestion_votes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => new { e.SuggestionId, e.UserId }).IsUnique();
+            entity.HasIndex(e => e.SuggestionId);
+        });
+
+        modelBuilder.Entity<SubscriptionRecord>(entity =>
+        {
+            entity.ToTable("subscription_records");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PlanType).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.StartedAt);
+        });
+
+        modelBuilder.Entity<SubscriptionEvent>(entity =>
+        {
+            entity.ToTable("subscription_events");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.UserEmail).HasMaxLength(255);
+            entity.Property(e => e.EventType).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.FromPlan).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.ToPlan).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.EventType);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<ChurnMetricSnapshot>(entity =>
+        {
+            entity.ToTable("churn_metric_snapshots");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ChurnRate).HasColumnType("decimal(10,4)");
+            entity.Property(e => e.Mrr).HasColumnType("decimal(18,2)");
+            entity.HasIndex(e => e.PeriodStart);
         });
 
         modelBuilder.Entity<HostingPlan>(entity =>

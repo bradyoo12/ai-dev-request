@@ -243,4 +243,32 @@ Log the current status of the project board:
 
 ## Lessons Learned
 
-_(No entries yet - this section will be populated as the pipeline runs)_
+### [2026-02-07] Azure App Service auto-disables after startup crashes
+- **Problem**: After deploying a backend change that caused the .NET app to crash on startup (migration bootstrap logic tried to INSERT into nonexistent `__EFMigrationsHistory` table), Azure auto-disabled the App Service entirely. Subsequent deployments then fail with "Site Disabled (CODE: 403)" and cannot deploy the fix.
+- **Solution**: The code fix (ensure `__EFMigrationsHistory` table exists before INSERT, and don't crash on migration failure) was merged to main. However, someone with Azure portal access must manually re-enable the App Service before the fix can be deployed.
+- **Prevention**: Always ensure migration bootstrap logic handles missing tables gracefully. Never let migration failures crash the application startup — log and continue so the app remains accessible for diagnostics. Consider adding a health check endpoint that works even when migrations fail.
+
+### [2026-02-07] EnsureCreatedAsync vs MigrateAsync for existing databases
+- **Problem**: The original code used `EnsureCreatedAsync()` which only creates a new database from scratch and cannot apply incremental schema changes. When new entities were added, the staging database (which already existed) never got the new tables, causing 500 errors on all database-dependent endpoints.
+- **Solution**: Replaced with `MigrateAsync()` plus EF Core migrations. Added bootstrap logic to detect legacy databases (created by `EnsureCreatedAsync`) and insert the initial migration record so `MigrateAsync()` doesn't try to re-create existing tables.
+- **Prevention**: Always use EF Core migrations from the start. Never use `EnsureCreatedAsync()` in any environment beyond initial prototyping.
+
+### [2026-02-07] Duplicate tickets (#41 and #43) addressing same issue
+- **Problem**: Tickets #41 and #43 both described the same staging 500 error from different angles. Both were in Ready status.
+- **Solution**: Treated #41 as the primary ticket (migration fix) and #43 as a follow-up (startup crash fix + error handling). Both ended up being processed sequentially.
+- **Prevention**: During audit, identify duplicates early and close/merge them before entering the b-ready phase.
+
+### [2026-02-07] Azure App Service Free tier (F1) quota exceeded blocks all deployments
+- **Problem**: The Free F1 App Service Plan has a 60 CPU-minutes/day quota. Repeated startup crashes burned through the quota, causing "QuotaExceeded" state and 403 "Site Disabled" on all deployment attempts. Quota resets at midnight UTC (~19 hours away).
+- **Solution**: Scaled the App Service Plan from F1 (Free) to B1 (Basic, ~$13/month) using `az appservice plan update --sku B1`. This immediately lifted the quota restriction.
+- **Prevention**: Use at least B1 tier for staging environments. F1 is only suitable for static sites or minimal testing.
+
+### [2026-02-07] No database configured for Azure deployment
+- **Problem**: The backend had no database connection string configured in Azure App Settings. It fell back to `Host=localhost` which doesn't work on Azure. The error handling in controllers returned default/empty data, masking the real issue (no database).
+- **Solution**: Created an `ai_dev_request` database on the existing `db-bradyoo-staging` PostgreSQL Flexible Server. Configured the connection string via Azure REST API (to avoid bash escaping issues with special characters in the password).
+- **Prevention**: Always verify database infrastructure exists BEFORE deploying a new service. Add connection string configuration to the deployment workflow or IaC. Consider adding a startup check that logs a clear warning if the database is unreachable.
+
+### [2026-02-07] Bash escaping mangles special characters in Azure CLI settings
+- **Problem**: Setting ConnectionStrings__DefaultConnection via "az webapp config appsettings set" mangled the password — the "!" character was escaped to "\!" by bash history expansion, even with single quotes.
+- **Solution**: Used `az rest --method PUT --body @file.json` with the connection string in a JSON file to bypass all shell escaping.
+- **Prevention**: For Azure App Settings containing special characters, always use `az rest` with a JSON body file instead of `az webapp config appsettings set`.

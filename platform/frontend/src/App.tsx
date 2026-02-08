@@ -55,10 +55,6 @@ function App() {
     loadTokenBalance()
   }
 
-  if (showLogin) {
-    return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!request.trim()) return
@@ -248,6 +244,10 @@ function App() {
       case 'enterprise': return t('complexity.enterprise')
       default: return complexity
     }
+  }
+
+  if (showLogin) {
+    return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
   }
 
   return (

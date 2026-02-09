@@ -590,7 +590,7 @@ export default function HomePage() {
                 title={t('button.comingSoon')}
                 className="flex-1 py-3 bg-gray-600 cursor-not-allowed rounded-xl font-medium transition-colors opacity-60"
               >
-                {t('button.downloadProject')}
+                {t('button.downloadProject')} ({t('button.comingSoon')})
               </button>
             </div>
           </div>

@@ -522,5 +522,13 @@
   "deploy.status.building": "Building",
   "deploy.status.deploying": "Deploying",
   "deploy.status.running": "Live",
-  "deploy.status.failed": "Failed"
+  "deploy.status.failed": "Failed",
+  "deploy.liveReady": "Your site is live and ready to preview below.",
+  "preview.title": "Live Preview",
+  "preview.desktop": "Desktop",
+  "preview.tablet": "Tablet",
+  "preview.mobile": "Mobile",
+  "preview.copyUrl": "Copy URL",
+  "preview.copied": "Copied!",
+  "preview.openNew": "Open in new tab"
 }

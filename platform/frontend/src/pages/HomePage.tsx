@@ -440,6 +440,12 @@ export default function HomePage() {
             <div className="animate-pulse"><div className="text-6xl mb-6">🔨</div></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.building')}</h3>
             <p className="text-gray-400">{t('status.buildingDetail')}</p>
+            {analysisResult && ['complex', 'enterprise'].includes(analysisResult.complexity.toLowerCase()) && (
+              <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-purple-900/40 border border-purple-700/50 rounded-full">
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-ping" />
+                <span className="text-sm text-purple-300 font-medium">{t('status.extendedThinking')}</span>
+              </div>
+            )}
             <div className="mt-6 flex justify-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

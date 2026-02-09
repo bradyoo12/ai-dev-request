@@ -486,23 +486,30 @@ public class RequestsController : ControllerBase
                 return BadRequest(new { error = "제안서를 불러올 수 없습니다." });
             }
 
-            // Detect platform from analysis
+            // Detect platform and complexity from analysis
             var platform = "web";
+            var complexity = "Medium";
             if (!string.IsNullOrEmpty(entity.AnalysisResultJson))
             {
                 var analysis = JsonSerializer.Deserialize<AnalysisResult>(
                     entity.AnalysisResultJson,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
-                if (analysis != null && !string.IsNullOrEmpty(analysis.Platform))
-                    platform = analysis.Platform;
+                if (analysis != null)
+                {
+                    if (!string.IsNullOrEmpty(analysis.Platform))
+                        platform = analysis.Platform;
+                    if (!string.IsNullOrEmpty(analysis.Complexity))
+                        complexity = analysis.Complexity;
+                }
             }
 
             var result = await _productionService.GenerateProjectAsync(
                 id.ToString(),
                 entity.Description,
                 proposal,
-                platform
+                platform,
+                complexity
             );
 
             entity.ProjectId = result.ProjectId;

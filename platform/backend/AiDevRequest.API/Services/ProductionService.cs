@@ -6,7 +6,7 @@ namespace AiDevRequest.API.Services;
 
 public interface IProductionService
 {
-    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web");
+    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium");
     Task<string> GetBuildStatusAsync(string projectId);
 }
 
@@ -27,12 +27,25 @@ public class ProductionService : IProductionService
         _projectsBasePath = configuration["Projects:BasePath"] ?? "./projects";
     }
 
-    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web")
+    private static int GetThinkingBudget(string complexity)
+    {
+        return complexity.ToLowerInvariant() switch
+        {
+            "simple" => 0,        // No thinking — fast, cheap
+            "medium" => 10000,    // Light thinking budget
+            "complex" => 50000,   // Full thinking budget
+            "enterprise" => 50000,
+            _ => 0
+        };
+    }
+
+    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium")
     {
         var projectId = $"proj_{requestId[..8]}_{DateTime.UtcNow:yyyyMMdd}";
         var projectPath = Path.Combine(_projectsBasePath, projectId);
+        var thinkingBudget = GetThinkingBudget(complexity);
 
-        _logger.LogInformation("Starting project generation: {ProjectId} (platform: {Platform})", projectId, platform);
+        _logger.LogInformation("Starting project generation: {ProjectId} (platform: {Platform}, complexity: {Complexity}, thinking: {ThinkingBudget})", projectId, platform, complexity, thinkingBudget);
 
         var proposalJson = JsonSerializer.Serialize(proposal);
 
@@ -110,12 +123,26 @@ JSON만 응답하세요.";
             {
                 Messages = messages,
                 Model = "claude-sonnet-4-20250514",
-                MaxTokens = 8000,
-                Temperature = 0.3m
+                MaxTokens = thinkingBudget > 0 ? 16000 : 8000,
             };
 
+            if (thinkingBudget > 0)
+            {
+                // Extended thinking requires Temperature = 1
+                parameters.Temperature = 1.0m;
+                parameters.Thinking = new ThinkingParameters { BudgetTokens = thinkingBudget };
+                _logger.LogInformation("Extended thinking enabled with {Budget} token budget for {ProjectId}", thinkingBudget, projectId);
+            }
+            else
+            {
+                parameters.Temperature = 0.3m;
+            }
+
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
-            var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
+            // Extract text content (skip thinking blocks)
+            var content = string.Join("", response.Content
+                .Where(c => c is TextContent)
+                .Select(c => c.ToString())) ?? "{}";
 
             // Extract JSON
             var jsonStart = content.IndexOf('{');

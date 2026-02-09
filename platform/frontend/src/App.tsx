@@ -52,7 +52,6 @@ function App() {
     logout()
     setAuthUser(null)
     setTokenBalance(null)
-    loadTokenBalance()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

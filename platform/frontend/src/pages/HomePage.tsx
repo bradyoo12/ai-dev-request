@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, InsufficientTokensError } from '../api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, InsufficientTokensError } from '../api/requests'
 import { createSite, getSiteDetail } from '../api/sites'
 import type { SiteResponse } from '../api/sites'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse } from '../api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
@@ -48,6 +48,8 @@ export default function HomePage() {
   const [githubResult, setGithubResult] = useState<GitHubExportResponse | null>(null)
   const [deployStatus, setDeployStatus] = useState<SiteResponse | null>(null)
   const [deploying, setDeploying] = useState(false)
+  const [versions, setVersions] = useState<ProjectVersion[]>([])
+  const [rollingBack, setRollingBack] = useState(false)
   const deployPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
@@ -111,6 +113,20 @@ export default function HomePage() {
       setErrorMessage(err instanceof Error ? err.message : t('export.githubFailed'))
     } finally {
       setExportingGithub(false)
+    }
+  }
+
+  const handleRollback = async (versionId: string) => {
+    if (!submittedRequest) return
+    setRollingBack(true)
+    try {
+      const result = await rollbackToVersion(submittedRequest.id, versionId)
+      setVersions(prev => [result, ...prev])
+    } catch (err) {
+      console.error('Rollback failed:', err)
+      setErrorMessage(err instanceof Error ? err.message : t('version.rollbackFailed'))
+    } finally {
+      setRollingBack(false)
     }
   }
 
@@ -271,6 +287,11 @@ export default function HomePage() {
         await new Promise(resolve => setTimeout(resolve, 1500))
       }
       setViewState('completed')
+
+      // Fetch version history
+      if (submittedRequest) {
+        getVersions(submittedRequest.id).then(setVersions).catch(() => {})
+      }
     } catch (err) {
       if (err instanceof InsufficientTokensError) {
         setInsufficientDialog(err)
@@ -1000,6 +1021,37 @@ export default function HomePage() {
                   className="text-blue-400 hover:text-blue-300 text-sm underline">
                   {githubResult.repoFullName}
                 </a>
+              </div>
+            )}
+
+            {versions.length > 0 && (
+              <div className="bg-gray-900 rounded-xl p-4 mb-4">
+                <h4 className="font-bold mb-3">{t('version.title')}</h4>
+                <div className="space-y-2">
+                  {versions.map((v) => (
+                    <div key={v.id} className="flex items-center justify-between bg-gray-800 rounded-lg p-3">
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          v.source === 'rollback' ? 'bg-yellow-600 text-white'
+                            : v.source === 'rebuild' ? 'bg-blue-600 text-white'
+                            : 'bg-gray-600 text-gray-200'
+                        }`}>v{v.versionNumber}</span>
+                        <div>
+                          <div className="text-sm font-medium">{v.label}</div>
+                          <div className="text-xs text-gray-500">
+                            {v.fileCount} {t('version.files')} · {new Date(v.createdAt).toLocaleString(i18n.language)}
+                          </div>
+                        </div>
+                      </div>
+                      {v.versionNumber < versions[0].versionNumber && (
+                        <button onClick={() => handleRollback(v.id)} disabled={rollingBack}
+                          className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-800 rounded-lg text-xs font-medium transition-colors">
+                          {rollingBack ? t('version.rollingBack') : t('version.rollback')}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

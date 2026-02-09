@@ -486,3 +486,33 @@ export async function exportToGitHub(id: string, accessToken: string, repoName?:
 
   return response.json();
 }
+
+// Version Control API
+export interface ProjectVersion {
+  id: string;
+  versionNumber: number;
+  label: string;
+  source: string;
+  fileCount: number;
+  createdAt: string;
+}
+
+export async function getVersions(id: string): Promise<ProjectVersion[]> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/versions`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) return [];
+  return response.json();
+}
+
+export async function rollbackToVersion(id: string, versionId: string): Promise<ProjectVersion> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/versions/${versionId}/rollback`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Rollback failed');
+  }
+  return response.json();
+}

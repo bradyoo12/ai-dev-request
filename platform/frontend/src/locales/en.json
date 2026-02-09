@@ -547,5 +547,12 @@
   "preview.openNew": "Open in new tab",
   "template.title": "Start from a Template",
   "template.hint": "Click a template to auto-fill your request, or write your own below.",
-  "template.used": "Used {{count}} times"
+  "template.used": "Used {{count}} times",
+  "githubSync.title": "GitHub Sync",
+  "githubSync.linked": "Linked",
+  "githubSync.syncNow": "Sync Changes",
+  "githubSync.syncing": "Syncing...",
+  "githubSync.tokenPrompt": "Enter your GitHub access token to sync:",
+  "githubSync.failed": "Failed to sync to GitHub.",
+  "api.error.githubSyncFailed": "Failed to sync to GitHub."
 }

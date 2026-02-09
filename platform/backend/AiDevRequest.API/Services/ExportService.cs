@@ -6,6 +6,7 @@ public interface IExportService
 {
     Task<byte[]> ExportAsZipAsync(string projectPath, string projectName);
     Task<GitHubExportResult> ExportToGitHubAsync(string projectPath, string projectName, string accessToken, string? repoName = null);
+    Task<GitHubSyncResult> SyncToGitHubAsync(string projectPath, string repoFullName, string accessToken);
 }
 
 public class ExportService : IExportService
@@ -121,6 +122,71 @@ public class ExportService : IExportService
             TotalFiles = files.Count
         };
     }
+
+    public async Task<GitHubSyncResult> SyncToGitHubAsync(
+        string projectPath, string repoFullName, string accessToken)
+    {
+        if (!Directory.Exists(projectPath))
+            throw new InvalidOperationException("Project directory not found");
+
+        var client = _httpClientFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
+        client.DefaultRequestHeaders.Add("User-Agent", "AiDevRequest");
+        client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+
+        // Get files to sync
+        var files = Directory.GetFiles(projectPath, "*", SearchOption.AllDirectories)
+            .Where(f => !f.Contains("node_modules") && !f.Contains(".git") && !f.Contains("bin") && !f.Contains("obj"))
+            .ToList();
+
+        var updatedCount = 0;
+        var createdCount = 0;
+
+        foreach (var file in files)
+        {
+            var relativePath = Path.GetRelativePath(projectPath, file).Replace('\\', '/');
+            var content = await File.ReadAllBytesAsync(file);
+            var base64Content = Convert.ToBase64String(content);
+
+            // Check if file exists to get its SHA (required for updates)
+            string? sha = null;
+            var getResponse = await client.GetAsync(
+                $"https://api.github.com/repos/{repoFullName}/contents/{relativePath}");
+            if (getResponse.IsSuccessStatusCode)
+            {
+                var existingFile = await getResponse.Content.ReadFromJsonAsync<GitHubContentResponse>();
+                sha = existingFile?.Sha;
+            }
+
+            var body = sha != null
+                ? (object)new { message = $"Sync {relativePath}", content = base64Content, sha }
+                : new { message = $"Add {relativePath}", content = base64Content };
+
+            var putResponse = await client.PutAsJsonAsync(
+                $"https://api.github.com/repos/{repoFullName}/contents/{relativePath}", body);
+
+            if (putResponse.IsSuccessStatusCode)
+            {
+                if (sha != null) updatedCount++;
+                else createdCount++;
+            }
+            else
+            {
+                _logger.LogWarning("Failed to sync {File} to GitHub: {Status}", relativePath, putResponse.StatusCode);
+            }
+        }
+
+        _logger.LogInformation("Synced to GitHub {Repo}: {Created} created, {Updated} updated / {Total} total",
+            repoFullName, createdCount, updatedCount, files.Count);
+
+        return new GitHubSyncResult
+        {
+            RepoFullName = repoFullName,
+            FilesCreated = createdCount,
+            FilesUpdated = updatedCount,
+            TotalFiles = files.Count
+        };
+    }
 }
 
 public class GitHubExportResult
@@ -131,9 +197,22 @@ public class GitHubExportResult
     public int TotalFiles { get; set; }
 }
 
+public class GitHubSyncResult
+{
+    public string RepoFullName { get; set; } = "";
+    public int FilesCreated { get; set; }
+    public int FilesUpdated { get; set; }
+    public int TotalFiles { get; set; }
+}
+
 public class GitHubRepoResponse
 {
     public string FullName { get; set; } = "";
     public string HtmlUrl { get; set; } = "";
     public string CloneUrl { get; set; } = "";
+}
+
+public class GitHubContentResponse
+{
+    public string? Sha { get; set; }
 }

@@ -463,5 +463,10 @@
   "feedback.admin.notePlaceholder": "Add a note (optional)...",
   "feedback.admin.replyPlaceholder": "Write an admin reply...",
   "feedback.admin.apply": "Apply",
-  "settings.tokens.action.suggestion_implemented": "Suggestion Implemented"
+  "settings.tokens.action.suggestion_implemented": "Suggestion Implemented",
+  "wizard.step.request": "Request",
+  "wizard.step.analysis": "Analysis",
+  "wizard.step.proposal": "Proposal",
+  "wizard.step.build": "Build",
+  "wizard.step.complete": "Complete"
 }

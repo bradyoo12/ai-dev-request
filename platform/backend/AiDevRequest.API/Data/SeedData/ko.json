@@ -471,5 +471,10 @@
   "feedback.admin.notePlaceholder": "메모 추가 (선택)...",
   "feedback.admin.replyPlaceholder": "관리자 답변을 작성하세요...",
   "feedback.admin.apply": "적용",
-  "settings.tokens.action.suggestion_implemented": "건의 구현 완료"
+  "settings.tokens.action.suggestion_implemented": "건의 구현 완료",
+  "wizard.step.request": "요청",
+  "wizard.step.analysis": "분석",
+  "wizard.step.proposal": "제안서",
+  "wizard.step.build": "빌드",
+  "wizard.step.complete": "완료"
 }

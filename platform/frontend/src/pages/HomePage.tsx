@@ -12,6 +12,7 @@ import HeroSection from '../components/HeroSection'
 import StatsSection from '../components/StatsSection'
 import FeaturesSection from '../components/FeaturesSection'
 import PricingSection from '../components/PricingSection'
+import StepIndicator from '../components/StepIndicator'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -220,6 +221,7 @@ export default function HomePage() {
       )}
 
       <section ref={formRef} className="bg-gray-800 rounded-2xl p-8 shadow-xl">
+        <StepIndicator viewState={viewState} />
         {viewState === 'form' && (
           <form onSubmit={handleSubmit}>
             <label className="block text-lg font-medium mb-4">{t('form.label')}</label>

@@ -193,7 +193,7 @@ public class RequestsController : ControllerBase
             entity.Status = RequestStatus.Submitted; // Reset status
             await _context.SaveChangesAsync();
 
-            return StatusCode(500, new { error = "분석 중 오류가 발생했습니다.", details = ex.Message });
+            return StatusCode(500, new { error = "분석 중 오류가 발생했습니다." });
         }
     }
 
@@ -357,7 +357,7 @@ public class RequestsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Proposal generation failed for request {RequestId}", id);
-            return StatusCode(500, new { error = "제안서 생성 중 오류가 발생했습니다.", details = ex.Message });
+            return StatusCode(500, new { error = "제안서 생성 중 오류가 발생했습니다." });
         }
     }
 
@@ -547,7 +547,7 @@ public class RequestsController : ControllerBase
             _logger.LogError(ex, "Build failed for request {RequestId}", id);
             entity.Status = RequestStatus.Approved;
             await _context.SaveChangesAsync();
-            return StatusCode(500, new { error = "빌드 중 오류가 발생했습니다.", details = ex.Message });
+            return StatusCode(500, new { error = "빌드 중 오류가 발생했습니다." });
         }
     }
 

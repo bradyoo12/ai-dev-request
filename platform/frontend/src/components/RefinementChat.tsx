@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getChatHistory, sendChatMessage } from '../api/refinement'
 import type { ChatMessage } from '../api/refinement'
@@ -45,22 +45,22 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
   const [registering, setRegistering] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    loadHistory()
-  }, [requestId])
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     try {
       const history = await getChatHistory(requestId)
       setMessages(history)
     } catch {
       // No history yet, that's fine
     }
-  }
+  }, [requestId])
+
+  useEffect(() => {
+    loadHistory()
+  }, [loadHistory])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   const handleSend = async () => {
     if (!input.trim() || sending) return

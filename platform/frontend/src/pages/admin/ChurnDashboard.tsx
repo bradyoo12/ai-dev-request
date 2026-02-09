@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -22,15 +22,7 @@ export default function ChurnDashboard() {
 
   const eventsPageSize = 20
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  useEffect(() => {
-    loadEvents()
-  }, [eventsPage, eventFilter, planFilter])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     try {
       const [overviewData, trendsData, planDataResult] = await Promise.all([
@@ -46,9 +38,9 @@ export default function ChurnDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     try {
       const data = await getSubscriptionEvents(eventsPage, eventsPageSize, eventFilter, planFilter)
       setEvents(data.items)
@@ -56,7 +48,15 @@ export default function ChurnDashboard() {
     } catch {
       // Silent fail
     }
-  }
+  }, [eventsPage, eventFilter, planFilter])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  useEffect(() => {
+    loadEvents()
+  }, [loadEvents])
 
   const formatKrw = (amount: number) => {
     return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount)

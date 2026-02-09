@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getSuggestions, voteSuggestion } from '../api/suggestions'
 import type { Suggestion } from '../api/suggestions'
@@ -18,11 +18,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
 
   const pageSize = 10
 
-  useEffect(() => {
-    loadSuggestions()
-  }, [page, category, sort])
-
-  const loadSuggestions = async () => {
+  const loadSuggestions = useCallback(async () => {
     setLoading(true)
     try {
       const data = await getSuggestions(page, pageSize, category, sort)
@@ -33,7 +29,11 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, category, sort])
+
+  useEffect(() => {
+    loadSuggestions()
+  }, [loadSuggestions])
 
   const handleVote = async (id: number) => {
     try {

@@ -476,5 +476,8 @@
   "accessibility.title": "Accessibility Audit (WCAG 2.2)",
   "accessibility.passed": "WCAG AA Compliant",
   "accessibility.needsWork": "Needs Improvement",
-  "accessibility.issuesFound": "{{count}} issues found"
+  "accessibility.issuesFound": "{{count}} issues found",
+  "tests.title": "Auto-Generated Tests",
+  "tests.files": "{{count}} test files",
+  "tests.cases": "{{count}} test cases"
 }

@@ -22,6 +22,7 @@ public class RequestsController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly IBuildVerificationService _verificationService;
     private readonly IAccessibilityService _accessibilityService;
+    private readonly ITestGenerationService _testGenerationService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -32,6 +33,7 @@ public class RequestsController : ControllerBase
         ITokenService tokenService,
         IBuildVerificationService verificationService,
         IAccessibilityService accessibilityService,
+        ITestGenerationService testGenerationService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -41,6 +43,7 @@ public class RequestsController : ControllerBase
         _tokenService = tokenService;
         _verificationService = verificationService;
         _accessibilityService = accessibilityService;
+        _testGenerationService = testGenerationService;
         _logger = logger;
     }
 
@@ -520,6 +523,15 @@ public class RequestsController : ControllerBase
                 result.AccessibilityScore = a11yResult.Score;
                 result.AccessibilitySummary = a11yResult.Summary;
                 result.AccessibilityIssueCount = a11yResult.Issues.Count;
+
+                // Generate tests
+                var testResult = await _testGenerationService.GenerateTestsAsync(
+                    result.ProjectPath, result.ProjectType);
+                result.TestFilesGenerated = testResult.TestFilesGenerated;
+                result.TotalTestCount = testResult.TotalTestCount;
+                result.TestCoverageEstimate = testResult.CoverageEstimate;
+                result.TestFramework = testResult.TestFramework;
+                result.TestSummary = testResult.Summary;
 
                 entity.Status = RequestStatus.Staging;
             }

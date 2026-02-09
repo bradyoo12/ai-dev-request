@@ -484,5 +484,8 @@
   "accessibility.title": "접근성 검사 (WCAG 2.2)",
   "accessibility.passed": "WCAG AA 준수",
   "accessibility.needsWork": "개선 필요",
-  "accessibility.issuesFound": "{{count}}건의 이슈 발견"
+  "accessibility.issuesFound": "{{count}}건의 이슈 발견",
+  "tests.title": "자동 생성 테스트",
+  "tests.files": "{{count}}개 테스트 파일",
+  "tests.cases": "{{count}}개 테스트 케이스"
 }

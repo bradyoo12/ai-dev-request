@@ -257,6 +257,11 @@ public class ProductionResult
     public int? AccessibilityScore { get; set; }
     public string? AccessibilitySummary { get; set; }
     public int? AccessibilityIssueCount { get; set; }
+    public int? TestFilesGenerated { get; set; }
+    public int? TotalTestCount { get; set; }
+    public int? TestCoverageEstimate { get; set; }
+    public string? TestFramework { get; set; }
+    public string? TestSummary { get; set; }
 }
 
 public class GeneratedProject

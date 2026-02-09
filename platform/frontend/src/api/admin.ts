@@ -90,6 +90,16 @@ export async function getSubscriptionEvents(
   return res.json()
 }
 
-export function getChurnExportUrl(): string {
-  return `${API_BASE_URL}/api/admin/churn/export`
+export async function exportChurnCsv(): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/admin/churn/export`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) throw new Error('Failed to export churn data')
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'churn-events.csv'
+  a.click()
+  URL.revokeObjectURL(url)
 }

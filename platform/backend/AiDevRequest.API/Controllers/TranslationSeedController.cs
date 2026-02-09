@@ -1,10 +1,12 @@
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/translations/seed")]
 public class TranslationSeedController : ControllerBase

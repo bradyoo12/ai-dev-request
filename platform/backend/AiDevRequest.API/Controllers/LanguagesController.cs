@@ -1,5 +1,6 @@
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,6 +57,7 @@ public class LanguagesController : ControllerBase
     /// <summary>
     /// Get all languages including inactive (admin endpoint)
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpGet("admin")]
     public async Task<ActionResult<IEnumerable<AdminLanguageDto>>> GetAllLanguages()
     {
@@ -96,6 +98,7 @@ public class LanguagesController : ControllerBase
     /// <summary>
     /// Add a new language (admin)
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPost("admin")]
     public async Task<ActionResult<AdminLanguageDto>> CreateLanguage([FromBody] CreateLanguageDto dto)
     {
@@ -156,6 +159,7 @@ public class LanguagesController : ControllerBase
     /// <summary>
     /// Update a language (admin)
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPut("admin/{code}")]
     public async Task<ActionResult> UpdateLanguage(string code, [FromBody] UpdateLanguageDto dto)
     {
@@ -178,6 +182,7 @@ public class LanguagesController : ControllerBase
     /// <summary>
     /// Delete a language (admin) - cannot delete default language
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("admin/{code}")]
     public async Task<ActionResult> DeleteLanguage(string code)
     {

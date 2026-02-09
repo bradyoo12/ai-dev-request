@@ -49,6 +49,7 @@ public class AuthController : ControllerBase
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
+                    IsAdmin = user.IsAdmin,
                     CreatedAt = user.CreatedAt
                 }
             });
@@ -87,6 +88,7 @@ public class AuthController : ControllerBase
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
+                    IsAdmin = user.IsAdmin,
                     CreatedAt = user.CreatedAt
                 }
             });
@@ -132,6 +134,7 @@ public class AuthController : ControllerBase
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
+                    IsAdmin = user.IsAdmin,
                     CreatedAt = user.CreatedAt
                 }
             });
@@ -192,6 +195,7 @@ public class AuthController : ControllerBase
             Email = user.Email,
             DisplayName = user.DisplayName,
             ProfileImageUrl = user.ProfileImageUrl,
+            IsAdmin = user.IsAdmin,
             CreatedAt = user.CreatedAt
         });
     }
@@ -230,6 +234,7 @@ public record UserDto
     public string Email { get; init; } = "";
     public string? DisplayName { get; init; }
     public string? ProfileImageUrl { get; init; }
+    public bool IsAdmin { get; init; }
     public DateTime CreatedAt { get; init; }
 }
 

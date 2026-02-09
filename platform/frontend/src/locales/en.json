@@ -484,5 +484,10 @@
   "codeReview.security": "Security",
   "codeReview.performance": "Performance",
   "codeReview.quality": "Quality",
-  "codeReview.issuesFound": "{{count}} issues found"
+  "codeReview.issuesFound": "{{count}} issues found",
+  "refinement.applyChanges": "Apply Changes ({{count}} files)",
+  "refinement.applying": "Applying...",
+  "refinement.changesApplied": "Changes applied to {{count}} files:",
+  "refinement.changesAppliedBadge": "Changes Applied",
+  "refinement.applyFailed": "Failed to apply changes. Please try again."
 }

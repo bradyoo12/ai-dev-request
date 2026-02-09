@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getChatHistory, sendChatMessage, sendChatMessageStream } from '../api/refinement'
+import { getChatHistory, sendChatMessage, sendChatMessageStream, applyChanges } from '../api/refinement'
 import type { ChatMessage } from '../api/refinement'
 import { createSuggestion } from '../api/suggestions'
 
@@ -14,6 +14,15 @@ interface SuggestionDetected {
 interface RefinementChatProps {
   requestId: string
   onTokensUsed?: (tokensUsed: number, newBalance: number) => void
+}
+
+function hasFileChanges(content: string): boolean {
+  return /\*\*File:\s*`[^`]+`\*\*\s*\n```/.test(content)
+}
+
+function countFileChanges(content: string): number {
+  const matches = content.match(/\*\*File:\s*`[^`]+`\*\*/g)
+  return matches ? matches.length : 0
 }
 
 function parseSuggestionFromContent(content: string): { cleanContent: string; suggestion: SuggestionDetected | null } {
@@ -44,6 +53,8 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
   const [pendingSuggestion, setPendingSuggestion] = useState<{ suggestion: SuggestionDetected; messageId: number } | null>(null)
   const [registering, setRegistering] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
+  const [appliedMessages, setAppliedMessages] = useState<Set<number>>(new Set())
+  const [applyingId, setApplyingId] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const loadHistory = useCallback(async () => {
@@ -198,6 +209,30 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     setPendingSuggestion(null)
   }
 
+  const handleApplyChanges = async (msg: ChatMessage) => {
+    if (applyingId || appliedMessages.has(msg.id)) return
+    setApplyingId(msg.id)
+    try {
+      const result = await applyChanges(requestId, msg.content)
+      setAppliedMessages(prev => new Set(prev).add(msg.id))
+
+      const allFiles = [...result.modifiedFiles, ...result.createdFiles]
+      const confirmMsg: ChatMessage = {
+        id: Date.now(),
+        role: 'assistant',
+        content: t('refinement.changesApplied', { count: result.totalChanges }) +
+          '\n' + allFiles.map(f => `- ${f}`).join('\n'),
+        tokensUsed: null,
+        createdAt: new Date().toISOString(),
+      }
+      setMessages(prev => [...prev, confirmMsg])
+    } catch {
+      setError(t('refinement.applyFailed'))
+    } finally {
+      setApplyingId(null)
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -254,6 +289,25 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
               {msg.tokensUsed != null && msg.tokensUsed > 0 && (
                 <div className="text-xs mt-1 opacity-60">
                   {t('tokens.used', { count: msg.tokensUsed })}
+                </div>
+              )}
+              {msg.role === 'assistant' && hasFileChanges(msg.content) && (
+                <div className="mt-2 pt-2 border-t border-gray-700">
+                  {appliedMessages.has(msg.id) ? (
+                    <span className="text-xs text-green-400 font-medium">
+                      {t('refinement.changesAppliedBadge')}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleApplyChanges(msg)}
+                      disabled={applyingId === msg.id}
+                      className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 rounded-lg text-xs font-medium transition-colors"
+                    >
+                      {applyingId === msg.id
+                        ? t('refinement.applying')
+                        : t('refinement.applyChanges', { count: countFileChanges(msg.content) })}
+                    </button>
+                  )}
                 </div>
               )}
             </div>

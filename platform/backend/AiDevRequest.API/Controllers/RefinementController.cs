@@ -100,6 +100,34 @@ public class RefinementController : ControllerBase
         });
     }
     /// <summary>
+    /// Apply code changes from an AI message to the project files
+    /// </summary>
+    [HttpPost("apply")]
+    public async Task<IActionResult> ApplyChanges(Guid requestId, [FromBody] ApplyChangesRequest body)
+    {
+        if (string.IsNullOrWhiteSpace(body.MessageContent))
+            return BadRequest(new { error = "Message content is required" });
+
+        var request = await _db.DevRequests.FindAsync(requestId);
+        if (request == null) return NotFound();
+
+        try
+        {
+            var result = await _refinementService.ApplyChangesAsync(requestId, body.MessageContent);
+            return Ok(new
+            {
+                result.ModifiedFiles,
+                result.CreatedFiles,
+                result.TotalChanges
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
     /// Send a chat message and get AI response via SSE streaming
     /// </summary>
     [HttpPost("stream")]
@@ -159,4 +187,9 @@ public class RefinementController : ControllerBase
 public class SendMessageRequest
 {
     public string Message { get; set; } = "";
+}
+
+public class ApplyChangesRequest
+{
+    public string MessageContent { get; set; } = "";
 }

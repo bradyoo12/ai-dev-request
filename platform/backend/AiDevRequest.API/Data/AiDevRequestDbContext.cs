@@ -43,6 +43,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<UserMemory> UserMemories => Set<UserMemory>();
     public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
     public DbSet<UserPreferenceSummary> UserPreferenceSummaries => Set<UserPreferenceSummary>();
+    public DbSet<UserInterest> UserInterests => Set<UserInterest>();
+    public DbSet<AppRecommendation> AppRecommendations => Set<AppRecommendation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -653,6 +655,34 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.SummaryText).IsRequired().HasMaxLength(5000);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<UserInterest>(entity =>
+        {
+            entity.ToTable("user_interests");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Confidence).HasColumnType("double precision");
+            entity.Property(e => e.Source).IsRequired().HasMaxLength(20);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.UserId, e.Category }).IsUnique();
+        });
+
+        modelBuilder.Entity<AppRecommendation>(entity =>
+        {
+            entity.ToTable("app_recommendations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.Reason).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.PromptTemplate).IsRequired().HasMaxLength(2000);
+            entity.Property(e => e.InterestCategory).IsRequired().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.InterestCategory);
         });
     }
 }

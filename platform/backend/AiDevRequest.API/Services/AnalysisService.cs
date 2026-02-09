@@ -7,7 +7,7 @@ namespace AiDevRequest.API.Services;
 
 public interface IAnalysisService
 {
-    Task<AnalysisResult> AnalyzeRequestAsync(string description);
+    Task<AnalysisResult> AnalyzeRequestAsync(string description, string? screenshotBase64 = null, string? screenshotMediaType = null);
 }
 
 public class AnalysisService : IAnalysisService
@@ -25,10 +25,14 @@ public class AnalysisService : IAnalysisService
         _logger = logger;
     }
 
-    public async Task<AnalysisResult> AnalyzeRequestAsync(string description)
+    public async Task<AnalysisResult> AnalyzeRequestAsync(string description, string? screenshotBase64 = null, string? screenshotMediaType = null)
     {
-        var prompt = $@"당신은 소프트웨어 개발 요청을 분석하는 전문가입니다.
+        var screenshotInstruction = !string.IsNullOrEmpty(screenshotBase64)
+            ? "\n\n사용자가 디자인 스크린샷/이미지를 첨부했습니다. 이 이미지의 UI/UX 디자인을 분석하여 요청 내용과 함께 고려해주세요. 이미지에서 보이는 레이아웃, 컴포넌트, 색상 등을 요구사항에 반영하세요.\n"
+            : "";
 
+        var prompt = $@"당신은 소프트웨어 개발 요청을 분석하는 전문가입니다.
+{screenshotInstruction}
 사용자의 개발 요청을 분석하고 다음 JSON 형식으로 응답해주세요:
 
 {{
@@ -62,10 +66,28 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
 
         try
         {
-            var messages = new List<Message>
+            List<Message> messages;
+
+            if (!string.IsNullOrEmpty(screenshotBase64))
             {
-                new Message(RoleType.User, prompt)
-            };
+                var contentBlocks = new List<ContentBase>
+                {
+                    new ImageContent
+                    {
+                        Source = new ImageSource
+                        {
+                            MediaType = screenshotMediaType ?? "image/png",
+                            Data = screenshotBase64,
+                        }
+                    },
+                    new TextContent { Text = prompt }
+                };
+                messages = new List<Message> { new Message { Role = RoleType.User, Content = contentBlocks } };
+            }
+            else
+            {
+                messages = new List<Message> { new Message(RoleType.User, prompt) };
+            }
 
             var parameters = new MessageParameters
             {

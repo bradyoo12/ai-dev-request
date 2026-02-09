@@ -469,5 +469,8 @@
   "wizard.step.proposal": "Proposal",
   "wizard.step.build": "Build",
   "wizard.step.complete": "Complete",
-  "status.extendedThinking": "Deep Analysis Active"
+  "status.extendedThinking": "Deep Analysis Active",
+  "screenshot.label": "Design screenshot (optional)",
+  "screenshot.dropzone": "Drag & drop a screenshot or click to upload",
+  "screenshot.hint": "Upload a design screenshot for AI to replicate the UI. Max 5MB."
 }

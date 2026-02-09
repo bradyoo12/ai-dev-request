@@ -151,8 +151,9 @@ public class RequestsController : ControllerBase
 
         try
         {
-            // Call AI analysis service
-            var analysisResult = await _analysisService.AnalyzeRequestAsync(entity.Description);
+            // Call AI analysis service (with optional screenshot for multimodal analysis)
+            var analysisResult = await _analysisService.AnalyzeRequestAsync(
+                entity.Description, entity.ScreenshotBase64, entity.ScreenshotMediaType);
 
             // Update entity with analysis results
             entity.AnalysisResultJson = JsonSerializer.Serialize(analysisResult);
@@ -509,7 +510,9 @@ public class RequestsController : ControllerBase
                 entity.Description,
                 proposal,
                 platform,
-                complexity
+                complexity,
+                entity.ScreenshotBase64,
+                entity.ScreenshotMediaType
             );
 
             entity.ProjectId = result.ProjectId;

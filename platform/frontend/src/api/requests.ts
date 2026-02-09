@@ -27,12 +27,15 @@ export interface CreateDevRequestDto {
   description: string;
   contactEmail?: string;
   contactPhone?: string;
+  screenshotBase64?: string;
+  screenshotMediaType?: string;
 }
 
 export interface DevRequestResponse {
   id: string;
   description: string;
   contactEmail?: string;
+  hasScreenshot?: boolean;
   category: string;
   complexity: string;
   status: string;

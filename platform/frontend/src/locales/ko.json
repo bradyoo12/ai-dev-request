@@ -469,5 +469,8 @@
   "wizard.step.proposal": "제안서",
   "wizard.step.build": "빌드",
   "wizard.step.complete": "완료",
-  "status.extendedThinking": "심층 분석 진행 중"
+  "status.extendedThinking": "심층 분석 진행 중",
+  "screenshot.label": "디자인 스크린샷 (선택)",
+  "screenshot.dropzone": "스크린샷을 드래그하거나 클릭하여 업로드",
+  "screenshot.hint": "AI가 UI를 재현할 수 있도록 디자인 스크린샷을 업로드하세요. 최대 5MB."
 }

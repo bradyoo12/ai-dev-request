@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import './App.css'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, InsufficientTokensError } from './api/requests'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, getPricingPlans, InsufficientTokensError } from './api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, PricingPlan } from './api/requests'
 import { getTokenOverview, checkTokens } from './api/settings'
 import type { TokenCheck } from './api/settings'
 import { getStoredUser, logout, socialLogin, isAuthenticated } from './api/auth'
@@ -41,6 +41,7 @@ function App() {
   const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
   const [showPlanSelection, setShowPlanSelection] = useState(false)
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([])
 
   const handleLogin = (user: AuthUser) => {
     setAuthUser(user)
@@ -199,6 +200,10 @@ function App() {
   useEffect(() => {
     loadTokenBalance()
   }, [loadTokenBalance])
+
+  useEffect(() => {
+    getPricingPlans().then(setPricingPlans).catch(() => {})
+  }, [])
 
   // Handle OAuth callback: /auth/callback/{provider}?code=...&state=...
   useEffect(() => {
@@ -863,16 +868,30 @@ function App() {
             <section id="pricing" className="py-12 text-center">
               <h3 className="text-2xl font-bold mb-6">{t('pricing.title')}</h3>
               <div className="flex justify-center gap-4 flex-wrap">
-                <div className="bg-gray-800 p-6 rounded-xl w-64">
-                  <div className="text-lg font-bold">Starter</div>
-                  <div className="text-3xl font-bold my-2">₩49,000<span className="text-lg text-gray-400">{t('pricing.perMonth')}</span></div>
-                  <div className="text-gray-400 text-sm">{t('pricing.starter.projects')}</div>
-                </div>
-                <div className="bg-blue-600 p-6 rounded-xl w-64 ring-2 ring-blue-400">
-                  <div className="text-lg font-bold">Pro</div>
-                  <div className="text-3xl font-bold my-2">₩149,000<span className="text-lg text-gray-200">{t('pricing.perMonth')}</span></div>
-                  <div className="text-gray-200 text-sm">{t('pricing.pro.projects')}</div>
-                </div>
+                {pricingPlans.filter(p => p.priceMonthly > 0).map(plan => (
+                  <div key={plan.id} className={`p-6 rounded-xl w-64 ${plan.isPopular ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-gray-800'}`}>
+                    <div className="text-lg font-bold">{plan.name}</div>
+                    <div className="text-3xl font-bold my-2">
+                      {formatCurrency(plan.priceMonthly)}
+                      <span className={`text-lg ${plan.isPopular ? 'text-gray-200' : 'text-gray-400'}`}>{t('pricing.perMonth')}</span>
+                    </div>
+                    <div className={`text-sm ${plan.isPopular ? 'text-gray-200' : 'text-gray-400'}`}>
+                      {t('pricing.projectLimit', { count: plan.projectLimit })}
+                    </div>
+                  </div>
+                ))}
+                {pricingPlans.length === 0 && (
+                  <>
+                    <div className="bg-gray-800 p-6 rounded-xl w-64">
+                      <div className="text-lg font-bold">Starter</div>
+                      <div className="text-3xl font-bold my-2">₩49,000<span className="text-lg text-gray-400">{t('pricing.perMonth')}</span></div>
+                    </div>
+                    <div className="bg-blue-600 p-6 rounded-xl w-64 ring-2 ring-blue-400">
+                      <div className="text-lg font-bold">Pro</div>
+                      <div className="text-3xl font-bold my-2">₩149,000<span className="text-lg text-gray-200">{t('pricing.perMonth')}</span></div>
+                    </div>
+                  </>
+                )}
               </div>
             </section>
           </>

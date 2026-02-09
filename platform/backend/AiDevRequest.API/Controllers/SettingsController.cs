@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +14,13 @@ namespace AiDevRequest.API.Controllers;
 public class SettingsController : ControllerBase
 {
     private readonly AiDevRequestDbContext _context;
+    private readonly ITokenService _tokenService;
     private readonly ILogger<SettingsController> _logger;
 
-    public SettingsController(AiDevRequestDbContext context, ILogger<SettingsController> logger)
+    public SettingsController(AiDevRequestDbContext context, ITokenService tokenService, ILogger<SettingsController> logger)
     {
         _context = context;
+        _tokenService = tokenService;
         _logger = logger;
     }
 
@@ -25,33 +28,8 @@ public class SettingsController : ControllerBase
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value
             ?? throw new InvalidOperationException("User not authenticated.");
 
-    private async Task<TokenBalance> GetOrCreateBalance(string userId)
-    {
-        var balance = await _context.TokenBalances.FirstOrDefaultAsync(b => b.UserId == userId);
-        if (balance != null) return balance;
-
-        balance = new TokenBalance
-        {
-            UserId = userId,
-            Balance = 1000,
-            TotalEarned = 1000,
-            TotalSpent = 0
-        };
-        _context.TokenBalances.Add(balance);
-
-        _context.TokenTransactions.Add(new TokenTransaction
-        {
-            UserId = userId,
-            Type = "credit",
-            Amount = 1000,
-            Action = "welcome_bonus",
-            Description = "Welcome bonus - 1,000 free tokens",
-            BalanceAfter = 1000
-        });
-
-        await _context.SaveChangesAsync();
-        return balance;
-    }
+    private Task<TokenBalance> GetOrCreateBalance(string userId) =>
+        _tokenService.GetOrCreateBalance(userId);
 
     /// <summary>
     /// Get current token balance and pricing info

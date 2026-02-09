@@ -21,6 +21,7 @@ public class RequestsController : ControllerBase
     private readonly IProductionService _productionService;
     private readonly ITokenService _tokenService;
     private readonly IBuildVerificationService _verificationService;
+    private readonly IAccessibilityService _accessibilityService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -30,6 +31,7 @@ public class RequestsController : ControllerBase
         IProductionService productionService,
         ITokenService tokenService,
         IBuildVerificationService verificationService,
+        IAccessibilityService accessibilityService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -38,6 +40,7 @@ public class RequestsController : ControllerBase
         _productionService = productionService;
         _tokenService = tokenService;
         _verificationService = verificationService;
+        _accessibilityService = accessibilityService;
         _logger = logger;
     }
 
@@ -510,6 +513,13 @@ public class RequestsController : ControllerBase
                 result.VerificationScore = verificationResult.QualityScore;
                 result.VerificationPassed = verificationResult.Passed;
                 result.VerificationSummary = verificationResult.Summary;
+
+                // Run accessibility audit
+                var a11yResult = await _accessibilityService.AuditProjectAsync(
+                    result.ProjectPath, result.ProjectType);
+                result.AccessibilityScore = a11yResult.Score;
+                result.AccessibilitySummary = a11yResult.Summary;
+                result.AccessibilityIssueCount = a11yResult.Issues.Count;
 
                 entity.Status = RequestStatus.Staging;
             }

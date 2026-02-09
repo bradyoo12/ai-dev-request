@@ -192,6 +192,9 @@ export interface ProductionResult {
   verificationScore?: number;
   verificationPassed?: boolean;
   verificationSummary?: string;
+  accessibilityScore?: number;
+  accessibilitySummary?: string;
+  accessibilityIssueCount?: number;
 }
 
 export interface ProductionResponse {

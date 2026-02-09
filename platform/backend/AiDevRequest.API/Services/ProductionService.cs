@@ -254,6 +254,9 @@ public class ProductionResult
     public int? VerificationScore { get; set; }
     public bool? VerificationPassed { get; set; }
     public string? VerificationSummary { get; set; }
+    public int? AccessibilityScore { get; set; }
+    public string? AccessibilitySummary { get; set; }
+    public int? AccessibilityIssueCount { get; set; }
 }
 
 public class GeneratedProject

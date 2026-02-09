@@ -530,5 +530,13 @@
   "deploy.status.building": "빌드 중",
   "deploy.status.deploying": "배포 중",
   "deploy.status.running": "라이브",
-  "deploy.status.failed": "실패"
+  "deploy.status.failed": "실패",
+  "deploy.liveReady": "사이트가 라이브되었습니다. 아래에서 미리보기를 확인하세요.",
+  "preview.title": "실시간 미리보기",
+  "preview.desktop": "데스크톱",
+  "preview.tablet": "태블릿",
+  "preview.mobile": "모바일",
+  "preview.copyUrl": "URL 복사",
+  "preview.copied": "복사됨!",
+  "preview.openNew": "새 탭에서 열기"
 }

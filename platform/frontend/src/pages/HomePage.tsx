@@ -15,6 +15,7 @@ import StatsSection from '../components/StatsSection'
 import FeaturesSection from '../components/FeaturesSection'
 import PricingSection from '../components/PricingSection'
 import StepIndicator from '../components/StepIndicator'
+import LivePreview from '../components/LivePreview'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -901,19 +902,16 @@ export default function HomePage() {
                   </div>
                 )}
                 {deployStatus.status === 'Running' && deployStatus.previewUrl && (
-                  <div className="mt-2">
-                    <a href={deployStatus.previewUrl.startsWith('http') ? deployStatus.previewUrl : `https://${deployStatus.previewUrl}`}
-                      target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-colors">
-                      {t('deploy.openSite')}
-                    </a>
-                    <p className="text-xs text-gray-400 mt-2 font-mono">{deployStatus.previewUrl}</p>
-                  </div>
+                  <p className="text-sm text-green-300">{t('deploy.liveReady')}</p>
                 )}
                 {deployStatus.status === 'Failed' && (
                   <p className="text-sm text-red-400">{t('deploy.failedMessage')}</p>
                 )}
               </div>
+            )}
+
+            {deployStatus?.status === 'Running' && deployStatus.previewUrl && (
+              <LivePreview previewUrl={deployStatus.previewUrl} />
             )}
 
             {githubResult && (

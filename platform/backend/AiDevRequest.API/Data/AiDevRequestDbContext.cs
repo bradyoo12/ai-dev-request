@@ -40,6 +40,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<A2AArtifact> A2AArtifacts => Set<A2AArtifact>();
     public DbSet<A2AConsent> A2AConsents => Set<A2AConsent>();
     public DbSet<A2AAuditLog> A2AAuditLogs => Set<A2AAuditLog>();
+    public DbSet<UserMemory> UserMemories => Set<UserMemory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -608,6 +609,22 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.IpAddress).HasMaxLength(50);
             entity.HasIndex(e => e.TaskId);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<UserMemory>(entity =>
+        {
+            entity.ToTable("user_memories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Scope).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.SessionId).HasMaxLength(100);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Scope);
+            entity.HasIndex(e => new { e.UserId, e.SessionId });
+            entity.HasIndex(e => e.Category);
         });
     }
 }

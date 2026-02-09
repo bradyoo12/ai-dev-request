@@ -5,9 +5,10 @@ import SettingsPage from './SettingsPage'
 import UsagePage from './UsagePage'
 import BillingPage from './BillingPage'
 import PaymentHistoryPage from './PaymentHistoryPage'
+import MemoryPage from './MemoryPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories'
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -59,11 +60,20 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.payments')}
         </button>
+        <button
+          onClick={() => setSettingsTab('memories')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'memories' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.memories')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
       {settingsTab === 'billing' && <BillingPage />}
       {settingsTab === 'payments' && <PaymentHistoryPage />}
+      {settingsTab === 'memories' && <MemoryPage />}
     </section>
   )
 }

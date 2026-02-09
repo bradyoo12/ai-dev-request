@@ -30,6 +30,7 @@ builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<ICryptoPaymentService, CoinbaseCryptoPaymentService>();
 builder.Services.AddScoped<IA2AService, A2AService>();
 builder.Services.AddScoped<IMemoryService, MemoryService>();
+builder.Services.AddScoped<IPreferenceService, PreferenceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISocialAuthService, SocialAuthService>();
 builder.Services.AddHttpClient();
@@ -193,7 +194,8 @@ app.UseExceptionHandler(errorApp =>
             "dev_requests", "domains", "domain_transactions", "hosting_plans", "languages",
             "payments", "project_templates", "project_versions", "refinement_messages",
             "token_balances", "token_packages", "token_pricing", "token_transactions",
-            "translations", "user_memories", "users" };
+            "translations", "user_memories", "user_preferences",
+            "user_preference_summaries", "users" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

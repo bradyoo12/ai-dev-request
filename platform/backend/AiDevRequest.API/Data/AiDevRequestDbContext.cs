@@ -44,6 +44,10 @@ public class AiDevRequestDbContext : DbContext
 
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.UserId)
+                .IsRequired()
+                .HasMaxLength(100);
+
             entity.Property(e => e.Description)
                 .IsRequired()
                 .HasMaxLength(10000);
@@ -84,6 +88,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ProjectPath)
                 .HasMaxLength(500);
 
+            entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });

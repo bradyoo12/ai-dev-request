@@ -45,6 +45,16 @@ public class RequestsController : ControllerBase
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value
             ?? throw new InvalidOperationException("User not authenticated.");
 
+    private async Task<(DevRequest? entity, ActionResult? error)> GetOwnedEntityAsync(Guid id)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+        if (entity == null)
+            return (null, NotFound());
+        if (entity.UserId != GetUserId())
+            return (null, StatusCode(403, new { error = "이 요청에 대한 접근 권한이 없습니다." }));
+        return (entity, null);
+    }
+
     /// <summary>
     /// Create a new development request
     /// </summary>
@@ -53,12 +63,13 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<DevRequestResponseDto>> CreateRequest([FromBody] CreateDevRequestDto dto)
     {
-        var entity = dto.ToEntity();
+        var userId = GetUserId();
+        var entity = dto.ToEntity(userId);
 
         _context.DevRequests.Add(entity);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("New dev request created: {RequestId}", entity.Id);
+        _logger.LogInformation("New dev request created: {RequestId} by user {UserId}", entity.Id, userId);
 
         return CreatedAtAction(
             nameof(GetRequest),
@@ -75,18 +86,14 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DevRequestResponseDto>> GetRequest(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(entity.ToResponseDto());
+        return Ok(entity!.ToResponseDto());
     }
 
     /// <summary>
-    /// Get all development requests (paginated)
+    /// Get all development requests (paginated) - filtered by current user
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DevRequestListItemDto>), StatusCodes.Status200OK)]
@@ -96,7 +103,8 @@ public class RequestsController : ControllerBase
         [FromQuery] RequestStatus? status = null)
     {
         pageSize = Math.Clamp(pageSize, 1, 100);
-        var query = _context.DevRequests.AsQueryable();
+        var userId = GetUserId();
+        var query = _context.DevRequests.Where(r => r.UserId == userId);
 
         if (status.HasValue)
         {
@@ -121,12 +129,8 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AnalysisResponseDto>> AnalyzeRequest(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
-
-        if (entity == null)
-        {
-            return NotFound();
-        }
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
         // Token gating: check balance before executing
         var userId = GetUserId();
@@ -144,7 +148,7 @@ public class RequestsController : ControllerBase
         }
 
         // Update status to analyzing
-        entity.Status = RequestStatus.Analyzing;
+        entity!.Status = RequestStatus.Analyzing;
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Starting analysis for request {RequestId}", id);
@@ -207,14 +211,10 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AnalysisResponseDto>> GetAnalysis(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        if (string.IsNullOrEmpty(entity.AnalysisResultJson))
+        if (string.IsNullOrEmpty(entity!.AnalysisResultJson))
         {
             return NotFound(new { error = "아직 분석이 완료되지 않았습니다." });
         }
@@ -252,14 +252,10 @@ public class RequestsController : ControllerBase
         Guid id,
         [FromBody] UpdateStatusDto dto)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        entity.Status = dto.Status;
+        entity!.Status = dto.Status;
 
         // Update relevant timestamps based on status
         switch (dto.Status)
@@ -294,14 +290,10 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProposalResponseDto>> GenerateProposal(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        if (string.IsNullOrEmpty(entity.AnalysisResultJson))
+        if (string.IsNullOrEmpty(entity!.AnalysisResultJson))
         {
             return BadRequest(new { error = "먼저 분석을 완료해주세요." });
         }
@@ -371,14 +363,10 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProposalResponseDto>> GetProposal(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        if (string.IsNullOrEmpty(entity.ProposalJson))
+        if (string.IsNullOrEmpty(entity!.ProposalJson))
         {
             return NotFound(new { error = "아직 제안서가 생성되지 않았습니다." });
         }
@@ -408,14 +396,10 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DevRequestResponseDto>> ApproveProposal(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        if (string.IsNullOrEmpty(entity.ProposalJson))
+        if (string.IsNullOrEmpty(entity!.ProposalJson))
         {
             return BadRequest(new { error = "승인할 제안서가 없습니다." });
         }
@@ -438,14 +422,10 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductionResponseDto>> StartBuild(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        if (entity.Status != RequestStatus.Approved)
+        if (entity!.Status != RequestStatus.Approved)
         {
             return BadRequest(new { error = "제안서가 승인된 후에만 빌드를 시작할 수 있습니다." });
         }
@@ -570,15 +550,11 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<BuildStatusDto>> GetBuildStatus(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
-
-        if (entity == null)
-        {
-            return NotFound();
-        }
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
         string buildStatus = "not_started";
-        if (!string.IsNullOrEmpty(entity.ProjectId))
+        if (!string.IsNullOrEmpty(entity!.ProjectId))
         {
             buildStatus = await _productionService.GetBuildStatusAsync(entity.ProjectId);
         }
@@ -601,6 +577,9 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<VerificationResponseDto>> GetVerification(Guid id)
     {
+        var (_, ownerError) = await GetOwnedEntityAsync(id);
+        if (ownerError != null) return ownerError;
+
         var verifications = await _context.BuildVerifications
             .Where(v => v.DevRequestId == id)
             .OrderByDescending(v => v.Iteration)
@@ -632,14 +611,10 @@ public class RequestsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<DevRequestResponseDto>> CompleteRequest(Guid id)
     {
-        var entity = await _context.DevRequests.FindAsync(id);
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
 
-        if (entity == null)
-        {
-            return NotFound();
-        }
-
-        entity.Status = RequestStatus.Completed;
+        entity!.Status = RequestStatus.Completed;
         entity.CompletedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 

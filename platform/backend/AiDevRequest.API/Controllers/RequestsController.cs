@@ -95,6 +95,7 @@ public class RequestsController : ControllerBase
         [FromQuery] int pageSize = 20,
         [FromQuery] RequestStatus? status = null)
     {
+        pageSize = Math.Clamp(pageSize, 1, 100);
         var query = _context.DevRequests.AsQueryable();
 
         if (status.HasValue)

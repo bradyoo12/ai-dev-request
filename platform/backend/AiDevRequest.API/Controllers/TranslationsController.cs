@@ -123,12 +123,15 @@ public class TranslationsController : ControllerBase
             return NotFound(new { error = $"Language '{locale}' not found." });
         }
 
+        // Fetch all existing translations for this locale in one query (avoids N+1)
+        var existingTranslations = await _context.Translations
+            .Where(t => t.LanguageCode == locale)
+            .ToDictionaryAsync(t => $"{t.Namespace}.{t.Key}");
+
         foreach (var entry in dto.Translations)
         {
-            var existing = await _context.Translations
-                .FirstOrDefaultAsync(t => t.LanguageCode == locale && t.Namespace == entry.Namespace && t.Key == entry.Key);
-
-            if (existing != null)
+            var lookupKey = $"{entry.Namespace}.{entry.Key}";
+            if (existingTranslations.TryGetValue(lookupKey, out var existing))
             {
                 existing.Value = entry.Value;
                 existing.UpdatedAt = DateTime.UtcNow;
@@ -166,6 +169,11 @@ public class TranslationsController : ControllerBase
             return NotFound(new { error = $"Language '{locale}' not found." });
         }
 
+        // Fetch all existing translations for this locale in one query (avoids N+1)
+        var existingImports = await _context.Translations
+            .Where(t => t.LanguageCode == locale)
+            .ToDictionaryAsync(t => $"{t.Namespace}.{t.Key}");
+
         var imported = 0;
         var updated = 0;
 
@@ -177,10 +185,7 @@ public class TranslationsController : ControllerBase
             var ns = fullKey[..dotIndex];
             var key = fullKey[(dotIndex + 1)..];
 
-            var existing = await _context.Translations
-                .FirstOrDefaultAsync(t => t.LanguageCode == locale && t.Namespace == ns && t.Key == key);
-
-            if (existing != null)
+            if (existingImports.TryGetValue(fullKey, out var existing))
             {
                 existing.Value = value;
                 existing.UpdatedAt = DateTime.UtcNow;

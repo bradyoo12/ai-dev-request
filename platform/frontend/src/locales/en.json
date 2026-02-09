@@ -544,5 +544,8 @@
   "preview.mobile": "Mobile",
   "preview.copyUrl": "Copy URL",
   "preview.copied": "Copied!",
-  "preview.openNew": "Open in new tab"
+  "preview.openNew": "Open in new tab",
+  "template.title": "Start from a Template",
+  "template.hint": "Click a template to auto-fill your request, or write your own below.",
+  "template.used": "Used {{count}} times"
 }

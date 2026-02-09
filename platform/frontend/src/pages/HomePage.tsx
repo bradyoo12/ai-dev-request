@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, InsufficientTokensError } from '../api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, InsufficientTokensError } from '../api/requests'
 import { createSite, getSiteDetail } from '../api/sites'
 import type { SiteResponse } from '../api/sites'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion } from '../api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion, ProjectTemplate } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
@@ -50,11 +50,15 @@ export default function HomePage() {
   const [deploying, setDeploying] = useState(false)
   const [versions, setVersions] = useState<ProjectVersion[]>([])
   const [rollingBack, setRollingBack] = useState(false)
+  const [templates, setTemplates] = useState<ProjectTemplate[]>([])
+  const [loadingTemplates, setLoadingTemplates] = useState(false)
   const deployPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     getPricingPlans().then(setPricingPlans).catch(() => {})
+    setLoadingTemplates(true)
+    getTemplates().then(setTemplates).catch(() => {}).finally(() => setLoadingTemplates(false))
   }, [])
 
   const handleScreenshotSelect = useCallback((file: File) => {
@@ -374,6 +378,34 @@ export default function HomePage() {
         <StepIndicator viewState={viewState} />
         {viewState === 'form' && (
           <form onSubmit={handleSubmit}>
+            {templates.length > 0 && !loadingTemplates && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2 text-gray-400">{t('template.title')}</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {templates.map((tpl) => (
+                    <button key={tpl.id} type="button"
+                      onClick={() => {
+                        setRequest(tpl.promptTemplate)
+                        if (tpl.framework) setFramework(tpl.framework)
+                      }}
+                      className="text-left p-4 bg-gray-900 border border-gray-700 hover:border-blue-500 rounded-xl transition-colors group">
+                      <div className="font-medium text-sm group-hover:text-blue-400 transition-colors">{tpl.name}</div>
+                      <div className="text-xs text-gray-500 mt-1 line-clamp-2">{tpl.description}</div>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        <span className="px-1.5 py-0.5 bg-blue-900/50 text-blue-300 rounded text-[10px]">{tpl.framework}</span>
+                        {tpl.tags.slice(0, 3).map((tag) => (
+                          <span key={tag} className="px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded text-[10px]">{tag}</span>
+                        ))}
+                      </div>
+                      {tpl.usageCount > 0 && (
+                        <div className="text-[10px] text-gray-600 mt-2">{t('template.used', { count: tpl.usageCount })}</div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-gray-500">{t('template.hint')}</p>
+              </div>
+            )}
             <label className="block text-lg font-medium mb-4">{t('form.label')}</label>
             <textarea
               value={request}

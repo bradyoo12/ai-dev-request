@@ -41,6 +41,7 @@ builder.Services.AddScoped<IRefinementService, RefinementService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 builder.Services.AddScoped<IDatabaseSchemaService, DatabaseSchemaService>();
 builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();
+builder.Services.AddScoped<ITemplateService, TemplateService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -185,8 +186,9 @@ app.UseExceptionHandler(errorApp =>
     {
         string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
             "dev_requests", "domains", "domain_transactions", "hosting_plans", "languages",
-            "payments", "project_versions", "refinement_messages", "token_balances",
-            "token_packages", "token_pricing", "token_transactions", "translations", "users" };
+            "payments", "project_templates", "project_versions", "refinement_messages",
+            "token_balances", "token_packages", "token_pricing", "token_transactions",
+            "translations", "users" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and
@@ -300,6 +302,76 @@ app.UseExceptionHandler(errorApp =>
 
             await dbContext.SaveChangesAsync();
             logger.LogInformation("Translation seeding completed.");
+        }
+
+        // Auto-seed project templates if the table is empty
+        if (!await dbContext.ProjectTemplates.AnyAsync())
+        {
+            logger.LogInformation("Seeding built-in project templates...");
+            dbContext.ProjectTemplates.AddRange(
+                new AiDevRequest.API.Entities.ProjectTemplate
+                {
+                    Name = "SaaS Starter",
+                    Description = "Full-stack SaaS with auth, billing, and dashboard",
+                    Category = "saas",
+                    Framework = "react",
+                    Tags = "auth,billing,dashboard,stripe",
+                    PromptTemplate = "Build a SaaS application with user authentication (email/password + OAuth), Stripe subscription billing with multiple tiers, an admin dashboard with analytics charts, and a user settings page. Include a landing page with pricing section.",
+                    CreatedBy = "system"
+                },
+                new AiDevRequest.API.Entities.ProjectTemplate
+                {
+                    Name = "E-Commerce Store",
+                    Description = "Online store with product catalog, cart, and checkout",
+                    Category = "ecommerce",
+                    Framework = "react",
+                    Tags = "shop,cart,products,payments",
+                    PromptTemplate = "Build an e-commerce store with a product catalog (grid/list view with filtering), shopping cart, checkout flow with Stripe payments, order history, and an admin panel for managing products and orders.",
+                    CreatedBy = "system"
+                },
+                new AiDevRequest.API.Entities.ProjectTemplate
+                {
+                    Name = "Blog Platform",
+                    Description = "Blog with markdown editor, categories, and comments",
+                    Category = "content",
+                    Framework = "nextjs",
+                    Tags = "blog,markdown,cms,seo",
+                    PromptTemplate = "Build a blog platform with a markdown editor for creating posts, category and tag management, comment system, SEO-friendly URLs, and an RSS feed. Include a clean reading experience with dark mode support.",
+                    CreatedBy = "system"
+                },
+                new AiDevRequest.API.Entities.ProjectTemplate
+                {
+                    Name = "Admin Dashboard",
+                    Description = "Data dashboard with charts, tables, and user management",
+                    Category = "dashboard",
+                    Framework = "react",
+                    Tags = "admin,charts,analytics,tables",
+                    PromptTemplate = "Build an admin dashboard with interactive charts (line, bar, pie), data tables with sorting/filtering/pagination, user management (CRUD), role-based access control, and a notification system.",
+                    CreatedBy = "system"
+                },
+                new AiDevRequest.API.Entities.ProjectTemplate
+                {
+                    Name = "Mobile Task App",
+                    Description = "Cross-platform task management with offline support",
+                    Category = "productivity",
+                    Framework = "flutter",
+                    Tags = "tasks,mobile,offline,notifications",
+                    PromptTemplate = "Build a cross-platform mobile task management app with project boards, task lists with drag-and-drop, due dates and reminders, offline support with local storage sync, and push notifications.",
+                    CreatedBy = "system"
+                },
+                new AiDevRequest.API.Entities.ProjectTemplate
+                {
+                    Name = "Landing Page",
+                    Description = "Modern landing page with hero, features, and CTA sections",
+                    Category = "marketing",
+                    Framework = "react",
+                    Tags = "landing,marketing,responsive,animations",
+                    PromptTemplate = "Build a modern landing page with a hero section with animated background, feature highlights with icons, testimonials carousel, pricing comparison table, FAQ accordion, and a contact form. Fully responsive with smooth scroll animations.",
+                    CreatedBy = "system"
+                }
+            );
+            await dbContext.SaveChangesAsync();
+            logger.LogInformation("Template seeding completed: 6 built-in templates.");
         }
     }
     catch (Exception ex)

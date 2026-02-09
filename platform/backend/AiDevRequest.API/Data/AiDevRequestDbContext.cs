@@ -34,6 +34,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<Domain> Domains => Set<Domain>();
     public DbSet<DomainTransaction> DomainTransactions => Set<DomainTransaction>();
     public DbSet<ProjectVersion> ProjectVersions => Set<ProjectVersion>();
+    public DbSet<ProjectTemplate> ProjectTemplates => Set<ProjectTemplate>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -499,6 +500,23 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => new { e.DevRequestId, e.VersionNumber }).IsUnique();
+        });
+
+        modelBuilder.Entity<ProjectTemplate>(entity =>
+        {
+            entity.ToTable("project_templates");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Category).HasMaxLength(50);
+            entity.Property(e => e.Framework).HasMaxLength(50);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+            entity.Property(e => e.PromptTemplate).HasColumnType("text");
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Framework);
         });
     }
 }

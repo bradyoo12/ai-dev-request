@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AiDevRequest.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class PaymentsController : ControllerBase
@@ -20,12 +22,9 @@ public class PaymentsController : ControllerBase
         _logger = logger;
     }
 
-    private string GetUserId()
-    {
-        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
-        return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
-    }
+    private string GetUserId() =>
+        User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? throw new InvalidOperationException("User not authenticated.");
 
     [HttpPost("checkout")]
     [ProducesResponseType(typeof(CheckoutResponseDto), StatusCodes.Status200OK)]

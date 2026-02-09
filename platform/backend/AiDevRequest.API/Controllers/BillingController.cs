@@ -1,9 +1,11 @@
 using System.Security.Claims;
 using AiDevRequest.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AiDevRequest.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/settings/billing")]
 public class BillingController : ControllerBase
@@ -17,12 +19,9 @@ public class BillingController : ControllerBase
         _logger = logger;
     }
 
-    private string GetUserId()
-    {
-        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
-        return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
-    }
+    private string GetUserId() =>
+        User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? throw new InvalidOperationException("User not authenticated.");
 
     [HttpGet]
     [ProducesResponseType(typeof(BillingOverviewDto), StatusCodes.Status200OK)]

@@ -517,5 +517,18 @@
   "export.githubSuccess": "GitHub로 내보내기 완료!",
   "export.filesUploaded": "{{uploaded}}/{{total}}개 파일 업로드됨",
   "api.error.exportZipFailed": "프로젝트 다운로드에 실패했습니다.",
-  "api.error.exportGitHubFailed": "GitHub 내보내기에 실패했습니다."
+  "api.error.exportGitHubFailed": "GitHub 내보내기에 실패했습니다.",
+  "deploy.title": "배포",
+  "deploy.deployNow": "지금 배포",
+  "deploy.deploying": "배포 중...",
+  "deploy.inProgress": "배포가 진행 중입니다...",
+  "deploy.openSite": "라이브 사이트 열기",
+  "deploy.failed": "배포에 실패했습니다. 다시 시도해주세요.",
+  "deploy.failedMessage": "배포에 실패했습니다. 내 사이트에서 재시도하세요.",
+  "deploy.status.pending": "대기 중",
+  "deploy.status.provisioning": "프로비저닝",
+  "deploy.status.building": "빌드 중",
+  "deploy.status.deploying": "배포 중",
+  "deploy.status.running": "라이브",
+  "deploy.status.failed": "실패"
 }

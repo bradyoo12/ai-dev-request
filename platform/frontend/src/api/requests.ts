@@ -195,6 +195,11 @@ export interface ProductionResult {
   accessibilityScore?: number;
   accessibilitySummary?: string;
   accessibilityIssueCount?: number;
+  testFilesGenerated?: number;
+  totalTestCount?: number;
+  testCoverageEstimate?: number;
+  testFramework?: string;
+  testSummary?: string;
 }
 
 export interface ProductionResponse {

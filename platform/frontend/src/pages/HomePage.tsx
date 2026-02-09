@@ -629,6 +629,30 @@ export default function HomePage() {
               </div>
             )}
 
+            {productionResult.production.testFilesGenerated != null && productionResult.production.testFilesGenerated > 0 && (
+              <div className="bg-purple-900/30 border border-purple-700 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-purple-400">{t('tests.title')}</h4>
+                  <div className={`text-2xl font-bold ${
+                    (productionResult.production.testCoverageEstimate ?? 0) >= 80 ? 'text-green-400' :
+                    (productionResult.production.testCoverageEstimate ?? 0) >= 60 ? 'text-yellow-400' : 'text-red-400'
+                  }`}>
+                    {productionResult.production.testCoverageEstimate ?? 0}%
+                  </div>
+                </div>
+                <p className="text-sm text-gray-400">{productionResult.production.testSummary}</p>
+                <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
+                  <span>{t('tests.files', { count: productionResult.production.testFilesGenerated })}</span>
+                  <span>{t('tests.cases', { count: productionResult.production.totalTestCount ?? 0 })}</span>
+                  {productionResult.production.testFramework && (
+                    <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-medium">
+                      {productionResult.production.testFramework}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             {productionResult.production.setupCommands.length > 0 && (
               <div className="bg-gray-900 rounded-xl p-4 mb-4">
                 <h4 className="font-bold mb-3">{t('completed.setupCommands')}</h4>

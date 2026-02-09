@@ -530,6 +530,41 @@ export interface ProjectTemplate {
   createdBy: string;
 }
 
+// GitHub Sync API
+export interface GitHubSyncStatus {
+  linked: boolean;
+  repoUrl?: string;
+  repoFullName?: string;
+}
+
+export interface GitHubSyncResult {
+  repoFullName: string;
+  filesCreated: number;
+  filesUpdated: number;
+  totalFiles: number;
+}
+
+export async function getGitHubStatus(id: string): Promise<GitHubSyncStatus> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/github`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) return { linked: false };
+  return response.json();
+}
+
+export async function syncToGitHub(id: string, accessToken: string): Promise<GitHubSyncResult> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/github/sync`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ accessToken }),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || t('api.error.githubSyncFailed'));
+  }
+  return response.json();
+}
+
 export async function getTemplates(category?: string, framework?: string): Promise<ProjectTemplate[]> {
   const params = new URLSearchParams();
   if (category) params.set('category', category);

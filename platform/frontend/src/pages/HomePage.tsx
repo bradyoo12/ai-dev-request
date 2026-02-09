@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, InsufficientTokensError } from '../api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError } from '../api/requests'
 import { createSite, getSiteDetail } from '../api/sites'
 import type { SiteResponse } from '../api/sites'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion, ProjectTemplate } from '../api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion, ProjectTemplate, GitHubSyncStatus } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
@@ -52,6 +52,8 @@ export default function HomePage() {
   const [rollingBack, setRollingBack] = useState(false)
   const [templates, setTemplates] = useState<ProjectTemplate[]>([])
   const [loadingTemplates, setLoadingTemplates] = useState(false)
+  const [githubSync, setGithubSync] = useState<GitHubSyncStatus | null>(null)
+  const [syncing, setSyncing] = useState(false)
   const deployPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
@@ -109,6 +111,7 @@ export default function HomePage() {
     try {
       const result = await exportToGitHub(submittedRequest.id, githubToken, githubRepoName || undefined)
       setGithubResult(result)
+      setGithubSync({ linked: true, repoUrl: result.repoUrl, repoFullName: result.repoFullName })
       setGithubDialog(false)
       setGithubToken('')
       setGithubRepoName('')
@@ -131,6 +134,21 @@ export default function HomePage() {
       setErrorMessage(err instanceof Error ? err.message : t('version.rollbackFailed'))
     } finally {
       setRollingBack(false)
+    }
+  }
+
+  const handleGitHubSync = async () => {
+    if (!submittedRequest || !githubSync?.linked) return
+    const token = prompt(t('githubSync.tokenPrompt'))
+    if (!token?.trim()) return
+    setSyncing(true)
+    try {
+      await syncToGitHub(submittedRequest.id, token)
+    } catch (err) {
+      console.error('GitHub sync failed:', err)
+      setErrorMessage(err instanceof Error ? err.message : t('githubSync.failed'))
+    } finally {
+      setSyncing(false)
     }
   }
 
@@ -292,9 +310,10 @@ export default function HomePage() {
       }
       setViewState('completed')
 
-      // Fetch version history
+      // Fetch version history and GitHub sync status
       if (submittedRequest) {
         getVersions(submittedRequest.id).then(setVersions).catch(() => {})
+        getGitHubStatus(submittedRequest.id).then(setGithubSync).catch(() => {})
       }
     } catch (err) {
       if (err instanceof InsufficientTokensError) {
@@ -1053,6 +1072,25 @@ export default function HomePage() {
                   className="text-blue-400 hover:text-blue-300 text-sm underline">
                   {githubResult.repoFullName}
                 </a>
+              </div>
+            )}
+
+            {githubSync?.linked && (
+              <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-gray-300">{t('githubSync.title')}</h4>
+                  <span className="px-2 py-0.5 rounded bg-green-600 text-white text-xs font-medium">
+                    {t('githubSync.linked')}
+                  </span>
+                </div>
+                <a href={githubSync.repoUrl} target="_blank" rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 text-sm underline block mb-3">
+                  {githubSync.repoFullName}
+                </a>
+                <button onClick={handleGitHubSync} disabled={syncing}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 rounded-lg text-sm font-medium transition-colors">
+                  {syncing ? t('githubSync.syncing') : t('githubSync.syncNow')}
+                </button>
               </div>
             )}
 

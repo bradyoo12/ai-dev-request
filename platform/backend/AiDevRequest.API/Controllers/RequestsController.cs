@@ -741,6 +741,11 @@ public class RequestsController : ControllerBase
             var result = await _exportService.ExportToGitHubAsync(
                 entity.ProjectPath, projectName, body.AccessToken, body.RepoName);
 
+            // Save GitHub link for future syncs
+            entity.GitHubRepoUrl = result.RepoUrl;
+            entity.GitHubRepoFullName = result.RepoFullName;
+            await _context.SaveChangesAsync();
+
             return Ok(new
             {
                 result.RepoUrl,
@@ -753,6 +758,60 @@ public class RequestsController : ControllerBase
         {
             return BadRequest(new { error = ex.Message });
         }
+    }
+
+    /// <summary>
+    /// Sync project changes to linked GitHub repository
+    /// </summary>
+    [HttpPost("{id:guid}/github/sync")]
+    public async Task<IActionResult> SyncToGitHub(Guid id, [FromBody] GitHubSyncRequest body)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        if (string.IsNullOrEmpty(entity!.ProjectPath))
+            return BadRequest(new { error = "Project has not been built yet." });
+
+        if (string.IsNullOrEmpty(entity.GitHubRepoFullName))
+            return BadRequest(new { error = "No linked GitHub repository. Export to GitHub first." });
+
+        if (string.IsNullOrWhiteSpace(body.AccessToken))
+            return BadRequest(new { error = "GitHub access token is required." });
+
+        try
+        {
+            var result = await _exportService.SyncToGitHubAsync(
+                entity.ProjectPath, entity.GitHubRepoFullName, body.AccessToken);
+
+            return Ok(new
+            {
+                result.RepoFullName,
+                result.FilesCreated,
+                result.FilesUpdated,
+                result.TotalFiles
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get GitHub sync status for a project
+    /// </summary>
+    [HttpGet("{id:guid}/github")]
+    public async Task<IActionResult> GetGitHubStatus(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        return Ok(new
+        {
+            linked = !string.IsNullOrEmpty(entity!.GitHubRepoFullName),
+            repoUrl = entity.GitHubRepoUrl,
+            repoFullName = entity.GitHubRepoFullName
+        });
     }
 
     /// <summary>
@@ -869,4 +928,9 @@ public class GitHubExportRequest
 {
     public string AccessToken { get; set; } = "";
     public string? RepoName { get; set; }
+}
+
+public class GitHubSyncRequest
+{
+    public string AccessToken { get; set; } = "";
 }

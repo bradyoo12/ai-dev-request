@@ -93,6 +93,12 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ProjectPath)
                 .HasMaxLength(500);
 
+            entity.Property(e => e.GitHubRepoUrl)
+                .HasMaxLength(500);
+
+            entity.Property(e => e.GitHubRepoFullName)
+                .HasMaxLength(200);
+
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => e.UserId);

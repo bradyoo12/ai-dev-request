@@ -24,6 +24,7 @@ public class RequestsController : ControllerBase
     private readonly IAccessibilityService _accessibilityService;
     private readonly ITestGenerationService _testGenerationService;
     private readonly ICodeReviewService _codeReviewService;
+    private readonly ICiCdService _ciCdService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -36,6 +37,7 @@ public class RequestsController : ControllerBase
         IAccessibilityService accessibilityService,
         ITestGenerationService testGenerationService,
         ICodeReviewService codeReviewService,
+        ICiCdService ciCdService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -47,6 +49,7 @@ public class RequestsController : ControllerBase
         _accessibilityService = accessibilityService;
         _testGenerationService = testGenerationService;
         _codeReviewService = codeReviewService;
+        _ciCdService = ciCdService;
         _logger = logger;
     }
 
@@ -545,6 +548,14 @@ public class RequestsController : ControllerBase
                 result.CodeQualityScore = reviewResult.QualityScore;
                 result.CodeReviewSummary = reviewResult.Summary;
                 result.CodeReviewIssueCount = reviewResult.Issues.Count;
+
+                // Generate CI/CD pipeline (GitHub Actions)
+                var ciCdResult = await _ciCdService.GeneratePipelineAsync(
+                    result.ProjectPath, result.ProjectType);
+                result.CiCdProvider = ciCdResult.PipelineProvider;
+                result.CiCdWorkflowCount = ciCdResult.Workflows.Count;
+                result.CiCdSummary = ciCdResult.Summary;
+                result.CiCdRequiredSecrets = ciCdResult.RequiredSecrets;
 
                 entity.Status = RequestStatus.Staging;
             }

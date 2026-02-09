@@ -696,6 +696,36 @@ export default function HomePage() {
               </div>
             )}
 
+            {productionResult.production.ciCdWorkflowCount != null && productionResult.production.ciCdWorkflowCount > 0 && (
+              <div className="bg-indigo-900/30 border border-indigo-700 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-indigo-400">{t('cicd.title')}</h4>
+                  <span className="px-2 py-0.5 rounded bg-indigo-600 text-white text-xs font-medium">
+                    {productionResult.production.ciCdProvider}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-400 mb-3">{productionResult.production.ciCdSummary}</p>
+                <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <span>{t('cicd.workflows', { count: productionResult.production.ciCdWorkflowCount })}</span>
+                  {productionResult.production.ciCdRequiredSecrets && productionResult.production.ciCdRequiredSecrets.length > 0 && (
+                    <span>{t('cicd.secrets', { count: productionResult.production.ciCdRequiredSecrets.length })}</span>
+                  )}
+                </div>
+                {productionResult.production.ciCdRequiredSecrets && productionResult.production.ciCdRequiredSecrets.length > 0 && (
+                  <div className="mt-3 bg-indigo-950/50 rounded-lg p-3">
+                    <div className="text-xs text-indigo-300 font-medium mb-1">{t('cicd.requiredSecrets')}</div>
+                    <div className="flex flex-wrap gap-1">
+                      {productionResult.production.ciCdRequiredSecrets.map((secret, i) => (
+                        <code key={i} className="px-2 py-0.5 bg-indigo-900 text-indigo-200 rounded text-xs">
+                          {secret}
+                        </code>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {productionResult.production.setupCommands.length > 0 && (
               <div className="bg-gray-900 rounded-xl p-4 mb-4">
                 <h4 className="font-bold mb-3">{t('completed.setupCommands')}</h4>

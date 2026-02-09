@@ -248,6 +248,192 @@ public class SuggestionsController : ControllerBase
 
         return Ok(new { voted = vote != null });
     }
+
+    /// <summary>
+    /// Get comments for a suggestion
+    /// </summary>
+    [HttpGet("{id}/comments")]
+    public async Task<IActionResult> GetComments(int id)
+    {
+        var comments = await _db.SuggestionComments
+            .Where(c => c.SuggestionId == id)
+            .OrderBy(c => c.CreatedAt)
+            .Select(c => new
+            {
+                c.Id,
+                c.SuggestionId,
+                c.UserId,
+                c.Content,
+                c.IsAdminReply,
+                c.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(comments);
+    }
+
+    /// <summary>
+    /// Add a comment to a suggestion
+    /// </summary>
+    [HttpPost("{id}/comments")]
+    public async Task<IActionResult> AddComment(int id, [FromBody] AddCommentRequest body)
+    {
+        if (string.IsNullOrWhiteSpace(body.Content))
+            return BadRequest(new { error = "Content is required" });
+
+        var suggestion = await _db.Suggestions.FindAsync(id);
+        if (suggestion == null) return NotFound();
+
+        var userId = GetUserId();
+
+        var comment = new SuggestionComment
+        {
+            SuggestionId = id,
+            UserId = userId,
+            Content = body.Content,
+            IsAdminReply = body.IsAdminReply
+        };
+        _db.SuggestionComments.Add(comment);
+
+        suggestion.CommentCount++;
+        suggestion.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            comment.Id,
+            comment.SuggestionId,
+            comment.UserId,
+            comment.Content,
+            comment.IsAdminReply,
+            comment.CreatedAt
+        });
+    }
+
+    /// <summary>
+    /// Get status history timeline for a suggestion
+    /// </summary>
+    [HttpGet("{id}/history")]
+    public async Task<IActionResult> GetStatusHistory(int id)
+    {
+        var history = await _db.SuggestionStatusHistories
+            .Where(h => h.SuggestionId == id)
+            .OrderBy(h => h.CreatedAt)
+            .Select(h => new
+            {
+                h.Id,
+                h.FromStatus,
+                h.ToStatus,
+                h.ChangedByUserId,
+                h.Note,
+                h.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(history);
+    }
+
+    /// <summary>
+    /// Admin: Update suggestion status
+    /// </summary>
+    [HttpPatch("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest body)
+    {
+        var suggestion = await _db.Suggestions.FindAsync(id);
+        if (suggestion == null) return NotFound();
+
+        var userId = GetUserId();
+        var oldStatus = suggestion.Status;
+
+        if (oldStatus == body.Status) return Ok(new { message = "Status unchanged" });
+
+        _db.SuggestionStatusHistories.Add(new SuggestionStatusHistory
+        {
+            SuggestionId = id,
+            FromStatus = oldStatus,
+            ToStatus = body.Status,
+            ChangedByUserId = userId,
+            Note = body.Note
+        });
+
+        suggestion.Status = body.Status;
+        suggestion.UpdatedAt = DateTime.UtcNow;
+
+        // Award tokens when suggestion is marked as implemented
+        if (body.Status == "implemented" && oldStatus != "implemented")
+        {
+            await _tokenService.CreditTokens(
+                suggestion.UserId,
+                ImplementedReward,
+                "suggestion_implemented",
+                suggestion.Id.ToString(),
+                "Suggestion implemented reward");
+            suggestion.TokenReward += ImplementedReward;
+        }
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            suggestion.Id,
+            suggestion.Status,
+            previousStatus = oldStatus
+        });
+    }
+
+    /// <summary>
+    /// Admin: Get all suggestions with admin-level detail
+    /// </summary>
+    [HttpGet("admin")]
+    public async Task<IActionResult> GetAdminSuggestions(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? status = null,
+        [FromQuery] string? category = null)
+    {
+        var query = _db.Suggestions.AsQueryable();
+
+        if (!string.IsNullOrEmpty(status) && status != "all")
+            query = query.Where(s => s.Status == status);
+        if (!string.IsNullOrEmpty(category) && category != "all")
+            query = query.Where(s => s.Category == category);
+
+        var total = await query.CountAsync();
+
+        var statusCounts = await _db.Suggestions
+            .GroupBy(s => s.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        var items = await query
+            .OrderByDescending(s => s.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(s => new
+            {
+                s.Id,
+                s.UserId,
+                s.Title,
+                s.Description,
+                s.Category,
+                s.Status,
+                s.UpvoteCount,
+                s.CommentCount,
+                s.TokenReward,
+                s.CreatedAt,
+                s.UpdatedAt
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            items,
+            total,
+            page,
+            pageSize,
+            statusCounts = statusCounts.ToDictionary(s => s.Status, s => s.Count)
+        });
+    }
 }
 
 public class CreateSuggestionRequest
@@ -256,4 +442,16 @@ public class CreateSuggestionRequest
     public string Description { get; set; } = "";
     public string? Category { get; set; }
     public Guid? DevRequestId { get; set; }
+}
+
+public class AddCommentRequest
+{
+    public string Content { get; set; } = "";
+    public bool IsAdminReply { get; set; } = false;
+}
+
+public class UpdateStatusRequest
+{
+    public string Status { get; set; } = "";
+    public string? Note { get; set; }
 }

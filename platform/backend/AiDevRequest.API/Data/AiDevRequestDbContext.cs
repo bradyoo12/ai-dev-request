@@ -26,6 +26,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<RefinementMessage> RefinementMessages => Set<RefinementMessage>();
     public DbSet<Suggestion> Suggestions => Set<Suggestion>();
     public DbSet<SuggestionVote> SuggestionVotes => Set<SuggestionVote>();
+    public DbSet<SuggestionComment> SuggestionComments => Set<SuggestionComment>();
+    public DbSet<SuggestionStatusHistory> SuggestionStatusHistories => Set<SuggestionStatusHistory>();
     public DbSet<SubscriptionRecord> SubscriptionRecords => Set<SubscriptionRecord>();
     public DbSet<SubscriptionEvent> SubscriptionEvents => Set<SubscriptionEvent>();
     public DbSet<ChurnMetricSnapshot> ChurnMetricSnapshots => Set<ChurnMetricSnapshot>();
@@ -309,6 +311,28 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => new { e.SuggestionId, e.UserId }).IsUnique();
             entity.HasIndex(e => e.SuggestionId);
+        });
+
+        modelBuilder.Entity<SuggestionComment>(entity =>
+        {
+            entity.ToTable("suggestion_comments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(5000);
+            entity.HasIndex(e => e.SuggestionId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<SuggestionStatusHistory>(entity =>
+        {
+            entity.ToTable("suggestion_status_history");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FromStatus).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ToStatus).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ChangedByUserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.HasIndex(e => e.SuggestionId);
+            entity.HasIndex(e => e.CreatedAt);
         });
 
         modelBuilder.Entity<SubscriptionRecord>(entity =>

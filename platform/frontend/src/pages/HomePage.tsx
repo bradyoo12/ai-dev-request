@@ -585,7 +585,11 @@ export default function HomePage() {
                 className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
                 {t('button.newRequest')}
               </button>
-              <button className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition-colors">
+              <button
+                disabled
+                title={t('button.comingSoon')}
+                className="flex-1 py-3 bg-gray-600 cursor-not-allowed rounded-xl font-medium transition-colors opacity-60"
+              >
                 {t('button.downloadProject')}
               </button>
             </div>

@@ -33,6 +33,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ChurnMetricSnapshot> ChurnMetricSnapshots => Set<ChurnMetricSnapshot>();
     public DbSet<Domain> Domains => Set<Domain>();
     public DbSet<DomainTransaction> DomainTransactions => Set<DomainTransaction>();
+    public DbSet<ProjectVersion> ProjectVersions => Set<ProjectVersion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -483,6 +484,21 @@ public class AiDevRequestDbContext : DbContext
                 new HostingPlan { Id = 3, Name = "standard", DisplayName = "Standard", MonthlyCostUsd = 25.00m, Vcpu = "2", MemoryGb = "2", StorageGb = 5, BandwidthGb = 200, SupportsCustomDomain = true, SupportsAutoscale = true, SupportsSla = true, MaxInstances = 3, AzureSku = "Dedicated-D4", Description = "Auto-scaling with SLA guarantee.", BestFor = "Business apps, medium-traffic sites", SortOrder = 3 },
                 new HostingPlan { Id = 4, Name = "premium", DisplayName = "Premium", MonthlyCostUsd = 70.00m, Vcpu = "4", MemoryGb = "4", StorageGb = 20, BandwidthGb = 500, SupportsCustomDomain = true, SupportsAutoscale = true, SupportsSla = true, MaxInstances = 10, AzureSku = "Dedicated-D8", Description = "High-performance with 99.9% SLA.", BestFor = "Enterprise apps, high-traffic platforms", SortOrder = 4 }
             );
+        });
+
+        modelBuilder.Entity<ProjectVersion>(entity =>
+        {
+            entity.ToTable("project_versions");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Label).HasMaxLength(255);
+            entity.Property(e => e.Source).HasMaxLength(50);
+            entity.Property(e => e.SnapshotPath).HasMaxLength(500);
+            entity.Property(e => e.ChangedFilesJson).HasColumnType("jsonb");
+
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => new { e.DevRequestId, e.VersionNumber }).IsUnique();
         });
     }
 }

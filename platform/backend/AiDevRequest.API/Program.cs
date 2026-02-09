@@ -35,8 +35,21 @@ builder.Services.AddScoped<IRefinementService, RefinementService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 
 // Add JWT Authentication
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "dev-secret-key-change-in-production-min-32-chars!!";
+var jwtSecret = builder.Configuration["Jwt:Secret"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "AiDevRequest";
+
+if (string.IsNullOrEmpty(jwtSecret))
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        jwtSecret = "dev-only-secret-key-not-for-production-min-32!";
+    }
+    else
+    {
+        throw new InvalidOperationException(
+            "Jwt:Secret must be configured. Set it in appsettings.json, environment variables, or appsettings.Local.json.");
+    }
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -55,8 +68,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // Add DbContext
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Host=localhost;Database=ai_dev_request;Username=postgres;Password=postgres";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        connectionString = "Host=localhost;Database=ai_dev_request;Username=postgres;Password=postgres";
+    }
+    else
+    {
+        throw new InvalidOperationException(
+            "ConnectionStrings:DefaultConnection must be configured. Set it in appsettings.json, environment variables, or appsettings.Local.json.");
+    }
+}
 
 builder.Services.AddDbContext<AiDevRequestDbContext>(options =>
     options.UseNpgsql(connectionString));

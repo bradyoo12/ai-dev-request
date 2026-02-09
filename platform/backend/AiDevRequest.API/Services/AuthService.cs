@@ -91,7 +91,8 @@ public class AuthService : IAuthService
 
     public string GenerateJwt(User user)
     {
-        var secret = _configuration["Jwt:Secret"] ?? "dev-secret-key-change-in-production-min-32-chars!!";
+        var secret = _configuration["Jwt:Secret"]
+            ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
         var issuer = _configuration["Jwt:Issuer"] ?? "AiDevRequest";
         var expiryDays = int.TryParse(_configuration["Jwt:ExpiryDays"], out var days) ? days : 7;
 

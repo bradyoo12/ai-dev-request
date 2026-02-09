@@ -58,13 +58,6 @@ export function getAuthHeaders(): Record<string, string> {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
   }
-  // Always send X-User-Id for backward compatibility
-  let userId = localStorage.getItem('ai-dev-user-id')
-  if (!userId) {
-    userId = crypto.randomUUID()
-    localStorage.setItem('ai-dev-user-id', userId)
-  }
-  headers['X-User-Id'] = userId
   return headers
 }
 

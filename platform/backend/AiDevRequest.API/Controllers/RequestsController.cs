@@ -4,11 +4,13 @@ using AiDevRequest.API.Data;
 using AiDevRequest.API.DTOs;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class RequestsController : ControllerBase
@@ -39,12 +41,9 @@ public class RequestsController : ControllerBase
         _logger = logger;
     }
 
-    private string GetUserId()
-    {
-        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
-        return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
-    }
+    private string GetUserId() =>
+        User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? throw new InvalidOperationException("User not authenticated.");
 
     /// <summary>
     /// Create a new development request

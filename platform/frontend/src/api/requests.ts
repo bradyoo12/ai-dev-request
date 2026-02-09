@@ -240,9 +240,7 @@ const t = (key: string) => i18n.t(key);
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: authHeaders(),
     body: JSON.stringify(data),
   });
 
@@ -255,7 +253,9 @@ export async function createRequest(data: CreateDevRequestDto): Promise<DevReque
 }
 
 export async function getRequest(id: string): Promise<DevRequestResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/requests/${id}`);
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}`, {
+    headers: authHeaders(),
+  });
 
   if (!response.ok) {
     throw new Error(t('api.error.notFound'));
@@ -266,7 +266,8 @@ export async function getRequest(id: string): Promise<DevRequestResponse> {
 
 export async function getRequests(page = 1, pageSize = 20): Promise<DevRequestResponse[]> {
   const response = await fetch(
-    `${API_BASE_URL}/api/requests?page=${page}&pageSize=${pageSize}`
+    `${API_BASE_URL}/api/requests?page=${page}&pageSize=${pageSize}`,
+    { headers: authHeaders() }
   );
 
   if (!response.ok) {
@@ -296,7 +297,9 @@ export async function analyzeRequest(id: string): Promise<AnalysisResponse> {
 }
 
 export async function getAnalysis(id: string): Promise<AnalysisResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/analysis`);
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/analysis`, {
+    headers: authHeaders(),
+  });
 
   if (!response.ok) {
     throw new Error(t('api.error.analysisLoadFailed'));
@@ -325,7 +328,9 @@ export async function generateProposal(id: string): Promise<ProposalResponse> {
 }
 
 export async function getProposal(id: string): Promise<ProposalResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal`);
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal`, {
+    headers: authHeaders(),
+  });
 
   if (!response.ok) {
     throw new Error(t('api.error.proposalLoadFailed'));
@@ -337,6 +342,7 @@ export async function getProposal(id: string): Promise<ProposalResponse> {
 export async function approveProposal(id: string): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/proposal/approve`, {
     method: 'POST',
+    headers: authHeaders(),
   });
 
   if (!response.ok) {
@@ -367,7 +373,9 @@ export async function startBuild(id: string): Promise<ProductionResponse> {
 }
 
 export async function getBuildStatus(id: string): Promise<BuildStatusResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/build`);
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/build`, {
+    headers: authHeaders(),
+  });
 
   if (!response.ok) {
     throw new Error(t('api.error.buildStatusFailed'));
@@ -379,6 +387,7 @@ export async function getBuildStatus(id: string): Promise<BuildStatusResponse> {
 export async function completeRequest(id: string): Promise<DevRequestResponse> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${id}/complete`, {
     method: 'POST',
+    headers: authHeaders(),
   });
 
   if (!response.ok) {

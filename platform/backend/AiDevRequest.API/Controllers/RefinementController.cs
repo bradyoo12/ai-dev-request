@@ -1,11 +1,13 @@
 using System.Security.Claims;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/requests/{requestId}/chat")]
 public class RefinementController : ControllerBase
@@ -24,12 +26,9 @@ public class RefinementController : ControllerBase
         _db = db;
     }
 
-    private string GetUserId()
-    {
-        var jwtUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!string.IsNullOrEmpty(jwtUserId)) return jwtUserId;
-        return Request.Headers["X-User-Id"].FirstOrDefault() ?? "anonymous";
-    }
+    private string GetUserId() =>
+        User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? throw new InvalidOperationException("User not authenticated.");
 
     /// <summary>
     /// Get chat history for a request

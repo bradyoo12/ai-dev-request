@@ -81,10 +81,11 @@ public static class DevRequestMappings
         };
     }
 
-    public static DevRequest ToEntity(this CreateDevRequestDto dto)
+    public static DevRequest ToEntity(this CreateDevRequestDto dto, string userId)
     {
         return new DevRequest
         {
+            UserId = userId,
             Description = dto.Description,
             ContactEmail = dto.ContactEmail,
             ContactPhone = dto.ContactPhone,

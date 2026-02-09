@@ -7,6 +7,10 @@ public class DevRequest
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
+    [MaxLength(100)]
+    public required string UserId { get; set; }
+
+    [Required]
     public required string Description { get; set; }
 
     public string? ContactEmail { get; set; }

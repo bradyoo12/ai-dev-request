@@ -19,11 +19,13 @@ export default function ChurnDashboard() {
   const [eventFilter, setEventFilter] = useState('all')
   const [planFilter, setPlanFilter] = useState('all')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const eventsPageSize = 20
 
   const loadData = useCallback(async () => {
     setLoading(true)
+    setError('')
     try {
       const [overviewData, trendsData, planDataResult] = await Promise.all([
         getChurnOverview(),
@@ -34,11 +36,11 @@ export default function ChurnDashboard() {
       setTrends(trendsData)
       setPlanData(planDataResult)
     } catch {
-      // Silent fail - dashboard will show empty state
+      setError(t('error.requestFailed'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   const loadEvents = useCallback(async () => {
     try {
@@ -110,6 +112,13 @@ export default function ChurnDashboard() {
           {t('churn.exportCsv')}
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700 rounded-xl p-4 mb-6 flex items-center justify-between">
+          <span className="text-red-400">{error}</span>
+          <button onClick={loadData} className="px-3 py-1 bg-red-700 hover:bg-red-600 rounded-lg text-sm">{t('common.retry')}</button>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

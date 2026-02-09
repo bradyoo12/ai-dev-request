@@ -104,6 +104,7 @@ export default function PaymentHistoryPage() {
                   <tr className="text-gray-400 border-b border-gray-700">
                     <th className="text-left py-2 px-2">{t('payments.date')}</th>
                     <th className="text-left py-2 px-2">{t('payments.typeLabel')}</th>
+                    <th className="text-center py-2 px-2">{t('payments.providerLabel')}</th>
                     <th className="text-left py-2 px-2">{t('payments.description')}</th>
                     <th className="text-right py-2 px-2">{t('payments.amount')}</th>
                     <th className="text-center py-2 px-2">{t('payments.tokensLabel')}</th>
@@ -117,6 +118,15 @@ export default function PaymentHistoryPage() {
                         {formatDate(payment.createdAt)}
                       </td>
                       <td className="py-2 px-2">{getTypeLabel(payment.type)}</td>
+                      <td className="py-2 px-2 text-center">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          payment.provider === 'CoinbaseCommerce'
+                            ? 'bg-orange-900/50 text-orange-400'
+                            : 'bg-blue-900/50 text-blue-400'
+                        }`}>
+                          {payment.provider === 'CoinbaseCommerce' ? t('payments.providerCrypto') : t('payments.providerStripe')}
+                        </span>
+                      </td>
                       <td className="py-2 px-2 text-gray-400">
                         {payment.description || '-'}
                       </td>

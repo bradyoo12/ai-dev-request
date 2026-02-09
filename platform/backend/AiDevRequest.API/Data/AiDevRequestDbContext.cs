@@ -217,6 +217,14 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.StripePaymentIntentId).HasMaxLength(200);
             entity.Property(e => e.StripeCheckoutSessionId).HasMaxLength(200);
+            entity.Property(e => e.Provider)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            entity.Property(e => e.CryptoChargeId).HasMaxLength(200);
+            entity.Property(e => e.CryptoTransactionHash).HasMaxLength(200);
+            entity.Property(e => e.CryptoCurrency).HasMaxLength(20);
+            entity.Property(e => e.CryptoAmount).HasColumnType("decimal(18,8)");
+            entity.Property(e => e.ExchangeRateUsd).HasColumnType("decimal(18,8)");
             entity.Property(e => e.AmountUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.Currency).HasMaxLength(10);
             entity.Property(e => e.Description).HasMaxLength(500);

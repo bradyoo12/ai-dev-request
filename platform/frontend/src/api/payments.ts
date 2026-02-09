@@ -12,11 +12,14 @@ function authHeaders(): Record<string, string> {
 export interface PaymentRecord {
   id: number
   type: string
+  provider: string
   amountUsd: number
   currency: string
   status: string
   description?: string
   tokensAwarded?: number
+  cryptoCurrency?: string
+  cryptoTransactionHash?: string
   createdAt: string
 }
 
@@ -35,12 +38,13 @@ export interface CheckoutResult {
 export async function createCheckout(
   packageId: number,
   successUrl?: string,
-  cancelUrl?: string
+  cancelUrl?: string,
+  paymentMethod: 'stripe' | 'crypto' = 'stripe'
 ): Promise<CheckoutResult> {
   const response = await fetch(`${API_BASE_URL}/api/payments/checkout`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ packageId, successUrl, cancelUrl }),
+    body: JSON.stringify({ packageId, successUrl, cancelUrl, paymentMethod }),
   })
 
   if (!response.ok) {

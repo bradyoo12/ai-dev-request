@@ -6,6 +6,12 @@ public class Payment
     public required string UserId { get; set; }
     public string? StripePaymentIntentId { get; set; }
     public string? StripeCheckoutSessionId { get; set; }
+    public PaymentProvider Provider { get; set; } = PaymentProvider.Stripe;
+    public string? CryptoChargeId { get; set; }
+    public string? CryptoTransactionHash { get; set; }
+    public string? CryptoCurrency { get; set; }
+    public decimal? CryptoAmount { get; set; }
+    public decimal? ExchangeRateUsd { get; set; }
     public PaymentType Type { get; set; } = PaymentType.TokenPurchase;
     public decimal AmountUsd { get; set; }
     public string Currency { get; set; } = "usd";
@@ -32,4 +38,10 @@ public enum PaymentStatus
     Failed,
     Refunded,
     Cancelled
+}
+
+public enum PaymentProvider
+{
+    Stripe,
+    CoinbaseCommerce
 }

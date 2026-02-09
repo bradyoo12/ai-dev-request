@@ -26,6 +26,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
   const [error, setError] = useState('')
   const [showBuyDialog, setShowBuyDialog] = useState(false)
   const [purchasing, setPurchasing] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'crypto'>('stripe')
   const [historyPage, setHistoryPage] = useState(1)
   const [actionFilter, setActionFilter] = useState<string>('')
 
@@ -68,13 +69,13 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
   const handleBuyTokens = async (pkg: TokenPackage) => {
     try {
       setPurchasing(true)
-      const result = await createCheckout(pkg.id)
+      const result = await createCheckout(pkg.id, undefined, undefined, paymentMethod)
       if (result.isSimulation) {
         // Simulation mode - tokens credited immediately
         setShowBuyDialog(false)
         await loadData()
       } else {
-        // Redirect to Stripe Checkout
+        // Redirect to checkout (Stripe or Coinbase hosted page)
         window.location.href = result.checkoutUrl
       }
     } catch (err) {
@@ -280,6 +281,36 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
               </button>
             </div>
 
+            {/* Payment Method Toggle */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setPaymentMethod('stripe')}
+                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors border ${
+                  paymentMethod === 'stripe'
+                    ? 'bg-blue-600 border-blue-500 text-white'
+                    : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                {t('payments.methodCard')}
+              </button>
+              <button
+                onClick={() => setPaymentMethod('crypto')}
+                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors border ${
+                  paymentMethod === 'crypto'
+                    ? 'bg-orange-600 border-orange-500 text-white'
+                    : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                {t('payments.methodCrypto')}
+              </button>
+            </div>
+
+            {paymentMethod === 'crypto' && (
+              <div className="bg-orange-900/20 border border-orange-800 rounded-lg p-3 mb-4 text-sm text-orange-300">
+                {t('payments.cryptoNote')}
+              </div>
+            )}
+
             <div className="space-y-3">
               {packages.map((pkg) => (
                 <div
@@ -300,7 +331,11 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
                   <button
                     onClick={() => handleBuyTokens(pkg)}
                     disabled={purchasing}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-medium transition-colors"
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:bg-gray-600 ${
+                      paymentMethod === 'crypto'
+                        ? 'bg-orange-600 hover:bg-orange-700'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
                   >
                     ${pkg.priceUsd.toFixed(2)}
                   </button>

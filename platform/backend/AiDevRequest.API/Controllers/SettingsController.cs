@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,44 +15,18 @@ public class SettingsController : ControllerBase
 {
     private readonly AiDevRequestDbContext _context;
     private readonly ILogger<SettingsController> _logger;
+    private readonly ITokenService _tokenService;
 
-    public SettingsController(AiDevRequestDbContext context, ILogger<SettingsController> logger)
+    public SettingsController(AiDevRequestDbContext context, ILogger<SettingsController> logger, ITokenService tokenService)
     {
         _context = context;
         _logger = logger;
+        _tokenService = tokenService;
     }
 
     private string GetUserId() =>
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value
             ?? throw new InvalidOperationException("User not authenticated.");
-
-    private async Task<TokenBalance> GetOrCreateBalance(string userId)
-    {
-        var balance = await _context.TokenBalances.FirstOrDefaultAsync(b => b.UserId == userId);
-        if (balance != null) return balance;
-
-        balance = new TokenBalance
-        {
-            UserId = userId,
-            Balance = 1000,
-            TotalEarned = 1000,
-            TotalSpent = 0
-        };
-        _context.TokenBalances.Add(balance);
-
-        _context.TokenTransactions.Add(new TokenTransaction
-        {
-            UserId = userId,
-            Type = "credit",
-            Amount = 1000,
-            Action = "welcome_bonus",
-            Description = "Welcome bonus - 1,000 free tokens",
-            BalanceAfter = 1000
-        });
-
-        await _context.SaveChangesAsync();
-        return balance;
-    }
 
     /// <summary>
     /// Get current token balance and pricing info
@@ -62,7 +37,7 @@ public class SettingsController : ControllerBase
         try
         {
             var userId = GetUserId();
-            var balance = await GetOrCreateBalance(userId);
+            var balance = await _tokenService.GetOrCreateBalance(userId);
 
             var pricing = await _context.TokenPricings
                 .Where(p => p.IsActive)
@@ -72,7 +47,7 @@ public class SettingsController : ControllerBase
                     ActionType = p.ActionType,
                     TokenCost = p.TokenCost,
                     Description = p.Description ?? p.ActionType,
-                    ApproxUsd = Math.Round(p.TokenCost * 0.01m, 2)
+                    ApproxUsd = Math.Round(p.TokenCost * TokenPricing.TokenToUsdRate, 2)
                 })
                 .ToListAsync();
 
@@ -81,7 +56,7 @@ public class SettingsController : ControllerBase
                 Balance = balance.Balance,
                 TotalEarned = balance.TotalEarned,
                 TotalSpent = balance.TotalSpent,
-                BalanceValueUsd = Math.Round(balance.Balance * 0.01m, 2),
+                BalanceValueUsd = Math.Round(balance.Balance * TokenPricing.TokenToUsdRate, 2),
                 Pricing = pricing
             });
         }
@@ -111,7 +86,7 @@ public class SettingsController : ControllerBase
     {
         pageSize = Math.Clamp(pageSize, 1, 100);
         var userId = GetUserId();
-        await GetOrCreateBalance(userId);
+        await _tokenService.GetOrCreateBalance(userId);
 
         var query = _context.TokenTransactions
             .Where(t => t.UserId == userId);
@@ -169,7 +144,7 @@ public class SettingsController : ControllerBase
     public async Task<ActionResult<TokenPurchaseResultDto>> PurchaseTokens([FromBody] PurchaseTokensDto dto)
     {
         var userId = GetUserId();
-        var balance = await GetOrCreateBalance(userId);
+        var balance = await _tokenService.GetOrCreateBalance(userId);
 
         var package_ = await _context.TokenPackages.FindAsync(dto.PackageId);
         if (package_ == null || !package_.IsActive)
@@ -211,7 +186,7 @@ public class SettingsController : ControllerBase
     public async Task<ActionResult<TokenCheckDto>> CheckTokens(string actionType)
     {
         var userId = GetUserId();
-        var balance = await GetOrCreateBalance(userId);
+        var balance = await _tokenService.GetOrCreateBalance(userId);
 
         var pricing = await _context.TokenPricings
             .FirstOrDefaultAsync(p => p.ActionType == actionType && p.IsActive);
@@ -240,7 +215,7 @@ public class SettingsController : ControllerBase
     public async Task<ActionResult<TokenDeductResultDto>> DeductTokens([FromBody] DeductTokensDto dto)
     {
         var userId = GetUserId();
-        var balance = await GetOrCreateBalance(userId);
+        var balance = await _tokenService.GetOrCreateBalance(userId);
 
         var pricing = await _context.TokenPricings
             .FirstOrDefaultAsync(p => p.ActionType == dto.ActionType && p.IsActive);
@@ -298,7 +273,7 @@ public class SettingsController : ControllerBase
     public async Task<ActionResult<UsageSummaryDto>> GetUsageSummary()
     {
         var userId = GetUserId();
-        var balance = await GetOrCreateBalance(userId);
+        var balance = await _tokenService.GetOrCreateBalance(userId);
 
         var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -320,7 +295,7 @@ public class SettingsController : ControllerBase
         return Ok(new UsageSummaryDto
         {
             Balance = balance.Balance,
-            BalanceValueUsd = Math.Round(balance.Balance * 0.01m, 2),
+            BalanceValueUsd = Math.Round(balance.Balance * TokenPricing.TokenToUsdRate, 2),
             UsedThisMonth = usedThisMonth,
             AddedThisMonth = addedThisMonth,
             ProjectsThisMonth = projectCount
@@ -342,7 +317,7 @@ public class SettingsController : ControllerBase
     {
         pageSize = Math.Clamp(pageSize, 1, 100);
         var userId = GetUserId();
-        await GetOrCreateBalance(userId);
+        await _tokenService.GetOrCreateBalance(userId);
 
         var query = _context.TokenTransactions
             .Where(t => t.UserId == userId);
@@ -393,7 +368,7 @@ public class SettingsController : ControllerBase
     public async Task<ActionResult<IEnumerable<ProjectUsageDto>>> GetUsageByProject()
     {
         var userId = GetUserId();
-        await GetOrCreateBalance(userId);
+        await _tokenService.GetOrCreateBalance(userId);
 
         var projectUsage = await _context.TokenTransactions
             .Where(t => t.UserId == userId && t.Type == "debit" && t.ReferenceId != null)
@@ -431,7 +406,7 @@ public class SettingsController : ControllerBase
         [FromQuery] DateTime? to = null)
     {
         var userId = GetUserId();
-        await GetOrCreateBalance(userId);
+        await _tokenService.GetOrCreateBalance(userId);
 
         var query = _context.TokenTransactions
             .Where(t => t.UserId == userId);
@@ -459,6 +434,16 @@ public class SettingsController : ControllerBase
     }
 
     /// <summary>
+    /// Public endpoint: get subscription pricing plans
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("/api/pricing/plans")]
+    public ActionResult<IEnumerable<PricingPlan>> GetPricingPlans()
+    {
+        return Ok(PricingPlan.GetAllPlans());
+    }
+
+    /// <summary>
     /// Public endpoint: get token costs per action
     /// </summary>
     [HttpGet("/api/pricing/token-costs")]
@@ -474,7 +459,7 @@ public class SettingsController : ControllerBase
                     ActionType = p.ActionType,
                     TokenCost = p.TokenCost,
                     Description = p.Description ?? p.ActionType,
-                    ApproxUsd = Math.Round(p.TokenCost * 0.01m, 2)
+                    ApproxUsd = Math.Round(p.TokenCost * TokenPricing.TokenToUsdRate, 2)
                 })
                 .ToListAsync();
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getHostingPlans, getRecommendedPlan } from '../api/hosting'
 import type { HostingPlan } from '../api/hosting'
+import { TOKEN_TO_USD_RATE } from '../api/settings'
 
 interface PlanSelectionDialogProps {
   complexity: string
@@ -126,7 +127,7 @@ export default function PlanSelectionDialog({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">{t('hosting.buildCost')}</span>
-                <span>{tokenCost} {t('settings.tokens.tokensUnit')} (${(tokenCost * 0.01).toFixed(2)})</span>
+                <span>{tokenCost} {t('settings.tokens.tokensUnit')} (${(tokenCost * TOKEN_TO_USD_RATE).toFixed(2)})</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">{t('hosting.monthlyCost')}</span>

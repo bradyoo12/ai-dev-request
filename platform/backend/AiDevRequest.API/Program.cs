@@ -20,7 +20,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// Add AI Services
+// Add AI Services (singleton: reads API key once at startup; config changes require restart)
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();
 builder.Services.AddSingleton<IProductionService, ProductionService>();

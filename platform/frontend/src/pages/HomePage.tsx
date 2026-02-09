@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, InsufficientTokensError } from '../api/requests'
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from '../api/requests'
-import { checkTokens } from '../api/settings'
-import type { TokenCheck } from '../api/settings'
+import { checkTokens, getPricingPlans } from '../api/settings'
+import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
 import PlanSelectionDialog from '../components/PlanSelectionDialog'
 import RefinementChat from '../components/RefinementChat'
@@ -27,6 +27,11 @@ export default function HomePage() {
   const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
   const [showPlanSelection, setShowPlanSelection] = useState(false)
+  const [pricingPlans, setPricingPlans] = useState<PricingPlanData[]>([])
+
+  useEffect(() => {
+    getPricingPlans().then(setPricingPlans).catch(() => {})
+  }, [])
 
   const handleReset = () => {
     setRequest('')
@@ -623,16 +628,24 @@ export default function HomePage() {
           <section id="pricing" className="py-12 text-center">
             <h3 className="text-2xl font-bold mb-6">{t('pricing.title')}</h3>
             <div className="flex justify-center gap-4 flex-wrap">
-              <div className="bg-gray-800 p-6 rounded-xl w-64">
-                <div className="text-lg font-bold">Starter</div>
-                <div className="text-3xl font-bold my-2">₩49,000<span className="text-lg text-gray-400">{t('pricing.perMonth')}</span></div>
-                <div className="text-gray-400 text-sm">{t('pricing.starter.projects')}</div>
-              </div>
-              <div className="bg-blue-600 p-6 rounded-xl w-64 ring-2 ring-blue-400">
-                <div className="text-lg font-bold">Pro</div>
-                <div className="text-3xl font-bold my-2">₩149,000<span className="text-lg text-gray-200">{t('pricing.perMonth')}</span></div>
-                <div className="text-gray-200 text-sm">{t('pricing.pro.projects')}</div>
-              </div>
+              {(pricingPlans.length > 0
+                ? pricingPlans.filter(p => p.priceMonthly > 0)
+                : [
+                    { id: 'starter', name: 'Starter', priceMonthly: 49000, projectLimit: 3, isPopular: false, features: [], currency: 'KRW', nameKorean: '', priceYearly: 0 },
+                    { id: 'pro', name: 'Pro', priceMonthly: 149000, projectLimit: 10, isPopular: true, features: [], currency: 'KRW', nameKorean: '', priceYearly: 0 },
+                  ]
+              ).map(plan => (
+                <div key={plan.id} className={`p-6 rounded-xl w-64 ${plan.isPopular ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-gray-800'}`}>
+                  <div className="text-lg font-bold">{plan.name}</div>
+                  <div className="text-3xl font-bold my-2">
+                    {plan.currency === 'KRW' ? '₩' : '$'}{plan.priceMonthly.toLocaleString()}
+                    <span className={`text-lg ${plan.isPopular ? 'text-gray-200' : 'text-gray-400'}`}>{t('pricing.perMonth')}</span>
+                  </div>
+                  <div className={`text-sm ${plan.isPopular ? 'text-gray-200' : 'text-gray-400'}`}>
+                    {t('pricing.projectLimit', { count: plan.projectLimit })}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         </>

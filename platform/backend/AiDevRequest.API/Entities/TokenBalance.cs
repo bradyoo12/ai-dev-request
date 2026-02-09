@@ -71,6 +71,11 @@ public class TokenPackage
 
 public class TokenPricing
 {
+    /// <summary>
+    /// Conversion rate: 1 token = $0.01 USD. Used for display purposes.
+    /// </summary>
+    public const decimal TokenToUsdRate = 0.01m;
+
     public int Id { get; set; }
 
     [Required]

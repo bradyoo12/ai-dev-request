@@ -76,14 +76,26 @@ public class TokenService : ITokenService
         if (pricing == null)
             throw new InvalidOperationException($"Unknown action type: {actionType}");
 
-        var balance = await GetOrCreateBalance(userId);
+        // Ensure balance row exists before atomic update
+        await GetOrCreateBalance(userId);
 
-        if (balance.Balance < pricing.TokenCost)
+        // Detach any tracked TokenBalance to avoid stale state conflicts
+        var tracked = _context.ChangeTracker.Entries<TokenBalance>()
+            .FirstOrDefault(e => e.Entity.UserId == userId);
+        if (tracked != null) tracked.State = EntityState.Detached;
+
+        // Atomic debit: UPDATE only succeeds if balance >= cost (prevents race condition)
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE token_balances SET balance = balance - {0}, total_spent = total_spent + {0}, updated_at = NOW() WHERE user_id = {1} AND balance >= {0}",
+            pricing.TokenCost, userId);
+
+        if (rowsAffected == 0)
             throw new InvalidOperationException("Insufficient tokens");
 
-        balance.Balance -= pricing.TokenCost;
-        balance.TotalSpent += pricing.TokenCost;
-        balance.UpdatedAt = DateTime.UtcNow;
+        // Re-read the updated balance for the transaction log
+        var newBalance = await _context.TokenBalances
+            .AsNoTracking()
+            .FirstAsync(b => b.UserId == userId);
 
         var transaction = new TokenTransaction
         {
@@ -93,7 +105,7 @@ public class TokenService : ITokenService
             Action = actionType,
             ReferenceId = referenceId,
             Description = pricing.Description ?? actionType,
-            BalanceAfter = balance.Balance
+            BalanceAfter = newBalance.Balance
         };
         _context.TokenTransactions.Add(transaction);
 
@@ -101,18 +113,30 @@ public class TokenService : ITokenService
 
         _logger.LogInformation(
             "User {UserId} spent {Tokens} tokens on {Action}. Balance: {Balance}",
-            userId, pricing.TokenCost, actionType, balance.Balance);
+            userId, pricing.TokenCost, actionType, newBalance.Balance);
 
         return transaction;
     }
 
     public async Task<TokenTransaction> CreditTokens(string userId, int amount, string action, string? referenceId = null, string? description = null)
     {
-        var balance = await GetOrCreateBalance(userId);
+        // Ensure balance row exists before atomic update
+        await GetOrCreateBalance(userId);
 
-        balance.Balance += amount;
-        balance.TotalEarned += amount;
-        balance.UpdatedAt = DateTime.UtcNow;
+        // Detach any tracked TokenBalance to avoid stale state conflicts
+        var tracked = _context.ChangeTracker.Entries<TokenBalance>()
+            .FirstOrDefault(e => e.Entity.UserId == userId);
+        if (tracked != null) tracked.State = EntityState.Detached;
+
+        // Atomic credit: prevents race condition on concurrent credit operations
+        await _context.Database.ExecuteSqlRawAsync(
+            "UPDATE token_balances SET balance = balance + {0}, total_earned = total_earned + {0}, updated_at = NOW() WHERE user_id = {1}",
+            amount, userId);
+
+        // Re-read the updated balance for the transaction log
+        var newBalance = await _context.TokenBalances
+            .AsNoTracking()
+            .FirstAsync(b => b.UserId == userId);
 
         var transaction = new TokenTransaction
         {
@@ -122,7 +146,7 @@ public class TokenService : ITokenService
             Action = action,
             ReferenceId = referenceId,
             Description = description ?? action,
-            BalanceAfter = balance.Balance
+            BalanceAfter = newBalance.Balance
         };
         _context.TokenTransactions.Add(transaction);
 
@@ -130,7 +154,7 @@ public class TokenService : ITokenService
 
         _logger.LogInformation(
             "User {UserId} earned {Tokens} tokens for {Action}. Balance: {Balance}",
-            userId, amount, action, balance.Balance);
+            userId, amount, action, newBalance.Balance);
 
         return transaction;
     }

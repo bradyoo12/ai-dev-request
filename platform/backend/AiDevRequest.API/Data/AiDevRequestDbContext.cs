@@ -88,6 +88,8 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ProjectPath)
                 .HasMaxLength(500);
 
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -148,6 +150,7 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("token_balances");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -160,6 +163,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Action).IsRequired().HasMaxLength(50);
             entity.Property(e => e.ReferenceId).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.CreatedAt);
         });
@@ -215,6 +219,9 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<TokenPackage>().WithMany().HasForeignKey(e => e.TokenPackageId).OnDelete(DeleteBehavior.SetNull);
+
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.StripePaymentIntentId);
             entity.HasIndex(e => e.StripeCheckoutSessionId);
@@ -240,6 +247,10 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<HostingPlan>().WithMany().HasForeignKey(e => e.HostingPlanId).OnDelete(DeleteBehavior.SetNull);
+
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
@@ -250,6 +261,7 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.Id).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
             entity.Property(e => e.PasswordHash).HasMaxLength(500);
             entity.Property(e => e.DisplayName).HasMaxLength(100);
@@ -277,6 +289,8 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MonthlyLimitUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.MonthlySpentUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.FailureReason).HasMaxLength(500);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<TokenPackage>().WithMany().HasForeignKey(e => e.TokenPackageId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -288,6 +302,7 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
             entity.Property(e => e.ResultJson).HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
         });
 
@@ -297,6 +312,7 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
             entity.Property(e => e.Content).IsRequired();
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.CreatedAt);
         });
@@ -310,6 +326,8 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Description).IsRequired().HasMaxLength(5000);
             entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.SetNull);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -320,6 +338,8 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("suggestion_votes");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.HasOne<Suggestion>().WithMany().HasForeignKey(e => e.SuggestionId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => new { e.SuggestionId, e.UserId }).IsUnique();
             entity.HasIndex(e => e.SuggestionId);
         });
@@ -330,6 +350,8 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Content).IsRequired().HasMaxLength(5000);
+            entity.HasOne<Suggestion>().WithMany().HasForeignKey(e => e.SuggestionId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.SuggestionId);
             entity.HasIndex(e => e.CreatedAt);
         });
@@ -342,6 +364,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ToStatus).IsRequired().HasMaxLength(50);
             entity.Property(e => e.ChangedByUserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Note).HasMaxLength(500);
+            entity.HasOne<Suggestion>().WithMany().HasForeignKey(e => e.SuggestionId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.SuggestionId);
             entity.HasIndex(e => e.CreatedAt);
         });
@@ -353,6 +376,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PlanType).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.StartedAt);
@@ -368,6 +392,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FromPlan).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.ToPlan).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.EventType);
             entity.HasIndex(e => e.CreatedAt);
@@ -406,6 +431,8 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Deployment>().WithMany().HasForeignKey(e => e.DeploymentId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DeploymentId);
             entity.HasIndex(e => e.DomainName).IsUnique();
@@ -428,6 +455,8 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Domain>().WithMany().HasForeignKey(e => e.DomainId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DomainId);
             entity.HasIndex(e => e.UserId);
         });

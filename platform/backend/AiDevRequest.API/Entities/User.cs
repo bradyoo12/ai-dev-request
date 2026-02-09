@@ -2,7 +2,7 @@ namespace AiDevRequest.API.Entities;
 
 public class User
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public required string Email { get; set; }
 

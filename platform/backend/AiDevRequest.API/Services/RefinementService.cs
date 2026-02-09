@@ -12,6 +12,20 @@ public interface IRefinementService
     Task<RefinementMessage> SendMessageAsync(Guid requestId, string userMessage);
     IAsyncEnumerable<string> StreamMessageAsync(Guid requestId, string userMessage, CancellationToken cancellationToken = default);
     Task<List<RefinementMessage>> GetHistoryAsync(Guid requestId);
+    Task<ApplyChangesResult> ApplyChangesAsync(Guid requestId, string messageContent);
+}
+
+public class ApplyChangesResult
+{
+    public List<string> ModifiedFiles { get; set; } = new();
+    public List<string> CreatedFiles { get; set; } = new();
+    public int TotalChanges { get; set; }
+}
+
+public class FileChange
+{
+    public string FilePath { get; set; } = "";
+    public string Content { get; set; } = "";
 }
 
 public class RefinementService : IRefinementService
@@ -262,6 +276,62 @@ Only detect genuine suggestions about new features or platform improvements - NO
             .Where(m => m.DevRequestId == requestId)
             .OrderBy(m => m.CreatedAt)
             .ToListAsync();
+    }
+
+    public async Task<ApplyChangesResult> ApplyChangesAsync(Guid requestId, string messageContent)
+    {
+        var request = await _db.DevRequests.FindAsync(requestId)
+            ?? throw new KeyNotFoundException("Request not found");
+
+        if (string.IsNullOrEmpty(request.ProjectPath) || !Directory.Exists(request.ProjectPath))
+            throw new InvalidOperationException("Project directory not found");
+
+        var changes = ParseFileChanges(messageContent);
+        var result = new ApplyChangesResult();
+
+        foreach (var change in changes)
+        {
+            var fullPath = Path.Combine(request.ProjectPath, change.FilePath.Replace('/', Path.DirectorySeparatorChar));
+            var dir = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            var existed = File.Exists(fullPath);
+            await File.WriteAllTextAsync(fullPath, change.Content);
+
+            if (existed)
+                result.ModifiedFiles.Add(change.FilePath);
+            else
+                result.CreatedFiles.Add(change.FilePath);
+        }
+
+        result.TotalChanges = result.ModifiedFiles.Count + result.CreatedFiles.Count;
+        return result;
+    }
+
+    internal static List<FileChange> ParseFileChanges(string content)
+    {
+        var changes = new List<FileChange>();
+        // Pattern: **File: `path/to/file`** followed by a code block
+        var regex = new System.Text.RegularExpressions.Regex(
+            @"\*\*File:\s*`([^`]+)`\*\*\s*\n```[^\n]*\n([\s\S]*?)```",
+            System.Text.RegularExpressions.RegexOptions.Multiline);
+
+        var matches = regex.Matches(content);
+        foreach (System.Text.RegularExpressions.Match match in matches)
+        {
+            var filePath = match.Groups[1].Value.Trim();
+            var code = match.Groups[2].Value;
+            // Remove trailing newline if present
+            if (code.EndsWith('\n'))
+                code = code[..^1];
+
+            changes.Add(new FileChange { FilePath = filePath, Content = code });
+        }
+
+        return changes;
     }
 
     private async Task<string> BuildProjectContextAsync(DevRequest request)

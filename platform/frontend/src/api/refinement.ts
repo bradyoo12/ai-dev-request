@@ -35,6 +35,22 @@ export async function sendChatMessage(requestId: string, message: string): Promi
   return res.json()
 }
 
+export interface ApplyChangesResponse {
+  modifiedFiles: string[]
+  createdFiles: string[]
+  totalChanges: number
+}
+
+export async function applyChanges(requestId: string, messageContent: string): Promise<ApplyChangesResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/requests/${requestId}/chat/apply`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ messageContent }),
+  })
+  if (!res.ok) throw new Error('Failed to apply changes')
+  return res.json()
+}
+
 export async function sendChatMessageStream(
   requestId: string,
   message: string,

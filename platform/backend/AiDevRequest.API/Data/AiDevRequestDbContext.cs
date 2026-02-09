@@ -48,6 +48,10 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TrendReport> TrendReports => Set<TrendReport>();
     public DbSet<ProjectReview> ProjectReviews => Set<ProjectReview>();
     public DbSet<UpdateRecommendation> UpdateRecommendations => Set<UpdateRecommendation>();
+    public DbSet<TeamWorkspace> TeamWorkspaces => Set<TeamWorkspace>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
+    public DbSet<TeamActivity> TeamActivities => Set<TeamActivity>();
+    public DbSet<TeamProject> TeamProjects => Set<TeamProject>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -725,6 +729,54 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
             entity.HasIndex(e => e.ProjectReviewId);
             entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<TeamWorkspace>(entity =>
+        {
+            entity.ToTable("team_workspaces");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.OwnerId).IsRequired().HasMaxLength(100);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.OwnerId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.OwnerId);
+        });
+
+        modelBuilder.Entity<TeamMember>(entity =>
+        {
+            entity.ToTable("team_members");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
+            entity.HasOne<TeamWorkspace>().WithMany().HasForeignKey(e => e.TeamId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.TeamId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.TeamId, e.UserId }).IsUnique();
+        });
+
+        modelBuilder.Entity<TeamActivity>(entity =>
+        {
+            entity.ToTable("team_activities");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Action).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.TargetUserId).HasMaxLength(100);
+            entity.Property(e => e.Detail).HasMaxLength(500);
+            entity.HasOne<TeamWorkspace>().WithMany().HasForeignKey(e => e.TeamId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TeamId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<TeamProject>(entity =>
+        {
+            entity.ToTable("team_projects");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SharedByUserId).IsRequired().HasMaxLength(100);
+            entity.HasOne<TeamWorkspace>().WithMany().HasForeignKey(e => e.TeamId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TeamId);
+            entity.HasIndex(e => new { e.TeamId, e.DevRequestId }).IsUnique();
         });
     }
 }

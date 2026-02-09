@@ -48,6 +48,7 @@ builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ITechTrendService, TechTrendService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -199,7 +200,8 @@ app.UseExceptionHandler(errorApp =>
             "trend_reports", "translations", "user_interests", "user_memories",
             "user_preferences", "user_preference_summaries", "update_recommendations",
             "users", "project_reviews",
-            "app_recommendations" };
+            "app_recommendations",
+            "team_workspaces", "team_members", "team_activities", "team_projects" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

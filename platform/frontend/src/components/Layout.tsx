@@ -42,6 +42,7 @@ export default function Layout() {
               <button onClick={() => navigateProtected('/suggestions')} className="hover:text-blue-400">{t('header.suggestions')}</button>
               <button onClick={() => navigateProtected('/recommendations')} className="hover:text-purple-400">{t('header.recommendations')}</button>
               <button onClick={() => navigateProtected('/project-health')} className="hover:text-green-400">{t('header.projectHealth')}</button>
+              <button onClick={() => navigateProtected('/teams')} className="hover:text-cyan-400">{t('header.teams')}</button>
               {authUser?.isAdmin && (
                 <button onClick={() => navigateProtected('/admin/churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
               )}

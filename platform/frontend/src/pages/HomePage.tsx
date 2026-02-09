@@ -653,6 +653,49 @@ export default function HomePage() {
               </div>
             )}
 
+            {productionResult.production.codeReviewScore != null && (
+              <div className="bg-gray-900 border border-gray-700 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-bold text-cyan-400">{t('codeReview.title')}</h4>
+                  <div className={`text-2xl font-bold ${
+                    (productionResult.production.codeReviewScore ?? 0) >= 85 ? 'text-green-400' :
+                    (productionResult.production.codeReviewScore ?? 0) >= 70 ? 'text-yellow-400' : 'text-red-400'
+                  }`}>
+                    {productionResult.production.codeReviewScore}/100
+                  </div>
+                </div>
+                <p className="text-sm text-gray-400 mb-3">{productionResult.production.codeReviewSummary}</p>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-gray-800 rounded-lg p-2">
+                    <div className="text-xs text-gray-500">{t('codeReview.security')}</div>
+                    <div className={`text-lg font-bold ${
+                      (productionResult.production.securityScore ?? 0) >= 85 ? 'text-green-400' :
+                      (productionResult.production.securityScore ?? 0) >= 70 ? 'text-yellow-400' : 'text-red-400'
+                    }`}>{productionResult.production.securityScore}</div>
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-2">
+                    <div className="text-xs text-gray-500">{t('codeReview.performance')}</div>
+                    <div className={`text-lg font-bold ${
+                      (productionResult.production.performanceScore ?? 0) >= 85 ? 'text-green-400' :
+                      (productionResult.production.performanceScore ?? 0) >= 70 ? 'text-yellow-400' : 'text-red-400'
+                    }`}>{productionResult.production.performanceScore}</div>
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-2">
+                    <div className="text-xs text-gray-500">{t('codeReview.quality')}</div>
+                    <div className={`text-lg font-bold ${
+                      (productionResult.production.codeQualityScore ?? 0) >= 85 ? 'text-green-400' :
+                      (productionResult.production.codeQualityScore ?? 0) >= 70 ? 'text-yellow-400' : 'text-red-400'
+                    }`}>{productionResult.production.codeQualityScore}</div>
+                  </div>
+                </div>
+                {(productionResult.production.codeReviewIssueCount ?? 0) > 0 && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    {t('codeReview.issuesFound', { count: productionResult.production.codeReviewIssueCount })}
+                  </p>
+                )}
+              </div>
+            )}
+
             {productionResult.production.setupCommands.length > 0 && (
               <div className="bg-gray-900 rounded-xl p-4 mb-4">
                 <h4 className="font-bold mb-3">{t('completed.setupCommands')}</h4>

@@ -479,5 +479,10 @@
   "accessibility.issuesFound": "{{count}}건의 이슈 발견",
   "tests.title": "자동 생성 테스트",
   "tests.files": "{{count}}개 테스트 파일",
-  "tests.cases": "{{count}}개 테스트 케이스"
+  "tests.cases": "{{count}}개 테스트 케이스",
+  "codeReview.title": "AI 코드 리뷰",
+  "codeReview.security": "보안",
+  "codeReview.performance": "성능",
+  "codeReview.quality": "품질",
+  "codeReview.issuesFound": "{{count}}건의 이슈 발견"
 }

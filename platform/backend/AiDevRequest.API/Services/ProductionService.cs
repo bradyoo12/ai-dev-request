@@ -262,6 +262,12 @@ public class ProductionResult
     public int? TestCoverageEstimate { get; set; }
     public string? TestFramework { get; set; }
     public string? TestSummary { get; set; }
+    public int? CodeReviewScore { get; set; }
+    public int? SecurityScore { get; set; }
+    public int? PerformanceScore { get; set; }
+    public int? CodeQualityScore { get; set; }
+    public string? CodeReviewSummary { get; set; }
+    public int? CodeReviewIssueCount { get; set; }
 }
 
 public class GeneratedProject

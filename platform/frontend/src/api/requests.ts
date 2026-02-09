@@ -200,6 +200,12 @@ export interface ProductionResult {
   testCoverageEstimate?: number;
   testFramework?: string;
   testSummary?: string;
+  codeReviewScore?: number;
+  securityScore?: number;
+  performanceScore?: number;
+  codeQualityScore?: number;
+  codeReviewSummary?: string;
+  codeReviewIssueCount?: number;
 }
 
 export interface ProductionResponse {

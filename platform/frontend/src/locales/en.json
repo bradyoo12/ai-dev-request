@@ -479,5 +479,10 @@
   "accessibility.issuesFound": "{{count}} issues found",
   "tests.title": "Auto-Generated Tests",
   "tests.files": "{{count}} test files",
-  "tests.cases": "{{count}} test cases"
+  "tests.cases": "{{count}} test cases",
+  "codeReview.title": "AI Code Review",
+  "codeReview.security": "Security",
+  "codeReview.performance": "Performance",
+  "codeReview.quality": "Quality",
+  "codeReview.issuesFound": "{{count}} issues found"
 }

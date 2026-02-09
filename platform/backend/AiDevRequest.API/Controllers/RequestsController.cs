@@ -23,6 +23,7 @@ public class RequestsController : ControllerBase
     private readonly IBuildVerificationService _verificationService;
     private readonly IAccessibilityService _accessibilityService;
     private readonly ITestGenerationService _testGenerationService;
+    private readonly ICodeReviewService _codeReviewService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -34,6 +35,7 @@ public class RequestsController : ControllerBase
         IBuildVerificationService verificationService,
         IAccessibilityService accessibilityService,
         ITestGenerationService testGenerationService,
+        ICodeReviewService codeReviewService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -44,6 +46,7 @@ public class RequestsController : ControllerBase
         _verificationService = verificationService;
         _accessibilityService = accessibilityService;
         _testGenerationService = testGenerationService;
+        _codeReviewService = codeReviewService;
         _logger = logger;
     }
 
@@ -532,6 +535,16 @@ public class RequestsController : ControllerBase
                 result.TestCoverageEstimate = testResult.CoverageEstimate;
                 result.TestFramework = testResult.TestFramework;
                 result.TestSummary = testResult.Summary;
+
+                // AI Code Review (security, performance, quality)
+                var reviewResult = await _codeReviewService.ReviewProjectAsync(
+                    result.ProjectPath, result.ProjectType);
+                result.CodeReviewScore = reviewResult.OverallScore;
+                result.SecurityScore = reviewResult.SecurityScore;
+                result.PerformanceScore = reviewResult.PerformanceScore;
+                result.CodeQualityScore = reviewResult.QualityScore;
+                result.CodeReviewSummary = reviewResult.Summary;
+                result.CodeReviewIssueCount = reviewResult.Issues.Count;
 
                 entity.Status = RequestStatus.Staging;
             }

@@ -476,5 +476,6 @@
   "wizard.step.analysis": "Analysis",
   "wizard.step.proposal": "Proposal",
   "wizard.step.build": "Build",
-  "wizard.step.complete": "Complete"
+  "wizard.step.complete": "Complete",
+  "status.extendedThinking": "Deep Analysis Active"
 }

@@ -476,5 +476,6 @@
   "wizard.step.analysis": "분석",
   "wizard.step.proposal": "제안서",
   "wizard.step.build": "빌드",
-  "wizard.step.complete": "완료"
+  "wizard.step.complete": "완료",
+  "status.extendedThinking": "심층 분석 진행 중"
 }

@@ -1,5 +1,6 @@
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,6 +63,7 @@ public class TranslationsController : ControllerBase
     /// <summary>
     /// Get translations grouped by namespace for admin editing
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpGet("admin/{locale}")]
     public async Task<ActionResult<IEnumerable<TranslationEntryDto>>> GetTranslationsForAdmin(
         string locale,
@@ -111,6 +113,7 @@ public class TranslationsController : ControllerBase
     /// <summary>
     /// Bulk update translations for a locale (admin)
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPut("admin/{locale}")]
     public async Task<ActionResult> UpdateTranslations(string locale, [FromBody] BulkUpdateTranslationsDto dto)
     {
@@ -153,6 +156,7 @@ public class TranslationsController : ControllerBase
     /// Import translations from JSON (admin)
     /// Format: { "namespace.key": "value", ... }
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpPost("admin/{locale}/import")]
     public async Task<ActionResult<ImportResultDto>> ImportTranslations(string locale, [FromBody] Dictionary<string, string> translations)
     {
@@ -205,6 +209,7 @@ public class TranslationsController : ControllerBase
     /// <summary>
     /// Export all translations for a locale as flat JSON
     /// </summary>
+    [Authorize(Roles = "Admin")]
     [HttpGet("admin/{locale}/export")]
     public async Task<ActionResult<Dictionary<string, string>>> ExportTranslations(string locale)
     {

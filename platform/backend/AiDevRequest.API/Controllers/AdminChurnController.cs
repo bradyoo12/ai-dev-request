@@ -2,11 +2,13 @@ using System.Globalization;
 using System.Text;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/admin/churn")]
 public class AdminChurnController : ControllerBase

@@ -4,7 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts'
 import {
-  getChurnOverview, getChurnTrends, getChurnByPlan, getSubscriptionEvents, getChurnExportUrl
+  getChurnOverview, getChurnTrends, getChurnByPlan, getSubscriptionEvents, exportChurnCsv
 } from '../../api/admin'
 import type { ChurnOverview, ChurnTrend, ChurnByPlan, SubscriptionEvent } from '../../api/admin'
 
@@ -103,12 +103,12 @@ export default function ChurnDashboard() {
           <h3 className="text-xl font-bold">{t('churn.title')}</h3>
           <p className="text-gray-400 text-sm mt-1">{t('churn.description')}</p>
         </div>
-        <a
-          href={getChurnExportUrl()}
+        <button
+          onClick={() => exportChurnCsv()}
           className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
         >
           {t('churn.exportCsv')}
-        </a>
+        </button>
       </div>
 
       {/* KPI Cards */}

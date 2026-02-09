@@ -303,7 +303,9 @@ function App() {
             <nav className="space-x-4">
               <button onClick={() => setPage('sites')} className="hover:text-blue-400">{t('header.mySites')}</button>
               <button onClick={() => setPage('suggestions')} className="hover:text-blue-400">{t('header.suggestions')}</button>
-              <button onClick={() => setPage('admin-churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
+              {authUser?.isAdmin && (
+                <button onClick={() => setPage('admin-churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
+              )}
               <a href="#pricing" className="hover:text-blue-400">{t('header.pricing')}</a>
               <button onClick={() => setPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>

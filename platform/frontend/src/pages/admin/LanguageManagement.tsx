@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getAuthHeaders } from '../../api/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
@@ -40,14 +41,18 @@ export default function LanguageManagement() {
   }, [])
 
   const fetchLanguages = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/languages/admin`)
+    const res = await fetch(`${API_BASE_URL}/api/languages/admin`, {
+      headers: getAuthHeaders(),
+    })
     if (res.ok) setLanguages(await res.json())
   }
 
   const fetchTranslations = async (locale: string) => {
     const params = new URLSearchParams()
     if (missingOnly) params.set('missingOnly', 'true')
-    const res = await fetch(`${API_BASE_URL}/api/translations/admin/${locale}?${params}`)
+    const res = await fetch(`${API_BASE_URL}/api/translations/admin/${locale}?${params}`, {
+      headers: getAuthHeaders(),
+    })
     if (res.ok) {
       const data = await res.json()
       setTranslations(data)
@@ -63,7 +68,7 @@ export default function LanguageManagement() {
   const handleAddLanguage = async () => {
     const res = await fetch(`${API_BASE_URL}/api/languages/admin`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         code: newLang.code,
         name: newLang.name,
@@ -81,7 +86,10 @@ export default function LanguageManagement() {
 
   const handleDeleteLanguage = async (code: string) => {
     if (!confirm(`Delete language "${code}"?`)) return
-    const res = await fetch(`${API_BASE_URL}/api/languages/admin/${code}`, { method: 'DELETE' })
+    const res = await fetch(`${API_BASE_URL}/api/languages/admin/${code}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    })
     if (res.ok) {
       fetchLanguages()
       if (selectedLang === code) {
@@ -101,7 +109,7 @@ export default function LanguageManagement() {
 
     const res = await fetch(`${API_BASE_URL}/api/translations/admin/${selectedLang}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ translations: updates }),
     })
 
@@ -113,7 +121,9 @@ export default function LanguageManagement() {
   }
 
   const handleExport = async (code: string) => {
-    const res = await fetch(`${API_BASE_URL}/api/translations/admin/${code}/export`)
+    const res = await fetch(`${API_BASE_URL}/api/translations/admin/${code}/export`, {
+      headers: getAuthHeaders(),
+    })
     if (res.ok) {
       const data = await res.json()
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -137,7 +147,7 @@ export default function LanguageManagement() {
       const data = JSON.parse(text)
       const res = await fetch(`${API_BASE_URL}/api/translations/admin/${code}/import`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       })
       if (res.ok) {

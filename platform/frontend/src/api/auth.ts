@@ -12,6 +12,7 @@ export interface AuthUser {
   email: string
   displayName?: string
   profileImageUrl?: string
+  isAdmin?: boolean
   createdAt: string
 }
 

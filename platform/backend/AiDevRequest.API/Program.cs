@@ -157,12 +157,26 @@ if (app.Environment.IsDevelopment())
         {
             // PARTIAL database: some tables exist, some don't.
             // This happens with legacy EnsureCreatedAsync or corrupted migration state.
-            // Drop and recreate for a clean state (safe for staging).
             var missingTables = allTables.Where(t => !existingTables.Contains(t)).ToList();
-            logger.LogInformation("Partial database detected. Missing tables: {Missing}. Recreating...",
-                string.Join(", ", missingTables));
-            await dbContext.Database.EnsureDeletedAsync();
-            // MigrateAsync below will create everything from scratch
+
+            if (app.Environment.IsDevelopment())
+            {
+                // Only drop and recreate in development — safe to lose data
+                logger.LogInformation("Partial database detected in Development. Missing tables: {Missing}. Recreating...",
+                    string.Join(", ", missingTables));
+                await dbContext.Database.EnsureDeletedAsync();
+                // MigrateAsync below will create everything from scratch
+            }
+            else
+            {
+                // In staging/production, never drop the database — require manual intervention
+                logger.LogCritical(
+                    "Database in partial state — manual intervention required. Missing tables: {Missing}",
+                    string.Join(", ", missingTables));
+                throw new InvalidOperationException(
+                    $"Database schema mismatch detected in {app.Environment.EnvironmentName}. " +
+                    $"Missing tables: {string.Join(", ", missingTables)}. Manual intervention required.");
+            }
         }
         else if (existingTables.Count == allTables.Length)
         {

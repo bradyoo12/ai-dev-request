@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { register, login } from '../api/auth'
-import type { AuthUser } from '../api/auth'
+import { register, login, getProviders, getAuthUrl, getOAuthCallbackUrl } from '../api/auth'
+import type { AuthUser, SocialProvider } from '../api/auth'
 
 interface LoginPageProps {
   onLogin: (user: AuthUser) => void
   onSkip: () => void
+}
+
+const providerConfig: Record<SocialProvider, { icon: string; label: string; bg: string; hover: string }> = {
+  google: { icon: 'G', label: 'Google', bg: 'bg-white text-gray-800', hover: 'hover:bg-gray-100' },
+  apple: { icon: '\uF8FF', label: 'Apple', bg: 'bg-black text-white', hover: 'hover:bg-gray-900' },
+  kakao: { icon: '\uD83D\uDCAC', label: 'Kakao', bg: 'bg-[#FEE500] text-[#191919]', hover: 'hover:bg-[#F5DC00]' },
+  line: { icon: '\uD83D\uDCAC', label: 'LINE', bg: 'bg-[#06C755] text-white', hover: 'hover:bg-[#05B34C]' },
 }
 
 export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
@@ -16,6 +23,12 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null)
+  const [providers, setProviders] = useState<SocialProvider[]>(['google', 'apple', 'kakao', 'line'])
+
+  useEffect(() => {
+    getProviders().then(setProviders)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,6 +60,19 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
     }
   }
 
+  const handleSocialLogin = async (provider: SocialProvider) => {
+    setSocialLoading(provider)
+    setError('')
+    try {
+      const redirectUri = getOAuthCallbackUrl(provider)
+      const url = await getAuthUrl(provider, redirectUri)
+      window.location.href = url
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('auth.error.unknown'))
+      setSocialLoading(null)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
@@ -56,7 +82,40 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
         </div>
 
         <div className="bg-gray-800 rounded-2xl p-8 shadow-xl">
-          <div className="flex gap-1 mb-6 bg-gray-900 rounded-lg p-1">
+          {/* Social Login Buttons */}
+          <div className="space-y-3 mb-6">
+            {providers.map((provider) => {
+              const config = providerConfig[provider]
+              return (
+                <button
+                  key={provider}
+                  onClick={() => handleSocialLogin(provider)}
+                  disabled={socialLoading !== null}
+                  className={`w-full py-3 px-4 rounded-xl font-medium transition-colors flex items-center justify-center gap-3 ${config.bg} ${config.hover} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <span className="text-lg">{config.icon}</span>
+                  <span>
+                    {socialLoading === provider
+                      ? t('auth.processing')
+                      : t('auth.continueWith', { provider: config.label })}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-gray-800 text-gray-500">{t('auth.orContinueWith')}</span>
+            </div>
+          </div>
+
+          {/* Email/Password Form */}
+          <div className="flex gap-1 mb-4 bg-gray-900 rounded-lg p-1">
             <button
               onClick={() => { setMode('login'); setError('') }}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${

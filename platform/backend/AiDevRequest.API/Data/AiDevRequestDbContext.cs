@@ -29,6 +29,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<SubscriptionRecord> SubscriptionRecords => Set<SubscriptionRecord>();
     public DbSet<SubscriptionEvent> SubscriptionEvents => Set<SubscriptionEvent>();
     public DbSet<ChurnMetricSnapshot> ChurnMetricSnapshots => Set<ChurnMetricSnapshot>();
+    public DbSet<Domain> Domains => Set<Domain>();
+    public DbSet<DomainTransaction> DomainTransactions => Set<DomainTransaction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -236,12 +238,22 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
-            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.PasswordHash).HasMaxLength(500);
             entity.Property(e => e.DisplayName).HasMaxLength(100);
+            entity.Property(e => e.ProfileImageUrl).HasMaxLength(500);
             entity.Property(e => e.AnonymousUserId).HasMaxLength(100);
+            entity.Property(e => e.GoogleId).HasMaxLength(100);
+            entity.Property(e => e.AppleId).HasMaxLength(100);
+            entity.Property(e => e.LineId).HasMaxLength(100);
+            entity.Property(e => e.KakaoId).HasMaxLength(100);
+            entity.Property(e => e.CountryCode).HasMaxLength(10);
 
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.AnonymousUserId);
+            entity.HasIndex(e => e.GoogleId);
+            entity.HasIndex(e => e.KakaoId);
+            entity.HasIndex(e => e.LineId);
+            entity.HasIndex(e => e.AppleId);
         });
 
         modelBuilder.Entity<AutoTopUpConfig>(entity =>
@@ -333,6 +345,56 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ChurnRate).HasColumnType("decimal(10,4)");
             entity.Property(e => e.Mrr).HasColumnType("decimal(18,2)");
             entity.HasIndex(e => e.PeriodStart);
+        });
+
+        modelBuilder.Entity<Domain>(entity =>
+        {
+            entity.ToTable("domains");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DomainName).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Tld).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Registrar).HasMaxLength(50);
+            entity.Property(e => e.RegistrarDomainId).HasMaxLength(200);
+            entity.Property(e => e.AnnualCostUsd).HasColumnType("decimal(10,2)");
+
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.SslStatus)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.DnsStatus)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.DeploymentId);
+            entity.HasIndex(e => e.DomainName).IsUnique();
+        });
+
+        modelBuilder.Entity<DomainTransaction>(entity =>
+        {
+            entity.ToTable("domain_transactions");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.AmountUsd).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.Description).HasMaxLength(500);
+
+            entity.Property(e => e.Type)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.PaymentMethod)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+
+            entity.HasIndex(e => e.DomainId);
+            entity.HasIndex(e => e.UserId);
         });
 
         modelBuilder.Entity<HostingPlan>(entity =>

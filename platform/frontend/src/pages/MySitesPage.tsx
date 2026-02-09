@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getSites, getSiteDetail, deleteSite, redeploySite } from '../api/sites'
 import type { SiteResponse, SiteDetailResponse } from '../api/sites'
+import { searchDomains, getSiteDomain, purchaseDomain, removeSiteDomain } from '../api/domains'
+import type { DomainSearchResult, DomainResponse } from '../api/domains'
 
 export default function MySitesPage() {
   const { t } = useTranslation()
@@ -10,6 +12,16 @@ export default function MySitesPage() {
   const [error, setError] = useState('')
   const [selectedSite, setSelectedSite] = useState<SiteDetailResponse | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+
+  // Domain state
+  const [siteDomain, setSiteDomain] = useState<DomainResponse | null>(null)
+  const [domainQuery, setDomainQuery] = useState('')
+  const [domainResults, setDomainResults] = useState<DomainSearchResult[]>([])
+  const [domainSearching, setDomainSearching] = useState(false)
+  const [domainPurchasing, setDomainPurchasing] = useState(false)
+  const [purchaseConfirm, setPurchaseConfirm] = useState<DomainSearchResult | null>(null)
+  const [domainError, setDomainError] = useState('')
+  const [domainRemoving, setDomainRemoving] = useState(false)
 
   const loadSites = useCallback(async () => {
     try {
@@ -39,10 +51,31 @@ export default function MySitesPage() {
     return () => clearInterval(interval)
   }, [sites, loadSites])
 
+  // Poll domain status when domain is pending/registering
+  useEffect(() => {
+    if (!selectedSite || !siteDomain) return
+    const isPending = siteDomain.status === 'Pending' || siteDomain.status === 'Registering'
+    const isDnsPending = siteDomain.dnsStatus === 'Pending' || siteDomain.dnsStatus === 'Configuring'
+    const isSslPending = siteDomain.sslStatus === 'Pending' || siteDomain.sslStatus === 'Provisioning'
+    if (!isPending && !isDnsPending && !isSslPending) return
+
+    const interval = setInterval(async () => {
+      const updated = await getSiteDomain(selectedSite.id)
+      if (updated) setSiteDomain(updated)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [selectedSite, siteDomain])
+
   const handleViewDetails = async (id: string) => {
     try {
       const detail = await getSiteDetail(id)
       setSelectedSite(detail)
+      setDomainQuery('')
+      setDomainResults([])
+      setDomainError('')
+      // Load domain info
+      const domain = await getSiteDomain(id)
+      setSiteDomain(domain)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('error.requestFailed'))
     }
@@ -68,6 +101,52 @@ export default function MySitesPage() {
     }
   }
 
+  const handleDomainSearch = async () => {
+    if (!domainQuery.trim()) return
+    setDomainSearching(true)
+    setDomainError('')
+    try {
+      const results = await searchDomains(domainQuery.trim())
+      setDomainResults(results)
+    } catch (err) {
+      setDomainError(err instanceof Error ? err.message : t('error.requestFailed'))
+    } finally {
+      setDomainSearching(false)
+    }
+  }
+
+  const handleDomainPurchase = async (result: DomainSearchResult) => {
+    if (!selectedSite || !result.priceUsd) return
+    setDomainPurchasing(true)
+    setDomainError('')
+    try {
+      const domain = await purchaseDomain(
+        selectedSite.id, result.domainName, result.tld, result.priceUsd, 'Card'
+      )
+      setSiteDomain(domain)
+      setPurchaseConfirm(null)
+      setDomainResults([])
+      setDomainQuery('')
+    } catch (err) {
+      setDomainError(err instanceof Error ? err.message : t('error.requestFailed'))
+    } finally {
+      setDomainPurchasing(false)
+    }
+  }
+
+  const handleDomainRemove = async () => {
+    if (!selectedSite) return
+    setDomainRemoving(true)
+    try {
+      await removeSiteDomain(selectedSite.id)
+      setSiteDomain(null)
+    } catch (err) {
+      setDomainError(err instanceof Error ? err.message : t('error.requestFailed'))
+    } finally {
+      setDomainRemoving(false)
+    }
+  }
+
   const getStatusIndicator = (status: string) => {
     switch (status) {
       case 'Running': return { color: 'bg-green-500', label: t('sites.status.running') }
@@ -87,6 +166,14 @@ export default function MySitesPage() {
     return new Date(dateStr).toLocaleDateString(undefined, {
       year: 'numeric', month: 'short', day: 'numeric'
     })
+  }
+
+  const getDomainStatusBadge = (domain: DomainResponse) => {
+    const isSetup = domain.status === 'Pending' || domain.status === 'Registering'
+    if (isSetup) return { bg: 'bg-blue-900/50 text-blue-400', label: t('domain.status.setting_up') }
+    if (domain.status === 'Active') return { bg: 'bg-green-900/50 text-green-400', label: t('domain.status.active') }
+    if (domain.status === 'Expired') return { bg: 'bg-red-900/50 text-red-400', label: t('domain.status.expired') }
+    return { bg: 'bg-gray-700 text-gray-400', label: domain.status }
   }
 
   if (loading) {
@@ -225,7 +312,7 @@ export default function MySitesPage() {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold">{t('sites.detailTitle')}: {selectedSite.siteName}</h3>
               <button
-                onClick={() => setSelectedSite(null)}
+                onClick={() => { setSelectedSite(null); setSiteDomain(null) }}
                 className="text-gray-400 hover:text-white text-2xl"
               >
                 &times;
@@ -258,6 +345,160 @@ export default function MySitesPage() {
                 </div>
               </div>
 
+              {/* Custom Domain Section */}
+              <div className="bg-gray-900 rounded-xl p-4">
+                <h4 className="font-bold mb-3">{t('domain.title')}</h4>
+
+                {siteDomain ? (
+                  <div className="space-y-3">
+                    {/* Domain info */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-400">https://{siteDomain.domainName}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs ${getDomainStatusBadge(siteDomain).bg}`}>
+                          {getDomainStatusBadge(siteDomain).label}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Domain setup progress */}
+                    {(siteDomain.status === 'Pending' || siteDomain.status === 'Registering') && (
+                      <div className="bg-gray-800 rounded-lg p-3 space-y-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                          <span className="text-blue-400">{t('domain.setup.inProgress')}</span>
+                        </div>
+                        <div className="space-y-1 ml-6">
+                          <div className={siteDomain.status !== 'Pending' ? 'text-green-400' : 'text-gray-500'}>
+                            {siteDomain.status !== 'Pending' ? '\u2713' : '\u25CB'} {t('domain.setup.registration')}
+                          </div>
+                          <div className={siteDomain.dnsStatus === 'Propagated' ? 'text-green-400' : 'text-gray-500'}>
+                            {siteDomain.dnsStatus === 'Propagated' ? '\u2713' : '\u25CB'} {t('domain.setup.dns')}
+                          </div>
+                          <div className={siteDomain.sslStatus === 'Active' ? 'text-green-400' : 'text-gray-500'}>
+                            {siteDomain.sslStatus === 'Active' ? '\u2713' : '\u25CB'} {t('domain.setup.ssl')}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Active domain details */}
+                    {siteDomain.status === 'Active' && (
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <div className="text-gray-500">{t('domain.registered')}</div>
+                          <div>{siteDomain.registeredAt ? formatDate(siteDomain.registeredAt) : '—'}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">{t('domain.expires')}</div>
+                          <div>{siteDomain.expiresAt ? formatDate(siteDomain.expiresAt) : '—'}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">{t('domain.autoRenew')}</div>
+                          <div>{siteDomain.autoRenew ? t('domain.enabled') : t('domain.disabled')}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">{t('domain.annualCost')}</div>
+                          <div>${siteDomain.annualCostUsd.toFixed(2)}/{t('domain.year')}</div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">SSL</div>
+                          <div className={siteDomain.sslStatus === 'Active' ? 'text-green-400' : 'text-yellow-400'}>
+                            {siteDomain.sslStatus === 'Active' ? t('domain.sslActive') : siteDomain.sslStatus}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-gray-500">DNS</div>
+                          <div className={siteDomain.dnsStatus === 'Propagated' ? 'text-green-400' : 'text-yellow-400'}>
+                            {siteDomain.dnsStatus === 'Propagated' ? t('domain.dnsPropagated') : siteDomain.dnsStatus}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="text-xs text-gray-500 mt-2">{t('domain.managedNotice')}</div>
+
+                    <button
+                      onClick={handleDomainRemove}
+                      disabled={domainRemoving}
+                      className="text-sm text-red-400 hover:text-red-300 disabled:opacity-50"
+                    >
+                      {domainRemoving ? t('auth.processing') : t('domain.remove')}
+                    </button>
+                  </div>
+                ) : selectedSite.status === 'Running' ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-400">{t('domain.searchDescription')}</p>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={domainQuery}
+                        onChange={(e) => setDomainQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleDomainSearch()}
+                        placeholder={t('domain.searchPlaceholder')}
+                        className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={handleDomainSearch}
+                        disabled={domainSearching || !domainQuery.trim()}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+                      >
+                        {domainSearching ? t('auth.processing') : t('domain.search')}
+                      </button>
+                    </div>
+
+                    {domainError && (
+                      <div className="text-sm text-red-400">{domainError}</div>
+                    )}
+
+                    {domainResults.length > 0 && (
+                      <div className="bg-gray-800 rounded-lg overflow-hidden">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-700">
+                              <th className="text-left py-2 px-3 text-gray-500 font-medium">{t('domain.columnDomain')}</th>
+                              <th className="text-center py-2 px-3 text-gray-500 font-medium">{t('domain.columnStatus')}</th>
+                              <th className="text-right py-2 px-3 text-gray-500 font-medium">{t('domain.columnPrice')}</th>
+                              <th className="text-right py-2 px-3 text-gray-500 font-medium"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {domainResults.map((result) => (
+                              <tr key={result.domainName} className="border-b border-gray-700/50">
+                                <td className="py-2 px-3 font-mono text-xs">{result.domainName}</td>
+                                <td className="py-2 px-3 text-center">
+                                  {result.available ? (
+                                    <span className="text-green-400 text-xs">{t('domain.available')}</span>
+                                  ) : (
+                                    <span className="text-red-400 text-xs">{t('domain.taken')}</span>
+                                  )}
+                                </td>
+                                <td className="py-2 px-3 text-right">
+                                  {result.priceUsd != null ? `$${result.priceUsd.toFixed(2)}/${t('domain.year')}` : '—'}
+                                </td>
+                                <td className="py-2 px-3 text-right">
+                                  {result.available && result.priceUsd != null && (
+                                    <button
+                                      onClick={() => setPurchaseConfirm(result)}
+                                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs font-medium transition-colors"
+                                    >
+                                      {t('domain.buy')}
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">{t('domain.siteNotRunning')}</p>
+                )}
+              </div>
+
               <div className="bg-gray-900 rounded-xl p-4">
                 <h4 className="font-bold mb-3">{t('sites.azureResources')}</h4>
                 <div className="grid grid-cols-1 gap-2 text-sm">
@@ -283,16 +524,31 @@ export default function MySitesPage() {
               {selectedSite.previewUrl && (
                 <div className="bg-gray-900 rounded-xl p-4">
                   <h4 className="font-bold mb-3">{t('sites.urls')}</h4>
-                  <div className="text-sm">
-                    <div className="text-gray-500 mb-1">{t('sites.previewUrl')}</div>
-                    <a
-                      href={selectedSite.previewUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 break-all"
-                    >
-                      {selectedSite.previewUrl}
-                    </a>
+                  <div className="text-sm space-y-2">
+                    {siteDomain?.status === 'Active' && (
+                      <div>
+                        <div className="text-gray-500 mb-1">{t('domain.customDomain')}</div>
+                        <a
+                          href={`https://${siteDomain.domainName}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-400 hover:text-green-300 break-all"
+                        >
+                          https://{siteDomain.domainName}
+                        </a>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-gray-500 mb-1">{t('sites.previewUrl')}</div>
+                      <a
+                        href={selectedSite.previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 break-all"
+                      >
+                        {selectedSite.previewUrl}
+                      </a>
+                    </div>
                   </div>
                 </div>
               )}
@@ -328,10 +584,54 @@ export default function MySitesPage() {
                 </a>
               )}
               <button
-                onClick={() => setSelectedSite(null)}
+                onClick={() => { setSelectedSite(null); setSiteDomain(null) }}
                 className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors"
               >
                 {t('sites.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Domain Purchase Confirmation */}
+      {purchaseConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4">
+          <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4">{t('domain.purchaseTitle')}</h3>
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">{t('domain.columnDomain')}</span>
+                <span className="font-mono">{purchaseConfirm.domainName}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">{t('domain.columnPrice')}</span>
+                <span>${purchaseConfirm.priceUsd?.toFixed(2)}/{t('domain.year')}</span>
+              </div>
+              <div className="border-t border-gray-700 pt-3 text-sm text-gray-400 space-y-1">
+                <div>{t('domain.includesRegistration')}</div>
+                <div>{t('domain.includesDns')}</div>
+                <div>{t('domain.includesSsl')}</div>
+                <div>{t('domain.includesAutoRenew')}</div>
+              </div>
+            </div>
+            {domainError && (
+              <div className="text-sm text-red-400 mb-4">{domainError}</div>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setPurchaseConfirm(null); setDomainError('') }}
+                disabled={domainPurchasing}
+                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                {t('tokens.confirm.cancel')}
+              </button>
+              <button
+                onClick={() => handleDomainPurchase(purchaseConfirm)}
+                disabled={domainPurchasing}
+                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
+              >
+                {domainPurchasing ? t('auth.processing') : `${t('domain.purchaseButton')} $${purchaseConfirm.priceUsd?.toFixed(2)}`}
               </button>
             </div>
           </div>

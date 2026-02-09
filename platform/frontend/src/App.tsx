@@ -5,8 +5,8 @@ import { createRequest, analyzeRequest, generateProposal, approveProposal, start
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
 import { getTokenOverview, checkTokens } from './api/settings'
 import type { TokenCheck } from './api/settings'
-import { getStoredUser, logout } from './api/auth'
-import type { AuthUser } from './api/auth'
+import { getStoredUser, logout, socialLogin } from './api/auth'
+import type { AuthUser, SocialProvider } from './api/auth'
 import LanguageSelector from './components/LanguageSelector'
 import SettingsPage from './pages/SettingsPage'
 import UsagePage from './pages/UsagePage'
@@ -53,10 +53,6 @@ function App() {
     setAuthUser(null)
     setTokenBalance(null)
     loadTokenBalance()
-  }
-
-  if (showLogin) {
-    return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -205,6 +201,38 @@ function App() {
     loadTokenBalance()
   }, [loadTokenBalance])
 
+  // Handle OAuth callback: /auth/callback/{provider}?code=...&state=...
+  useEffect(() => {
+    const path = window.location.pathname
+    const match = path.match(/^\/auth\/callback\/(google|kakao|line|apple)$/)
+    if (!match) return
+
+    const provider = match[1] as SocialProvider
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get('code')
+    const state = params.get('state')
+    const savedState = localStorage.getItem('oauth-state')
+
+    // Clean up URL immediately
+    window.history.replaceState({}, '', '/')
+
+    if (!code) return
+    if (state && savedState && state !== savedState) return
+
+    localStorage.removeItem('oauth-state')
+    localStorage.removeItem('oauth-provider')
+
+    const redirectUri = `${window.location.origin}/auth/callback/${provider}`
+    socialLogin(provider, code, redirectUri)
+      .then((result) => {
+        handleLogin(result.user)
+      })
+      .catch((err) => {
+        console.error('Social login failed:', err)
+        setShowLogin(true)
+      })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
@@ -248,6 +276,10 @@ function App() {
       case 'enterprise': return t('complexity.enterprise')
       default: return complexity
     }
+  }
+
+  if (showLogin) {
+    return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
   }
 
   return (

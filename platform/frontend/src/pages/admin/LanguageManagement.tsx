@@ -144,7 +144,13 @@ export default function LanguageManagement() {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
       const text = await file.text()
-      const data = JSON.parse(text)
+      let data: unknown
+      try {
+        data = JSON.parse(text)
+      } catch {
+        alert(t('admin.languages.importError'))
+        return
+      }
       const res = await fetch(`${API_BASE_URL}/api/translations/admin/${code}/import`, {
         method: 'POST',
         headers: getAuthHeaders(),
@@ -236,7 +242,7 @@ export default function LanguageManagement() {
                         onClick={() => handleExport(lang.code)}
                         className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs transition-colors"
                       >
-                        Export
+                        {t('admin.languages.export')}
                       </button>
                       {!lang.isDefault && (
                         <button
@@ -348,10 +354,10 @@ export default function LanguageManagement() {
         {showAddDialog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-gray-800 rounded-xl p-6 w-96">
-              <h3 className="text-lg font-bold mb-4">Add New Language</h3>
+              <h3 className="text-lg font-bold mb-4">{t('admin.languages.addNewLanguage')}</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Language Code</label>
+                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.languageCode')}</label>
                   <input
                     type="text"
                     value={newLang.code}
@@ -361,7 +367,7 @@ export default function LanguageManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Language Name</label>
+                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.languageName')}</label>
                   <input
                     type="text"
                     value={newLang.name}
@@ -371,7 +377,7 @@ export default function LanguageManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Native Name</label>
+                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.nativeName')}</label>
                   <input
                     type="text"
                     value={newLang.nativeName}
@@ -381,13 +387,13 @@ export default function LanguageManagement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Copy translations from</label>
+                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.copyFrom')}</label>
                   <select
                     value={newLang.copyFromCode}
                     onChange={e => setNewLang(prev => ({ ...prev, copyFromCode: e.target.value }))}
                     className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
                   >
-                    <option value="">Empty (start from scratch)</option>
+                    <option value="">{t('admin.languages.emptyStart')}</option>
                     {languages.map(l => (
                       <option key={l.code} value={l.code}>{l.nativeName} ({l.code})</option>
                     ))}
@@ -399,14 +405,14 @@ export default function LanguageManagement() {
                   onClick={() => setShowAddDialog(false)}
                   className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
                 >
-                  Cancel
+                  {t('tokens.confirm.cancel')}
                 </button>
                 <button
                   onClick={handleAddLanguage}
                   disabled={!newLang.code || !newLang.name || !newLang.nativeName}
                   className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded transition-colors"
                 >
-                  Add Language
+                  {t('admin.languages.addLanguage')}
                 </button>
               </div>
             </div>

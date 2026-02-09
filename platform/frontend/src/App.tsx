@@ -1,12 +1,15 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
-import SettingsLayout from './pages/SettingsLayout'
-import SitesPage from './pages/SitesPage'
-import SuggestionsPage from './pages/SuggestionsPage'
-import AdminChurnPage from './pages/AdminChurnPage'
 import './App.css'
+
+const LazyFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" /></div>
+const SettingsLayout = lazy(() => import('./pages/SettingsLayout'))
+const SitesPage = lazy(() => import('./pages/SitesPage'))
+const SuggestionsPage = lazy(() => import('./pages/SuggestionsPage'))
+const AdminChurnPage = lazy(() => import('./pages/AdminChurnPage'))
 
 function App() {
   return (
@@ -15,10 +18,10 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/settings" element={<SettingsLayout />} />
-            <Route path="/sites" element={<SitesPage />} />
-            <Route path="/suggestions" element={<SuggestionsPage />} />
-            <Route path="/admin/churn" element={<AdminChurnPage />} />
+            <Route path="/settings" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
+            <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
+            <Route path="/admin/churn" element={<Suspense fallback={LazyFallback}><AdminChurnPage /></Suspense>} />
           </Route>
         </Routes>
       </AuthProvider>

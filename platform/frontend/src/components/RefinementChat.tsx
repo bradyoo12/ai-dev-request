@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getChatHistory, sendChatMessage } from '../api/refinement'
+import { getChatHistory, sendChatMessage, sendChatMessageStream } from '../api/refinement'
 import type { ChatMessage } from '../api/refinement'
 import { createSuggestion } from '../api/suggestions'
 
@@ -43,6 +43,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
   const [error, setError] = useState('')
   const [pendingSuggestion, setPendingSuggestion] = useState<{ suggestion: SuggestionDetected; messageId: number } | null>(null)
   const [registering, setRegistering] = useState(false)
+  const [streamingContent, setStreamingContent] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const loadHistory = useCallback(async () => {
@@ -70,6 +71,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     setError('')
     setSending(true)
     setPendingSuggestion(null)
+    setStreamingContent('')
 
     // Optimistic add user message
     const tempMsg: ChatMessage = {
@@ -82,35 +84,76 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     setMessages(prev => [...prev, tempMsg])
 
     try {
-      const response = await sendChatMessage(requestId, userMessage)
+      // Try streaming first
+      let streamed = ''
+      await sendChatMessageStream(
+        requestId,
+        userMessage,
+        (token) => {
+          streamed += token
+          setStreamingContent(prev => prev + token)
+        },
+        (tokensUsed, newBalance) => {
+          // Stream complete — finalize message
+          const { cleanContent, suggestion } = parseSuggestionFromContent(streamed)
+          const assistantMsg: ChatMessage = {
+            id: Date.now() + 1,
+            role: 'assistant',
+            content: cleanContent,
+            tokensUsed,
+            createdAt: new Date().toISOString(),
+          }
+          setMessages(prev => [...prev, assistantMsg])
+          setStreamingContent('')
+          setSending(false)
 
-      if (response.error === 'insufficient_tokens') {
-        setError(t('refinement.insufficientTokens'))
-        // Remove optimistic message
-        setMessages(prev => prev.filter(m => m.id !== tempMsg.id))
-        return
-      }
+          if (suggestion) {
+            setPendingSuggestion({ suggestion, messageId: assistantMsg.id })
+          }
 
-      // Check for suggestion detection in assistant response
-      const { cleanContent, suggestion } = parseSuggestionFromContent(response.message.content)
-
-      const cleanMessage = { ...response.message, content: cleanContent }
-
-      // Replace temp message and add assistant response
-      setMessages(prev => [
-        ...prev.filter(m => m.id !== tempMsg.id),
-        { ...tempMsg, id: response.message.id - 1 },
-        cleanMessage,
-      ])
-
-      if (suggestion) {
-        setPendingSuggestion({ suggestion, messageId: response.message.id })
-      }
-
-      onTokensUsed?.(response.tokensUsed, response.newBalance)
+          onTokensUsed?.(tokensUsed, newBalance)
+        },
+        (errorMsg) => {
+          if (errorMsg === 'insufficient_tokens') {
+            setError(t('refinement.insufficientTokens'))
+            setMessages(prev => prev.filter(m => m.id !== tempMsg.id))
+          } else {
+            setError(errorMsg)
+          }
+          setStreamingContent('')
+          setSending(false)
+        },
+      )
     } catch {
-      setError(t('refinement.sendFailed'))
-      setMessages(prev => prev.filter(m => m.id !== tempMsg.id))
+      // Fallback to non-streaming endpoint
+      setStreamingContent('')
+      try {
+        const response = await sendChatMessage(requestId, userMessage)
+
+        if (response.error === 'insufficient_tokens') {
+          setError(t('refinement.insufficientTokens'))
+          setMessages(prev => prev.filter(m => m.id !== tempMsg.id))
+          return
+        }
+
+        const { cleanContent, suggestion } = parseSuggestionFromContent(response.message.content)
+        const cleanMessage = { ...response.message, content: cleanContent }
+
+        setMessages(prev => [
+          ...prev.filter(m => m.id !== tempMsg.id),
+          { ...tempMsg, id: response.message.id - 1 },
+          cleanMessage,
+        ])
+
+        if (suggestion) {
+          setPendingSuggestion({ suggestion, messageId: response.message.id })
+        }
+
+        onTokensUsed?.(response.tokensUsed, response.newBalance)
+      } catch {
+        setError(t('refinement.sendFailed'))
+        setMessages(prev => prev.filter(m => m.id !== tempMsg.id))
+      }
     } finally {
       setSending(false)
     }
@@ -254,15 +297,22 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
 
         {sending && (
           <div className="flex justify-start">
-            <div className="bg-gray-800 rounded-2xl px-4 py-3">
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
-                <div className="flex gap-1">
-                  <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                  <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                  <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+            <div className="max-w-[80%] bg-gray-800 rounded-2xl px-4 py-3">
+              {streamingContent ? (
+                <div className="whitespace-pre-wrap text-sm text-gray-100">
+                  {streamingContent}
+                  <span className="inline-block w-2 h-4 bg-blue-400 ml-0.5 animate-pulse" />
                 </div>
-                {t('refinement.thinking')}
-              </div>
+              ) : (
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <div className="flex gap-1">
+                    <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                  </div>
+                  {t('refinement.thinking')}
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import LanguageSelector from './LanguageSelector'
 import LoginPage from '../pages/LoginPage'
+import FooterSection from './FooterSection'
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -73,9 +74,7 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-gray-700 p-6 text-center text-gray-500">
-        <p>{t('footer.copyright')}</p>
-      </footer>
+      <FooterSection />
     </div>
   )
 }

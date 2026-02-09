@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, InsufficientTokensError } from '../api/requests'
@@ -8,6 +8,10 @@ import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
 import PlanSelectionDialog from '../components/PlanSelectionDialog'
 import RefinementChat from '../components/RefinementChat'
+import HeroSection from '../components/HeroSection'
+import StatsSection from '../components/StatsSection'
+import FeaturesSection from '../components/FeaturesSection'
+import PricingSection from '../components/PricingSection'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -28,6 +32,7 @@ export default function HomePage() {
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
   const [showPlanSelection, setShowPlanSelection] = useState(false)
   const [pricingPlans, setPricingPlans] = useState<PricingPlanData[]>([])
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     getPricingPlans().then(setPricingPlans).catch(() => {})
@@ -211,13 +216,10 @@ export default function HomePage() {
   return (
     <>
       {viewState === 'form' && (
-        <section className="text-center py-12">
-          <h2 className="text-4xl font-bold mb-4">{t('hero.title')}</h2>
-          <p className="text-xl text-gray-400 mb-8">{t('hero.subtitle')}</p>
-        </section>
+        <HeroSection onScrollToForm={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} />
       )}
 
-      <section className="bg-gray-800 rounded-2xl p-8 shadow-xl">
+      <section ref={formRef} className="bg-gray-800 rounded-2xl p-8 shadow-xl">
         {viewState === 'form' && (
           <form onSubmit={handleSubmit}>
             <label className="block text-lg font-medium mb-4">{t('form.label')}</label>
@@ -611,47 +613,9 @@ export default function HomePage() {
 
       {viewState === 'form' && (
         <>
-          <section className="py-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gray-800 p-6 rounded-xl">
-              <div className="text-3xl mb-3">📝</div>
-              <h3 className="text-xl font-bold mb-2">{t('steps.request.title')}</h3>
-              <p className="text-gray-400">{t('steps.request.description')}</p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-xl">
-              <div className="text-3xl mb-3">🔍</div>
-              <h3 className="text-xl font-bold mb-2">{t('steps.analysis.title')}</h3>
-              <p className="text-gray-400">{t('steps.analysis.description')}</p>
-            </div>
-            <div className="bg-gray-800 p-6 rounded-xl">
-              <div className="text-3xl mb-3">🤖</div>
-              <h3 className="text-xl font-bold mb-2">{t('steps.build.title')}</h3>
-              <p className="text-gray-400">{t('steps.build.description')}</p>
-            </div>
-          </section>
-
-          <section id="pricing" className="py-12 text-center">
-            <h3 className="text-2xl font-bold mb-6">{t('pricing.title')}</h3>
-            <div className="flex justify-center gap-4 flex-wrap">
-              {(pricingPlans.length > 0
-                ? pricingPlans.filter(p => p.priceMonthly > 0)
-                : [
-                    { id: 'starter', name: 'Starter', priceMonthly: 49000, projectLimit: 3, isPopular: false, features: [], currency: 'KRW', nameKorean: '', priceYearly: 0 },
-                    { id: 'pro', name: 'Pro', priceMonthly: 149000, projectLimit: 10, isPopular: true, features: [], currency: 'KRW', nameKorean: '', priceYearly: 0 },
-                  ]
-              ).map(plan => (
-                <div key={plan.id} className={`p-6 rounded-xl w-64 ${plan.isPopular ? 'bg-blue-600 ring-2 ring-blue-400' : 'bg-gray-800'}`}>
-                  <div className="text-lg font-bold">{plan.name}</div>
-                  <div className="text-3xl font-bold my-2">
-                    {plan.currency === 'KRW' ? '₩' : '$'}{plan.priceMonthly.toLocaleString()}
-                    <span className={`text-lg ${plan.isPopular ? 'text-gray-200' : 'text-gray-400'}`}>{t('pricing.perMonth')}</span>
-                  </div>
-                  <div className={`text-sm ${plan.isPopular ? 'text-gray-200' : 'text-gray-400'}`}>
-                    {t('pricing.projectLimit', { count: plan.projectLimit })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <StatsSection />
+          <FeaturesSection />
+          <PricingSection plans={pricingPlans} />
         </>
       )}
 

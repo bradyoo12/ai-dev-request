@@ -10,6 +10,8 @@ const SettingsLayout = lazy(() => import('./pages/SettingsLayout'))
 const SitesPage = lazy(() => import('./pages/SitesPage'))
 const SuggestionsPage = lazy(() => import('./pages/SuggestionsPage'))
 const AdminChurnPage = lazy(() => import('./pages/AdminChurnPage'))
+const SuggestionDetailPage = lazy(() => import('./pages/SuggestionDetailPage'))
+const AdminSuggestionPage = lazy(() => import('./pages/admin/SuggestionManagement'))
 
 function App() {
   return (
@@ -21,7 +23,9 @@ function App() {
             <Route path="/settings" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
+            <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />
             <Route path="/admin/churn" element={<Suspense fallback={LazyFallback}><AdminChurnPage /></Suspense>} />
+            <Route path="/admin/suggestions" element={<Suspense fallback={LazyFallback}><AdminSuggestionPage /></Suspense>} />
           </Route>
         </Routes>
       </AuthProvider>

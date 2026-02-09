@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { getSuggestions, voteSuggestion } from '../api/suggestions'
 import type { Suggestion } from '../api/suggestions'
 
@@ -9,6 +10,7 @@ interface SuggestionBoardPageProps {
 
 export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange }: SuggestionBoardPageProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -72,10 +74,14 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'pending': return { color: 'bg-yellow-600', label: t('suggestions.status.pending') }
-      case 'approved': return { color: 'bg-blue-600', label: t('suggestions.status.approved') }
-      case 'implemented': return { color: 'bg-green-600', label: t('suggestions.status.implemented') }
-      case 'closed': return { color: 'bg-gray-600', label: t('suggestions.status.closed') }
+      case 'pending': return { color: 'bg-yellow-600', label: t('feedback.status.pending') }
+      case 'reviewing': return { color: 'bg-blue-600', label: t('feedback.status.reviewing') }
+      case 'in_progress': return { color: 'bg-purple-600', label: t('feedback.status.in_progress') }
+      case 'approved': return { color: 'bg-blue-600', label: t('feedback.status.approved') }
+      case 'implemented': return { color: 'bg-green-600', label: t('feedback.status.implemented') }
+      case 'resolved': return { color: 'bg-green-600', label: t('feedback.status.resolved') }
+      case 'on_hold': return { color: 'bg-orange-600', label: t('feedback.status.on_hold') }
+      case 'closed': return { color: 'bg-gray-600', label: t('feedback.status.closed') }
       default: return { color: 'bg-gray-600', label: status }
     }
   }
@@ -159,7 +165,10 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-bold text-white">
+                    <h4
+                      className="font-bold text-white cursor-pointer hover:text-blue-400 transition-colors"
+                      onClick={() => navigate(`/suggestions/${suggestion.id}`)}
+                    >
                       {getCategoryIcon(suggestion.category)} {suggestion.title}
                     </h4>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${statusBadge.color}`}>

@@ -64,6 +64,7 @@ public class PaymentsController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
+        pageSize = Math.Clamp(pageSize, 1, 100);
         var userId = GetUserId();
         var payments = await _paymentService.GetPaymentHistoryAsync(userId, page, pageSize);
         var totalCount = await _paymentService.GetPaymentCountAsync(userId);

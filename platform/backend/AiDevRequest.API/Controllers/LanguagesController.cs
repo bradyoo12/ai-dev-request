@@ -66,18 +66,19 @@ public class LanguagesController : ControllerBase
             .ThenBy(l => l.Name)
             .ToListAsync();
 
-        var totalKeys = await _context.Translations
-            .Where(t => t.LanguageCode == languages.FirstOrDefault(l => l.IsDefault)!.Code)
-            .CountAsync();
+        // Single query to get translation counts per language (avoids N+1)
+        var translationCounts = await _context.Translations
+            .GroupBy(t => t.LanguageCode)
+            .Select(g => new { LanguageCode = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.LanguageCode, x => x.Count);
 
-        var result = new List<AdminLanguageDto>();
-        foreach (var lang in languages)
+        var defaultLang = languages.FirstOrDefault(l => l.IsDefault);
+        var totalKeys = defaultLang != null && translationCounts.TryGetValue(defaultLang.Code, out var dk) ? dk : 0;
+
+        var result = languages.Select(lang =>
         {
-            var translatedKeys = await _context.Translations
-                .Where(t => t.LanguageCode == lang.Code)
-                .CountAsync();
-
-            result.Add(new AdminLanguageDto
+            var translatedKeys = translationCounts.GetValueOrDefault(lang.Code, 0);
+            return new AdminLanguageDto
             {
                 Id = lang.Id,
                 Code = lang.Code,
@@ -89,8 +90,8 @@ public class LanguagesController : ControllerBase
                 TranslatedKeys = translatedKeys,
                 TotalKeys = totalKeys,
                 CreatedAt = lang.CreatedAt
-            });
-        }
+            };
+        }).ToList();
 
         return Ok(result);
     }

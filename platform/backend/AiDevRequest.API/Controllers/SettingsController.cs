@@ -109,6 +109,7 @@ public class SettingsController : ControllerBase
         [FromQuery] int pageSize = 20,
         [FromQuery] string? actionFilter = null)
     {
+        pageSize = Math.Clamp(pageSize, 1, 100);
         var userId = GetUserId();
         await GetOrCreateBalance(userId);
 
@@ -339,6 +340,7 @@ public class SettingsController : ControllerBase
         [FromQuery] DateTime? from = null,
         [FromQuery] DateTime? to = null)
     {
+        pageSize = Math.Clamp(pageSize, 1, 100);
         var userId = GetUserId();
         await GetOrCreateBalance(userId);
 
@@ -441,6 +443,7 @@ public class SettingsController : ControllerBase
 
         var transactions = await query
             .OrderByDescending(t => t.CreatedAt)
+            .Take(10000)
             .ToListAsync();
 
         var csv = new System.Text.StringBuilder();

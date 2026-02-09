@@ -26,6 +26,7 @@ public class RequestsController : ControllerBase
     private readonly ICodeReviewService _codeReviewService;
     private readonly ICiCdService _ciCdService;
     private readonly IExportService _exportService;
+    private readonly IDatabaseSchemaService _databaseSchemaService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -40,6 +41,7 @@ public class RequestsController : ControllerBase
         ICodeReviewService codeReviewService,
         ICiCdService ciCdService,
         IExportService exportService,
+        IDatabaseSchemaService databaseSchemaService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -53,6 +55,7 @@ public class RequestsController : ControllerBase
         _codeReviewService = codeReviewService;
         _ciCdService = ciCdService;
         _exportService = exportService;
+        _databaseSchemaService = databaseSchemaService;
         _logger = logger;
     }
 
@@ -559,6 +562,16 @@ public class RequestsController : ControllerBase
                 result.CiCdWorkflowCount = ciCdResult.Workflows.Count;
                 result.CiCdSummary = ciCdResult.Summary;
                 result.CiCdRequiredSecrets = ciCdResult.RequiredSecrets;
+
+                // Auto-generate database schema if project needs one
+                var dbResult = await _databaseSchemaService.GenerateSchemaAsync(
+                    result.ProjectPath, result.ProjectType, entity.Description);
+                result.HasDatabase = dbResult.HasDatabase;
+                result.DatabaseProvider = dbResult.Provider;
+                result.DatabaseTableCount = dbResult.Tables.Count;
+                result.DatabaseRelationshipCount = dbResult.Relationships.Count;
+                result.DatabaseSummary = dbResult.Summary;
+                result.DatabaseTables = dbResult.Tables.Select(t => t.Name).ToList();
 
                 entity.Status = RequestStatus.Staging;
             }

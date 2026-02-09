@@ -210,6 +210,12 @@ export interface ProductionResult {
   ciCdWorkflowCount?: number;
   ciCdSummary?: string;
   ciCdRequiredSecrets?: string[];
+  hasDatabase?: boolean;
+  databaseProvider?: string;
+  databaseTableCount?: number;
+  databaseRelationshipCount?: number;
+  databaseSummary?: string;
+  databaseTables?: string[];
 }
 
 export interface ProductionResponse {

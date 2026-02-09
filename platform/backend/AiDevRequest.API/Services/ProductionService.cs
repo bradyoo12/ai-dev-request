@@ -272,6 +272,12 @@ public class ProductionResult
     public int? CiCdWorkflowCount { get; set; }
     public string? CiCdSummary { get; set; }
     public List<string>? CiCdRequiredSecrets { get; set; }
+    public bool? HasDatabase { get; set; }
+    public string? DatabaseProvider { get; set; }
+    public int? DatabaseTableCount { get; set; }
+    public int? DatabaseRelationshipCount { get; set; }
+    public string? DatabaseSummary { get; set; }
+    public List<string>? DatabaseTables { get; set; }
 }
 
 public class GeneratedProject

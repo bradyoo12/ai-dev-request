@@ -489,5 +489,9 @@
   "refinement.applying": "적용 중...",
   "refinement.changesApplied": "{{count}}개 파일에 변경 사항 적용됨:",
   "refinement.changesAppliedBadge": "변경 적용 완료",
-  "refinement.applyFailed": "변경 적용에 실패했습니다. 다시 시도해주세요."
+  "refinement.applyFailed": "변경 적용에 실패했습니다. 다시 시도해주세요.",
+  "cicd.title": "CI/CD 파이프라인",
+  "cicd.workflows": "{{count}}개 워크플로우",
+  "cicd.secrets": "{{count}}개 시크릿 필요",
+  "cicd.requiredSecrets": "필요한 GitHub Secrets"
 }

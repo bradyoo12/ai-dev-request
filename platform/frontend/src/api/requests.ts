@@ -206,6 +206,10 @@ export interface ProductionResult {
   codeQualityScore?: number;
   codeReviewSummary?: string;
   codeReviewIssueCount?: number;
+  ciCdProvider?: string;
+  ciCdWorkflowCount?: number;
+  ciCdSummary?: string;
+  ciCdRequiredSecrets?: string[];
 }
 
 export interface ProductionResponse {

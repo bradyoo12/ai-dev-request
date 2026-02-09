@@ -489,5 +489,9 @@
   "refinement.applying": "Applying...",
   "refinement.changesApplied": "Changes applied to {{count}} files:",
   "refinement.changesAppliedBadge": "Changes Applied",
-  "refinement.applyFailed": "Failed to apply changes. Please try again."
+  "refinement.applyFailed": "Failed to apply changes. Please try again.",
+  "cicd.title": "CI/CD Pipeline",
+  "cicd.workflows": "{{count}} workflows",
+  "cicd.secrets": "{{count}} secrets required",
+  "cicd.requiredSecrets": "Required GitHub Secrets"
 }

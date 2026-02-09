@@ -268,6 +268,10 @@ public class ProductionResult
     public int? CodeQualityScore { get; set; }
     public string? CodeReviewSummary { get; set; }
     public int? CodeReviewIssueCount { get; set; }
+    public string? CiCdProvider { get; set; }
+    public int? CiCdWorkflowCount { get; set; }
+    public string? CiCdSummary { get; set; }
+    public List<string>? CiCdRequiredSecrets { get; set; }
 }
 
 public class GeneratedProject

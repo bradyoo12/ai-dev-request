@@ -12,6 +12,7 @@ const SuggestionsPage = lazy(() => import('./pages/SuggestionsPage'))
 const AdminChurnPage = lazy(() => import('./pages/AdminChurnPage'))
 const SuggestionDetailPage = lazy(() => import('./pages/SuggestionDetailPage'))
 const AdminSuggestionPage = lazy(() => import('./pages/admin/SuggestionManagement'))
+const A2APage = lazy(() => import('./pages/A2APage'))
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />
             <Route path="/admin/churn" element={<Suspense fallback={LazyFallback}><AdminChurnPage /></Suspense>} />
             <Route path="/admin/suggestions" element={<Suspense fallback={LazyFallback}><AdminSuggestionPage /></Suspense>} />
+            <Route path="/a2a" element={<Suspense fallback={LazyFallback}><A2APage /></Suspense>} />
           </Route>
         </Routes>
       </AuthProvider>

@@ -35,6 +35,11 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DomainTransaction> DomainTransactions => Set<DomainTransaction>();
     public DbSet<ProjectVersion> ProjectVersions => Set<ProjectVersion>();
     public DbSet<ProjectTemplate> ProjectTemplates => Set<ProjectTemplate>();
+    public DbSet<AgentCard> AgentCards => Set<AgentCard>();
+    public DbSet<A2ATask> A2ATasks => Set<A2ATask>();
+    public DbSet<A2AArtifact> A2AArtifacts => Set<A2AArtifact>();
+    public DbSet<A2AConsent> A2AConsents => Set<A2AConsent>();
+    public DbSet<A2AAuditLog> A2AAuditLogs => Set<A2AAuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -531,6 +536,78 @@ public class AiDevRequestDbContext : DbContext
 
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Framework);
+        });
+
+        modelBuilder.Entity<AgentCard>(entity =>
+        {
+            entity.ToTable("a2a_agent_cards");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.AgentKey).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(1000);
+            entity.Property(e => e.OwnerId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.InputSchemaJson).HasColumnType("jsonb");
+            entity.Property(e => e.OutputSchemaJson).HasColumnType("jsonb");
+            entity.Property(e => e.Scopes).HasMaxLength(500);
+            entity.Property(e => e.ClientId).HasMaxLength(100);
+            entity.Property(e => e.ClientSecretHash).HasMaxLength(500);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.OwnerId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.AgentKey).IsUnique();
+            entity.HasIndex(e => e.OwnerId);
+        });
+
+        modelBuilder.Entity<A2ATask>(entity =>
+        {
+            entity.ToTable("a2a_tasks");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.TaskUid).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(1000);
+            entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.FromAgentId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.ToAgentId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.TaskUid).IsUnique();
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<A2AArtifact>(entity =>
+        {
+            entity.ToTable("a2a_artifacts");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ArtifactType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SchemaVersion).HasMaxLength(20);
+            entity.Property(e => e.DataJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.Direction).HasMaxLength(20);
+            entity.HasOne<A2ATask>().WithMany().HasForeignKey(e => e.TaskId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TaskId);
+        });
+
+        modelBuilder.Entity<A2AConsent>(entity =>
+        {
+            entity.ToTable("a2a_consents");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Scopes).IsRequired().HasMaxLength(500);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.FromAgentId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.ToAgentId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.UserId, e.FromAgentId, e.ToAgentId }).IsUnique();
+        });
+
+        modelBuilder.Entity<A2AAuditLog>(entity =>
+        {
+            entity.ToTable("a2a_audit_logs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Action).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.UserId).HasMaxLength(100);
+            entity.Property(e => e.DetailJson).HasColumnType("jsonb");
+            entity.Property(e => e.IpAddress).HasMaxLength(50);
+            entity.HasIndex(e => e.TaskId);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

@@ -39,6 +39,7 @@ builder.Services.AddScoped<ICiCdService, CiCdService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
+builder.Services.AddScoped<IDatabaseSchemaService, DatabaseSchemaService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

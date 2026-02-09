@@ -814,6 +814,34 @@ export default function HomePage() {
               </div>
             )}
 
+            {productionResult.production.hasDatabase && (
+              <div className="bg-emerald-900/30 border border-emerald-700 rounded-xl p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-emerald-400">{t('database.title')}</h4>
+                  <span className="px-2 py-0.5 rounded bg-emerald-600 text-white text-xs font-medium">
+                    {productionResult.production.databaseProvider}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-400 mb-3">{productionResult.production.databaseSummary}</p>
+                <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                  <span>{t('database.tables', { count: productionResult.production.databaseTableCount ?? 0 })}</span>
+                  <span>{t('database.relationships', { count: productionResult.production.databaseRelationshipCount ?? 0 })}</span>
+                </div>
+                {productionResult.production.databaseTables && productionResult.production.databaseTables.length > 0 && (
+                  <div className="bg-emerald-950/50 rounded-lg p-3">
+                    <div className="text-xs text-emerald-300 font-medium mb-1">{t('database.tableList')}</div>
+                    <div className="flex flex-wrap gap-1">
+                      {productionResult.production.databaseTables.map((table, i) => (
+                        <code key={i} className="px-2 py-0.5 bg-emerald-900 text-emerald-200 rounded text-xs">
+                          {table}
+                        </code>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {productionResult.production.setupCommands.length > 0 && (
               <div className="bg-gray-900 rounded-xl p-4 mb-4">
                 <h4 className="font-bold mb-3">{t('completed.setupCommands')}</h4>

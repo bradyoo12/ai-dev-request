@@ -47,7 +47,7 @@ public class AuthController : ControllerBase
                 Token = token,
                 User = new UserDto
                 {
-                    Id = user.Id.ToString(),
+                    Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
@@ -87,7 +87,7 @@ public class AuthController : ControllerBase
                 Token = token,
                 User = new UserDto
                 {
-                    Id = user.Id.ToString(),
+                    Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
@@ -134,7 +134,7 @@ public class AuthController : ControllerBase
                 Token = token,
                 User = new UserDto
                 {
-                    Id = user.Id.ToString(),
+                    Id = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
@@ -181,8 +181,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<UserDto>> GetMe()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
         }
@@ -195,7 +195,7 @@ public class AuthController : ControllerBase
 
         return Ok(new UserDto
         {
-            Id = user.Id.ToString(),
+            Id = user.Id,
             Email = user.Email,
             DisplayName = user.DisplayName,
             ProfileImageUrl = user.ProfileImageUrl,

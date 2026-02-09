@@ -12,7 +12,7 @@ public interface IAuthService
 {
     Task<(User User, string Token)> RegisterAsync(string email, string password, string? displayName, string? anonymousUserId);
     Task<(User User, string Token)> LoginAsync(string email, string password);
-    Task<User?> GetUserAsync(Guid userId);
+    Task<User?> GetUserAsync(string userId);
     string GenerateJwt(User user);
 }
 
@@ -55,7 +55,7 @@ public class AuthService : IAuthService
         // Migrate anonymous data if provided
         if (!string.IsNullOrEmpty(anonymousUserId))
         {
-            await MigrateAnonymousDataAsync(anonymousUserId, user.Id.ToString());
+            await MigrateAnonymousDataAsync(anonymousUserId, user.Id);
         }
 
         _logger.LogInformation("User registered: {Email} (migrated from {AnonymousId})", normalizedEmail, anonymousUserId ?? "none");
@@ -84,7 +84,7 @@ public class AuthService : IAuthService
         return (user, token);
     }
 
-    public async Task<User?> GetUserAsync(Guid userId)
+    public async Task<User?> GetUserAsync(string userId)
     {
         return await _context.Users.FindAsync(userId);
     }
@@ -101,9 +101,9 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim("display_name", user.DisplayName ?? user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

@@ -516,3 +516,26 @@ export async function rollbackToVersion(id: string, versionId: string): Promise<
   }
   return response.json();
 }
+
+// Template API
+export interface ProjectTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  framework: string;
+  tags: string[];
+  promptTemplate: string;
+  usageCount: number;
+  createdBy: string;
+}
+
+export async function getTemplates(category?: string, framework?: string): Promise<ProjectTemplate[]> {
+  const params = new URLSearchParams();
+  if (category) params.set('category', category);
+  if (framework) params.set('framework', framework);
+  const query = params.toString() ? `?${params}` : '';
+  const response = await fetch(`${API_BASE_URL}/api/templates${query}`);
+  if (!response.ok) return [];
+  return response.json();
+}

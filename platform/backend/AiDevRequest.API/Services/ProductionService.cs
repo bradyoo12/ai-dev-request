@@ -6,7 +6,7 @@ namespace AiDevRequest.API.Services;
 
 public interface IProductionService
 {
-    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium", string? screenshotBase64 = null, string? screenshotMediaType = null);
+    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium", string? screenshotBase64 = null, string? screenshotMediaType = null, string? framework = null);
     Task<string> GetBuildStatusAsync(string projectId);
 }
 
@@ -39,21 +39,24 @@ public class ProductionService : IProductionService
         };
     }
 
-    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium", string? screenshotBase64 = null, string? screenshotMediaType = null)
+    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium", string? screenshotBase64 = null, string? screenshotMediaType = null, string? framework = null)
     {
         var projectId = $"proj_{requestId[..8]}_{DateTime.UtcNow:yyyyMMdd}";
         var projectPath = Path.Combine(_projectsBasePath, projectId);
         var thinkingBudget = GetThinkingBudget(complexity);
 
-        _logger.LogInformation("Starting project generation: {ProjectId} (platform: {Platform}, complexity: {Complexity}, thinking: {ThinkingBudget})", projectId, platform, complexity, thinkingBudget);
+        _logger.LogInformation("Starting project generation: {ProjectId} (platform: {Platform}, framework: {Framework}, complexity: {Complexity}, thinking: {ThinkingBudget})", projectId, platform, framework ?? "auto", complexity, thinkingBudget);
 
         var proposalJson = JsonSerializer.Serialize(proposal);
 
         var isMobile = platform == "mobile" || platform == "fullstack";
 
-        var projectTypeOptions = isMobile
-            ? "react-native|expo"
-            : "react|nextjs|dotnet|python";
+        // If user selected a specific framework, use it; otherwise fall back to defaults
+        var projectTypeOptions = !string.IsNullOrEmpty(framework)
+            ? framework
+            : isMobile
+                ? "react-native|expo"
+                : "react|nextjs|dotnet|python";
 
         var fileGuidance = isMobile
             ? @"핵심 파일들만 생성하세요:

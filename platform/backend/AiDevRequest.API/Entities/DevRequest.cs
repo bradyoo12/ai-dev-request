@@ -22,6 +22,9 @@ public class DevRequest
 
     public string? ScreenshotMediaType { get; set; }
 
+    // Preferred framework (e.g. react, vue, svelte, nextjs, nuxt, angular)
+    public string? Framework { get; set; }
+
     // Request classification
     public RequestCategory Category { get; set; } = RequestCategory.Unknown;
 

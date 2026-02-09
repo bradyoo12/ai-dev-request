@@ -29,6 +29,7 @@ export interface CreateDevRequestDto {
   contactPhone?: string;
   screenshotBase64?: string;
   screenshotMediaType?: string;
+  framework?: string;
 }
 
 export interface DevRequestResponse {

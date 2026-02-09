@@ -19,6 +19,11 @@ public record CreateDevRequestDto
     public string? ScreenshotBase64 { get; init; }
 
     public string? ScreenshotMediaType { get; init; }
+
+    /// <summary>
+    /// Preferred framework: react, vue, svelte, nextjs, nuxt, angular (default: auto-detect)
+    /// </summary>
+    public string? Framework { get; init; }
 }
 
 public record DevRequestResponseDto
@@ -90,7 +95,8 @@ public static class DevRequestMappings
             ContactEmail = dto.ContactEmail,
             ContactPhone = dto.ContactPhone,
             ScreenshotBase64 = dto.ScreenshotBase64,
-            ScreenshotMediaType = dto.ScreenshotMediaType
+            ScreenshotMediaType = dto.ScreenshotMediaType,
+            Framework = dto.Framework
         };
     }
 }

@@ -64,6 +64,9 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ScreenshotMediaType)
                 .HasMaxLength(50);
 
+            entity.Property(e => e.Framework)
+                .HasMaxLength(50);
+
             entity.Property(e => e.Category)
                 .HasConversion<string>()
                 .HasMaxLength(50);

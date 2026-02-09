@@ -510,7 +510,8 @@ public class RequestsController : ControllerBase
                 platform,
                 complexity,
                 entity.ScreenshotBase64,
-                entity.ScreenshotMediaType
+                entity.ScreenshotMediaType,
+                entity.Framework
             );
 
             entity.ProjectId = result.ProjectId;

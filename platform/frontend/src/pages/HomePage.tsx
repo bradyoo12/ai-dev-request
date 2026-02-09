@@ -29,6 +29,7 @@ export default function HomePage() {
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [framework, setFramework] = useState('')
   const [viewState, setViewState] = useState<ViewState>('form')
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
@@ -188,6 +189,7 @@ export default function HomePage() {
         contactEmail: email || undefined,
         screenshotBase64,
         screenshotMediaType,
+        framework: framework || undefined,
       })
       setSubmittedRequest(result)
 
@@ -401,6 +403,30 @@ export default function HomePage() {
                 </div>
               )}
               <p className="mt-1 text-xs text-gray-500">{t('screenshot.hint')}</p>
+            </div>
+            <div className="mt-6">
+              <label className="block text-sm font-medium mb-2 text-gray-400">{t('framework.label')}</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: '', label: t('framework.auto') },
+                  { value: 'react', label: 'React' },
+                  { value: 'vue', label: 'Vue' },
+                  { value: 'svelte', label: 'Svelte' },
+                  { value: 'nextjs', label: 'Next.js' },
+                  { value: 'nuxt', label: 'Nuxt' },
+                  { value: 'angular', label: 'Angular' },
+                ].map((fw) => (
+                  <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      framework === fw.value
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}>
+                    {fw.label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1 text-xs text-gray-500">{t('framework.hint')}</p>
             </div>
             <button type="submit" disabled={!request.trim()}
               className="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl font-medium text-lg transition-colors">

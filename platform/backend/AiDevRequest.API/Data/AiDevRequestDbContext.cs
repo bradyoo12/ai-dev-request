@@ -45,6 +45,9 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<UserPreferenceSummary> UserPreferenceSummaries => Set<UserPreferenceSummary>();
     public DbSet<UserInterest> UserInterests => Set<UserInterest>();
     public DbSet<AppRecommendation> AppRecommendations => Set<AppRecommendation>();
+    public DbSet<TrendReport> TrendReports => Set<TrendReport>();
+    public DbSet<ProjectReview> ProjectReviews => Set<ProjectReview>();
+    public DbSet<UpdateRecommendation> UpdateRecommendations => Set<UpdateRecommendation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -683,6 +686,45 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.InterestCategory);
+        });
+
+        modelBuilder.Entity<TrendReport>(entity =>
+        {
+            entity.ToTable("trend_reports");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.SummaryJson).IsRequired();
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.AnalyzedAt);
+        });
+
+        modelBuilder.Entity<ProjectReview>(entity =>
+        {
+            entity.ToTable("project_reviews");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProjectName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.FindingsJson).IsRequired();
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.DevRequestId);
+        });
+
+        modelBuilder.Entity<UpdateRecommendation>(entity =>
+        {
+            entity.ToTable("update_recommendations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Severity).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(300);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(2000);
+            entity.Property(e => e.CurrentVersion).HasMaxLength(50);
+            entity.Property(e => e.RecommendedVersion).HasMaxLength(50);
+            entity.Property(e => e.EffortEstimate).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.HasIndex(e => e.ProjectReviewId);
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

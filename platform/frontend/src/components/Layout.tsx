@@ -40,6 +40,7 @@ export default function Layout() {
             <nav className="space-x-4">
               <button onClick={() => navigateProtected('/sites')} className="hover:text-blue-400">{t('header.mySites')}</button>
               <button onClick={() => navigateProtected('/suggestions')} className="hover:text-blue-400">{t('header.suggestions')}</button>
+              <button onClick={() => navigateProtected('/recommendations')} className="hover:text-purple-400">{t('header.recommendations')}</button>
               {authUser?.isAdmin && (
                 <button onClick={() => navigateProtected('/admin/churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
               )}

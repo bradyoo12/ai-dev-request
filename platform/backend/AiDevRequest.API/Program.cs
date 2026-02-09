@@ -87,6 +87,10 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<AiDevRequestDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// Add health checks with DB verification
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString, name: "database", tags: ["ready"]);
+
 // Add Rate Limiting for auth endpoints
 builder.Services.AddRateLimiter(options =>
 {
@@ -133,7 +137,7 @@ builder.Services.AddCors(options =>
                 "https://ai-dev-request.kr" // Production (future)
             )
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS");
     });
 });
 
@@ -144,6 +148,24 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Global exception handler for consistent JSON error responses
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        var exceptionFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (exceptionFeature?.Error != null)
+        {
+            logger.LogError(exceptionFeature.Error, "Unhandled exception on {Path}", context.Request.Path);
+        }
+        await context.Response.WriteAsync(
+            """{"error":"An unexpected error occurred. Please try again later."}""");
+    });
+});
 
 // Auto-migrate database on startup (applies pending EF Core migrations)
 // This runs in all environments so staging/production schemas stay up to date
@@ -288,8 +310,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Health check endpoint
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
-    .WithName("HealthCheck");
+// Health check endpoint with DB verification
+app.MapHealthChecks("/health");
 
 app.Run();

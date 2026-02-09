@@ -19,15 +19,18 @@ public class StripePaymentService : IPaymentService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _configuration;
     private readonly ILogger<StripePaymentService> _logger;
+    private readonly IWebHostEnvironment _environment;
 
     public StripePaymentService(
         IServiceScopeFactory scopeFactory,
         IConfiguration configuration,
-        ILogger<StripePaymentService> logger)
+        ILogger<StripePaymentService> logger,
+        IWebHostEnvironment environment)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
         _logger = logger;
+        _environment = environment;
 
         var secretKey = _configuration["Stripe:SecretKey"];
         if (!string.IsNullOrEmpty(secretKey))
@@ -50,7 +53,11 @@ public class StripePaymentService : IPaymentService
         var secretKey = _configuration["Stripe:SecretKey"];
         if (string.IsNullOrEmpty(secretKey))
         {
-            // Simulation mode - create a fake checkout session
+            if (!_environment.IsDevelopment())
+            {
+                throw new InvalidOperationException("Stripe SecretKey must be configured in non-development environments.");
+            }
+            // Simulation mode - only allowed in Development
             _logger.LogWarning("Stripe SecretKey not configured. Running in simulation mode.");
             return await SimulateCheckoutAsync(context, userId, package);
         }

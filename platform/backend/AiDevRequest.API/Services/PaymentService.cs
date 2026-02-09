@@ -216,6 +216,16 @@ public class StripePaymentService : IPaymentService
                 balance.TotalEarned += tokensToAdd;
                 balance.UpdatedAt = DateTime.UtcNow;
             }
+            else
+            {
+                balance = new TokenBalance
+                {
+                    UserId = userId,
+                    Balance = tokensToAdd,
+                    TotalEarned = tokensToAdd,
+                };
+                context.TokenBalances.Add(balance);
+            }
 
             context.TokenTransactions.Add(new TokenTransaction
             {
@@ -225,7 +235,7 @@ public class StripePaymentService : IPaymentService
                 Action = "purchase",
                 Description = payment.Description ?? "Token purchase",
                 ReferenceId = payment.Id.ToString(),
-                BalanceAfter = balance?.Balance ?? tokensToAdd,
+                BalanceAfter = balance.Balance,
             });
         }
 
@@ -281,6 +291,16 @@ public class StripePaymentService : IPaymentService
             balance.TotalEarned += package.TokenAmount;
             balance.UpdatedAt = DateTime.UtcNow;
         }
+        else
+        {
+            balance = new TokenBalance
+            {
+                UserId = userId,
+                Balance = package.TokenAmount,
+                TotalEarned = package.TokenAmount,
+            };
+            context.TokenBalances.Add(balance);
+        }
 
         context.TokenTransactions.Add(new TokenTransaction
         {
@@ -290,7 +310,7 @@ public class StripePaymentService : IPaymentService
             Action = "purchase",
             Description = $"[SIMULATION] {package.Name}",
             ReferenceId = payment.Id.ToString(),
-            BalanceAfter = balance?.Balance ?? package.TokenAmount,
+            BalanceAfter = balance.Balance,
         });
 
         await context.SaveChangesAsync();

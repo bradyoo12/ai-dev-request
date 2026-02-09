@@ -5,7 +5,7 @@ import { createRequest, analyzeRequest, generateProposal, approveProposal, start
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from './api/requests'
 import { getTokenOverview, checkTokens } from './api/settings'
 import type { TokenCheck } from './api/settings'
-import { getStoredUser, logout, socialLogin } from './api/auth'
+import { getStoredUser, logout, socialLogin, isAuthenticated } from './api/auth'
 import type { AuthUser, SocialProvider } from './api/auth'
 import LanguageSelector from './components/LanguageSelector'
 import SettingsPage from './pages/SettingsPage'
@@ -232,6 +232,14 @@ function App() {
       })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const navigateToProtectedPage = (target: PageState) => {
+    if (!isAuthenticated()) {
+      setShowLogin(true)
+      return
+    }
+    setPage(target)
+  }
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
@@ -292,7 +300,7 @@ function App() {
           <div className="flex items-center gap-4">
             {tokenBalance !== null && (
               <button
-                onClick={() => setPage('settings')}
+                onClick={() => navigateToProtectedPage('settings')}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
               >
                 <span className="text-yellow-400">&#9679;</span>
@@ -300,13 +308,13 @@ function App() {
               </button>
             )}
             <nav className="space-x-4">
-              <button onClick={() => setPage('sites')} className="hover:text-blue-400">{t('header.mySites')}</button>
-              <button onClick={() => setPage('suggestions')} className="hover:text-blue-400">{t('header.suggestions')}</button>
+              <button onClick={() => navigateToProtectedPage('sites')} className="hover:text-blue-400">{t('header.mySites')}</button>
+              <button onClick={() => navigateToProtectedPage('suggestions')} className="hover:text-blue-400">{t('header.suggestions')}</button>
               {authUser?.isAdmin && (
-                <button onClick={() => setPage('admin-churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
+                <button onClick={() => navigateToProtectedPage('admin-churn')} className="hover:text-blue-400">{t('header.adminChurn')}</button>
               )}
               <a href="#pricing" className="hover:text-blue-400">{t('header.pricing')}</a>
-              <button onClick={() => setPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
+              <button onClick={() => navigateToProtectedPage('settings')} className="hover:text-blue-400">{t('header.settings')}</button>
               <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
             </nav>
             <LanguageSelector />

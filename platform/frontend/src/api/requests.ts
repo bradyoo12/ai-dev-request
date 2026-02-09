@@ -412,9 +412,7 @@ export async function getPricingPlans(): Promise<PricingPlan[]> {
 export async function getCostEstimate(complexity: string, category: string): Promise<CostEstimate> {
   const response = await fetch(`${API_BASE_URL}/api/pricing/estimate`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: authHeaders(),
     body: JSON.stringify({ complexity, category }),
   });
 

@@ -40,6 +40,7 @@ builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 builder.Services.AddScoped<IDatabaseSchemaService, DatabaseSchemaService>();
+builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -184,8 +185,8 @@ app.UseExceptionHandler(errorApp =>
     {
         string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
             "dev_requests", "domains", "domain_transactions", "hosting_plans", "languages",
-            "payments", "refinement_messages", "token_balances", "token_packages",
-            "token_pricing", "token_transactions", "translations", "users" };
+            "payments", "project_versions", "refinement_messages", "token_balances",
+            "token_packages", "token_pricing", "token_transactions", "translations", "users" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

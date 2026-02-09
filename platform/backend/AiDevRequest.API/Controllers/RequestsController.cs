@@ -27,6 +27,7 @@ public class RequestsController : ControllerBase
     private readonly ICiCdService _ciCdService;
     private readonly IExportService _exportService;
     private readonly IDatabaseSchemaService _databaseSchemaService;
+    private readonly IProjectVersionService _versionService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -42,6 +43,7 @@ public class RequestsController : ControllerBase
         ICiCdService ciCdService,
         IExportService exportService,
         IDatabaseSchemaService databaseSchemaService,
+        IProjectVersionService versionService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -56,6 +58,7 @@ public class RequestsController : ControllerBase
         _ciCdService = ciCdService;
         _exportService = exportService;
         _databaseSchemaService = databaseSchemaService;
+        _versionService = versionService;
         _logger = logger;
     }
 
@@ -574,6 +577,9 @@ public class RequestsController : ControllerBase
                 result.DatabaseSummary = dbResult.Summary;
                 result.DatabaseTables = dbResult.Tables.Select(t => t.Name).ToList();
 
+                // Create version snapshot of the completed build
+                await _versionService.CreateSnapshotAsync(id, result.ProjectPath, "Initial build", "build");
+
                 entity.Status = RequestStatus.Staging;
             }
             else
@@ -748,6 +754,61 @@ public class RequestsController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Get version history for a project
+    /// </summary>
+    [HttpGet("{id:guid}/versions")]
+    public async Task<ActionResult<List<ProjectVersionDto>>> GetVersions(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        var versions = await _versionService.GetVersionsAsync(id);
+        return Ok(versions.Select(v => new ProjectVersionDto
+        {
+            Id = v.Id,
+            VersionNumber = v.VersionNumber,
+            Label = v.Label,
+            Source = v.Source,
+            FileCount = v.FileCount,
+            CreatedAt = v.CreatedAt
+        }).ToList());
+    }
+
+    /// <summary>
+    /// Rollback to a specific version
+    /// </summary>
+    [HttpPost("{id:guid}/versions/{versionId:guid}/rollback")]
+    public async Task<ActionResult<ProjectVersionDto>> RollbackToVersion(Guid id, Guid versionId)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        var result = await _versionService.RollbackAsync(id, versionId);
+        if (result == null)
+            return NotFound(new { error = "Version snapshot not found." });
+
+        return Ok(new ProjectVersionDto
+        {
+            Id = result.Id,
+            VersionNumber = result.VersionNumber,
+            Label = result.Label,
+            Source = result.Source,
+            FileCount = result.FileCount,
+            CreatedAt = result.CreatedAt
+        });
+    }
+}
+
+public record ProjectVersionDto
+{
+    public Guid Id { get; init; }
+    public int VersionNumber { get; init; }
+    public string Label { get; init; } = "";
+    public string Source { get; init; } = "";
+    public int FileCount { get; init; }
+    public DateTime CreatedAt { get; init; }
 }
 
 public record UpdateStatusDto

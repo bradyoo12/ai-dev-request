@@ -17,6 +17,7 @@ const RecommendationsPage = lazy(() => import('./pages/RecommendationsPage'))
 const ProjectHealthPage = lazy(() => import('./pages/ProjectHealthPage'))
 const TeamPage = lazy(() => import('./pages/TeamPage'))
 const MicroservicesPage = lazy(() => import('./pages/MicroservicesPage'))
+const WhiteLabelPage = lazy(() => import('./pages/WhiteLabelPage'))
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/project-health" element={<Suspense fallback={LazyFallback}><ProjectHealthPage /></Suspense>} />
             <Route path="/teams" element={<Suspense fallback={LazyFallback}><TeamPage /></Suspense>} />
             <Route path="/microservices" element={<Suspense fallback={LazyFallback}><MicroservicesPage /></Suspense>} />
+            <Route path="/whitelabel" element={<Suspense fallback={LazyFallback}><WhiteLabelPage /></Suspense>} />
           </Route>
         </Routes>
       </AuthProvider>

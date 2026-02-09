@@ -53,6 +53,9 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TeamActivity> TeamActivities => Set<TeamActivity>();
     public DbSet<TeamProject> TeamProjects => Set<TeamProject>();
     public DbSet<ServiceBlueprint> ServiceBlueprints => Set<ServiceBlueprint>();
+    public DbSet<WhiteLabelTenant> WhiteLabelTenants => Set<WhiteLabelTenant>();
+    public DbSet<ResellerPartner> ResellerPartners => Set<ResellerPartner>();
+    public DbSet<TenantUsage> TenantUsages => Set<TenantUsage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -795,6 +798,53 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
+        });
+
+        modelBuilder.Entity<WhiteLabelTenant>(entity =>
+        {
+            entity.ToTable("whitelabel_tenants");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Slug).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.CustomDomain).HasMaxLength(255);
+            entity.Property(e => e.LogoUrl).HasMaxLength(500);
+            entity.Property(e => e.PrimaryColor).HasMaxLength(20);
+            entity.Property(e => e.SecondaryColor).HasMaxLength(20);
+            entity.Property(e => e.FaviconUrl).HasMaxLength(500);
+            entity.Property(e => e.CustomCss).HasColumnType("text");
+            entity.Property(e => e.AiPromptGuidelines).HasMaxLength(5000);
+            entity.Property(e => e.WelcomeMessage).HasMaxLength(1000);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Slug).IsUnique();
+        });
+
+        modelBuilder.Entity<ResellerPartner>(entity =>
+        {
+            entity.ToTable("reseller_partners");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.CompanyName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ContactEmail).HasMaxLength(255);
+            entity.Property(e => e.MarginPercent).HasColumnType("decimal(5,2)");
+            entity.Property(e => e.CommissionRate).HasColumnType("decimal(5,2)");
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.HasOne<WhiteLabelTenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<TenantUsage>(entity =>
+        {
+            entity.ToTable("tenant_usages");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Action).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.UserId).HasMaxLength(100);
+            entity.HasOne<WhiteLabelTenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => e.RecordedAt);
         });
     }
 }

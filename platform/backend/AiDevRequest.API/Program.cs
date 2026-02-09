@@ -32,6 +32,7 @@ builder.Services.AddScoped<ISocialAuthService, SocialAuthService>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>();
+builder.Services.AddScoped<IAccessibilityService, AccessibilityService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 

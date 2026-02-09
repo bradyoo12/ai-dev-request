@@ -480,5 +480,9 @@
   "status.extendedThinking": "Deep Analysis Active",
   "screenshot.label": "Design screenshot (optional)",
   "screenshot.dropzone": "Drag & drop a screenshot or click to upload",
-  "screenshot.hint": "Upload a design screenshot for AI to replicate the UI. Max 5MB."
+  "screenshot.hint": "Upload a design screenshot for AI to replicate the UI. Max 5MB.",
+  "accessibility.title": "Accessibility Audit (WCAG 2.2)",
+  "accessibility.passed": "WCAG AA Compliant",
+  "accessibility.needsWork": "Needs Improvement",
+  "accessibility.issuesFound": "{{count}} issues found"
 }

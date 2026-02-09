@@ -596,6 +596,39 @@ export default function HomePage() {
               </div>
             )}
 
+            {productionResult.production.accessibilityScore != null && (
+              <div className={`rounded-xl p-4 mb-4 ${
+                productionResult.production.accessibilityScore >= 85
+                  ? 'bg-blue-900/30 border border-blue-700'
+                  : 'bg-yellow-900/30 border border-yellow-700'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-blue-400">{t('accessibility.title')}</h4>
+                  <div className={`text-2xl font-bold ${
+                    productionResult.production.accessibilityScore >= 85 ? 'text-green-400' :
+                    productionResult.production.accessibilityScore >= 70 ? 'text-yellow-400' : 'text-red-400'
+                  }`}>
+                    {productionResult.production.accessibilityScore}/100
+                  </div>
+                </div>
+                <p className="text-sm text-gray-400">{productionResult.production.accessibilitySummary}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                    productionResult.production.accessibilityScore >= 85
+                      ? 'bg-green-600 text-white'
+                      : 'bg-yellow-600 text-white'
+                  }`}>
+                    {productionResult.production.accessibilityScore >= 85 ? t('accessibility.passed') : t('accessibility.needsWork')}
+                  </span>
+                  {(productionResult.production.accessibilityIssueCount ?? 0) > 0 && (
+                    <span className="text-xs text-gray-400">
+                      {t('accessibility.issuesFound', { count: productionResult.production.accessibilityIssueCount })}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             {productionResult.production.setupCommands.length > 0 && (
               <div className="bg-gray-900 rounded-xl p-4 mb-4">
                 <h4 className="font-bold mb-3">{t('completed.setupCommands')}</h4>

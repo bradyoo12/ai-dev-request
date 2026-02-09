@@ -26,8 +26,9 @@ test.describe('Request Form', () => {
     await textarea.fill('');
     const submitButton = page.locator('button[type="submit"]').first();
     if (await submitButton.isVisible()) {
-      await submitButton.click();
-      // Should stay on form view
+      // Button should be disabled when form is empty
+      await expect(submitButton).toBeDisabled();
+      // Form should remain visible (no navigation)
       await expect(textarea).toBeVisible();
     }
   });

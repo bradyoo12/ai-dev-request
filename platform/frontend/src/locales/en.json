@@ -509,5 +509,18 @@
   "export.githubSuccess": "Successfully exported to GitHub!",
   "export.filesUploaded": "{{uploaded}}/{{total}} files uploaded",
   "api.error.exportZipFailed": "Failed to download project.",
-  "api.error.exportGitHubFailed": "Failed to export to GitHub."
+  "api.error.exportGitHubFailed": "Failed to export to GitHub.",
+  "deploy.title": "Deployment",
+  "deploy.deployNow": "Deploy Now",
+  "deploy.deploying": "Deploying...",
+  "deploy.inProgress": "Deployment in progress...",
+  "deploy.openSite": "Open Live Site",
+  "deploy.failed": "Deployment failed. Please try again.",
+  "deploy.failedMessage": "Deployment failed. Go to My Sites to retry.",
+  "deploy.status.pending": "Pending",
+  "deploy.status.provisioning": "Provisioning",
+  "deploy.status.building": "Building",
+  "deploy.status.deploying": "Deploying",
+  "deploy.status.running": "Live",
+  "deploy.status.failed": "Failed"
 }

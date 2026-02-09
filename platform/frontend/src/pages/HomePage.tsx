@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, InsufficientTokensError } from '../api/requests'
+import { createSite, getSiteDetail } from '../api/sites'
+import type { SiteResponse } from '../api/sites'
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
@@ -42,6 +44,9 @@ export default function HomePage() {
   const [githubRepoName, setGithubRepoName] = useState('')
   const [exportingGithub, setExportingGithub] = useState(false)
   const [githubResult, setGithubResult] = useState<GitHubExportResponse | null>(null)
+  const [deployStatus, setDeployStatus] = useState<SiteResponse | null>(null)
+  const [deploying, setDeploying] = useState(false)
+  const deployPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -107,6 +112,41 @@ export default function HomePage() {
     }
   }
 
+  const handleDeploy = async () => {
+    if (!submittedRequest || !productionResult) return
+    setDeploying(true)
+    try {
+      const site = await createSite(submittedRequest.id, productionResult.production.projectName)
+      setDeployStatus(site)
+
+      // Poll for deploy status updates
+      deployPollRef.current = setInterval(async () => {
+        try {
+          const detail = await getSiteDetail(site.id)
+          setDeployStatus(detail)
+          if (detail.status === 'Running' || detail.status === 'Failed') {
+            if (deployPollRef.current) clearInterval(deployPollRef.current)
+            deployPollRef.current = null
+            setDeploying(false)
+          }
+        } catch {
+          // ignore polling errors
+        }
+      }, 3000)
+    } catch (err) {
+      console.error('Failed to deploy:', err)
+      setErrorMessage(err instanceof Error ? err.message : t('deploy.failed'))
+      setDeploying(false)
+    }
+  }
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (deployPollRef.current) clearInterval(deployPollRef.current)
+    }
+  }, [])
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
@@ -119,6 +159,8 @@ export default function HomePage() {
     setProductionResult(null)
     setErrorMessage('')
     setGithubResult(null)
+    setDeployStatus(null)
+    if (deployPollRef.current) clearInterval(deployPollRef.current)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -834,6 +876,46 @@ export default function HomePage() {
               </div>
             )}
 
+            {deployStatus && (
+              <div className={`rounded-xl p-4 mb-4 ${
+                deployStatus.status === 'Running'
+                  ? 'bg-green-900/30 border border-green-700'
+                  : deployStatus.status === 'Failed'
+                    ? 'bg-red-900/30 border border-red-700'
+                    : 'bg-blue-900/30 border border-blue-700'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-emerald-400">{t('deploy.title')}</h4>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                    deployStatus.status === 'Running' ? 'bg-green-600 text-white' :
+                    deployStatus.status === 'Failed' ? 'bg-red-600 text-white' :
+                    'bg-blue-600 text-white'
+                  }`}>
+                    {t(`deploy.status.${deployStatus.status.toLowerCase()}`)}
+                  </span>
+                </div>
+                {deploying && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-ping" />
+                    <span className="text-sm text-gray-400">{t('deploy.inProgress')}</span>
+                  </div>
+                )}
+                {deployStatus.status === 'Running' && deployStatus.previewUrl && (
+                  <div className="mt-2">
+                    <a href={deployStatus.previewUrl.startsWith('http') ? deployStatus.previewUrl : `https://${deployStatus.previewUrl}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-colors">
+                      {t('deploy.openSite')}
+                    </a>
+                    <p className="text-xs text-gray-400 mt-2 font-mono">{deployStatus.previewUrl}</p>
+                  </div>
+                )}
+                {deployStatus.status === 'Failed' && (
+                  <p className="text-sm text-red-400">{t('deploy.failedMessage')}</p>
+                )}
+              </div>
+            )}
+
             {githubResult && (
               <div className="bg-green-900/30 border border-green-700 rounded-xl p-4 mb-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -849,17 +931,23 @@ export default function HomePage() {
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               <button onClick={handleReset}
-                className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
                 {t('button.newRequest')}
               </button>
+              {!deployStatus && (
+                <button onClick={handleDeploy} disabled={deploying}
+                  className="flex-1 min-w-[120px] py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-800 rounded-xl font-medium transition-colors">
+                  {deploying ? t('deploy.deploying') : t('deploy.deployNow')}
+                </button>
+              )}
               <button onClick={handleExportZip} disabled={exportingZip}
-                className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-xl font-medium transition-colors">
                 {exportingZip ? t('export.downloading') : t('button.downloadProject')}
               </button>
               <button onClick={() => setGithubDialog(true)}
-                className="flex-1 py-3 bg-gray-900 hover:bg-gray-800 border border-gray-600 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] py-3 bg-gray-900 hover:bg-gray-800 border border-gray-600 rounded-xl font-medium transition-colors">
                 {t('export.toGitHub')}
               </button>
             </div>

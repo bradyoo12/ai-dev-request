@@ -3,6 +3,9 @@ import { getAuthHeaders } from './auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
+/** Conversion rate: 1 token = $0.01 USD. Must match backend TokenPricing.TokenToUsdRate. */
+export const TOKEN_TO_USD_RATE = 0.01
+
 const t = (key: string) => i18n.t(key)
 
 export function getUserId(): string {
@@ -168,6 +171,25 @@ export async function deductTokens(
     throw new Error(t('api.error.tokenDeductFailed'))
   }
 
+  return response.json()
+}
+
+// Pricing Plan Types
+export interface PricingPlanData {
+  id: string
+  name: string
+  nameKorean: string
+  priceMonthly: number
+  priceYearly: number
+  currency: string
+  projectLimit: number
+  features: string[]
+  isPopular: boolean
+}
+
+export async function getPricingPlans(): Promise<PricingPlanData[]> {
+  const response = await fetch(`${API_BASE_URL}/api/pricing/plans`)
+  if (!response.ok) return []
   return response.json()
 }
 

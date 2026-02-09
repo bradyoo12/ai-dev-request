@@ -1,33 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace AiDevRequest.API.Entities;
-
-public class Subscription
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    [Required]
-    public required string Email { get; set; }
-
-    public SubscriptionPlan Plan { get; set; } = SubscriptionPlan.Free;
-
-    public int ProjectLimit { get; set; } = 1;
-
-    public int ProjectsUsed { get; set; } = 0;
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    public DateTime? ExpiresAt { get; set; }
-
-    public bool IsActive => ExpiresAt == null || ExpiresAt > DateTime.UtcNow;
-}
 
 public enum SubscriptionPlan
 {
-    Free,       // 1 project, basic features
-    Starter,    // 3 projects, ₩49,000/월
-    Pro,        // 10 projects, ₩149,000/월
-    Enterprise  // Unlimited, custom pricing
+    Free,
+    Starter,
+    Pro,
+    Enterprise
 }
 
 public class PricingPlan

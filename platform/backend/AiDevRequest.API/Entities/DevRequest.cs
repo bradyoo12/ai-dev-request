@@ -44,6 +44,11 @@ public class DevRequest
 
     public string? ProjectPath { get; set; }
 
+    // GitHub sync
+    public string? GitHubRepoUrl { get; set; }
+
+    public string? GitHubRepoFullName { get; set; }
+
     // Timestamps
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

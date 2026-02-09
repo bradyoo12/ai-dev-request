@@ -555,5 +555,12 @@
   "preview.openNew": "새 탭에서 열기",
   "template.title": "템플릿으로 시작하기",
   "template.hint": "템플릿을 클릭하면 요청이 자동으로 입력됩니다. 직접 작성할 수도 있습니다.",
-  "template.used": "{{count}}회 사용됨"
+  "template.used": "{{count}}회 사용됨",
+  "githubSync.title": "GitHub 동기화",
+  "githubSync.linked": "연결됨",
+  "githubSync.syncNow": "변경사항 동기화",
+  "githubSync.syncing": "동기화 중...",
+  "githubSync.tokenPrompt": "동기화할 GitHub 액세스 토큰을 입력하세요:",
+  "githubSync.failed": "GitHub 동기화에 실패했습니다.",
+  "api.error.githubSyncFailed": "GitHub 동기화에 실패했습니다."
 }

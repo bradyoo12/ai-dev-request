@@ -13,6 +13,11 @@ public class DevRequest
 
     public string? ContactPhone { get; set; }
 
+    // Screenshot for design-to-code
+    public string? ScreenshotBase64 { get; set; }
+
+    public string? ScreenshotMediaType { get; set; }
+
     // Request classification
     public RequestCategory Category { get; set; } = RequestCategory.Unknown;
 

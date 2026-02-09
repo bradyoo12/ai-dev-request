@@ -15,6 +15,10 @@ public record CreateDevRequestDto
 
     [Phone(ErrorMessage = "유효한 전화번호를 입력해주세요.")]
     public string? ContactPhone { get; init; }
+
+    public string? ScreenshotBase64 { get; init; }
+
+    public string? ScreenshotMediaType { get; init; }
 }
 
 public record DevRequestResponseDto
@@ -22,6 +26,7 @@ public record DevRequestResponseDto
     public Guid Id { get; init; }
     public required string Description { get; init; }
     public string? ContactEmail { get; init; }
+    public bool HasScreenshot { get; init; }
     public RequestCategory Category { get; init; }
     public RequestComplexity Complexity { get; init; }
     public RequestStatus Status { get; init; }
@@ -50,6 +55,7 @@ public static class DevRequestMappings
             Id = entity.Id,
             Description = entity.Description,
             ContactEmail = entity.ContactEmail,
+            HasScreenshot = !string.IsNullOrEmpty(entity.ScreenshotBase64),
             Category = entity.Category,
             Complexity = entity.Complexity,
             Status = entity.Status,
@@ -81,7 +87,9 @@ public static class DevRequestMappings
         {
             Description = dto.Description,
             ContactEmail = dto.ContactEmail,
-            ContactPhone = dto.ContactPhone
+            ContactPhone = dto.ContactPhone,
+            ScreenshotBase64 = dto.ScreenshotBase64,
+            ScreenshotMediaType = dto.ScreenshotMediaType
         };
     }
 }

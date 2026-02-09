@@ -6,7 +6,7 @@ namespace AiDevRequest.API.Services;
 
 public interface IProductionService
 {
-    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium");
+    Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium", string? screenshotBase64 = null, string? screenshotMediaType = null);
     Task<string> GetBuildStatusAsync(string projectId);
 }
 
@@ -39,7 +39,7 @@ public class ProductionService : IProductionService
         };
     }
 
-    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium")
+    public async Task<ProductionResult> GenerateProjectAsync(string requestId, string description, ProposalResult proposal, string platform = "web", string complexity = "Medium", string? screenshotBase64 = null, string? screenshotMediaType = null)
     {
         var projectId = $"proj_{requestId[..8]}_{DateTime.UtcNow:yyyyMMdd}";
         var projectPath = Path.Combine(_projectsBasePath, projectId);
@@ -114,10 +114,28 @@ JSON만 응답하세요.";
 
         try
         {
-            var messages = new List<Message>
+            List<Message> messages;
+
+            if (!string.IsNullOrEmpty(screenshotBase64))
             {
-                new Message(RoleType.User, prompt)
-            };
+                var contentBlocks = new List<ContentBase>
+                {
+                    new ImageContent
+                    {
+                        Source = new ImageSource
+                        {
+                            MediaType = screenshotMediaType ?? "image/png",
+                            Data = screenshotBase64,
+                        }
+                    },
+                    new TextContent { Text = prompt + "\n\n사용자가 첨부한 디자인 스크린샷을 참고하여 UI를 최대한 동일하게 구현해주세요." }
+                };
+                messages = new List<Message> { new Message { Role = RoleType.User, Content = contentBlocks } };
+            }
+            else
+            {
+                messages = new List<Message> { new Message(RoleType.User, prompt) };
+            }
 
             var parameters = new MessageParameters
             {

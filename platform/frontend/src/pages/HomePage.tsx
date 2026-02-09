@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, InsufficientTokensError } from '../api/requests'
@@ -23,6 +23,9 @@ export default function HomePage() {
 
   const [request, setRequest] = useState('')
   const [email, setEmail] = useState('')
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null)
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
   const [viewState, setViewState] = useState<ViewState>('form')
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
@@ -39,9 +42,32 @@ export default function HomePage() {
     getPricingPlans().then(setPricingPlans).catch(() => {})
   }, [])
 
+  const handleScreenshotSelect = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) return
+    if (file.size > 5 * 1024 * 1024) return // 5MB limit
+    setScreenshotFile(file)
+    const reader = new FileReader()
+    reader.onload = (e) => setScreenshotPreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+  }, [])
+
+  const handleScreenshotRemove = useCallback(() => {
+    setScreenshotFile(null)
+    setScreenshotPreview(null)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleScreenshotSelect(file)
+  }, [handleScreenshotSelect])
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
+    setScreenshotFile(null)
+    setScreenshotPreview(null)
     setViewState('form')
     setSubmittedRequest(null)
     setAnalysisResult(null)
@@ -58,9 +84,22 @@ export default function HomePage() {
     setErrorMessage('')
 
     try {
+      let screenshotBase64: string | undefined
+      let screenshotMediaType: string | undefined
+
+      if (screenshotFile && screenshotPreview) {
+        // Extract base64 data from data URL (remove "data:image/png;base64," prefix)
+        const dataUrl = screenshotPreview
+        const commaIndex = dataUrl.indexOf(',')
+        screenshotBase64 = dataUrl.substring(commaIndex + 1)
+        screenshotMediaType = screenshotFile.type
+      }
+
       const result = await createRequest({
         description: request,
         contactEmail: email || undefined,
+        screenshotBase64,
+        screenshotMediaType,
       })
       setSubmittedRequest(result)
 
@@ -244,6 +283,36 @@ export default function HomePage() {
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@example.com"
                 className="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div className="mt-6">
+              <label className="block text-sm font-medium mb-2 text-gray-400">{t('screenshot.label')}</label>
+              {screenshotPreview ? (
+                <div className="relative inline-block">
+                  <img src={screenshotPreview} alt="Screenshot preview" className="max-h-48 rounded-xl border border-gray-700" />
+                  <button type="button" onClick={handleScreenshotRemove}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full text-xs flex items-center justify-center transition-colors">
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                  onClick={() => document.getElementById('screenshot-input')?.click()}
+                  className={`w-full p-6 border-2 border-dashed rounded-xl text-center cursor-pointer transition-colors ${
+                    isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-gray-700 hover:border-gray-500'
+                  }`}
+                >
+                  <div className="text-gray-400 text-sm">
+                    <div className="text-2xl mb-2">📸</div>
+                    {t('screenshot.dropzone')}
+                  </div>
+                  <input id="screenshot-input" type="file" accept="image/*" className="hidden"
+                    onChange={(e) => { if (e.target.files?.[0]) handleScreenshotSelect(e.target.files[0]) }} />
+                </div>
+              )}
+              <p className="mt-1 text-xs text-gray-500">{t('screenshot.hint')}</p>
             </div>
             <button type="submit" disabled={!request.trim()}
               className="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl font-medium text-lg transition-colors">

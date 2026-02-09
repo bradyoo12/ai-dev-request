@@ -406,9 +406,17 @@ export default function HomePage() {
             </div>
             <div className="mt-6">
               <label className="block text-sm font-medium mb-2 text-gray-400">{t('framework.label')}</label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-2">
+                <button type="button" onClick={() => setFramework('')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    framework === '' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}>
+                  {t('framework.auto')}
+                </button>
+              </div>
+              <div className="text-xs text-gray-500 mb-1">{t('framework.web')}</div>
+              <div className="flex flex-wrap gap-2 mb-2">
                 {[
-                  { value: '', label: t('framework.auto') },
                   { value: 'react', label: 'React' },
                   { value: 'vue', label: 'Vue' },
                   { value: 'svelte', label: 'Svelte' },
@@ -418,15 +426,27 @@ export default function HomePage() {
                 ].map((fw) => (
                   <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      framework === fw.value
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      framework === fw.value ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}>
                     {fw.label}
                   </button>
                 ))}
               </div>
-              <p className="mt-1 text-xs text-gray-500">{t('framework.hint')}</p>
+              <div className="text-xs text-gray-500 mb-1">{t('framework.mobile')}</div>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: 'flutter', label: 'Flutter' },
+                  { value: 'react-native', label: 'React Native' },
+                ].map((fw) => (
+                  <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      framework === fw.value ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}>
+                    {fw.label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-gray-500">{t('framework.hint')}</p>
             </div>
             <button type="submit" disabled={!request.trim()}
               className="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl font-medium text-lg transition-colors">

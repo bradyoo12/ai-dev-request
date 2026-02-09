@@ -146,7 +146,7 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Social login failed for {Provider}", provider);
-            return BadRequest(new { error = $"Social login failed: {ex.Message}" });
+            return BadRequest(new { error = "Social login failed. Please try again." });
         }
     }
 

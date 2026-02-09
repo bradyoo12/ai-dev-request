@@ -52,6 +52,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<TeamActivity> TeamActivities => Set<TeamActivity>();
     public DbSet<TeamProject> TeamProjects => Set<TeamProject>();
+    public DbSet<ServiceBlueprint> ServiceBlueprints => Set<ServiceBlueprint>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -777,6 +778,23 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.TeamId);
             entity.HasIndex(e => new { e.TeamId, e.DevRequestId }).IsUnique();
+        });
+
+        modelBuilder.Entity<ServiceBlueprint>(entity =>
+        {
+            entity.ToTable("service_blueprints");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ServicesJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.DependenciesJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.GatewayConfigJson).HasColumnType("jsonb");
+            entity.Property(e => e.DockerComposeYaml).HasColumnType("text");
+            entity.Property(e => e.K8sManifestYaml).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.DevRequestId);
         });
     }
 }

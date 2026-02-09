@@ -25,6 +25,7 @@ public class RequestsController : ControllerBase
     private readonly ITestGenerationService _testGenerationService;
     private readonly ICodeReviewService _codeReviewService;
     private readonly ICiCdService _ciCdService;
+    private readonly IExportService _exportService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -38,6 +39,7 @@ public class RequestsController : ControllerBase
         ITestGenerationService testGenerationService,
         ICodeReviewService codeReviewService,
         ICiCdService ciCdService,
+        IExportService exportService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -50,6 +52,7 @@ public class RequestsController : ControllerBase
         _testGenerationService = testGenerationService;
         _codeReviewService = codeReviewService;
         _ciCdService = ciCdService;
+        _exportService = exportService;
         _logger = logger;
     }
 
@@ -668,6 +671,69 @@ public class RequestsController : ControllerBase
 
         return Ok(entity.ToResponseDto());
     }
+
+    /// <summary>
+    /// Download project as ZIP file
+    /// </summary>
+    [HttpGet("{id:guid}/export/zip")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ExportZip(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        if (string.IsNullOrEmpty(entity!.ProjectPath))
+            return BadRequest(new { error = "Project has not been built yet." });
+
+        try
+        {
+            var projectName = entity.ProjectId ?? $"project-{id.ToString()[..8]}";
+            var zipBytes = await _exportService.ExportAsZipAsync(entity.ProjectPath, projectName);
+            return File(zipBytes, "application/zip", $"{projectName}.zip");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Export project to a new GitHub repository
+    /// </summary>
+    [HttpPost("{id:guid}/export/github")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ExportToGitHub(Guid id, [FromBody] GitHubExportRequest body)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        if (string.IsNullOrEmpty(entity!.ProjectPath))
+            return BadRequest(new { error = "Project has not been built yet." });
+
+        if (string.IsNullOrWhiteSpace(body.AccessToken))
+            return BadRequest(new { error = "GitHub access token is required." });
+
+        try
+        {
+            var projectName = entity.ProjectId ?? $"project-{id.ToString()[..8]}";
+            var result = await _exportService.ExportToGitHubAsync(
+                entity.ProjectPath, projectName, body.AccessToken, body.RepoName);
+
+            return Ok(new
+            {
+                result.RepoUrl,
+                result.RepoFullName,
+                result.FilesUploaded,
+                result.TotalFiles
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 }
 
 public record UpdateStatusDto
@@ -722,4 +788,10 @@ public record VerificationResponseDto
     public int IssuesFound { get; init; }
     public int FixesApplied { get; init; }
     public int Iterations { get; init; }
+}
+
+public class GitHubExportRequest
+{
+    public string AccessToken { get; set; } = "";
+    public string? RepoName { get; set; }
 }

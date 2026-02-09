@@ -27,6 +27,7 @@ builder.Services.AddSingleton<IProductionService, ProductionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<IDeploymentService, AzureDeploymentService>();
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
+builder.Services.AddScoped<ICryptoPaymentService, CoinbaseCryptoPaymentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISocialAuthService, SocialAuthService>();
 builder.Services.AddHttpClient();

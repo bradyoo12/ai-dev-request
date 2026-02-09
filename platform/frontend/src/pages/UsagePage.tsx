@@ -21,6 +21,7 @@ export default function UsagePage() {
   const [totalCount, setTotalCount] = useState(0)
   const [projects, setProjects] = useState<ProjectUsage[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const pageSize = 15
 
@@ -31,6 +32,7 @@ export default function UsagePage() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true)
+      setError('')
       const [summaryData, txData, projectData] = await Promise.all([
         getUsageSummary(),
         getUsageTransactions({
@@ -47,11 +49,11 @@ export default function UsagePage() {
       setProjects(projectData)
       setPage(1)
     } catch {
-      // Silently handle
+      setError(t('error.requestFailed'))
     } finally {
       setLoading(false)
     }
-  }, [typeFilter, actionFilter])
+  }, [typeFilter, actionFilter, t])
 
   useEffect(() => {
     loadData()
@@ -69,7 +71,7 @@ export default function UsagePage() {
       setTotalCount(txData.totalCount)
       setPage(newPage)
     } catch {
-      // Silently handle
+      setError(t('error.requestFailed'))
     }
   }
 
@@ -119,6 +121,12 @@ export default function UsagePage() {
 
   return (
     <div className="space-y-6">
+      {error && (
+        <div className="bg-red-900/30 border border-red-700 rounded-xl p-4 flex items-center justify-between">
+          <span className="text-red-400">{error}</span>
+          <button onClick={loadData} className="px-3 py-1 bg-red-700 hover:bg-red-600 rounded-lg text-sm">{t('common.retry')}</button>
+        </div>
+      )}
       {/* Summary Cards */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

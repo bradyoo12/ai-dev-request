@@ -15,21 +15,23 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('newest')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const pageSize = 10
 
   const loadSuggestions = useCallback(async () => {
     setLoading(true)
+    setError('')
     try {
       const data = await getSuggestions(page, pageSize, category, sort)
       setSuggestions(data.items)
       setTotal(data.total)
     } catch {
-      // Silent fail
+      setError(t('error.requestFailed'))
     } finally {
       setLoading(false)
     }
-  }, [page, category, sort])
+  }, [page, category, sort, t])
 
   useEffect(() => {
     loadSuggestions()
@@ -89,6 +91,13 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
           <p className="text-gray-400 text-sm mt-1">{t('suggestions.boardDescription')}</p>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-900/30 border border-red-700 rounded-xl p-4 mb-6 flex items-center justify-between">
+          <span className="text-red-400">{error}</span>
+          <button onClick={loadSuggestions} className="px-3 py-1 bg-red-700 hover:bg-red-600 rounded-lg text-sm">{t('common.retry')}</button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">

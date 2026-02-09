@@ -21,6 +21,7 @@ export default function PlanSelectionDialog({
   const [recommendedPlanId, setRecommendedPlanId] = useState<number | null>(null)
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -33,13 +34,13 @@ export default function PlanSelectionDialog({
         setRecommendedPlanId(recommended.id)
         setSelectedPlanId(recommended.id)
       } catch {
-        // Fallback if loading fails
+        setError(t('error.requestFailed'))
       } finally {
         setLoading(false)
       }
     }
     load()
-  }, [complexity])
+  }, [complexity, t])
 
   if (loading) {
     return (
@@ -53,6 +54,17 @@ export default function PlanSelectionDialog({
   }
 
   const selectedPlan = plans.find(p => p.id === selectedPlanId)
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full text-center">
+          <p className="text-red-400 mb-4">{error}</p>
+          <button onClick={onCancel} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">{t('common.close')}</button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">

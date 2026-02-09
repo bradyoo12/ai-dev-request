@@ -99,6 +99,61 @@ public class RefinementController : ControllerBase
             newBalance = updatedBalance.Balance
         });
     }
+    /// <summary>
+    /// Send a chat message and get AI response via SSE streaming
+    /// </summary>
+    [HttpPost("stream")]
+    public async Task StreamChat(Guid requestId, [FromBody] SendMessageRequest body, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(body.Message))
+        {
+            Response.StatusCode = 400;
+            return;
+        }
+
+        var request = await _db.DevRequests.FindAsync(requestId);
+        if (request == null)
+        {
+            Response.StatusCode = 404;
+            return;
+        }
+
+        // Check tokens (10 tokens per refinement message)
+        var userId = GetUserId();
+        var tokenBalance = await _tokenService.GetOrCreateBalance(userId);
+        if (tokenBalance.Balance < 10)
+        {
+            Response.ContentType = "text/event-stream";
+            Response.Headers.Append("Cache-Control", "no-cache");
+            Response.Headers.Append("Connection", "keep-alive");
+            await Response.WriteAsync($"event: error\ndata: {{\"error\":\"insufficient_tokens\",\"required\":10,\"balance\":{tokenBalance.Balance}}}\n\n", cancellationToken);
+            return;
+        }
+
+        Response.ContentType = "text/event-stream";
+        Response.Headers.Append("Cache-Control", "no-cache");
+        Response.Headers.Append("Connection", "keep-alive");
+
+        try
+        {
+            await foreach (var token in _refinementService.StreamMessageAsync(requestId, body.Message, cancellationToken))
+            {
+                var escaped = System.Text.Json.JsonSerializer.Serialize(token);
+                await Response.WriteAsync($"data: {{\"token\":{escaped}}}\n\n", cancellationToken);
+                await Response.Body.FlushAsync(cancellationToken);
+            }
+
+            // Deduct tokens
+            await _tokenService.DebitTokens(userId, "refinement", requestId.ToString()[..8]);
+            var updatedBalance = await _tokenService.GetOrCreateBalance(userId);
+
+            await Response.WriteAsync($"event: done\ndata: {{\"tokensUsed\":10,\"newBalance\":{updatedBalance.Balance}}}\n\n", cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await Response.WriteAsync($"event: error\ndata: {{\"error\":\"{System.Text.Json.JsonSerializer.Serialize(ex.Message)}\"}}\n\n", cancellationToken);
+        }
+    }
 }
 
 public class SendMessageRequest

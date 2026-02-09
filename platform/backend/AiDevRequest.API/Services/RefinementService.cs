@@ -10,6 +10,7 @@ namespace AiDevRequest.API.Services;
 public interface IRefinementService
 {
     Task<RefinementMessage> SendMessageAsync(Guid requestId, string userMessage);
+    IAsyncEnumerable<string> StreamMessageAsync(Guid requestId, string userMessage, CancellationToken cancellationToken = default);
     Task<List<RefinementMessage>> GetHistoryAsync(Guid requestId);
 }
 
@@ -145,6 +146,114 @@ Only detect genuine suggestions about new features or platform improvements - NO
 
             return assistantMsg;
         }
+    }
+
+    public async IAsyncEnumerable<string> StreamMessageAsync(
+        Guid requestId,
+        string userMessage,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var request = await _db.DevRequests.FindAsync(requestId)
+            ?? throw new KeyNotFoundException("Request not found");
+
+        // Save user message
+        var userMsg = new RefinementMessage
+        {
+            DevRequestId = requestId,
+            Role = "user",
+            Content = userMessage
+        };
+        _db.RefinementMessages.Add(userMsg);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        // Build context from project files
+        var projectContext = await BuildProjectContextAsync(request);
+
+        // Get conversation history
+        var history = await _db.RefinementMessages
+            .Where(m => m.DevRequestId == requestId)
+            .OrderBy(m => m.CreatedAt)
+            .ToListAsync(cancellationToken);
+
+        var messages = new List<Message>();
+        foreach (var msg in history)
+        {
+            var role = msg.Role == "user" ? RoleType.User : RoleType.Assistant;
+            messages.Add(new Message(role, msg.Content));
+        }
+
+        var systemPrompt = $@"You are a helpful AI developer assistant that helps users refine their generated project.
+
+## Project Context
+- Project: {request.ProjectId ?? "unknown"}
+- Description: {request.Description}
+
+## Current Project Files
+{projectContext}
+
+## Instructions
+- Answer questions about the generated project
+- Suggest specific code changes when the user asks for modifications
+- When suggesting changes, show the exact file path and the updated code
+- Format code changes as:
+  **File: `path/to/file`**
+  ```language
+  // updated code
+  ```
+- Keep responses concise and focused on the user's request
+- If the change is small, show only the relevant portion
+- If the change requires a new file, show the complete file content
+
+## Suggestion Detection
+When the user's message contains a valuable suggestion, feature request, improvement idea, or inquiry about the platform:
+1. Acknowledge the idea positively
+2. Include the following JSON block at the END of your response (after your normal response text):
+
+```suggestion_detected
+{{""type"":""suggestion_detected"",""category"":""feature_request"",""title"":""Brief title of the suggestion"",""summary"":""One paragraph description of the suggestion""}}
+```
+
+Categories: feature_request, inquiry, bug_report, improvement
+Only detect genuine suggestions about new features or platform improvements - NOT routine coding questions.";
+
+        var fullContent = new System.Text.StringBuilder();
+
+        var parameters = new MessageParameters
+        {
+            Messages = messages,
+            Model = "claude-sonnet-4-20250514",
+            MaxTokens = 4000,
+            Temperature = 0.3m,
+            System = new List<SystemMessage> { new SystemMessage(systemPrompt) },
+            Stream = true
+        };
+
+        var outputMessages = new List<Message>();
+        await foreach (var res in _client.Messages.StreamClaudeMessageAsync(parameters, cancellationToken))
+        {
+            if (res.Delta?.Text != null)
+            {
+                fullContent.Append(res.Delta.Text);
+                yield return res.Delta.Text;
+            }
+            if (res.StreamStartMessage?.Content != null)
+            {
+                outputMessages.AddRange(res.StreamStartMessage.Content
+                    .Where(c => c.ToString() is not null)
+                    .Select(c => new Message(RoleType.Assistant, c.ToString()!)));
+            }
+        }
+
+        // Save the complete assistant message
+        var assistantMsg = new RefinementMessage
+        {
+            DevRequestId = requestId,
+            Role = "assistant",
+            Content = fullContent.ToString(),
+            TokensUsed = 10
+        };
+        _db.RefinementMessages.Add(assistantMsg);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<RefinementMessage>> GetHistoryAsync(Guid requestId)

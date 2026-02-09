@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, InsufficientTokensError } from '../api/requests'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse } from '../api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, InsufficientTokensError } from '../api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
@@ -36,6 +36,12 @@ export default function HomePage() {
   const [confirmDialog, setConfirmDialog] = useState<{ action: string; tokenCheck: TokenCheck; onConfirm: () => void } | null>(null)
   const [showPlanSelection, setShowPlanSelection] = useState(false)
   const [pricingPlans, setPricingPlans] = useState<PricingPlanData[]>([])
+  const [exportingZip, setExportingZip] = useState(false)
+  const [githubDialog, setGithubDialog] = useState(false)
+  const [githubToken, setGithubToken] = useState('')
+  const [githubRepoName, setGithubRepoName] = useState('')
+  const [exportingGithub, setExportingGithub] = useState(false)
+  const [githubResult, setGithubResult] = useState<GitHubExportResponse | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -63,6 +69,44 @@ export default function HomePage() {
     if (file) handleScreenshotSelect(file)
   }, [handleScreenshotSelect])
 
+  const handleExportZip = async () => {
+    if (!submittedRequest) return
+    setExportingZip(true)
+    try {
+      const blob = await exportZip(submittedRequest.id)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${productionResult?.production.projectName || 'project'}.zip`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Failed to export ZIP:', err)
+      setErrorMessage(err instanceof Error ? err.message : t('export.zipFailed'))
+    } finally {
+      setExportingZip(false)
+    }
+  }
+
+  const handleExportGitHub = async () => {
+    if (!submittedRequest || !githubToken.trim()) return
+    setExportingGithub(true)
+    try {
+      const result = await exportToGitHub(submittedRequest.id, githubToken, githubRepoName || undefined)
+      setGithubResult(result)
+      setGithubDialog(false)
+      setGithubToken('')
+      setGithubRepoName('')
+    } catch (err) {
+      console.error('Failed to export to GitHub:', err)
+      setErrorMessage(err instanceof Error ? err.message : t('export.githubFailed'))
+    } finally {
+      setExportingGithub(false)
+    }
+  }
+
   const handleReset = () => {
     setRequest('')
     setEmail('')
@@ -74,6 +118,7 @@ export default function HomePage() {
     setProposalResult(null)
     setProductionResult(null)
     setErrorMessage('')
+    setGithubResult(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -789,17 +834,33 @@ export default function HomePage() {
               </div>
             )}
 
+            {githubResult && (
+              <div className="bg-green-900/30 border border-green-700 rounded-xl p-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-green-400 font-bold">{t('export.githubSuccess')}</span>
+                </div>
+                <p className="text-sm text-gray-300 mb-2">
+                  {t('export.filesUploaded', { uploaded: githubResult.filesUploaded, total: githubResult.totalFiles })}
+                </p>
+                <a href={githubResult.repoUrl} target="_blank" rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 text-sm underline">
+                  {githubResult.repoFullName}
+                </a>
+              </div>
+            )}
+
             <div className="flex gap-4">
               <button onClick={handleReset}
                 className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
                 {t('button.newRequest')}
               </button>
-              <button
-                disabled
-                title={t('button.comingSoon')}
-                className="flex-1 py-3 bg-gray-600 cursor-not-allowed rounded-xl font-medium transition-colors opacity-60"
-              >
-                {t('button.downloadProject')} ({t('button.comingSoon')})
+              <button onClick={handleExportZip} disabled={exportingZip}
+                className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-xl font-medium transition-colors">
+                {exportingZip ? t('export.downloading') : t('button.downloadProject')}
+              </button>
+              <button onClick={() => setGithubDialog(true)}
+                className="flex-1 py-3 bg-gray-900 hover:bg-gray-800 border border-gray-600 rounded-xl font-medium transition-colors">
+                {t('export.toGitHub')}
               </button>
             </div>
           </div>
@@ -864,6 +925,41 @@ export default function HomePage() {
           onSelect={handlePlanSelected}
           onCancel={() => setShowPlanSelection(false)}
         />
+      )}
+
+      {/* GitHub Export Dialog */}
+      {githubDialog && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4">{t('export.githubTitle')}</h3>
+            <p className="text-gray-400 text-sm mb-4">{t('export.githubDescription')}</p>
+            <div className="space-y-3 mb-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('export.accessToken')}</label>
+                <input type="password" value={githubToken} onChange={(e) => setGithubToken(e.target.value)}
+                  placeholder={t('export.accessTokenPlaceholder')}
+                  className="w-full p-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">{t('export.repoName')}</label>
+                <input type="text" value={githubRepoName} onChange={(e) => setGithubRepoName(e.target.value)}
+                  placeholder={productionResult?.production.projectName || 'my-project'}
+                  className="w-full p-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <p className="text-xs text-gray-500 mt-1">{t('export.repoNameHint')}</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => { setGithubDialog(false); setGithubToken(''); setGithubRepoName('') }}
+                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                {t('tokens.confirm.cancel')}
+              </button>
+              <button onClick={handleExportGitHub} disabled={!githubToken.trim() || exportingGithub}
+                className="flex-1 py-2 bg-gray-900 hover:bg-gray-800 border border-gray-600 disabled:opacity-50 rounded-lg font-medium transition-colors">
+                {exportingGithub ? t('export.pushing') : t('export.pushToGitHub')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Insufficient Tokens Dialog */}

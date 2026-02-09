@@ -501,5 +501,21 @@
   "cicd.title": "CI/CD Pipeline",
   "cicd.workflows": "{{count}} workflows",
   "cicd.secrets": "{{count}} secrets required",
-  "cicd.requiredSecrets": "Required GitHub Secrets"
+  "cicd.requiredSecrets": "Required GitHub Secrets",
+  "export.toGitHub": "Export to GitHub",
+  "export.downloading": "Downloading...",
+  "export.zipFailed": "Failed to download project ZIP.",
+  "export.githubFailed": "Failed to export to GitHub.",
+  "export.githubTitle": "Export to GitHub",
+  "export.githubDescription": "Create a new GitHub repository and push all project files. You need a GitHub Personal Access Token with 'repo' scope.",
+  "export.accessToken": "GitHub Access Token",
+  "export.accessTokenPlaceholder": "ghp_xxxxxxxxxxxx",
+  "export.repoName": "Repository Name (optional)",
+  "export.repoNameHint": "Leave blank to use the project name.",
+  "export.pushing": "Pushing...",
+  "export.pushToGitHub": "Push to GitHub",
+  "export.githubSuccess": "Successfully exported to GitHub!",
+  "export.filesUploaded": "{{uploaded}}/{{total}} files uploaded",
+  "api.error.exportZipFailed": "Failed to download project.",
+  "api.error.exportGitHubFailed": "Failed to export to GitHub."
 }

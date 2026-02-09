@@ -443,3 +443,39 @@ export async function getCostEstimate(complexity: string, category: string): Pro
 
   return response.json();
 }
+
+// Export Types
+export interface GitHubExportResponse {
+  repoUrl: string;
+  repoFullName: string;
+  filesUploaded: number;
+  totalFiles: number;
+}
+
+// Export API Functions
+export async function exportZip(id: string): Promise<Blob> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/export/zip`, {
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(t('api.error.exportZipFailed'));
+  }
+
+  return response.blob();
+}
+
+export async function exportToGitHub(id: string, accessToken: string, repoName?: string): Promise<GitHubExportResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/export/github`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ accessToken, repoName }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || t('api.error.exportGitHubFailed'));
+  }
+
+  return response.json();
+}

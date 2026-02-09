@@ -501,5 +501,21 @@
   "cicd.title": "CI/CD 파이프라인",
   "cicd.workflows": "{{count}}개 워크플로우",
   "cicd.secrets": "{{count}}개 시크릿 필요",
-  "cicd.requiredSecrets": "필요한 GitHub Secrets"
+  "cicd.requiredSecrets": "필요한 GitHub Secrets",
+  "export.toGitHub": "GitHub로 내보내기",
+  "export.downloading": "다운로드 중...",
+  "export.zipFailed": "프로젝트 ZIP 다운로드에 실패했습니다.",
+  "export.githubFailed": "GitHub 내보내기에 실패했습니다.",
+  "export.githubTitle": "GitHub로 내보내기",
+  "export.githubDescription": "새 GitHub 저장소를 생성하고 모든 프로젝트 파일을 푸시합니다. 'repo' 범위의 GitHub Personal Access Token이 필요합니다.",
+  "export.accessToken": "GitHub 액세스 토큰",
+  "export.accessTokenPlaceholder": "ghp_xxxxxxxxxxxx",
+  "export.repoName": "저장소 이름 (선택)",
+  "export.repoNameHint": "비워두면 프로젝트 이름을 사용합니다.",
+  "export.pushing": "푸시 중...",
+  "export.pushToGitHub": "GitHub에 푸시",
+  "export.githubSuccess": "GitHub로 내보내기 완료!",
+  "export.filesUploaded": "{{uploaded}}/{{total}}개 파일 업로드됨",
+  "api.error.exportZipFailed": "프로젝트 다운로드에 실패했습니다.",
+  "api.error.exportGitHubFailed": "GitHub 내보내기에 실패했습니다."
 }

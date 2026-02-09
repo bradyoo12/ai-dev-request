@@ -52,14 +52,33 @@ public class ProductionService : IProductionService
         var isMobile = platform == "mobile" || platform == "fullstack";
 
         // If user selected a specific framework, use it; otherwise fall back to defaults
+        var isFlutter = framework?.Equals("flutter", StringComparison.OrdinalIgnoreCase) == true;
+        var isReactNative = framework?.Equals("react-native", StringComparison.OrdinalIgnoreCase) == true
+                         || framework?.Equals("expo", StringComparison.OrdinalIgnoreCase) == true;
+
         var projectTypeOptions = !string.IsNullOrEmpty(framework)
             ? framework
             : isMobile
-                ? "react-native|expo"
+                ? "flutter|react-native|expo"
                 : "react|nextjs|dotnet|python";
 
-        var fileGuidance = isMobile
+        var fileGuidance = isFlutter
             ? @"핵심 파일들만 생성하세요:
+- pubspec.yaml (Flutter 의존성)
+- lib/main.dart (메인 진입점)
+- lib/screens/ (스크린 파일 3-5개)
+- lib/widgets/ (재사용 위젯 컴포넌트)
+- lib/services/ (API, 데이터 서비스)
+- lib/models/ (데이터 모델)
+- README.md (빌드/실행 가이드 포함)
+
+Flutter 3.x + Dart 기반으로 생성하세요.
+GoRouter를 네비게이션에 사용하세요.
+Material 3 디자인 시스템을 사용하세요.
+iOS/Android 크로스플랫폼 지원.
+네이티브 기능(카메라, GPS, 푸시알림)은 적절한 Flutter 플러그인 사용."
+            : (isMobile || isReactNative)
+                ? @"핵심 파일들만 생성하세요:
 - package.json (React Native + Expo 의존성)
 - app.json (Expo 설정)
 - App.tsx (메인 진입점)
@@ -71,7 +90,7 @@ public class ProductionService : IProductionService
 React Native + Expo (managed workflow) 기반으로 생성하세요.
 React Navigation을 사용하세요.
 NativeWind (Tailwind for RN) 또는 React Native Paper를 UI에 사용하세요."
-            : @"핵심 파일들만 생성하세요:
+                : @"핵심 파일들만 생성하세요:
 - package.json / .csproj (의존성)
 - 메인 진입점 파일
 - 핵심 컴포넌트/서비스 파일 (3-5개)

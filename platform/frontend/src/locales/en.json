@@ -475,6 +475,8 @@
   "screenshot.hint": "Upload a design screenshot for AI to replicate the UI. Max 5MB.",
   "framework.label": "Framework (optional)",
   "framework.auto": "Auto-detect",
+  "framework.web": "Web Frameworks",
+  "framework.mobile": "Mobile Frameworks",
   "framework.hint": "Select a framework or let AI choose the best fit for your project.",
   "accessibility.title": "Accessibility Audit (WCAG 2.2)",
   "accessibility.passed": "WCAG AA Compliant",

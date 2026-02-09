@@ -14,14 +14,14 @@ namespace AiDevRequest.API.Controllers;
 public class SettingsController : ControllerBase
 {
     private readonly AiDevRequestDbContext _context;
-    private readonly ILogger<SettingsController> _logger;
     private readonly ITokenService _tokenService;
+    private readonly ILogger<SettingsController> _logger;
 
     public SettingsController(AiDevRequestDbContext context, ILogger<SettingsController> logger, ITokenService tokenService)
     {
         _context = context;
-        _logger = logger;
         _tokenService = tokenService;
+        _logger = logger;
     }
 
     private string GetUserId() =>

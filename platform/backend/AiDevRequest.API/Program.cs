@@ -28,6 +28,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddSingleton<IDeploymentService, AzureDeploymentService>();
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<ICryptoPaymentService, CoinbaseCryptoPaymentService>();
+builder.Services.AddScoped<IA2AService, A2AService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISocialAuthService, SocialAuthService>();
 builder.Services.AddHttpClient();
@@ -185,7 +186,9 @@ app.UseExceptionHandler(errorApp =>
 
     try
     {
-        string[] allTables = { "auto_topup_configs", "build_verifications", "deployments",
+        string[] allTables = { "a2a_agent_cards", "a2a_artifacts", "a2a_audit_logs",
+            "a2a_consents", "a2a_tasks",
+            "auto_topup_configs", "build_verifications", "deployments",
             "dev_requests", "domains", "domain_transactions", "hosting_plans", "languages",
             "payments", "project_templates", "project_versions", "refinement_messages",
             "token_balances", "token_packages", "token_pricing", "token_transactions",

@@ -1,3 +1,16 @@
+---
+description: Automated staging verification workflow that tests "In Review" tickets on staging using Playwright and all available tools. Supports team mode for parallel testing.
+allowed-prompts:
+  - tool: Bash
+    prompt: run gh commands for GitHub operations
+  - tool: Bash
+    prompt: run git commands
+  - tool: Bash
+    prompt: run npm commands
+  - tool: Bash
+    prompt: run npx commands
+---
+
 Automated staging verification workflow that tests "In Review" tickets on staging using Playwright and all available tools.
 
 ## Usage
@@ -21,7 +34,34 @@ gh auth switch -u bradyoo12
 1. `.claude/policy.md` - Ensure workflow follows policy rules
 2. `.claude/design.md` - Verify implementation aligns with architecture
 
-## Loop Behavior
+## Operating Modes
+
+### Standalone Mode (invoked directly via `/b-review`)
+Runs the full workflow in an infinite loop.
+
+### Team Mode (spawned by b-start as part of review team)
+When spawned as part of an Agent Team by b-start:
+- You are one of two agents: **test-runner** or **ai-verifier**
+- The ticket number and your role are provided via the task prompt
+- Do your assigned work and report results via SendMessage to the team lead
+- Do NOT loop — process once and report
+
+**How to detect team mode:** If you were spawned via Task tool with a `team_name` parameter, you are in team mode. Your specific role (test-runner or ai-verifier) will be specified in the task prompt.
+
+### Team Roles
+
+#### test-runner
+- Runs the FULL Playwright E2E test suite against staging
+- Reports pass/fail with detailed results
+
+#### ai-verifier
+- Reads the ticket requirements and "How to Test" comment
+- Uses WebFetch to verify staging URL is accessible
+- Performs AI-simulated human testing
+- Checks for console errors, performance, visual correctness
+- Reports verification results
+
+## Loop Behavior (Standalone Mode Only)
 This workflow runs in an infinite loop with 5-second intervals:
 1. Execute the workflow (Steps 1-6)
 2. After completing one ticket (success or failure), wait 5 seconds
@@ -33,6 +73,8 @@ This workflow runs in an infinite loop with 5-second intervals:
 Execute this workflow in sequence, then loop:
 
 ### Step 1: Find Tickets Ready for Staging Verification
+
+**In team mode, skip this — the ticket is already provided.**
 
 #### Step 1a: Get issues in "In Review" status
 
@@ -65,7 +107,9 @@ No local build or preview server is needed — tests run directly against the li
 
 ### Step 3: Run Tests (Full Regression Suite)
 
-Run ALL available tests against the local staging build (or remote staging).
+Run ALL available tests against the staging site.
+
+**In team mode:** Only run your assigned role's tests (test-runner OR ai-verifier), not both.
 
 #### Step 3a: Run FULL Playwright E2E Test Suite Against Staging
 ```bash
@@ -92,6 +136,10 @@ Perform AI-simulated human testing:
 
 ### Step 4: Handle Test Results
 
+**In team mode:** Report results via SendMessage to the team lead. Do NOT directly modify ticket status — the team lead handles that.
+
+**In standalone mode:**
+
 **If all tests PASS:**
 
 1. Move ticket to "Done" status:
@@ -117,7 +165,7 @@ Perform AI-simulated human testing:
 ### Step 5: Cleanup
 1. Clean up any test artifacts or temporary files
 
-### Step 6: Loop
+### Step 6: Loop (Standalone Mode Only)
 1. Log "Cycle complete. Waiting 5 seconds before next iteration..."
 2. Wait 5 seconds
 3. Pull latest changes before starting the next iteration:
@@ -126,11 +174,14 @@ Perform AI-simulated human testing:
    ```
 4. Go back to Step 1
 
+In team mode, stop here and wait for shutdown.
+
 ## Important Notes
-- **This command runs in an infinite loop** - keep processing until Ctrl+C
+- **Standalone mode runs in an infinite loop** - keep processing until Ctrl+C
 - Only process tickets in "In Review" WITHOUT `on hold` label
 - Tests run against the staging site: `https://icy-desert-07c08ba00.2.azurestaticapps.net`
-- If tests pass: move to "Done" and close the issue
-- If tests fail: add comment + `on hold` label
+- If tests pass: move to "Done" and close the issue (standalone) or report success (team mode)
+- If tests fail: add comment + `on hold` label (standalone) or report failure (team mode)
 - If staging is unavailable: do NOT add `on hold` — just skip and retry next cycle
 - **ALL tests must pass for a ticket to pass review**
+- In team mode, report results via SendMessage — do NOT modify ticket status directly

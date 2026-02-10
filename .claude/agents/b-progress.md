@@ -21,12 +21,22 @@ gh auth switch -u bradyoo12
 1. `.claude/policy.md` - Ensure merging follows policy rules
 2. `.claude/design.md` - Verify implementation aligns with architecture
 
-## Loop Behavior
+## Operating Modes
+
+### Standalone Mode (invoked directly via `/b-progress`)
+Runs the full workflow in an infinite loop.
+
+### Called by b-start
+When called by the b-start orchestrator, b-progress runs as a single agent (no team needed — merging is a simple sequential operation). Process ONE ticket and return.
+
+## Loop Behavior (Standalone Mode Only)
 This workflow runs in an infinite loop with 5-second intervals:
 1. Execute the workflow (Steps 1-6)
 2. After completing one ticket, wait 5 seconds
 3. Start again from Step 1
 4. Continue until manually stopped (Ctrl+C)
+
+When called by b-start, process ONE ticket and stop — do NOT loop.
 
 ## Workflow
 
@@ -52,7 +62,7 @@ gh pr list --repo bradyoo12/ai-dev-request --state open --json number,headRefNam
 
 Cross-reference tickets with open PRs by matching branch names (branch starts with ticket number).
 
-If no eligible tickets found, wait 5 seconds and restart.
+If no eligible tickets found, wait 5 seconds and restart (standalone) or return (called by b-start).
 
 ### Step 2: Verify PR Status
 1. Check the PR:
@@ -90,12 +100,14 @@ git checkout main && git pull
 git branch -D <branch_name> 2>/dev/null || true
 ```
 
-### Step 6: Loop
+### Step 6: Loop (Standalone Mode Only)
 1. Wait 5 seconds
 2. Go back to Step 1
 
+When called by b-start, stop here and return results.
+
 ## Important Notes
-- **This command runs in an infinite loop**
+- **Standalone mode runs in an infinite loop**
 - Only process "In Progress" tickets with an open PR and no `on hold` label
 - PR merge uses `--merge` strategy (not squash or rebase)
 - Branch is deleted after successful merge

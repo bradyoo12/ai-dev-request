@@ -9,7 +9,7 @@ allowed-prompts:
     prompt: run echo commands
 ---
 
-Master orchestrator that runs the full automated development pipeline continuously.
+Master orchestrator that runs the full automated development pipeline continuously using Claude Agent Teams.
 
 ## Usage
 `/b-start`
@@ -30,21 +30,34 @@ gh auth switch -u bradyoo12
 
 ## Overview
 
-This command orchestrates the entire development workflow:
+This command orchestrates the entire development workflow using Agent Teams for parallelism within each ticket:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        b-start (Orchestrator)                    │
+│                    b-start (Team Orchestrator)                    │
 ├─────────────────────────────────────────────────────────────────┤
 │  1. Check policy.md & design.md                                  │
 │  2. Audit all tickets for alignment                              │
-│  3. Run b-ready → implements, local tests & creates PR           │
-│  4. Run b-progress → merges PR to main, moves to In Review       │
-│  5. Run b-review → tests on staging, moves to Done or on hold    │
-│  6. Run b-modernize → web search for new tech, create suggestions │
+│  3. b-ready team → plan, implement, test, create PR              │
+│  4. b-progress → merge PR to main, move to In Review             │
+│  5. b-review team → parallel test + verify on staging            │
+│  6. b-modernize team → parallel research + create suggestions    │
 │  7. Report status & loop back to step 1                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+### Agent Team Strategy
+
+Teams are used within a single ticket to parallelize independent work:
+
+| Step | Team Name | Agents | Why Parallel |
+|------|-----------|--------|-------------|
+| b-ready | `ready-<ticket#>` | planner + frontend-dev + backend-dev + tester | Frontend & backend can be implemented simultaneously |
+| b-progress | No team | Single operation | Simple merge, no parallelism needed |
+| b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
+| b-modernize | `modernize` | tech-scout + competitor-scout | Independent web searches |
+
+**Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
 
 ## Main Loop
 
@@ -97,75 +110,235 @@ Check all tickets in the project to ensure they align with policy and design:
 
 4. Log summary of audit results
 
-### Step 3: Run b-ready Agent
+### Step 3: b-ready — Implement with Agent Team
 
-Implement and locally test Ready tickets:
+Implement and locally test ONE Ready ticket using an Agent Team.
 
-1. Log "Starting b-ready agent..."
+#### Step 3a: Claim the Ticket
 
-2. **Claim the ticket BEFORE delegating to b-ready (prevents race conditions):**
-   - Find the top Ready ticket (no `on hold` label) from the project:
-     ```bash
-     gh project item-list 26 --owner bradyoo12 --format json --limit 200
-     ```
-   - Filter for issues with "Ready" status and no `on hold` label
-   - If no ticket found, skip to Step 4
-   - **Immediately move the ticket to "In Progress"** to prevent other Claude Code instances from picking it up:
-     ```bash
-     gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
-     ```
-   - Log: "Claimed ticket #<number> — moved to In Progress"
+1. Find the top Ready ticket (no `on hold` label) from the project:
+   ```bash
+   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   ```
+2. Filter for issues with "Ready" status and no `on hold` label
+3. If no ticket found, skip to Step 4
+4. **Immediately move the ticket to "In Progress"** to prevent other instances from picking it up:
+   ```bash
+   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+   ```
+5. Log: "Claimed ticket #<number> — moved to In Progress"
 
-3. **Pass the claimed ticket number to b-ready** so it skips auto-discovery:
-   - Execute the b-ready workflow with the specific ticket: `/b-ready <issue_number>`
-   - b-ready will skip its own Step 1 (auto-discover) and Step 2 (move to In Progress) since both are already done
-   - Create branch from main (branch name starts with ticket number)
-   - Implement the ticket
-   - Run local tests (unit tests + Playwright)
-   - If problem: add `on hold` label, move to next ticket
-   - If success: create PR (ticket stays "In Progress")
+#### Step 3b: Read and Classify the Ticket
 
-4. Process ONE ticket, then proceed to Step 4
+1. Fetch the issue details:
+   ```bash
+   gh issue view <issue_number> --repo bradyoo12/ai-dev-request
+   ```
+2. Classify the ticket scope:
+   - **Full-stack**: Needs both frontend AND backend changes → use team
+   - **Single-scope**: Only frontend OR only backend → use single agent
+   - **Simple**: Config, docs, small fix → do directly (no team)
 
-### Step 4: Run b-progress Agent
+#### Step 3c: Create Team and Execute
 
-Merge PRs to main and deploy to staging:
+**For full-stack tickets — create a team:**
 
-1. Log "Starting b-progress agent..."
-2. Execute the b-progress workflow (refer to `.claude/agents/b-progress.md`):
-   - Find "In Progress" tickets with open PRs (no `on hold` label)
-   - Verify PR is mergeable
-   - Merge PR to main, delete branch
-   - Move ticket to "In Review" (now on staging)
-   - **CRITICAL: Add a detailed "How to Test" comment**
+1. Create the team:
+   ```
+   TeamCreate: ready-<ticket_number>
+   ```
 
-3. Process ONE ticket, then proceed to Step 5
+2. Create tasks in the team's task list using TaskCreate:
+   - Task: "Analyze ticket and create implementation plan"
+   - Task: "Create feature branch from main"
+   - Task: "Implement frontend changes"
+   - Task: "Implement backend changes"
+   - Task: "Run full test suite"
+   - Task: "Commit, push, and create PR"
 
-### Step 5: Run b-review Agent (Staging Verification)
+3. Spawn the **planner** agent (general-purpose, team_name: ready-<ticket_number>):
+   - Reads the ticket, policy.md, and design.md
+   - Creates a detailed implementation plan
+   - Posts the plan as a comment on the issue
+   - Creates the feature branch: `<ticket_number>-<slug>`
+   - Assigns frontend and backend tasks to the respective agents
+   - Sends message to frontend-dev and backend-dev with their assignments
 
-Verify changes on staging:
+4. Spawn **frontend-dev** agent (general-purpose, team_name: ready-<ticket_number>):
+   - Waits for assignment from planner
+   - Implements frontend changes following the plan
+   - Reports completion to planner
 
-1. Log "Starting b-review agent..."
-2. Execute the b-review workflow (refer to `.claude/commands/b-review.md`):
-   - Find tickets in "In Review" WITHOUT `on hold` label
-   - Run Playwright tests and all available tools against staging
-   - If tests PASS: set project status to "Done", close issue
-   - If tests FAIL: add comment explaining failure + add `on hold` label
+5. Spawn **backend-dev** agent (general-purpose, team_name: ready-<ticket_number>):
+   - Waits for assignment from planner
+   - Implements backend changes following the plan
+   - Reports completion to planner
 
-3. Process ONE ticket, then proceed to Step 6
+6. After frontend-dev and backend-dev complete, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
+   - Runs `npm run build` in platform/frontend
+   - Runs full Playwright E2E suite: `npm test` in platform/frontend
+   - Reports results to planner
+   - If tests fail: attempt fixes (up to 3 attempts), then report
 
-### Step 6: Run b-modernize Agent (Technology Scout)
+7. Planner handles final steps:
+   - Commits all changes with "Refs #<ticket_number>"
+   - Pushes branch and creates PR
+   - Reports success/failure
 
-Search for recent technologies and create suggestion tickets:
+8. Shut down all agents and delete the team:
+   ```
+   SendMessage: shutdown_request to each agent
+   TeamDelete
+   ```
 
-1. Log "Starting b-modernize agent..."
-2. Execute the b-modernize workflow (refer to `.claude/commands/b-modernize.md`):
-   - Web search for recent technologies relevant to the platform
-   - Evaluate relevance, impact, and effort scores
-   - Create suggestion tickets for qualifying technologies (max 3 per cycle)
-   - Add tickets to project board with NO status (human triage required)
+**For single-scope or simple tickets — use single Task agent:**
 
-3. Proceed to Step 7
+Spawn a single general-purpose agent via Task tool (no team needed):
+- Read ticket, create plan, create branch
+- Implement changes
+- Run tests
+- Commit, push, create PR
+- This follows the same workflow as `.claude/agents/b-ready.md`
+
+#### Step 3d: Handle Failures
+
+If the team fails or gets stuck:
+1. Shut down all agents in the team
+2. Delete the team
+3. Add `on hold` label to the ticket
+4. Add a comment explaining the failure
+5. Checkout main, delete the branch
+6. Proceed to Step 4
+
+### Step 4: b-progress — Merge PR (No Team)
+
+Merge PRs to main. This is a simple operation — no team needed.
+
+1. Log "Starting b-progress..."
+2. Find "In Progress" tickets with open PRs (no `on hold` label):
+   ```bash
+   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   gh pr list --repo bradyoo12/ai-dev-request --state open --json number,headRefName,url
+   ```
+3. Verify PR is mergeable:
+   ```bash
+   gh pr view <pr_number> --repo bradyoo12/ai-dev-request --json mergeable,mergeStateStatus
+   ```
+4. Merge:
+   ```bash
+   gh pr merge <pr_number> --repo bradyoo12/ai-dev-request --merge --delete-branch
+   ```
+5. Move ticket to "In Review":
+   ```bash
+   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
+   ```
+6. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
+7. Cleanup: `git checkout main && git pull`
+
+### Step 5: b-review — Verify with Agent Team
+
+Verify changes on staging using parallel agents.
+
+#### Step 5a: Find Eligible Ticket
+
+1. Get "In Review" tickets without `on hold` label
+2. If none found, skip to Step 6
+
+#### Step 5b: Create Review Team
+
+1. Create the team:
+   ```
+   TeamCreate: review-<ticket_number>
+   ```
+
+2. Pull latest and install deps:
+   ```bash
+   git checkout main && git pull
+   cd platform/frontend && npm install
+   ```
+
+3. Spawn **test-runner** agent (general-purpose, team_name: review-<ticket_number>):
+   - Installs Playwright: `npx playwright install chromium`
+   - Runs FULL Playwright E2E suite against staging: `npm run test:staging`
+   - Reports pass/fail results with details
+
+4. Spawn **ai-verifier** agent (general-purpose, team_name: review-<ticket_number>) IN PARALLEL:
+   - Reads the ticket requirements
+   - Reads the "How to Test" comment
+   - Uses WebFetch to verify staging URL is accessible
+   - Performs AI-simulated human testing
+   - Checks for console errors, performance, visual correctness
+   - Reports verification results
+
+5. Wait for both agents to complete and collect results
+
+#### Step 5c: Handle Results
+
+**If BOTH pass:**
+- Move to "Done":
+  ```bash
+  gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 98236657
+  ```
+- Close the issue:
+  ```bash
+  gh issue close <issue_number> --repo bradyoo12/ai-dev-request --reason completed
+  ```
+- Add completion comment
+
+**If EITHER fails:**
+- Add failure comment with details from both agents
+- Add `on hold` label
+
+#### Step 5d: Cleanup
+
+Shut down all agents, delete the team.
+
+### Step 6: b-modernize — Research with Agent Team
+
+Search for recent technologies and create suggestion tickets using parallel researchers.
+
+#### Step 6a: Pre-check
+
+1. Check existing open suggestion tickets:
+   ```bash
+   gh issue list --repo bradyoo12/ai-dev-request --state open --label suggestion --json number,title --limit 50
+   ```
+2. If 4+ suggestion tickets exist in Backlog, skip b-modernize entirely
+
+#### Step 6b: Create Research Team
+
+1. Create the team:
+   ```
+   TeamCreate: modernize
+   ```
+
+2. Spawn **tech-scout** agent (general-purpose, team_name: modernize):
+   - Searches for recent technologies: AI code generation, agent frameworks, .NET innovations, React ecosystem, DevOps tools
+   - Evaluates relevance, effort, and impact scores
+   - Reports top findings with scores
+
+3. Spawn **competitor-scout** agent (general-purpose, team_name: modernize) IN PARALLEL:
+   - Researches competitor features: Replit, Base44, Bolt.new, v0.dev, Cursor
+   - Evaluates differentiation, user value, feasibility
+   - Reports top findings with scores
+
+4. Wait for both scouts to complete
+
+#### Step 6c: Create Tickets
+
+After collecting findings from both scouts:
+1. Filter for qualifying technologies (relevance >= 3, impact >= 3, effort <= 4)
+2. Deduplicate against existing tickets
+3. Create max 3 suggestion tickets:
+   ```bash
+   gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body "{body}" --label "suggestion"
+   gh project item-add 26 --owner bradyoo12 --url {issue_url}
+   ```
+4. Do NOT set any status — leave for human triage
+
+#### Step 6d: Cleanup
+
+Shut down all agents, delete the team.
 
 ### Step 7: Report Cycle Status
 
@@ -192,16 +365,29 @@ Log the current status of the project board:
 ## Ticket Flow Summary
 
 ```
-┌──────────┐   b-ready    ┌─────────────┐  b-progress   ┌───────────┐  b-review   ┌──────┐
-│  Ready   │ ──────────→ │ In Progress │ ───────────→ │ In Review │ ─────────→ │ Done │
-└──────────┘              └─────────────┘              └───────────┘             └──────┘
-                          (implement,          (merge PR,          (test on staging,
-                           local tests,         deploy to           close issue)
-                           create PR)           staging)
-     │                          │                            │
-     └─── on hold ──────────────┴─── on hold (test fail) ────┘
-           (needs human attention)
+┌──────────┐  b-ready team  ┌─────────────┐  b-progress  ┌───────────┐  b-review team  ┌──────┐
+│  Ready   │ ────────────→ │ In Progress │ ──────────→ │ In Review │ ──────────────→ │ Done │
+└──────────┘                └─────────────┘              └───────────┘                └──────┘
+             (team: plan,        (merge PR,          (team: test-runner
+              implement,          deploy to           + ai-verifier)
+              test, PR)           staging)
+     │                │                          │
+     └── on hold ─────┴── on hold (test fail) ───┘
+          (needs human attention)
 ```
+
+## Agent Team Lifecycle
+
+```
+1. TeamCreate("ready-123")           → Creates team + task list
+2. Task(team_name: "ready-123")      → Spawns agents into the team
+3. SendMessage(type: "message")      → Agents coordinate via messages
+4. TaskUpdate(status: "completed")   → Agents mark tasks done
+5. SendMessage(type: "shutdown_request") → Orchestrator shuts down agents
+6. TeamDelete()                      → Cleans up team resources
+```
+
+**IMPORTANT:** Always shut down agents and delete teams before moving to the next step. Stale teams waste resources.
 
 ## Label Meanings
 
@@ -213,7 +399,8 @@ Log the current status of the project board:
 
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
-- Each agent processes ONE ticket per cycle to maintain balance
+- **ONE ticket at a time** - teams parallelize WITHIN a ticket, not across tickets
+- Teams are created and destroyed per-step — no long-lived teams
 - 5-second delay between full cycles to avoid API rate limiting
 - Always check policy.md and design.md at the start of each cycle
 - Tickets out of alignment get `on hold` label automatically

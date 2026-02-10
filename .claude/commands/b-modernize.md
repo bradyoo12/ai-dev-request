@@ -1,5 +1,5 @@
 ---
-description: Web search for recent technologies and competitor features, then create suggestion tickets in the AI Dev Request project.
+description: Web search for recent technologies and competitor features, then create suggestion tickets in the AI Dev Request project. Supports team mode for parallel research.
 allowed-prompts:
   - tool: Bash
     prompt: run gh commands for GitHub operations
@@ -23,6 +23,41 @@ AI Dev Request is a SaaS platform for AI-powered development automation:
 - **AI**: Claude API (requirement analysis + code generation)
 - **Core**: Automated dev request → analysis → proposal → build pipeline
 
+## Operating Modes
+
+### Standalone Mode (invoked directly via `/b-modernize`)
+Runs the full workflow: search, evaluate, create tickets.
+
+### Team Mode (spawned by b-start as part of modernize team)
+When spawned as part of an Agent Team by b-start:
+- You are one of two agents: **tech-scout** or **competitor-scout**
+- Your specific research scope is provided via the task prompt
+- Do your assigned research and report findings via SendMessage to the team lead
+- Do NOT create tickets directly — report findings so the team lead can deduplicate and create tickets
+- Do NOT loop — research once and report
+
+**How to detect team mode:** If you were spawned via Task tool with a `team_name` parameter, you are in team mode.
+
+### Team Roles
+
+#### tech-scout
+Research scope:
+1. **AI Code Generation**: Recent AI coding tools, Claude Code alternatives, agentic coding frameworks
+2. **AI Agent Frameworks**: Agent orchestration tools, function-calling improvements, tool-use patterns
+3. **Backend/.NET Innovations**: Recent .NET 9 libraries, performance tools, new EF Core features
+4. **Frontend/React**: Recent React ecosystem tools, UI components, state management
+5. **DevOps & Infrastructure**: Deployment, monitoring, CI/CD innovations for small teams
+
+Report each finding with: name, description, relevance score (1-5), effort score (1-5), impact score (1-5).
+
+#### competitor-scout
+Research scope:
+1. **AI App Builder Competitors**: Replit, Base44, Bolt.new, v0.dev, Cursor features
+2. **AI Dev Request Competitors**: "AI development request platform", "automated software development SaaS"
+3. **Search queries**: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
+
+Report each finding with: name, description, differentiation (Yes/No/Partial), user value (1-5), feasibility (1-5), competitive edge (1-5).
+
 ## Step 1: Load Existing Tickets
 
 Before searching, check what suggestion tickets already exist to avoid duplicates:
@@ -33,32 +68,23 @@ gh issue list --repo bradyoo12/ai-dev-request --state open --json number,title,l
 
 Note all existing titles to avoid creating duplicate suggestions.
 
+**In team mode:** The team lead handles this check before spawning you. Your existing ticket list will be provided in the task prompt.
+
 ## Step 2: Web Search for Recent Technologies
 
-Search the web for recent technologies relevant to the platform. Focus on:
+**In team mode, only search your assigned scope (tech-scout or competitor-scout).**
 
-### Search Queries (run all)
+### Search Queries — tech-scout (run all)
 1. **AI Code Generation**: Recent AI coding tools, Claude Code alternatives, agentic coding frameworks
 2. **AI Agent Frameworks**: Agent orchestration tools, function-calling improvements, tool-use patterns
 3. **Backend/.NET Innovations**: Recent .NET 9 libraries, performance tools, new EF Core features
 4. **Frontend/React**: Recent React ecosystem tools, UI components, state management
 5. **DevOps & Infrastructure**: Deployment, monitoring, CI/CD innovations for small teams
 
-## Step 2B: Competitor Feature Research
-
-### AI App Builder Competitors
-Research features from AI-powered app/service builders:
-- **Replit** - AI coding, deployment, collaboration features
-- **Base44** - AI app generation features
-- **Bolt.new** - AI full-stack app builder
-- **v0.dev** - AI UI component generation
-- **Cursor** - AI code editor features
-- Search for: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
-
-### AI Dev Request Competitors
-- "AI development request platform"
-- "automated software development SaaS"
-- "AI project generation tools"
+### Search Queries — competitor-scout
+1. **AI App Builder Competitors**: Replit, Base44, Bolt.new, v0.dev, Cursor features
+2. **AI Dev Request Competitors**: "AI development request platform", "automated software development SaaS"
+3. **General**: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
 
 ### Evaluate Competitor Features
 For each discovered feature:
@@ -80,7 +106,11 @@ For each discovered technology, evaluate:
 - Impact >= 3
 - Effort <= 4
 
-## Step 4: Create Suggestion Tickets
+**In team mode:** Report all qualifying findings via SendMessage. The team lead will handle deduplication and ticket creation.
+
+## Step 4: Create Suggestion Tickets (Standalone Mode Only)
+
+**In team mode, skip this step — the team lead creates tickets after collecting findings from all scouts.**
 
 For each qualifying technology, create a GitHub issue:
 
@@ -100,6 +130,8 @@ Do NOT set any status field — leave it for human triage.
 
 Log a summary of findings and tickets created.
 
+**In team mode:** Send summary via SendMessage to team lead, then wait for shutdown.
+
 ## Important Notes
 
 - **Do NOT create duplicate tickets** — always check existing issues first
@@ -107,3 +139,4 @@ Log a summary of findings and tickets created.
 - **No status on project board** — suggestions need human triage
 - **Label all tickets with `suggestion`**
 - If 4+ suggestion tickets already exist in Backlog, skip b-modernize entirely
+- In team mode, report findings — do NOT create tickets directly

@@ -879,13 +879,13 @@ public class RequestsController : ControllerBase
     /// Get version history for a project
     /// </summary>
     [HttpGet("{id:guid}/versions")]
-    public async Task<ActionResult<List<ProjectVersionDto>>> GetVersions(Guid id)
+    public async Task<ActionResult<List<RequestVersionDto>>> GetVersions(Guid id)
     {
         var (entity, error) = await GetOwnedEntityAsync(id);
         if (error != null) return error;
 
         var versions = await _versionService.GetVersionsAsync(id);
-        return Ok(versions.Select(v => new ProjectVersionDto
+        return Ok(versions.Select(v => new RequestVersionDto
         {
             Id = v.Id,
             VersionNumber = v.VersionNumber,
@@ -900,7 +900,7 @@ public class RequestsController : ControllerBase
     /// Rollback to a specific version
     /// </summary>
     [HttpPost("{id:guid}/versions/{versionId:guid}/rollback")]
-    public async Task<ActionResult<ProjectVersionDto>> RollbackToVersion(Guid id, Guid versionId)
+    public async Task<ActionResult<RequestVersionDto>> RollbackToVersion(Guid id, Guid versionId)
     {
         var (entity, error) = await GetOwnedEntityAsync(id);
         if (error != null) return error;
@@ -909,7 +909,7 @@ public class RequestsController : ControllerBase
         if (result == null)
             return NotFound(new { error = "Version snapshot not found." });
 
-        return Ok(new ProjectVersionDto
+        return Ok(new RequestVersionDto
         {
             Id = result.Id,
             VersionNumber = result.VersionNumber,
@@ -1071,7 +1071,7 @@ public class RequestsController : ControllerBase
     }
 }
 
-public record ProjectVersionDto
+public record RequestVersionDto
 {
     public Guid Id { get; init; }
     public int VersionNumber { get; init; }

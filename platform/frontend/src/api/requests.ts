@@ -587,6 +587,21 @@ export async function generateExpoPreview(requestId: string): Promise<ExpoPrevie
   return response.json()
 }
 
+// Project Files API
+export interface ProjectFilesResponse {
+  files: Record<string, string>
+  projectName: string | null
+}
+
+export async function getProjectFiles(requestId: string): Promise<ProjectFilesResponse | null> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/files`, {
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) return null
+  return response.json()
+}
+
 export async function getExpoPreview(requestId: string): Promise<{ previewUrl: string; snackUrl: string } | null> {
   const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/preview`, {
     headers: authHeaders(),

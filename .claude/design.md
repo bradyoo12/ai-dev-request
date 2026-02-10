@@ -126,7 +126,7 @@ Bidirectional GitHub repository sync for generated projects (Lovable-style code 
 ## AI-Powered Code Quality Review
 
 Multi-dimensional AI code review scoring architecture, security, performance, accessibility, and maintainability:
-- **Backend**: `CodeQualityReviewService` performs 5-dimension AI review using Claude API, supports per-finding and bulk fix application
+- **Backend**: `CodeQualityReviewService` reads actual project source files (`.ts`, `.tsx`, `.js`, `.cs`, `.py`, etc.), sends them to Claude API (`claude-sonnet-4-20250514`) for real 5-dimension analysis, parses structured JSON findings, and supports per-finding and bulk fix application
 - **Endpoints**:
   - `POST /api/projects/{id}/review` — trigger AI code review
   - `GET /api/projects/{id}/review/results` — get latest review results
@@ -135,7 +135,8 @@ Multi-dimensional AI code review scoring architecture, security, performance, ac
   - `POST /api/projects/{id}/review/fix-all` — apply all fixes by severity
 - **Frontend**: `CodeReviewPage` in Settings with dimension score bars, overall score badge, findings list with severity filtering, per-finding "Apply Fix" button, bulk fix actions, review history
 - **Dimensions**: Architecture (separation of concerns), Security (XSS, auth), Performance (rendering, bundle), Accessibility (ARIA, keyboard), Maintainability (naming, types)
-- **Flow**: Code generated → trigger review → AI scores 5 dimensions → findings with severity → user applies fixes → re-review shows improvement
+- **File Resolution**: `ResolveProjectPathAsync` looks up project path from DevRequest records or scans `Projects:BasePath` directory; `ReadSourceFiles` collects source files (excluding `node_modules`, `dist`, `build`, etc.) up to 50KB each
+- **Flow**: Code generated → trigger review → service reads project source files → Claude API analyzes across 5 dimensions → structured findings with severity → user applies fixes → re-review shows improvement
 
 ## Real-Time Streaming Code Generation
 

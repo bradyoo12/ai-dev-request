@@ -84,6 +84,7 @@ User Request (natural language)
 | PreviewDeployment | Edge preview deployment record for a generated project |
 | GenerationManifest | Multi-file generation manifest with cross-file consistency validation |
 | DevelopmentSpec | Structured specification (requirements/design/implementation) for a dev request |
+| GitHubSync | Bidirectional GitHub repository sync record for a generated project |
 
 ## Spec-Driven Development Pipeline
 
@@ -98,6 +99,22 @@ Formal structured specifications before code generation (Kiro-style):
   - `PUT /api/requests/{id}/specs/{specId}` — update spec (user edits)
 - **Frontend**: `SpecificationPage` in Settings with three-phase stepper, approve/reject workflow, user edit mode, version history
 - **Flow**: Dev request created → generate requirements spec → user reviews/approves → generate design spec → user reviews/approves → generate implementation spec → user approves → code generation begins
+
+## GitHub Two-Way Sync
+
+Bidirectional GitHub repository sync for generated projects (Lovable-style code ownership):
+- **Backend**: `GitHubSyncService` manages repo connection, push/pull operations, webhook handling, conflict detection with HMAC-SHA256 signature verification
+- **Endpoints**:
+  - `POST /api/projects/{id}/github/connect` — link project to GitHub repo
+  - `DELETE /api/projects/{id}/github/disconnect` — unlink from repo
+  - `POST /api/projects/{id}/github/push` — push generated code to repo
+  - `POST /api/projects/{id}/github/pull` — pull user changes from repo
+  - `GET /api/projects/{id}/github/status` — sync status
+  - `POST /api/projects/{id}/github/resolve` — resolve merge conflicts
+  - `POST /api/webhooks/github` — webhook receiver for push events
+  - `GET /api/projects/{id}/github/history` — sync operation history
+- **Frontend**: `GitHubSyncPage` in Settings with connect form, status indicator, push/pull buttons, conflict resolution UI, sync history timeline
+- **Flow**: Project generated → connect to GitHub repo → push code → webhook detects user changes → pull & merge → resolve conflicts if any
 
 ## Security & Compliance (SBOM)
 

@@ -60,6 +60,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<GrowthSnapshot> GrowthSnapshots => Set<GrowthSnapshot>();
     public DbSet<SbomReport> SbomReports => Set<SbomReport>();
     public DbSet<VulnerabilityResult> VulnerabilityResults => Set<VulnerabilityResult>();
+    public DbSet<InfrastructureConfig> InfrastructureConfigs => Set<InfrastructureConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -905,6 +906,20 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<SbomReport>().WithMany().HasForeignKey(e => e.SbomReportId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.SbomReportId);
             entity.HasIndex(e => e.Severity);
+        });
+
+        modelBuilder.Entity<InfrastructureConfig>(entity =>
+        {
+            entity.ToTable("infrastructure_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SelectedServicesJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.Tier).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.EstimatedMonthlyCostUsd).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.GeneratedBicepMain).HasColumnType("text");
+            entity.Property(e => e.GeneratedBicepParameters).HasColumnType("text");
+            entity.Property(e => e.AnalysisSummary).HasMaxLength(5000);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId).IsUnique();
         });
     }
 }

@@ -18,11 +18,12 @@ import WorkflowPage from './WorkflowPage'
 import SpecificationPage from './SpecificationPage'
 import GitHubSyncPage from './GitHubSyncPage'
 import CodeReviewPage from './CodeReviewPage'
+import StreamingGenerationPage from './StreamingGenerationPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -33,7 +34,8 @@ export default function SettingsLayout() {
   const tabParam = searchParams.get('tab') as SettingsTab | null
   const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab
     : location.pathname === '/settings/github-sync' ? 'github-sync' as SettingsTab
-    : location.pathname === '/settings/code-review' ? 'code-review' as SettingsTab : null
+    : location.pathname === '/settings/code-review' ? 'code-review' as SettingsTab
+    : location.pathname === '/settings/streaming-generation' ? 'streaming-generation' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -191,6 +193,17 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.codeReview', 'Code Review')}
         </button>
+        <button
+          onClick={() => setSettingsTab('streaming-generation')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'streaming-generation' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            {t('settings.tabs.streamingGeneration', 'Live Generation')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -209,6 +222,7 @@ export default function SettingsLayout() {
       {settingsTab === 'specifications' && <SpecificationPage />}
       {settingsTab === 'github-sync' && <GitHubSyncPage />}
       {settingsTab === 'code-review' && <CodeReviewPage />}
+      {settingsTab === 'streaming-generation' && <StreamingGenerationPage />}
     </section>
   )
 }

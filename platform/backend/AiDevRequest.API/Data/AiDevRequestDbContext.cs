@@ -72,6 +72,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DevelopmentSpec> DevelopmentSpecs => Set<DevelopmentSpec>();
     public DbSet<GitHubSync> GitHubSyncs => Set<GitHubSync>();
     public DbSet<CodeQualityReview> CodeQualityReviews => Set<CodeQualityReview>();
+    public DbSet<GenerationStream> GenerationStreams => Set<GenerationStream>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1103,6 +1104,21 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.AppliedFixes).HasColumnType("jsonb");
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<GenerationStream>(entity =>
+        {
+            entity.ToTable("generation_streams");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.CurrentFile).HasMaxLength(500);
+            entity.Property(e => e.ProgressPercent).HasColumnType("double precision");
+            entity.Property(e => e.GeneratedFiles).HasColumnType("jsonb");
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });

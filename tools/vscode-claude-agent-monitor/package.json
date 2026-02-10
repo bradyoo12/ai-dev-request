@@ -1,0 +1,69 @@
+{
+  "name": "claude-agent-monitor",
+  "displayName": "Claude Agent Monitor",
+  "description": "Monitor spawned Claude Code agent teams and their progress",
+  "version": "0.1.0",
+  "publisher": "bradyoo12",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "claude-agent-monitor",
+          "title": "Claude Agent Monitor",
+          "icon": "resources/icons/claude-agent.svg"
+        }
+      ]
+    },
+    "views": {
+      "claude-agent-monitor": [
+        {
+          "id": "claudeAgentMonitor.teamsView",
+          "name": "Agent Teams"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "claudeAgentMonitor.refresh",
+        "title": "Refresh Agent Teams",
+        "icon": "$(refresh)",
+        "category": "Claude Agent Monitor"
+      },
+      {
+        "command": "claudeAgentMonitor.showDetail",
+        "title": "Show Agent/Task Detail",
+        "category": "Claude Agent Monitor"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "claudeAgentMonitor.refresh",
+          "when": "view == claudeAgentMonitor.teamsView",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node esbuild.js --production",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "npx @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.0",
+    "@vscode/vsce": "^2.24.0"
+  }
+}

@@ -1130,6 +1130,11 @@ export default function HomePage() {
                 className="flex-1 min-w-[120px] py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors">
                 {t('button.newRequest')}
               </button>
+              <button
+                onClick={() => navigate(`/preview?projectId=${productionResult.production.projectId}&name=${encodeURIComponent(productionResult.production.projectName || '')}`)}
+                className="flex-1 min-w-[120px] py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-medium transition-colors">
+                {t('codePreview.openPreview')}
+              </button>
               {!deployStatus && (
                 <button onClick={handleDeploy} disabled={deploying}
                   className="flex-1 min-w-[120px] py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-800 rounded-xl font-medium transition-colors">

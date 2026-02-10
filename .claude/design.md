@@ -123,6 +123,21 @@ Bidirectional GitHub repository sync for generated projects (Lovable-style code 
 - **Frontend**: `GitHubSyncPage` in Settings with connect form, status indicator, push/pull buttons, conflict resolution UI, sync history timeline
 - **Flow**: Project generated → connect to GitHub repo → push code → webhook detects user changes → pull & merge → resolve conflicts if any
 
+## Real-Time Collaborative Editing
+
+CRDT-based collaborative editing for dev requests with presence tracking and activity feeds:
+- **Backend**: `CollaborativeEditingService` manages session lifecycle (create, join, update, end), participant tracking with color-coded avatars, document versioning, and activity feed persistence
+- **Endpoints**:
+  - `POST /api/projects/{id}/collab/session` — create collaborative session
+  - `GET /api/projects/{id}/collab/session` — get active session
+  - `POST /api/projects/{id}/collab/join` — join existing session
+  - `PUT /api/projects/{id}/collab/document` — update shared document
+  - `POST /api/projects/{id}/collab/end` — end session
+  - `GET /api/projects/{id}/collab/history` — session history
+- **Entity**: `CollaborativeSession` with participants JSON (userId, displayName, color), activity feed JSON, document content, version tracking
+- **Frontend**: `CollaborativeEditingPage` in Settings with create/join session panels, collaborative text editor with save, activity feed with action icons (created/joined/edited/ended), participant avatar circles with color coding, stats grid (participants/version/activities/last activity), session history
+- **Flow**: Create session → share with team → participants join → edit document collaboratively → activity tracked → end session → view history
+
 ## AI-Powered Test Generation
 
 Automated test generation pipeline using Claude API to produce unit, integration, and E2E tests for generated projects:

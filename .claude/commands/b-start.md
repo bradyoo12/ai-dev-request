@@ -42,7 +42,8 @@ This command orchestrates the entire development workflow using Agent Teams for 
 │  4. b-progress → merge PR to main, move to In Review             │
 │  5. b-review team → parallel test + verify on staging            │
 │  6. b-modernize team → parallel research + create suggestions    │
-│  7. Report status & loop back to step 1                          │
+│  7. Site audit → visit live site, find errors, create tickets    │
+│  8. Report status & loop back to step 1                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -56,6 +57,7 @@ Teams are used within a single ticket to parallelize independent work:
 | b-progress | No team | Single operation | Simple merge, no parallelism needed |
 | b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
 | b-modernize | `modernize` | tech-scout + competitor-scout | Independent web searches |
+| site-audit | `site-audit` | error-checker + ux-reviewer | Error checking and UX review run independently |
 
 **Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
 
@@ -340,7 +342,77 @@ After collecting findings from both scouts:
 
 Shut down all agents, delete the team.
 
-### Step 7: Report Cycle Status
+### Step 7: Site Audit — Find Errors and Improvements
+
+After modernization research, audit the live site to catch errors, bugs, and UX improvements.
+
+#### Step 7a: Pre-check
+
+1. Check existing open bug/improvement tickets to avoid duplicates:
+   ```bash
+   gh issue list --repo bradyoo12/ai-dev-request --state open --json number,title,labels --limit 200
+   ```
+2. Note all existing titles for dedup
+
+#### Step 7b: Create Audit Team
+
+1. Create the team:
+   ```
+   TeamCreate: site-audit
+   ```
+
+2. Spawn **error-checker** agent (general-purpose, team_name: site-audit):
+   - Use WebFetch to visit `https://icy-desert-07c08ba00.2.azurestaticapps.net/`
+   - Check for:
+     - HTTP errors (4xx, 5xx responses)
+     - Broken links or missing assets
+     - JavaScript console errors visible in the page
+     - API endpoint failures (check network requests if visible)
+     - Missing or broken images
+     - Empty states that should have content
+   - Navigate to all discoverable pages/routes from the main page
+   - Report all errors found with severity (critical/major/minor)
+
+3. Spawn **ux-reviewer** agent (general-purpose, team_name: site-audit) IN PARALLEL:
+   - Use WebFetch to visit `https://icy-desert-07c08ba00.2.azurestaticapps.net/`
+   - Read `.claude/design.md` to understand the intended UX
+   - Evaluate:
+     - **Visual polish**: Layout issues, spacing, alignment, color consistency
+     - **Navigation**: Is it intuitive? Are there dead ends?
+     - **Responsiveness**: Does the layout suggest mobile-friendliness?
+     - **Accessibility**: Missing alt text, contrast issues, keyboard navigation hints
+     - **Content**: Typos, placeholder text left in, unclear labels
+     - **Performance**: Slow-loading elements, large unoptimized assets
+     - **Missing features**: Compare against design.md — what's described but not implemented?
+   - Report all findings with impact score (1-5) and suggested improvement
+
+4. Wait for both agents to complete and collect results
+
+#### Step 7c: Create Tickets
+
+After collecting findings from both agents:
+
+1. Filter findings:
+   - **Errors** (from error-checker): Create tickets for all critical and major errors
+   - **Improvements** (from ux-reviewer): Create tickets for findings with impact >= 3
+2. Deduplicate against existing open tickets
+3. Create max 5 tickets per cycle:
+   ```bash
+   gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body "{body}" --label "bug"
+   ```
+   - Use label `bug` for errors found by error-checker
+   - Use label `enhancement` for improvements found by ux-reviewer
+4. Add tickets to the project:
+   ```bash
+   gh project item-add 26 --owner bradyoo12 --url {issue_url}
+   ```
+5. Set status to **Backlog** — leave for human triage or next b-start cycle to pick up
+
+#### Step 7d: Cleanup
+
+Shut down all agents, delete the team.
+
+### Step 8: Report Cycle Status
 
 Log the current status of the project board:
 
@@ -357,7 +429,7 @@ Log the current status of the project board:
    - Tickets with `on hold` label
    - Backlog tickets awaiting triage
 
-### Step 8: Loop
+### Step 9: Loop
 1. Log "Waiting 5 seconds before next cycle..."
 2. Wait 5 seconds
 3. Go back to Step 1

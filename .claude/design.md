@@ -87,6 +87,7 @@ User Request (natural language)
 | GitHubSync | Bidirectional GitHub repository sync record for a generated project |
 | CodeQualityReview | AI-powered multi-dimensional code quality review result for a generated project |
 | GenerationStream | Real-time streaming code generation session with SSE event tracking |
+| BillingAccount | Usage-based billing account with hybrid pricing (subscription + metered AI usage) |
 
 ## Spec-Driven Development Pipeline
 
@@ -145,6 +146,23 @@ Token-by-token streaming output for AI code generation via Server-Sent Events:
 - **SSE Events**: `stream_start`, `file_start`, `code_chunk`, `file_complete`, `progress_update`, `stream_complete`, `error`
 - **Frontend**: `StreamingGenerationPage` in Settings with live code display, blinking cursor, file tabs with completion indicators, progress bar, token counter, cancel button, stream history
 - **Flow**: Start generation → SSE connection opened → tokens stream in real-time → file tabs update → progress bar fills → stream completes
+
+## Usage-Based Billing
+
+Hybrid pricing infrastructure with subscription + metered AI usage and Stripe integration:
+- **Backend**: `UsageBillingService` manages subscriptions, usage metering, invoicing, and Stripe portal sessions
+- **Endpoints**:
+  - `GET /api/billing/account` — get billing account
+  - `POST /api/billing/subscribe` — subscribe to plan
+  - `POST /api/billing/cancel` — cancel subscription
+  - `GET /api/billing/usage` — current period usage summary
+  - `GET /api/billing/invoices` — invoice history
+  - `GET /api/billing/plans` — available pricing plans
+  - `POST /api/billing/portal` — create Stripe customer portal session
+  - `POST /api/webhooks/stripe` — Stripe webhook receiver
+- **Pricing Tiers**: Free (3 requests/mo), Pro ($29/mo + $0.50/overage), Team ($99/mo + $0.30/overage)
+- **Frontend**: `BillingPage` in Settings with plan card, usage meters, plan comparison, invoice history, Stripe portal link
+- **Flow**: User signs up (free tier) → uses platform → tracks tokens/requests → upgrades plan → overage billed → invoices generated
 
 ## Security & Compliance (SBOM)
 

@@ -88,6 +88,7 @@ User Request (natural language)
 | CodeQualityReview | AI-powered multi-dimensional code quality review result for a generated project |
 | GenerationStream | Real-time streaming code generation session with SSE event tracking |
 | BillingAccount | Usage-based billing account with hybrid pricing (subscription + metered AI usage) |
+| McpConnection | MCP server connection record for platform and project-level tool integration |
 
 ## Spec-Driven Development Pipeline
 
@@ -163,6 +164,24 @@ Hybrid pricing infrastructure with subscription + metered AI usage and Stripe in
 - **Pricing Tiers**: Free (3 requests/mo), Pro ($29/mo + $0.50/overage), Team ($99/mo + $0.30/overage)
 - **Frontend**: `BillingPage` in Settings with plan card, usage meters, plan comparison, invoice history, Stripe portal link
 - **Flow**: User signs up (free tier) → uses platform → tracks tokens/requests → upgrades plan → overage billed → invoices generated
+
+## MCP Extensibility Layer
+
+Model Context Protocol integration for platform tool exposure and external server connections:
+- **Backend**: `McpIntegrationService` exposes platform capabilities as MCP tools and manages external MCP server connections
+- **Platform Tools**: `create_request`, `analyze_request`, `generate_code`, `review_code`, `deploy_preview`
+- **Endpoints**:
+  - `GET /api/mcp/tools` — list platform MCP tools
+  - `POST /api/mcp/tools/call` — execute platform MCP tool
+  - `POST /api/mcp/servers` — register external MCP server
+  - `DELETE /api/mcp/servers/{id}` — unregister server
+  - `GET /api/mcp/servers` — list servers (optional projectId filter)
+  - `GET /api/mcp/servers/{id}/status` — health check
+  - `POST /api/mcp/servers/{id}/discover` — discover available tools
+  - `POST /api/mcp/servers/{id}/tools/call` — call external tool
+- **Transports**: SSE, stdio, gRPC
+- **Frontend**: `McpIntegrationPage` in Settings with platform tool catalog, external server management, tool discovery, connection health monitoring
+- **Flow**: External AI agents → call platform MCP tools → platform executes operations; Generated projects → connect to user's MCP servers → access external databases/APIs/services
 
 ## Security & Compliance (SBOM)
 

@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import CodePreview from '../components/CodePreview'
+import { getProjectFiles } from '../api/requests'
 import { sampleProjectFiles } from '../utils/sampleProject'
 
 export default function PreviewPage() {
@@ -10,10 +12,47 @@ export default function PreviewPage() {
 
   const projectId = searchParams.get('projectId')
   const projectName = searchParams.get('name')
+  const requestId = searchParams.get('requestId')
 
-  // TODO: When real project file data is available from the backend,
-  // fetch files by projectId here. For now, use the sample project.
-  const files = sampleProjectFiles
+  const [files, setFiles] = useState<Record<string, string> | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isSample, setIsSample] = useState(false)
+
+  useEffect(() => {
+    if (!requestId) {
+      setFiles(sampleProjectFiles)
+      setIsSample(true)
+      return
+    }
+
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+
+    getProjectFiles(requestId)
+      .then((data) => {
+        if (cancelled) return
+        if (data && data.files && Object.keys(data.files).length > 0) {
+          setFiles(data.files)
+          setIsSample(false)
+        } else {
+          setFiles(sampleProjectFiles)
+          setIsSample(true)
+        }
+      })
+      .catch(() => {
+        if (cancelled) return
+        setError(t('codePreview.loadError'))
+        setFiles(sampleProjectFiles)
+        setIsSample(true)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [requestId, t])
 
   return (
     <section>
@@ -34,10 +73,31 @@ export default function PreviewPage() {
         </div>
       </div>
 
-      <CodePreview
-        files={files}
-        projectName={projectName || undefined}
-      />
+      {loading && (
+        <div className="text-center py-12 text-gray-400">
+          <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <p>{t('codePreview.loading')}</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 px-4 py-3 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-400 text-sm">
+          {error}
+        </div>
+      )}
+
+      {isSample && !loading && (
+        <div className="mb-4 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 text-sm">
+          {t('codePreview.sampleData')}
+        </div>
+      )}
+
+      {!loading && files && (
+        <CodePreview
+          files={files}
+          projectName={projectName || undefined}
+        />
+      )}
     </section>
   )
 }

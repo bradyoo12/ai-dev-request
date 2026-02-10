@@ -1114,7 +1114,7 @@ export default function HomePage() {
                 {t('button.newRequest')}
               </button>
               <button
-                onClick={() => navigate(`/preview?projectId=${productionResult.production.projectId}&name=${encodeURIComponent(productionResult.production.projectName || '')}`)}
+                onClick={() => navigate(`/preview?projectId=${productionResult.production.projectId}&name=${encodeURIComponent(productionResult.production.projectName || '')}&requestId=${submittedRequest?.id || ''}`)}
                 className="flex-1 min-w-[120px] py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-medium transition-colors">
                 {t('codePreview.openPreview')}
               </button>

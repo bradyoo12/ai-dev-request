@@ -917,6 +917,62 @@ public class RequestsController : ControllerBase
             hasPreview = true
         });
     }
+
+    /// <summary>
+    /// Get generated project files as a map of relative path to content
+    /// </summary>
+    [HttpGet("{id:guid}/files")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetProjectFiles(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        if (string.IsNullOrEmpty(entity!.ProjectPath) || !Directory.Exists(entity.ProjectPath))
+        {
+            return NotFound(new { error = "Project has not been built yet or directory not found." });
+        }
+
+        var textExtensions = new HashSet<string>
+        {
+            ".ts", ".tsx", ".js", ".jsx", ".json", ".css", ".scss",
+            ".html", ".md", ".yaml", ".yml", ".toml", ".xml",
+            ".dart", ".py", ".cs", ".java", ".go", ".rs",
+            ".env", ".gitignore", ".eslintrc", ".prettierrc",
+            ".cfg", ".ini", ".txt", ".sh", ".bat", ".cmd",
+            ".lock", ".config", ".csproj", ".sln", ".gradle"
+        };
+
+        var files = new Dictionary<string, string>();
+        var projectFiles = Directory.GetFiles(entity.ProjectPath, "*", SearchOption.AllDirectories)
+            .Where(f => !f.Contains("node_modules") && !f.Contains(".git")
+                     && !f.Contains("bin") && !f.Contains("obj")
+                     && !f.Contains("__pycache__"))
+            .OrderBy(f => f);
+
+        foreach (var filePath in projectFiles)
+        {
+            var ext = Path.GetExtension(filePath).ToLowerInvariant();
+            if (!textExtensions.Contains(ext) && !Path.GetFileName(filePath).StartsWith(".")) continue;
+
+            try
+            {
+                var content = await System.IO.File.ReadAllTextAsync(filePath);
+                // Skip very large files (>100KB) to keep response manageable
+                if (content.Length > 100_000) continue;
+
+                var relativePath = "/" + Path.GetRelativePath(entity.ProjectPath, filePath).Replace('\\', '/');
+                files[relativePath] = content;
+            }
+            catch
+            {
+                // Skip files that can't be read
+            }
+        }
+
+        return Ok(new { files, projectName = entity.ProjectId });
+    }
 }
 
 public record ProjectVersionDto

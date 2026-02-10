@@ -20,7 +20,7 @@ import type {
 
 export default function StreamingGenerationPage() {
   const { t } = useTranslation()
-  const [stream, setStream] = useState<GenerationStream | null>(null)
+  const [, setStream] = useState<GenerationStream | null>(null)
   const [history, setHistory] = useState<GenerationStream[]>([])
   const [loading, setLoading] = useState(false)
   const [starting, setStarting] = useState(false)

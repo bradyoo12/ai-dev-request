@@ -497,7 +497,8 @@ function TemplateCard({
   parseTechStack: (ts: string) => string[]
   renderStars: (rating: number) => React.ReactNode
   onSelect: () => void
-  t: (key: string, fallback?: string) => string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t: any
 }) {
   const techStackItems = parseTechStack(template.techStack).slice(0, 3)
 

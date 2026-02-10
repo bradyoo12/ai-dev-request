@@ -61,6 +61,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<SbomReport> SbomReports => Set<SbomReport>();
     public DbSet<VulnerabilityResult> VulnerabilityResults => Set<VulnerabilityResult>();
     public DbSet<InfrastructureConfig> InfrastructureConfigs => Set<InfrastructureConfig>();
+    public DbSet<SecretScanResult> SecretScanResults => Set<SecretScanResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -920,6 +921,21 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.AnalysisSummary).HasMaxLength(5000);
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId).IsUnique();
+        });
+
+        modelBuilder.Entity<SecretScanResult>(entity =>
+        {
+            entity.ToTable("secret_scan_results");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FindingsJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.EnvTemplateContent).HasColumnType("text");
+            entity.Property(e => e.GitignoreContent).HasColumnType("text");
+            entity.Property(e => e.ConfigModuleContent).HasColumnType("text");
+            entity.Property(e => e.KeyVaultConfigContent).HasColumnType("text");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.ScannedAt);
         });
     }
 }

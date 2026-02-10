@@ -21,7 +21,7 @@ const ROLES = ['editor', 'viewer'] as const
 export default function TeamPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { authUser } = useAuth()
   const [teams, setTeams] = useState<Team[]>([])
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [members, setMembers] = useState<TeamMember[]>([])
@@ -151,7 +151,7 @@ export default function TeamPage() {
     }
   }
 
-  if (!user) {
+  if (!authUser) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('team.title')}</h2>
@@ -252,7 +252,7 @@ export default function TeamPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {team.ownerId === user?.id && (
+                  {team.ownerId === authUser?.id && (
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDeleteTeam(team.id) }}
                       className="px-2 py-1 text-xs bg-red-900/30 text-red-400 rounded hover:bg-red-900/50 transition-colors"
@@ -375,7 +375,7 @@ export default function TeamPage() {
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${roleColor(member.role)}`}>
                           {t(`team.role.${member.role}`)}
                         </span>
-                        {member.role !== 'owner' && selectedTeam.ownerId === user?.id && (
+                        {member.role !== 'owner' && selectedTeam.ownerId === authUser?.id && (
                           <div className="flex gap-1">
                             <select
                               value={member.role}

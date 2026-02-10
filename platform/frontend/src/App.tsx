@@ -45,6 +45,7 @@ function App() {
             <Route path="/admin/growth" element={<Suspense fallback={LazyFallback}><GrowthDashboardPage /></Suspense>} />
             <Route path="/preview" element={<Suspense fallback={LazyFallback}><PreviewPage /></Suspense>} />
             <Route path="/compliance" element={<Suspense fallback={LazyFallback}><CompliancePage /></Suspense>} />
+            <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full" /></div>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />
           </Route>
         </Routes>

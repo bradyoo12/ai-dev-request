@@ -64,6 +64,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<SecretScanResult> SecretScanResults => Set<SecretScanResult>();
     public DbSet<PreviewDeployment> PreviewDeployments => Set<PreviewDeployment>();
     public DbSet<GenerationManifest> GenerationManifests => Set<GenerationManifest>();
+    public DbSet<OAuthComplianceReport> OAuthComplianceReports => Set<OAuthComplianceReport>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -968,6 +969,19 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.ValidationStatus);
+        });
+
+        modelBuilder.Entity<OAuthComplianceReport>(entity =>
+        {
+            entity.ToTable("oauth_compliance_reports");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ScopesAnalyzedJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.RecommendationsJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.ComplianceDocsJson).HasColumnType("jsonb");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Status);
         });
     }
 }

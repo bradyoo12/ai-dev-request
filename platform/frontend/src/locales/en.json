@@ -884,5 +884,8 @@
   "growth.funnel": "Conversion Funnel",
   "growth.export": "Export CSV",
   "growth.noData": "No data yet",
-  "growth.loading": "Loading growth data..."
+  "growth.loading": "Loading growth data...",
+  "notFound.title": "Page Not Found",
+  "notFound.message": "The page you're looking for doesn't exist or has been moved.",
+  "notFound.backHome": "Back to Home"
 }

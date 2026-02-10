@@ -102,6 +102,10 @@ vi.mock('./AnalyticsDashboardPage', () => ({
   default: () => <div data-testid="analytics-dashboard-page">AnalyticsDashboardPage</div>,
 }))
 
+vi.mock('./MarketplacePage', () => ({
+  default: () => <div data-testid="marketplace-page">MarketplacePage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

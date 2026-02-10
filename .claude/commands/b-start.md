@@ -38,7 +38,7 @@ This command orchestrates the entire development workflow using Agent Teams for 
 ├─────────────────────────────────────────────────────────────────┤
 │  1. Check policy.md & design.md                                  │
 │  2. Audit all tickets for alignment                              │
-│  3. b-ready team → plan, implement, test, create PR              │
+│  3. b-ready team → plan, implement, unit tests, E2E test, PR      │
 │  4. b-progress → merge PR to main, move to In Review             │
 │  5. b-review team → parallel test + verify on staging            │
 │  6. b-modernize team → parallel research + create suggestions    │
@@ -53,7 +53,7 @@ Teams are used within a single ticket to parallelize independent work:
 
 | Step | Team Name | Agents | Why Parallel |
 |------|-----------|--------|-------------|
-| b-ready | `ready-<ticket#>` | planner + frontend-dev + backend-dev + tester | Frontend & backend can be implemented simultaneously |
+| b-ready | `ready-<ticket#>` | planner + frontend-dev + backend-dev + unit-test-analyst + tester | Frontend & backend can be implemented simultaneously; unit tests created before E2E |
 | b-progress | No team | Single operation | Simple merge, no parallelism needed |
 | b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
 | b-modernize | `modernize` | tech-scout + competitor-scout | Independent web searches |
@@ -155,6 +155,7 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Task: "Create feature branch from main"
    - Task: "Implement frontend changes"
    - Task: "Implement backend changes"
+   - Task: "Analyze new code for unit test gaps and create missing unit tests"
    - Task: "Run full test suite"
    - Task: "Commit, push, and create PR"
 
@@ -176,18 +177,38 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Implements backend changes following the plan
    - Reports completion to planner
 
-6. After frontend-dev and backend-dev complete, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
+6. After frontend-dev and backend-dev complete, spawn **unit-test-analyst** agent (general-purpose, team_name: ready-<ticket_number>):
+   - Identifies all files added or modified by the current ticket (diff against main)
+   - For each modified/new file, checks if corresponding unit test files exist:
+     - Frontend: `*.test.ts` / `*.test.tsx` alongside or in `__tests__/` directories
+     - Backend: `*Tests.cs` in the test project
+   - Analyzes the new code for logic that should be covered by unit tests rather than E2E tests:
+     - Utility functions, helpers, and pure logic
+     - State management (Zustand stores, reducers)
+     - Data transformations and formatting
+     - Validation logic
+     - API response parsing / error handling
+     - Custom hooks with testable behavior
+     - Backend service methods, validators, and business logic
+   - Creates missing unit tests following existing test patterns in the codebase
+   - Runs unit tests to verify they pass:
+     - Frontend: `npx vitest run` (or `npm test -- --watchAll=false`)
+     - Backend: `dotnet test`
+   - If new tests fail, fixes them (up to 3 attempts)
+   - Reports results to planner: how many tests added, coverage summary
+
+7. After unit-test-analyst completes, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
    - Runs `npm run build` in platform/frontend
    - Runs full Playwright E2E suite: `npm test` in platform/frontend
    - Reports results to planner
    - If tests fail: attempt fixes (up to 3 attempts), then report
 
-7. Planner handles final steps:
-   - Commits all changes with "Refs #<ticket_number>"
+8. Planner handles final steps:
+   - Commits all changes (including new unit tests) with "Refs #<ticket_number>"
    - Pushes branch and creates PR
    - Reports success/failure
 
-8. Shut down all agents and delete the team:
+9. Shut down all agents and delete the team:
    ```
    SendMessage: shutdown_request to each agent
    TeamDelete
@@ -502,7 +523,8 @@ Log the current status of the project board:
 └──────────┘                └─────────────┘              └───────────┘                └──────┘
              (team: plan,        (merge PR,          (team: test-runner
               implement,          deploy to           + ai-verifier)
-              test, PR)           staging)
+              unit tests,         staging)
+              E2E test, PR)
      │                │                          │
      └── on hold ─────┴── on hold (test fail) ───┘
           (needs human attention)

@@ -16,11 +16,12 @@ import CompilerValidationPage from './CompilerValidationPage'
 import ObservabilityPage from './ObservabilityPage'
 import WorkflowPage from './WorkflowPage'
 import SpecificationPage from './SpecificationPage'
+import GitHubSyncPage from './GitHubSyncPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -29,7 +30,8 @@ export default function SettingsLayout() {
   const location = useLocation()
   const { setTokenBalance } = useAuth()
   const tabParam = searchParams.get('tab') as SettingsTab | null
-  const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab : null
+  const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab
+    : location.pathname === '/settings/github-sync' ? 'github-sync' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -171,6 +173,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.specifications', 'Specifications')}
         </button>
+        <button
+          onClick={() => setSettingsTab('github-sync')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'github-sync' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.githubSync', 'GitHub Sync')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -187,6 +197,7 @@ export default function SettingsLayout() {
       {settingsTab === 'observability' && <ObservabilityPage />}
       {settingsTab === 'workflows' && <WorkflowPage />}
       {settingsTab === 'specifications' && <SpecificationPage />}
+      {settingsTab === 'github-sync' && <GitHubSyncPage />}
     </section>
   )
 }

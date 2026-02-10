@@ -82,6 +82,10 @@ vi.mock('./SpecificationPage', () => ({
   default: () => <div data-testid="specification-page">SpecificationPage</div>,
 }))
 
+vi.mock('./GitHubSyncPage', () => ({
+  default: () => <div data-testid="github-sync-page">GitHubSyncPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

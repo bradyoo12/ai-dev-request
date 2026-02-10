@@ -13,11 +13,12 @@ import PreviewDeploymentPage from './PreviewDeploymentPage'
 import GenerationManifestPage from './GenerationManifestPage'
 import OAuthCompliancePage from './OAuthCompliancePage'
 import CompilerValidationPage from './CompilerValidationPage'
+import ObservabilityPage from './ObservabilityPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -143,6 +144,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.compiler', 'Compiler')}
         </button>
+        <button
+          onClick={() => setSettingsTab('observability')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'observability' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.observability', 'Observability')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -156,6 +165,7 @@ export default function SettingsLayout() {
       {settingsTab === 'generation' && <GenerationManifestPage />}
       {settingsTab === 'oauth' && <OAuthCompliancePage />}
       {settingsTab === 'compiler' && <CompilerValidationPage />}
+      {settingsTab === 'observability' && <ObservabilityPage />}
     </section>
   )
 }

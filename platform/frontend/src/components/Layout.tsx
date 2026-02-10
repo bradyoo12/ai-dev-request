@@ -49,7 +49,7 @@ export default function Layout() {
               )}
               <Link to="/#pricing" className="hover:text-blue-400">{t('header.pricing')}</Link>
               <button onClick={() => navigateProtected('/settings')} className="hover:text-blue-400">{t('header.settings')}</button>
-              <a href="#" className="hover:text-blue-400">{t('header.contact')}</a>
+              <a href="mailto:support@aidevrequest.com" className="hover:text-blue-400">{t('header.contact')}</a>
             </nav>
             <LanguageSelector />
             {authUser ? (

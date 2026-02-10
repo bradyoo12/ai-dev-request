@@ -78,6 +78,20 @@ User Request (natural language)
 | Proposal | AI-generated implementation proposal |
 | Project | Generated project (code + deployment) |
 | Conversation | Chat history for request refinement |
+| SbomReport | SBOM and vulnerability scan results for a generated project |
+
+## Security & Compliance (SBOM)
+
+Post-generation security scanning for every AI-generated project:
+- **Backend**: `SecurityService` generates CycloneDX SBOMs, scans via OSV.dev API, checks license compatibility
+- **Endpoints**:
+  - `POST /api/projects/{id}/security/scan` — trigger SBOM generation + vulnerability scan
+  - `GET /api/projects/{id}/security/sbom` — get SBOM report
+  - `GET /api/projects/{id}/security/vulnerabilities` — get vulnerability results
+  - `GET /api/projects/{id}/security/licenses` — get license analysis
+  - `GET /api/projects/{id}/security/sbom/export/{format}` — export SBOM (cyclonedx/spdx)
+- **Frontend**: `CompliancePage` in Settings with SBOM viewer, vulnerability results, license table, and export
+- **Flow**: Project generated → auto-scan dependencies → flag CVEs → suggest safer alternatives
 
 ## Mobile Preview (Expo)
 

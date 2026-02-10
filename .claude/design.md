@@ -80,6 +80,7 @@ User Request (natural language)
 | Conversation | Chat history for request refinement |
 | SbomReport | SBOM and vulnerability scan results for a generated project |
 | InfrastructureConfig | IaC configuration and generated Bicep templates for a project |
+| SecretScanResult | Secret detection scan results for a generated project |
 
 ## Security & Compliance (SBOM)
 
@@ -93,6 +94,19 @@ Post-generation security scanning for every AI-generated project:
   - `GET /api/projects/{id}/security/sbom/export/{format}` — export SBOM (cyclonedx/spdx)
 - **Frontend**: `CompliancePage` in Settings with SBOM viewer, vulnerability results, license table, and export
 - **Flow**: Project generated → auto-scan dependencies → flag CVEs → suggest safer alternatives
+
+## Secret Detection & Secure Configuration
+
+AI-powered secret detection and secure config management for generated projects:
+- **Backend**: `SecretDetectionService` scans prompts and code for hardcoded secrets (regex + entropy analysis); `SecureConfigService` generates .env templates, gitignore, type-safe config modules, Key Vault configs
+- **Endpoints**:
+  - `POST /api/projects/{id}/secrets/scan` — trigger secret scan
+  - `GET /api/projects/{id}/secrets/results` — get scan results
+  - `GET /api/secrets/patterns` — list detection patterns
+  - `POST /api/projects/{id}/secrets/config/generate` — generate secure config files
+  - `GET /api/projects/{id}/secrets/config` — get generated config
+- **Frontend**: `SecretDetectionPage` in Settings with scan results, pattern list, config preview, Key Vault status
+- **Flow**: User prompt → sanitize secrets → generate code → post-scan for leaks → generate .env.example + gitignore + config module
 
 ## Mobile Preview (Expo)
 

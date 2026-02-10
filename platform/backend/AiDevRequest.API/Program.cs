@@ -68,6 +68,7 @@ builder.Services.AddScoped<IFileGenerationService, FileGenerationService>();
 builder.Services.AddScoped<IOAuthComplianceService, OAuthComplianceService>();
 builder.Services.AddScoped<ICompilerValidationService, CompilerValidationService>();
 builder.Services.AddScoped<IObservabilityService, ObservabilityService>();
+builder.Services.AddScoped<IWorkflowOrchestrationService, WorkflowOrchestrationService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -232,7 +233,8 @@ app.UseExceptionHandler(errorApp =>
             "preview_deployments",
             "oauth_compliance_reports",
             "compilation_results",
-            "observability_traces", "observability_spans" };
+            "observability_traces", "observability_spans",
+            "workflow_executions" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

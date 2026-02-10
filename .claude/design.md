@@ -194,6 +194,21 @@ Compiler validation step ensuring generated code builds before delivery:
 - **Entity**: `CompilationResult` tracks language, success, errors (JSON), warnings (JSON), retryCount, compiledAt
 - **Flow**: Code generated → compile → if errors, feed to AI → regenerate → recompile → repeat until pass or max retries
 
+## Durable AI Workflow Orchestration
+
+Fault-tolerant generation pipeline with step-level retry and cancellation:
+- **Backend**: `WorkflowOrchestrationService` manages durable workflows (analysis -> proposal -> generation -> validation -> deployment), supports per-step retry, cancellation, and metrics aggregation
+- **Endpoints**:
+  - `POST /api/workflows/start` — start a durable workflow for a dev request
+  - `GET /api/workflows/{executionId}` — get workflow execution status
+  - `POST /api/workflows/{executionId}/retry/{stepName}` — retry a failed step
+  - `POST /api/workflows/{executionId}/cancel` — cancel a running workflow
+  - `GET /api/workflows` — list all workflow executions
+  - `GET /api/workflows/metrics` — aggregate success/failure rates, avg duration
+- **Frontend**: `WorkflowPage` in Settings with execution list, pipeline visualization, step details, retry/cancel, and metrics dashboard
+- **Entity**: `WorkflowExecution` tracks devRequestId, workflowType, status, steps (JSON), retryCount, timestamps
+- **Flow**: Dev request created -> start workflow -> execute steps sequentially -> on failure, user can retry step or cancel -> metrics track success rates
+
 ## Directory Structure
 
 ```

@@ -14,11 +14,12 @@ import GenerationManifestPage from './GenerationManifestPage'
 import OAuthCompliancePage from './OAuthCompliancePage'
 import CompilerValidationPage from './CompilerValidationPage'
 import ObservabilityPage from './ObservabilityPage'
+import WorkflowPage from './WorkflowPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -152,6 +153,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.observability', 'Observability')}
         </button>
+        <button
+          onClick={() => setSettingsTab('workflows')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'workflows' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.workflows', 'Workflows')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -166,6 +175,7 @@ export default function SettingsLayout() {
       {settingsTab === 'oauth' && <OAuthCompliancePage />}
       {settingsTab === 'compiler' && <CompilerValidationPage />}
       {settingsTab === 'observability' && <ObservabilityPage />}
+      {settingsTab === 'workflows' && <WorkflowPage />}
     </section>
   )
 }

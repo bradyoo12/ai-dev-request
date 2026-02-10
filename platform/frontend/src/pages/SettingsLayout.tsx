@@ -12,11 +12,12 @@ import SecretDetectionPage from './SecretDetectionPage'
 import PreviewDeploymentPage from './PreviewDeploymentPage'
 import GenerationManifestPage from './GenerationManifestPage'
 import OAuthCompliancePage from './OAuthCompliancePage'
+import CompilerValidationPage from './CompilerValidationPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -134,6 +135,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.oauth', 'OAuth')}
         </button>
+        <button
+          onClick={() => setSettingsTab('compiler')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'compiler' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.compiler', 'Compiler')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -146,6 +155,7 @@ export default function SettingsLayout() {
       {settingsTab === 'preview' && <PreviewDeploymentPage />}
       {settingsTab === 'generation' && <GenerationManifestPage />}
       {settingsTab === 'oauth' && <OAuthCompliancePage />}
+      {settingsTab === 'compiler' && <CompilerValidationPage />}
     </section>
   )
 }

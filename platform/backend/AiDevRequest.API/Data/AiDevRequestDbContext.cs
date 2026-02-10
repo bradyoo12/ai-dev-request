@@ -65,6 +65,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PreviewDeployment> PreviewDeployments => Set<PreviewDeployment>();
     public DbSet<GenerationManifest> GenerationManifests => Set<GenerationManifest>();
     public DbSet<OAuthComplianceReport> OAuthComplianceReports => Set<OAuthComplianceReport>();
+    public DbSet<CompilationResult> CompilationResults => Set<CompilationResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -982,6 +983,18 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<CompilationResult>(entity =>
+        {
+            entity.ToTable("compilation_results");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Language).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ErrorsJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.WarningsJson).IsRequired().HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.CompiledAt);
         });
     }
 }

@@ -64,6 +64,7 @@ builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
 builder.Services.AddScoped<ISecretDetectionService, SecretDetectionService>();
 builder.Services.AddScoped<ISecureConfigService, SecureConfigService>();
 builder.Services.AddScoped<IPreviewDeploymentService, PreviewDeploymentService>();
+builder.Services.AddScoped<IFileGenerationService, FileGenerationService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

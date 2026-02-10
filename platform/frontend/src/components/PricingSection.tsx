@@ -5,6 +5,7 @@ import type { PricingPlanData } from '../api/settings'
 
 interface PricingSectionProps {
   plans: PricingPlanData[]
+  onSelectPlan?: (planId: string) => void
 }
 
 const fallbackPlans: PricingPlanData[] = [
@@ -14,7 +15,7 @@ const fallbackPlans: PricingPlanData[] = [
   { id: 'enterprise', name: 'Enterprise', nameKorean: '엔터프라이즈', priceMonthly: -1, priceYearly: -1, currency: 'KRW', projectLimit: -1, features: ['dedicated_infra', 'sla', 'dedicated_manager'], isPopular: false },
 ]
 
-export default function PricingSection({ plans }: PricingSectionProps) {
+export default function PricingSection({ plans, onSelectPlan }: PricingSectionProps) {
   const { t, i18n } = useTranslation()
   const [annual, setAnnual] = useState(false)
 
@@ -114,7 +115,9 @@ export default function PricingSection({ plans }: PricingSectionProps) {
               })}
             </div>
 
-            <button className={`w-full py-2.5 rounded-xl font-medium text-sm transition-colors ${
+            <button
+              onClick={() => onSelectPlan?.(plan.id)}
+              className={`w-full py-2.5 rounded-xl font-medium text-sm transition-colors ${
               plan.isPopular
                 ? 'bg-white text-blue-600 hover:bg-blue-50'
                 : plan.priceMonthly < 0

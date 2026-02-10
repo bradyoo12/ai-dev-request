@@ -1170,7 +1170,15 @@ export default function HomePage() {
         <>
           <StatsSection />
           <FeaturesSection />
-          <PricingSection plans={pricingPlans} />
+          <PricingSection plans={pricingPlans} onSelectPlan={(planId) => {
+            if (planId === 'enterprise') {
+              window.location.href = 'mailto:contact@ai-dev-request.kr?subject=Enterprise%20Plan%20Inquiry'
+            } else if (planId === 'free') {
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            } else {
+              navigate('/settings/billing')
+            }
+          }} />
         </>
       )}
 

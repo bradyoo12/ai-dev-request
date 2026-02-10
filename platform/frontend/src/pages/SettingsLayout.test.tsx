@@ -98,6 +98,10 @@ vi.mock('./McpIntegrationPage', () => ({
   default: () => <div data-testid="mcp-integration-page">McpIntegrationPage</div>,
 }))
 
+vi.mock('./AnalyticsDashboardPage', () => ({
+  default: () => <div data-testid="analytics-dashboard-page">AnalyticsDashboardPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

@@ -79,6 +79,7 @@ User Request (natural language)
 | Project | Generated project (code + deployment) |
 | Conversation | Chat history for request refinement |
 | SbomReport | SBOM and vulnerability scan results for a generated project |
+| InfrastructureConfig | IaC configuration and generated Bicep templates for a project |
 
 ## Security & Compliance (SBOM)
 
@@ -110,6 +111,21 @@ Automated validate-fix loop that runs after AI code generation:
 - **Entity**: `DevRequest` tracks `ValidationIterations`, `FixHistory` (JSON), `ValidationPassed`
 - **Frontend**: `ValidationProgress` shows real-time build validation phases; `FixHistoryDisplay` shows collapsible fix history
 - **Flow**: Code generated → validate → if issues, ask AI to fix → re-validate → repeat until pass or max retries
+
+## Infrastructure-as-Code Auto-Generation
+
+Automated Bicep/IaC template generation for every AI-generated project:
+- **Backend**: `InfrastructureService` analyzes project requirements, generates Bicep templates, estimates Azure costs
+- **Endpoints**:
+  - `POST /api/projects/{id}/infrastructure/analyze` — AI-driven infrastructure analysis
+  - `GET /api/projects/{id}/infrastructure/config` — get infrastructure config
+  - `PUT /api/projects/{id}/infrastructure/config` — update user selections
+  - `POST /api/projects/{id}/infrastructure/generate` — generate Bicep templates
+  - `GET /api/projects/{id}/infrastructure/cost` — get cost estimation
+  - `GET /api/projects/{id}/infrastructure/templates` — download generated templates
+- **Frontend**: `InfrastructurePage` in Settings with service selector, tier selection, cost estimation, Bicep preview, and export
+- **Templates**: Azure Container Apps, PostgreSQL Flexible Server, Blob Storage, Application Insights, Static Web Apps
+- **Flow**: Project generated → analyze requirements → suggest infrastructure → user configures → generate Bicep → deploy with `azd up`
 
 ## Heterogeneous Model Architecture (Cost Optimization)
 

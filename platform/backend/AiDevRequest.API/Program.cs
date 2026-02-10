@@ -61,6 +61,8 @@ builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICodeValidationService, CodeValidationService>();
 builder.Services.AddScoped<ISelfHealingService, SelfHealingService>();
 builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
+builder.Services.AddScoped<ISecretDetectionService, SecretDetectionService>();
+builder.Services.AddScoped<ISecureConfigService, SecureConfigService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -220,7 +222,8 @@ app.UseExceptionHandler(errorApp =>
             "whitelabel_tenants", "reseller_partners", "tenant_usages",
             "platform_events", "growth_snapshots",
             "sbom_reports", "vulnerability_results",
-            "infrastructure_configs" };
+            "infrastructure_configs",
+            "secret_scan_results" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

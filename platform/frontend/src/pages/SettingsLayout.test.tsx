@@ -45,6 +45,14 @@ vi.mock('./PreferencePage', () => ({
   default: () => <div data-testid="preference-page">PreferencePage</div>,
 }))
 
+vi.mock('./InfrastructurePage', () => ({
+  default: () => <div data-testid="infrastructure-page">InfrastructurePage</div>,
+}))
+
+vi.mock('./SecretDetectionPage', () => ({
+  default: () => <div data-testid="secret-detection-page">SecretDetectionPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

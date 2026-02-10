@@ -123,6 +123,20 @@ Bidirectional GitHub repository sync for generated projects (Lovable-style code 
 - **Frontend**: `GitHubSyncPage` in Settings with connect form, status indicator, push/pull buttons, conflict resolution UI, sync history timeline
 - **Flow**: Project generated → connect to GitHub repo → push code → webhook detects user changes → pull & merge → resolve conflicts if any
 
+## AI-Powered Test Generation
+
+Automated test generation pipeline using Claude API to produce unit, integration, and E2E tests for generated projects:
+- **Backend**: `TestGenerationService` reads project source files, auto-detects project type (React, .NET, Python, Vue, Svelte), sends code to Claude API (`claude-sonnet-4-20250514`) for comprehensive test generation, parses structured JSON with test file contents
+- **Endpoints**:
+  - `POST /api/projects/{id}/tests/generate` — trigger AI test generation
+  - `GET /api/projects/{id}/tests/results` — get latest test generation results
+  - `GET /api/projects/{id}/tests/history` — generation version history
+- **Entity**: `TestGenerationRecord` persists generation results including status, file count, test count, coverage estimate, framework, version, and full test files JSON
+- **Frontend**: `TestGenerationPage` in Settings with project ID selector, Generate Tests button, summary card (status badge, version, stats grid), coverage progress bar (color-coded), test files list with unit/integration/E2E filter, code preview on click, generation history panel
+- **Test Frameworks**: Auto-selected based on project type — Vitest + React Testing Library + Playwright (React), xUnit + FluentAssertions (.NET), pytest (Python), etc.
+- **File Resolution**: Reuses `ResolveProjectPathAsync` pattern from DevRequest records or `Projects:BasePath` directory; `ReadSourceFiles` skips `node_modules`, `dist`, `build`, existing test files, etc.
+- **Flow**: Select project → Generate Tests → service reads source files → detects project type → Claude generates comprehensive tests → results persisted with version → UI shows files/coverage/stats → browse generated test code
+
 ## AI-Powered Code Quality Review
 
 Multi-dimensional AI code review scoring architecture, security, performance, accessibility, and maintainability:

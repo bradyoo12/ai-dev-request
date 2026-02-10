@@ -181,6 +181,19 @@ Cross-file consistency validation for AI-generated multi-file projects:
 - **Entity**: `GenerationManifest` tracks files (JSON), cross-references (JSON), validation results (JSON), status
 - **Flow**: Files generated → create manifest → extract imports/exports → build cross-refs → validate consistency → resolve conflicts
 
+## Compiler-in-the-Loop Validation
+
+Compiler validation step ensuring generated code builds before delivery:
+- **Backend**: `CompilerValidationService` runs real compilers (tsc, dotnet build, python compileall), parses errors/warnings, and auto-fixes via Claude API (up to 3 retries)
+- **Endpoints**:
+  - `POST /api/projects/{id}/compiler/validate` — trigger compilation validation
+  - `GET /api/projects/{id}/compiler/result` — get latest compilation result
+  - `POST /api/projects/{id}/compiler/fix` — auto-fix compilation errors with AI
+  - `GET /api/compiler/languages` — list supported languages
+- **Frontend**: `CompilerValidationPage` in Settings with status indicator, error/warning lists, auto-fix button, retry history, language selector
+- **Entity**: `CompilationResult` tracks language, success, errors (JSON), warnings (JSON), retryCount, compiledAt
+- **Flow**: Code generated → compile → if errors, feed to AI → regenerate → recompile → repeat until pass or max retries
+
 ## Directory Structure
 
 ```

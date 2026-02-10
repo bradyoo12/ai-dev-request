@@ -65,6 +65,10 @@ vi.mock('./OAuthCompliancePage', () => ({
   default: () => <div data-testid="oauth-compliance-page">OAuthCompliancePage</div>,
 }))
 
+vi.mock('./CompilerValidationPage', () => ({
+  default: () => <div data-testid="compiler-validation-page">CompilerValidationPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

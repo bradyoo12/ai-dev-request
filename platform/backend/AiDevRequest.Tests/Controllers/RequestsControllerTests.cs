@@ -25,7 +25,8 @@ public class RequestsControllerTests
         Mock<IExportService>? exportService = null,
         Mock<IDatabaseSchemaService>? databaseSchemaService = null,
         Mock<IProjectVersionService>? versionService = null,
-        Mock<IExpoPreviewService>? expoPreviewService = null)
+        Mock<IExpoPreviewService>? expoPreviewService = null,
+        Mock<ISelfHealingService>? selfHealingService = null)
     {
         db ??= TestDbContextFactory.Create();
         analysisService ??= new Mock<IAnalysisService>();
@@ -41,6 +42,7 @@ public class RequestsControllerTests
         databaseSchemaService ??= new Mock<IDatabaseSchemaService>();
         versionService ??= new Mock<IProjectVersionService>();
         expoPreviewService ??= new Mock<IExpoPreviewService>();
+        selfHealingService ??= new Mock<ISelfHealingService>();
         var logger = new Mock<ILogger<RequestsController>>();
 
         return new RequestsController(
@@ -58,6 +60,7 @@ public class RequestsControllerTests
             databaseSchemaService.Object,
             versionService.Object,
             expoPreviewService.Object,
+            selfHealingService.Object,
             logger.Object);
     }
 

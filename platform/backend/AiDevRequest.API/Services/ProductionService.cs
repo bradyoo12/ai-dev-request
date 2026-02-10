@@ -284,6 +284,10 @@ public class ProductionResult
     public int? TestCoverageEstimate { get; set; }
     public string? TestFramework { get; set; }
     public string? TestSummary { get; set; }
+    public int? ValidationScore { get; set; }
+    public bool? ValidationPassed { get; set; }
+    public int? ValidationIterations { get; set; }
+    public string? ValidationSummary { get; set; }
     public int? CodeReviewScore { get; set; }
     public int? SecurityScore { get; set; }
     public int? PerformanceScore { get; set; }

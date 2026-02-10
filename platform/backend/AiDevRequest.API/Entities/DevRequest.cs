@@ -52,6 +52,13 @@ public class DevRequest
 
     public string? GitHubRepoFullName { get; set; }
 
+    // Self-healing validation
+    public int ValidationIterations { get; set; }
+
+    public string? FixHistory { get; set; }
+
+    public bool ValidationPassed { get; set; }
+
     // Timestamps
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

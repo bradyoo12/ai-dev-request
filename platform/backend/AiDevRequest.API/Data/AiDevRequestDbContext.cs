@@ -127,6 +127,9 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.GitHubRepoFullName)
                 .HasMaxLength(200);
 
+            entity.Property(e => e.FixHistory)
+                .HasColumnType("jsonb");
+
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => e.UserId);

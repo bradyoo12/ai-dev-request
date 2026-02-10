@@ -217,6 +217,9 @@ export interface ProductionResult {
   databaseRelationshipCount?: number;
   databaseSummary?: string;
   databaseTables?: string[];
+  validationIterations?: number;
+  fixHistory?: Array<{ iteration: number; issues: string[]; fixDescription: string }>;
+  validationPassed?: boolean;
 }
 
 export interface ProductionResponse {

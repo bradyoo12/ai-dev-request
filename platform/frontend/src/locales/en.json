@@ -991,5 +991,13 @@
   "compliance.licensesCompatible": "All licenses are compatible",
   "compliance.licensesReview": "Copyleft licenses detected - review required",
   "compliance.uniqueLicenses": "unique licenses",
-  "compliance.more": "more"
+  "compliance.more": "more",
+  "validation.validating": "Validating generated code...",
+  "validation.fixing": "Fixing issues (attempt {{current}}/{{max}})...",
+  "validation.passed": "Code validation passed!",
+  "validation.maxRetries": "Max validation retries reached",
+  "validation.iterations": "Validation iterations",
+  "validation.fixHistory": "Fix History",
+  "validation.issuesFound": "issues found",
+  "validation.fixApplied": "Fix applied"
 }

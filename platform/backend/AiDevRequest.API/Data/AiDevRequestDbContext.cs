@@ -68,6 +68,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CompilationResult> CompilationResults => Set<CompilationResult>();
     public DbSet<ObservabilityTrace> ObservabilityTraces => Set<ObservabilityTrace>();
     public DbSet<ObservabilitySpan> ObservabilitySpans => Set<ObservabilitySpan>();
+    public DbSet<WorkflowExecution> WorkflowExecutions => Set<WorkflowExecution>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1028,6 +1029,21 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<ObservabilityTrace>().WithMany().HasForeignKey(e => e.TraceId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.TraceId);
             entity.HasIndex(e => e.StartedAt);
+        });
+
+        modelBuilder.Entity<WorkflowExecution>(entity =>
+        {
+            entity.ToTable("workflow_executions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.WorkflowType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            entity.Property(e => e.StepsJson).IsRequired().HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

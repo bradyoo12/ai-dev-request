@@ -78,6 +78,7 @@ builder.Services.AddScoped<IMcpIntegrationService, McpIntegrationService>();
 builder.Services.AddScoped<IAnalyticsDashboardService, AnalyticsDashboardService>();
 builder.Services.AddScoped<ITemplateMarketplaceService, TemplateMarketplaceService>();
 builder.Services.AddScoped<IContainerizationService, ContainerizationService>();
+builder.Services.AddScoped<ICollaborativeEditingService, CollaborativeEditingService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

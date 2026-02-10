@@ -79,6 +79,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<MarketplaceTemplate> MarketplaceTemplates => Set<MarketplaceTemplate>();
     public DbSet<ContainerConfig> ContainerConfigs => Set<ContainerConfig>();
     public DbSet<TestGenerationRecord> TestGenerationRecords => Set<TestGenerationRecord>();
+    public DbSet<CollaborativeSession> CollaborativeSessions => Set<CollaborativeSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1233,6 +1234,21 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.BuildStatus);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<CollaborativeSession>(entity =>
+        {
+            entity.ToTable("collaborative_sessions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.SessionName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ParticipantsJson).HasColumnType("jsonb");
+            entity.Property(e => e.ActivityFeedJson).HasColumnType("jsonb");
+            entity.Property(e => e.DocumentContent).HasColumnType("text");
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });
     }

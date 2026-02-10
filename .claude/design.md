@@ -91,6 +91,7 @@ User Request (natural language)
 | McpConnection | MCP server connection record for platform and project-level tool integration |
 | AnalyticsEvent | Platform analytics event for user behavior and funnel tracking |
 | MarketplaceTemplate | Community-driven project generation template in the marketplace |
+| ContainerConfig | Docker containerization configuration for a generated project |
 
 ## Spec-Driven Development Pipeline
 
@@ -211,6 +212,22 @@ Community-driven project scaffolding templates:
   - `GET /api/marketplace/templates/popular` — most downloaded
 - **Categories**: Web App, API, Mobile, Automation, Data Pipeline
 - **Frontend**: `MarketplacePage` in Settings with search, category filters, template grid, detail view, star ratings, import button, submit form
+
+## Docker Containerization
+
+One-click Docker containerization for generated projects:
+- **Backend**: `ContainerizationService` detects tech stack, generates multi-stage Dockerfiles, docker-compose, and K8s manifests
+- **Endpoints**:
+  - `POST /api/projects/{id}/containers/generate` — generate Dockerfile and compose
+  - `GET /api/projects/{id}/containers/config` — get container config
+  - `POST /api/projects/{id}/containers/build` — trigger container build
+  - `GET /api/projects/{id}/containers/status` — build status
+  - `GET /api/projects/{id}/containers/logs` — build logs
+  - `POST /api/projects/{id}/containers/deploy` — deploy container
+  - `POST /api/projects/{id}/containers/k8s` — generate K8s manifest
+- **Supported Stacks**: Node.js, .NET, Python, Static Web Apps
+- **Frontend**: `ContainerizationPage` in Settings with Dockerfile preview, compose preview, K8s generation, build logs terminal, registry config, deploy button
+- **Flow**: Project generated → detect stack → generate Dockerfile/compose → build → push to registry → deploy
 
 ## Security & Compliance (SBOM)
 

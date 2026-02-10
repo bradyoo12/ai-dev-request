@@ -23,11 +23,12 @@ import McpIntegrationPage from './McpIntegrationPage'
 import AnalyticsDashboardPage from './AnalyticsDashboardPage'
 import MarketplacePage from './MarketplacePage'
 import ContainerizationPage from './ContainerizationPage'
+import TestGenerationPage from './TestGenerationPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -44,7 +45,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/mcp-integration' ? 'mcp-integration' as SettingsTab
     : location.pathname === '/settings/analytics' ? 'analytics' as SettingsTab
     : location.pathname === '/settings/marketplace' ? 'marketplace' as SettingsTab
-    : location.pathname === '/settings/containerization' ? 'containerization' as SettingsTab : null
+    : location.pathname === '/settings/containerization' ? 'containerization' as SettingsTab
+    : location.pathname === '/settings/test-generation' ? 'test-generation' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -260,6 +262,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.containerization', 'Containers')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('test-generation')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'test-generation' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+            {t('settings.tabs.testGeneration', 'Tests')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -283,6 +296,7 @@ export default function SettingsLayout() {
       {settingsTab === 'analytics' && <AnalyticsDashboardPage />}
       {settingsTab === 'marketplace' && <MarketplacePage />}
       {settingsTab === 'containerization' && <ContainerizationPage />}
+      {settingsTab === 'test-generation' && <TestGenerationPage />}
     </section>
   )
 }

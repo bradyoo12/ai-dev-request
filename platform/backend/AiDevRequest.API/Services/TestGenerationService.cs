@@ -1,46 +1,205 @@
 using System.Text.Json;
+using AiDevRequest.API.Data;
+using AiDevRequest.API.Entities;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
+using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Services;
 
 public interface ITestGenerationService
 {
+    Task<TestGenerationRecord> TriggerGenerationAsync(int projectId);
+    Task<TestGenerationRecord?> GetResultAsync(int projectId);
+    Task<List<TestGenerationRecord>> GetHistoryAsync(int projectId);
     Task<TestGenerationResult> GenerateTestsAsync(string projectPath, string projectType);
 }
 
 public class TestGenerationService : ITestGenerationService
 {
+    private readonly AiDevRequestDbContext _context;
     private readonly AnthropicClient _client;
     private readonly ILogger<TestGenerationService> _logger;
+    private readonly string _projectsBasePath;
 
-    public TestGenerationService(IConfiguration configuration, ILogger<TestGenerationService> logger)
+    public TestGenerationService(
+        AiDevRequestDbContext context,
+        IConfiguration configuration,
+        ILogger<TestGenerationService> logger)
     {
+        _context = context;
+        _logger = logger;
+        _projectsBasePath = configuration["Projects:BasePath"] ?? "./projects";
+
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
             ?? throw new InvalidOperationException("Anthropic API key not configured");
 
         _client = new AnthropicClient(apiKey);
-        _logger = logger;
+    }
+
+    public async Task<TestGenerationRecord> TriggerGenerationAsync(int projectId)
+    {
+        var latestVersion = await _context.TestGenerationRecords
+            .Where(r => r.ProjectId == projectId)
+            .MaxAsync(r => (int?)r.GenerationVersion) ?? 0;
+
+        var record = new TestGenerationRecord
+        {
+            ProjectId = projectId,
+            Status = "generating",
+            GenerationVersion = latestVersion + 1,
+        };
+
+        _context.TestGenerationRecords.Add(record);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Started test generation v{Version} for project {ProjectId}",
+            record.GenerationVersion, projectId);
+
+        try
+        {
+            var projectPath = await ResolveProjectPathAsync(projectId);
+
+            if (projectPath != null)
+            {
+                var sourceFiles = ReadSourceFiles(projectPath);
+                if (sourceFiles.Count > 0)
+                {
+                    var projectType = DetectProjectType(sourceFiles);
+                    var result = await GenerateWithClaudeAsync(sourceFiles, projectType, projectId);
+
+                    record.TestFilesGenerated = result.TestFiles.Count;
+                    record.TotalTestCount = result.TestFiles.Sum(f => f.TestCount);
+                    record.CoverageEstimate = result.CoverageEstimate;
+                    record.TestFramework = result.TestFramework;
+                    record.Summary = result.Summary;
+                    record.TestFilesJson = JsonSerializer.Serialize(result.TestFiles);
+                }
+                else
+                {
+                    _logger.LogWarning("No source files found at {Path} for project {ProjectId}", projectPath, projectId);
+                    record.Summary = "No source files found to generate tests for.";
+                }
+            }
+            else
+            {
+                _logger.LogWarning("No project path found for project {ProjectId}", projectId);
+                record.Summary = "Project path could not be resolved.";
+            }
+
+            record.Status = "completed";
+            record.CompletedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Test generation completed for project {ProjectId}: {FileCount} files, {TestCount} tests, ~{Coverage}% coverage",
+                projectId, record.TestFilesGenerated, record.TotalTestCount, record.CoverageEstimate);
+
+            return record;
+        }
+        catch (Exception ex)
+        {
+            record.Status = "failed";
+            await _context.SaveChangesAsync();
+
+            _logger.LogError(ex, "Test generation failed for project {ProjectId}", projectId);
+            throw;
+        }
+    }
+
+    public async Task<TestGenerationRecord?> GetResultAsync(int projectId)
+    {
+        return await _context.TestGenerationRecords
+            .Where(r => r.ProjectId == projectId)
+            .OrderByDescending(r => r.GenerationVersion)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<List<TestGenerationRecord>> GetHistoryAsync(int projectId)
+    {
+        return await _context.TestGenerationRecords
+            .Where(r => r.ProjectId == projectId)
+            .OrderByDescending(r => r.GenerationVersion)
+            .ToListAsync();
     }
 
     public async Task<TestGenerationResult> GenerateTestsAsync(string projectPath, string projectType)
     {
-        _logger.LogInformation("Starting test generation for project at {Path} (type: {Type})", projectPath, projectType);
-
         var sourceFiles = ReadSourceFiles(projectPath);
         if (sourceFiles.Count == 0)
         {
-            return new TestGenerationResult
-            {
-                TestFilesGenerated = 0,
-                TestFramework = "none",
-                Summary = "No source files found to generate tests for."
-            };
+            return new TestGenerationResult { TestFramework = "none", Summary = "No source files found to generate tests for." };
         }
 
+        var result = await GenerateWithClaudeAsync(sourceFiles, projectType, 0);
+        return new TestGenerationResult
+        {
+            TestFilesGenerated = result.TestFiles.Count,
+            TotalTestCount = result.TestFiles.Sum(f => f.TestCount),
+            CoverageEstimate = result.CoverageEstimate,
+            TestFramework = result.TestFramework,
+            Summary = result.Summary,
+            TestFiles = result.TestFiles.Select(f => new TestFileInfo
+            {
+                Path = f.Path,
+                TestCount = f.TestCount,
+                Type = f.Type
+            }).ToList()
+        };
+    }
+
+    private async Task<string?> ResolveProjectPathAsync(int projectId)
+    {
+        var devRequest = await _context.DevRequests
+            .Where(r => r.ProjectPath != null)
+            .OrderBy(r => r.CreatedAt)
+            .Skip(projectId - 1)
+            .FirstOrDefaultAsync();
+
+        if (devRequest?.ProjectPath != null && Directory.Exists(devRequest.ProjectPath))
+            return devRequest.ProjectPath;
+
+        if (Directory.Exists(_projectsBasePath))
+        {
+            var dirs = Directory.GetDirectories(_projectsBasePath)
+                .OrderBy(d => d)
+                .ToArray();
+
+            if (projectId >= 1 && projectId <= dirs.Length)
+                return dirs[projectId - 1];
+        }
+
+        return null;
+    }
+
+    private static string DetectProjectType(Dictionary<string, string> sourceFiles)
+    {
+        var extensions = sourceFiles.Keys.Select(k => Path.GetExtension(k).ToLower()).ToHashSet();
+
+        if (extensions.Contains(".tsx") || extensions.Contains(".jsx"))
+            return "react";
+        if (extensions.Contains(".cs"))
+            return "dotnet";
+        if (extensions.Contains(".py"))
+            return "python";
+        if (extensions.Contains(".vue"))
+            return "vue";
+        if (extensions.Contains(".svelte"))
+            return "svelte";
+
+        return "react"; // default
+    }
+
+    private async Task<GeneratedTestSuite> GenerateWithClaudeAsync(
+        Dictionary<string, string> sourceFiles, string projectType, int projectId)
+    {
         var filesSummary = string.Join("\n\n", sourceFiles.Select(f =>
             $"### {f.Key}\n```\n{(f.Value.Length > 3000 ? f.Value[..3000] + "\n... (truncated)" : f.Value)}\n```"));
+
+        if (filesSummary.Length > 80000)
+            filesSummary = filesSummary[..80000] + "\n\n... (additional files truncated for token limit)";
 
         var testFramework = GetTestFramework(projectType);
 
@@ -59,7 +218,7 @@ Use {testFramework}.
 4. Tests should cover: happy paths, edge cases, error handling
 5. Use descriptive test names in the format: 'should [expected behavior] when [condition]'
 
-Respond in JSON format:
+Respond with ONLY a JSON object:
 {{
   ""testFramework"": ""{testFramework}"",
   ""summary"": ""brief description of test coverage"",
@@ -102,55 +261,19 @@ Generate realistic, runnable test files. JSON only.";
                 PropertyNameCaseInsensitive = true
             });
 
-            if (generated?.TestFiles != null && generated.TestFiles.Count > 0)
+            if (generated != null)
             {
-                // Write test files to project
-                var filesWritten = 0;
-                foreach (var testFile in generated.TestFiles)
-                {
-                    var filePath = Path.Combine(projectPath, testFile.Path);
-                    var directory = Path.GetDirectoryName(filePath);
-                    if (!string.IsNullOrEmpty(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-                    await File.WriteAllTextAsync(filePath, testFile.Content);
-                    filesWritten++;
-                    _logger.LogInformation("Generated test file: {Path}", testFile.Path);
-                }
-
-                var totalTests = generated.TestFiles.Sum(f => f.TestCount);
-
-                _logger.LogInformation("Test generation completed: {FileCount} files, {TestCount} tests, ~{Coverage}% estimated coverage",
-                    filesWritten, totalTests, generated.CoverageEstimate);
-
-                return new TestGenerationResult
-                {
-                    TestFilesGenerated = filesWritten,
-                    TotalTestCount = totalTests,
-                    CoverageEstimate = generated.CoverageEstimate,
-                    TestFramework = generated.TestFramework,
-                    Summary = generated.Summary,
-                    TestFiles = generated.TestFiles.Select(f => new TestFileInfo
-                    {
-                        Path = f.Path,
-                        TestCount = f.TestCount,
-                        Type = f.Type
-                    }).ToList()
-                };
+                _logger.LogInformation("Claude returned {Count} test files for project {ProjectId}",
+                    generated.TestFiles.Count, projectId);
+                return generated;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Test generation failed");
+            _logger.LogError(ex, "Claude API call failed for test generation, project {ProjectId}", projectId);
         }
 
-        return new TestGenerationResult
-        {
-            TestFilesGenerated = 0,
-            TestFramework = testFramework,
-            Summary = "Test generation could not be completed."
-        };
+        return new GeneratedTestSuite { TestFramework = testFramework, Summary = "Test generation could not be completed." };
     }
 
     private static string GetTestFramework(string projectType)
@@ -161,11 +284,13 @@ Generate realistic, runnable test files. JSON only.";
             "react-native" or "expo" => "Jest + React Native Testing Library",
             "dotnet" => "xUnit + FluentAssertions",
             "python" => "pytest",
+            "vue" => "Vitest + Vue Test Utils",
+            "svelte" => "Vitest + Svelte Testing Library",
             _ => "Vitest + Playwright"
         };
     }
 
-    private Dictionary<string, string> ReadSourceFiles(string projectPath)
+    private static Dictionary<string, string> ReadSourceFiles(string projectPath)
     {
         var files = new Dictionary<string, string>();
         if (!Directory.Exists(projectPath)) return files;
@@ -179,7 +304,7 @@ Generate realistic, runnable test files. JSON only.";
         var excludeDirs = new HashSet<string>
         {
             "node_modules", "dist", "build", ".next", "bin", "obj",
-            "__pycache__", ".pytest_cache", "coverage"
+            "__pycache__", ".pytest_cache", "coverage", ".git"
         };
 
         foreach (var filePath in Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories))
@@ -202,7 +327,7 @@ Generate realistic, runnable test files. JSON only.";
                     files[relativePath] = content;
                 }
             }
-            catch { }
+            catch { /* Skip files that can't be read */ }
         }
 
         return files;

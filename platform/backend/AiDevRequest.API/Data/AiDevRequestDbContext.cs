@@ -78,6 +78,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
     public DbSet<MarketplaceTemplate> MarketplaceTemplates => Set<MarketplaceTemplate>();
     public DbSet<ContainerConfig> ContainerConfigs => Set<ContainerConfig>();
+    public DbSet<TestGenerationRecord> TestGenerationRecords => Set<TestGenerationRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1198,6 +1199,20 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.DownloadCount);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<TestGenerationRecord>(entity =>
+        {
+            entity.ToTable("test_generation_records");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.TestFramework).HasMaxLength(100);
+            entity.Property(e => e.Summary).HasMaxLength(5000);
+            entity.Property(e => e.TestFilesJson).HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });
 

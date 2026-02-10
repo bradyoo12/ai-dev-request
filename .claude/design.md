@@ -74,10 +74,18 @@ User Request (natural language)
 | Entity | Description |
 |--------|-------------|
 | User | Platform user (OAuth via BradYoo.Core) |
-| DevRequest | A development request from user |
+| DevRequest | A development request from user (includes PreviewUrl for mobile projects) |
 | Proposal | AI-generated implementation proposal |
 | Project | Generated project (code + deployment) |
 | Conversation | Chat history for request refinement |
+
+## Mobile Preview (Expo)
+
+Mobile projects support instant QR code preview via Expo Snack:
+- **Backend**: `ExpoPreviewService` generates Expo Snack URLs from built mobile project code
+- **Endpoints**: `POST /api/requests/{id}/preview/expo` (generate), `GET /api/requests/{id}/preview` (retrieve)
+- **Frontend**: `MobilePreview` component renders QR code for scanning with Expo Go app
+- **Flow**: Build completes → detect mobile platform → show QR preview → user scans with Expo Go
 
 ## Directory Structure
 

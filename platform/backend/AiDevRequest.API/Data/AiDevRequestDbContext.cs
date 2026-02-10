@@ -70,6 +70,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ObservabilitySpan> ObservabilitySpans => Set<ObservabilitySpan>();
     public DbSet<WorkflowExecution> WorkflowExecutions => Set<WorkflowExecution>();
     public DbSet<DevelopmentSpec> DevelopmentSpecs => Set<DevelopmentSpec>();
+    public DbSet<GitHubSync> GitHubSyncs => Set<GitHubSync>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1068,6 +1069,25 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Phase);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<GitHubSync>(entity =>
+        {
+            entity.ToTable("github_syncs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.GitHubRepoOwner).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.GitHubRepoName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.GitHubRepoUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Branch).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.LastSyncCommitSha).HasMaxLength(100);
+            entity.Property(e => e.ConflictDetails).HasColumnType("jsonb");
+            entity.Property(e => e.WebhookId).HasMaxLength(100);
+            entity.Property(e => e.WebhookSecret).HasMaxLength(200);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.ProjectId).IsUnique();
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });

@@ -85,6 +85,7 @@ User Request (natural language)
 | GenerationManifest | Multi-file generation manifest with cross-file consistency validation |
 | DevelopmentSpec | Structured specification (requirements/design/implementation) for a dev request |
 | GitHubSync | Bidirectional GitHub repository sync record for a generated project |
+| CodeQualityReview | AI-powered multi-dimensional code quality review result for a generated project |
 
 ## Spec-Driven Development Pipeline
 
@@ -115,6 +116,20 @@ Bidirectional GitHub repository sync for generated projects (Lovable-style code 
   - `GET /api/projects/{id}/github/history` — sync operation history
 - **Frontend**: `GitHubSyncPage` in Settings with connect form, status indicator, push/pull buttons, conflict resolution UI, sync history timeline
 - **Flow**: Project generated → connect to GitHub repo → push code → webhook detects user changes → pull & merge → resolve conflicts if any
+
+## AI-Powered Code Quality Review
+
+Multi-dimensional AI code review scoring architecture, security, performance, accessibility, and maintainability:
+- **Backend**: `CodeQualityReviewService` performs 5-dimension AI review using Claude API, supports per-finding and bulk fix application
+- **Endpoints**:
+  - `POST /api/projects/{id}/review` — trigger AI code review
+  - `GET /api/projects/{id}/review/results` — get latest review results
+  - `GET /api/projects/{id}/review/history` — review version history
+  - `POST /api/projects/{id}/review/fix/{findingId}` — apply AI fix for specific finding
+  - `POST /api/projects/{id}/review/fix-all` — apply all fixes by severity
+- **Frontend**: `CodeReviewPage` in Settings with dimension score bars, overall score badge, findings list with severity filtering, per-finding "Apply Fix" button, bulk fix actions, review history
+- **Dimensions**: Architecture (separation of concerns), Security (XSS, auth), Performance (rendering, bundle), Accessibility (ARIA, keyboard), Maintainability (naming, types)
+- **Flow**: Code generated → trigger review → AI scores 5 dimensions → findings with severity → user applies fixes → re-review shows improvement
 
 ## Security & Compliance (SBOM)
 

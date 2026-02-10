@@ -8,10 +8,12 @@ namespace AiDevRequest.API.Controllers;
 public class TemplatesController : ControllerBase
 {
     private readonly ITemplateService _templateService;
+    private readonly ILogger<TemplatesController> _logger;
 
-    public TemplatesController(ITemplateService templateService)
+    public TemplatesController(ITemplateService templateService, ILogger<TemplatesController> logger)
     {
         _templateService = templateService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -19,19 +21,27 @@ public class TemplatesController : ControllerBase
         [FromQuery] string? category = null,
         [FromQuery] string? framework = null)
     {
-        var templates = await _templateService.GetTemplatesAsync(category, framework);
-        return Ok(templates.Select(t => new TemplateDto
+        try
         {
-            Id = t.Id,
-            Name = t.Name,
-            Description = t.Description,
-            Category = t.Category,
-            Framework = t.Framework,
-            Tags = t.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
-            PromptTemplate = t.PromptTemplate,
-            UsageCount = t.UsageCount,
-            CreatedBy = t.CreatedBy
-        }).ToList());
+            var templates = await _templateService.GetTemplatesAsync(category, framework);
+            return Ok(templates.Select(t => new TemplateDto
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Description = t.Description,
+                Category = t.Category,
+                Framework = t.Framework,
+                Tags = t.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                PromptTemplate = t.PromptTemplate,
+                UsageCount = t.UsageCount,
+                CreatedBy = t.CreatedBy
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load templates");
+            return Ok(new List<TemplateDto>());
+        }
     }
 
     [HttpGet("{id:guid}")]

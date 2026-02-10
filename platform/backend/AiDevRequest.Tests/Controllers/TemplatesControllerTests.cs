@@ -2,6 +2,7 @@ using AiDevRequest.API.Controllers;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace AiDevRequest.Tests.Controllers;
@@ -11,7 +12,8 @@ public class TemplatesControllerTests
     private TemplatesController CreateController(Mock<ITemplateService>? templateService = null)
     {
         templateService ??= new Mock<ITemplateService>();
-        return new TemplatesController(templateService.Object);
+        var logger = new Mock<ILogger<TemplatesController>>();
+        return new TemplatesController(templateService.Object, logger.Object);
     }
 
     [Fact]

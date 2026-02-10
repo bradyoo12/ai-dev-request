@@ -66,6 +66,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<GenerationManifest> GenerationManifests => Set<GenerationManifest>();
     public DbSet<OAuthComplianceReport> OAuthComplianceReports => Set<OAuthComplianceReport>();
     public DbSet<CompilationResult> CompilationResults => Set<CompilationResult>();
+    public DbSet<ObservabilityTrace> ObservabilityTraces => Set<ObservabilityTrace>();
+    public DbSet<ObservabilitySpan> ObservabilitySpans => Set<ObservabilitySpan>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -995,6 +997,37 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.CompiledAt);
+        });
+
+        modelBuilder.Entity<ObservabilityTrace>(entity =>
+        {
+            entity.ToTable("observability_traces");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.TraceId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.TotalCost).HasColumnType("decimal(18,8)");
+            entity.Property(e => e.Model).HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.SetNull);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.TraceId).IsUnique();
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<ObservabilitySpan>(entity =>
+        {
+            entity.ToTable("observability_spans");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.SpanName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Model).HasMaxLength(50);
+            entity.Property(e => e.Cost).HasColumnType("decimal(18,8)");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.HasOne<ObservabilityTrace>().WithMany().HasForeignKey(e => e.TraceId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.TraceId);
+            entity.HasIndex(e => e.StartedAt);
         });
     }
 }

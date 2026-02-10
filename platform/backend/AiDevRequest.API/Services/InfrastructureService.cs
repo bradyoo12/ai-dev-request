@@ -457,28 +457,34 @@ internal static class BicepSnippets
         }
         """;
 
-    public static string ContainerAppsEnvironment(string tier, bool hasAppInsights) => $"""
-        // Container Apps Environment
-        resource containerEnv 'Microsoft.App/managedEnvironments@2024-03-01' = {{
-          name: '${{resourcePrefix}}-env'
-          location: location
-          properties: {{
-            workloadProfiles: [
-              {{
-                name: 'Consumption'
-                workloadProfileType: 'Consumption'
-              }}
-            ]{(hasAppInsights ? @"
+    public static string ContainerAppsEnvironment(string tier, bool hasAppInsights)
+    {
+        var appLogsSection = hasAppInsights ? """
             appLogsConfiguration: {
               destination: 'log-analytics'
               logAnalyticsConfiguration: {
                 customerId: logAnalytics.properties.customerId
                 sharedKey: logAnalytics.listKeys().primarySharedKey
               }
-            }" : "")}
-          }}
-        }}
+            }
+""" : "";
+        return $$"""
+        // Container Apps Environment
+        resource containerEnv 'Microsoft.App/managedEnvironments@2024-03-01' = {
+          name: '${resourcePrefix}-env'
+          location: location
+          properties: {
+            workloadProfiles: [
+              {
+                name: 'Consumption'
+                workloadProfileType: 'Consumption'
+              }
+            ]
+            {{appLogsSection}}
+          }
+        }
         """;
+    }
 
     public static string ContainerApp(string tier)
     {
@@ -487,38 +493,38 @@ internal static class BicepSnippets
         var minReplicas = tier == "Standard" ? 1 : 0;
         var maxReplicas = tier switch { "Standard" => 5, "Basic" => 2, _ => 1 };
 
-        return $"""
+        return $$"""
             // Container App
-            resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {{
-              name: '${{resourcePrefix}}-app'
+            resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
+              name: '${resourcePrefix}-app'
               location: location
-              properties: {{
+              properties: {
                 managedEnvironmentId: containerEnv.id
-                configuration: {{
-                  ingress: {{
+                configuration: {
+                  ingress: {
                     external: true
                     targetPort: 8080
                     transport: 'http'
-                  }}
-                }}
-                template: {{
+                  }
+                }
+                template: {
                   containers: [
-                    {{
+                    {
                       name: 'api'
                       image: 'mcr.microsoft.com/dotnet/samples:aspnetapp'
-                      resources: {{
-                        cpu: json('{cpu}')
-                        memory: '{memory}'
-                      }}
-                    }}
+                      resources: {
+                        cpu: json('{{cpu}}')
+                        memory: '{{memory}}'
+                      }
+                    }
                   ]
-                  scale: {{
-                    minReplicas: {minReplicas}
-                    maxReplicas: {maxReplicas}
-                  }}
-                }}
-              }}
-            }}
+                  scale: {
+                    minReplicas: {{minReplicas}}
+                    maxReplicas: {{maxReplicas}}
+                  }
+                }
+              }
+            }
             """;
     }
 
@@ -537,43 +543,43 @@ internal static class BicepSnippets
         };
         var storageGb = tier switch { "Standard" => 64, "Basic" => 32, _ => 32 };
 
-        return $"""
+        return $$"""
             // PostgreSQL Flexible Server
             @secure()
             param postgresAdminPassword string
 
-            resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {{
-              name: '${{resourcePrefix}}-pg'
+            resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-01-preview' = {
+              name: '${resourcePrefix}-pg'
               location: location
-              sku: {{
-                name: '{sku}'
-                tier: '{skuTier}'
-              }}
-              properties: {{
+              sku: {
+                name: '{{sku}}'
+                tier: '{{skuTier}}'
+              }
+              properties: {
                 version: '16'
                 administratorLogin: 'pgadmin'
                 administratorLoginPassword: postgresAdminPassword
-                storage: {{
-                  storageSizeGB: {storageGb}
-                }}
-                backup: {{
+                storage: {
+                  storageSizeGB: {{storageGb}}
+                }
+                backup: {
                   backupRetentionDays: 7
                   geoRedundantBackup: 'Disabled'
-                }}
-                highAvailability: {{
+                }
+                highAvailability: {
                   mode: 'Disabled'
-                }}
-              }}
-            }}
+                }
+              }
+            }
 
-            resource postgresDb 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-12-01-preview' = {{
+            resource postgresDb 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2023-12-01-preview' = {
               parent: postgresServer
-              name: '${{projectName}}-db'
-              properties: {{
+              name: '${projectName}-db'
+              properties: {
                 charset: 'UTF8'
                 collation: 'en_US.utf8'
-              }}
-            }}
+              }
+            }
             """;
     }
 
@@ -581,34 +587,34 @@ internal static class BicepSnippets
     {
         var skuName = tier == "Standard" ? "Standard_GRS" : "Standard_LRS";
 
-        return $"""
+        return $$"""
             // Azure Blob Storage
-            resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {{
-              name: replace('${{resourcePrefix}}stor', '-', '')
+            resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+              name: replace('${resourcePrefix}stor', '-', '')
               location: location
-              sku: {{
-                name: '{skuName}'
-              }}
+              sku: {
+                name: '{{skuName}}'
+              }
               kind: 'StorageV2'
-              properties: {{
+              properties: {
                 accessTier: 'Hot'
                 supportsHttpsTrafficOnly: true
                 minimumTlsVersion: 'TLS1_2'
-              }}
-            }}
+              }
+            }
 
-            resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {{
+            resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
               parent: storageAccount
               name: 'default'
-            }}
+            }
 
-            resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {{
+            resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
               parent: blobService
               name: 'uploads'
-              properties: {{
+              properties: {
                 publicAccess: 'None'
-              }}
-            }}
+              }
+            }
             """;
     }
 
@@ -616,22 +622,22 @@ internal static class BicepSnippets
     {
         var skuName = tier == "Free" ? "Free" : "Standard";
 
-        return $"""
+        return $$"""
             // Azure Static Web Apps
-            resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {{
-              name: '${{resourcePrefix}}-web'
+            resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
+              name: '${resourcePrefix}-web'
               location: location
-              sku: {{
-                name: '{skuName}'
-                tier: '{skuName}'
-              }}
-              properties: {{
-                buildProperties: {{
+              sku: {
+                name: '{{skuName}}'
+                tier: '{{skuName}}'
+              }
+              properties: {
+                buildProperties: {
                   appLocation: '/'
                   outputLocation: 'dist'
-                }}
-              }}
-            }}
+                }
+              }
+            }
             """;
     }
 }

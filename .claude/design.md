@@ -83,6 +83,21 @@ User Request (natural language)
 | SecretScanResult | Secret detection scan results for a generated project |
 | PreviewDeployment | Edge preview deployment record for a generated project |
 | GenerationManifest | Multi-file generation manifest with cross-file consistency validation |
+| DevelopmentSpec | Structured specification (requirements/design/implementation) for a dev request |
+
+## Spec-Driven Development Pipeline
+
+Formal structured specifications before code generation (Kiro-style):
+- **Backend**: `SpecificationService` generates three-phase specs: Requirements (user stories, acceptance criteria, edge cases) → Design (architecture, API contracts, data models, components) → Implementation (task list, dependency ordering, file estimates, traceability links)
+- **Endpoints**:
+  - `POST /api/requests/{id}/specs/generate` — trigger spec generation for a phase
+  - `GET /api/requests/{id}/specs` — get current spec
+  - `GET /api/requests/{id}/specs/history` — get spec version history
+  - `POST /api/requests/{id}/specs/{specId}/approve` — approve a spec phase
+  - `POST /api/requests/{id}/specs/{specId}/reject` — reject with feedback
+  - `PUT /api/requests/{id}/specs/{specId}` — update spec (user edits)
+- **Frontend**: `SpecificationPage` in Settings with three-phase stepper, approve/reject workflow, user edit mode, version history
+- **Flow**: Dev request created → generate requirements spec → user reviews/approves → generate design spec → user reviews/approves → generate implementation spec → user approves → code generation begins
 
 ## Security & Compliance (SBOM)
 

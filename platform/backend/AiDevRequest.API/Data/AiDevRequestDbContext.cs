@@ -63,6 +63,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<InfrastructureConfig> InfrastructureConfigs => Set<InfrastructureConfig>();
     public DbSet<SecretScanResult> SecretScanResults => Set<SecretScanResult>();
     public DbSet<PreviewDeployment> PreviewDeployments => Set<PreviewDeployment>();
+    public DbSet<GenerationManifest> GenerationManifests => Set<GenerationManifest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -954,6 +955,19 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<GenerationManifest>(entity =>
+        {
+            entity.ToTable("generation_manifests");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FilesJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.CrossReferencesJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.ValidationResultsJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.ValidationStatus).IsRequired().HasMaxLength(20);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.ValidationStatus);
         });
     }
 }

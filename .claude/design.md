@@ -82,6 +82,7 @@ User Request (natural language)
 | InfrastructureConfig | IaC configuration and generated Bicep templates for a project |
 | SecretScanResult | Secret detection scan results for a generated project |
 | PreviewDeployment | Edge preview deployment record for a generated project |
+| GenerationManifest | Multi-file generation manifest with cross-file consistency validation |
 
 ## Security & Compliance (SBOM)
 
@@ -165,6 +166,20 @@ Intelligent model routing to reduce AI costs by using the cheapest sufficient mo
 - **Entity**: `DevRequest` tracks `ModelTierUsage` (JSON), `EstimatedCostSavings` (decimal)
 - **Frontend**: `CostSavingsDisplay` component shows tier breakdown bar chart and estimated savings after build
 - **Flow**: Task submitted → classify category → route to cheapest sufficient tier → track usage → report savings
+
+## Structured Multi-File Generation Protocol
+
+Cross-file consistency validation for AI-generated multi-file projects:
+- **Backend**: `FileGenerationService` creates generation manifests, extracts imports/exports, builds cross-reference graphs, validates consistency (imports match exports, no cycles, no duplicate exports, API contract alignment)
+- **Endpoints**:
+  - `POST /api/projects/{id}/generation/manifest` — create generation manifest from file specs
+  - `GET /api/projects/{id}/generation/manifest` — get manifest with validation status
+  - `POST /api/projects/{id}/generation/validate` — trigger cross-file consistency validation
+  - `POST /api/projects/{id}/generation/resolve` — AI-assisted conflict resolution
+  - `GET /api/projects/{id}/generation/files` — list generated files with metadata
+- **Frontend**: `GenerationManifestPage` in Settings with file tree, dependency graph, validation results, conflict resolution UI
+- **Entity**: `GenerationManifest` tracks files (JSON), cross-references (JSON), validation results (JSON), status
+- **Flow**: Files generated → create manifest → extract imports/exports → build cross-refs → validate consistency → resolve conflicts
 
 ## Directory Structure
 

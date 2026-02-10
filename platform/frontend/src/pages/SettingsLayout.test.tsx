@@ -94,6 +94,10 @@ vi.mock('./StreamingGenerationPage', () => ({
   default: () => <div data-testid="streaming-generation-page">StreamingGenerationPage</div>,
 }))
 
+vi.mock('./McpIntegrationPage', () => ({
+  default: () => <div data-testid="mcp-integration-page">McpIntegrationPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

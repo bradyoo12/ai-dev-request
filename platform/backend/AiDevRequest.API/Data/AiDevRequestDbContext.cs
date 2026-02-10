@@ -74,6 +74,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CodeQualityReview> CodeQualityReviews => Set<CodeQualityReview>();
     public DbSet<GenerationStream> GenerationStreams => Set<GenerationStream>();
     public DbSet<BillingAccount> BillingAccounts => Set<BillingAccount>();
+    public DbSet<McpConnection> McpConnections => Set<McpConnection>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1141,6 +1142,24 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId).IsUnique();
             entity.HasIndex(e => e.Plan);
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<McpConnection>(entity =>
+        {
+            entity.ToTable("mcp_connections");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ServerUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Transport).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.AuthType).HasMaxLength(20);
+            entity.Property(e => e.AuthToken).HasMaxLength(1000);
+            entity.Property(e => e.AvailableTools).HasColumnType("jsonb");
+            entity.Property(e => e.AvailableResources).HasColumnType("jsonb");
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

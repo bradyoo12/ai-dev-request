@@ -161,14 +161,4 @@ public class SettingsControllerTests
         Assert.IsType<OkObjectResult>(result.Result);
     }
 
-    [Fact]
-    public void GetPricingPlans_ReturnsOk()
-    {
-        var controller = CreateController();
-        ControllerTestHelper.SetupUser(controller);
-
-        var result = controller.GetPricingPlans();
-
-        Assert.IsType<OkObjectResult>(result.Result);
-    }
 }

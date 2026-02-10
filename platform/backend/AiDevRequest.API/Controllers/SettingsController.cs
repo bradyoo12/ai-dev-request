@@ -434,18 +434,9 @@ public class SettingsController : ControllerBase
     }
 
     /// <summary>
-    /// Public endpoint: get subscription pricing plans
-    /// </summary>
-    [AllowAnonymous]
-    [HttpGet("/api/pricing/plans")]
-    public ActionResult<IEnumerable<PricingPlan>> GetPricingPlans()
-    {
-        return Ok(PricingPlan.GetAllPlans());
-    }
-
-    /// <summary>
     /// Public endpoint: get token costs per action
     /// </summary>
+    [AllowAnonymous]
     [HttpGet("/api/pricing/token-costs")]
     public async Task<ActionResult<IEnumerable<TokenCostDto>>> GetTokenCosts()
     {

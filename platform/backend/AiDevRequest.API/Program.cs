@@ -74,6 +74,7 @@ builder.Services.AddScoped<IGitHubSyncService, GitHubSyncService>();
 builder.Services.AddScoped<ICodeQualityReviewService, CodeQualityReviewService>();
 builder.Services.AddScoped<IStreamingGenerationService, StreamingGenerationService>();
 builder.Services.AddScoped<IUsageBillingService, UsageBillingService>();
+builder.Services.AddScoped<IMcpIntegrationService, McpIntegrationService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -244,7 +245,8 @@ app.UseExceptionHandler(errorApp =>
             "github_syncs",
             "code_quality_reviews",
             "generation_streams",
-            "billing_accounts" };
+            "billing_accounts",
+            "mcp_connections" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

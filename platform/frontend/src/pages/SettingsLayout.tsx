@@ -19,11 +19,12 @@ import SpecificationPage from './SpecificationPage'
 import GitHubSyncPage from './GitHubSyncPage'
 import CodeReviewPage from './CodeReviewPage'
 import StreamingGenerationPage from './StreamingGenerationPage'
+import McpIntegrationPage from './McpIntegrationPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -36,7 +37,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/github-sync' ? 'github-sync' as SettingsTab
     : location.pathname === '/settings/code-review' ? 'code-review' as SettingsTab
     : location.pathname === '/settings/streaming-generation' ? 'streaming-generation' as SettingsTab
-    : location.pathname === '/settings/billing' ? 'billing' as SettingsTab : null
+    : location.pathname === '/settings/billing' ? 'billing' as SettingsTab
+    : location.pathname === '/settings/mcp-integration' ? 'mcp-integration' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -208,6 +210,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.streamingGeneration', 'Live Generation')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('mcp-integration')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'mcp-integration' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/><path d="M12 17v5"/></svg>
+            {t('settings.tabs.mcpIntegration', 'MCP')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -227,6 +240,7 @@ export default function SettingsLayout() {
       {settingsTab === 'github-sync' && <GitHubSyncPage />}
       {settingsTab === 'code-review' && <CodeReviewPage />}
       {settingsTab === 'streaming-generation' && <StreamingGenerationPage />}
+      {settingsTab === 'mcp-integration' && <McpIntegrationPage />}
     </section>
   )
 }

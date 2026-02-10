@@ -101,6 +101,16 @@ Mobile projects support instant QR code preview via Expo Snack:
 - **Frontend**: `MobilePreview` component renders QR code for scanning with Expo Go app
 - **Flow**: Build completes → detect mobile platform → show QR preview → user scans with Expo Go
 
+## Self-Testing & Self-Healing Code Generation
+
+Automated validate-fix loop that runs after AI code generation:
+- **Backend**: `CodeValidationService` validates code for syntax, imports, structure, and entry points (scores 0-100)
+- **Backend**: `SelfHealingService` orchestrates a generate→validate→fix loop (up to 3 iterations) using Claude API to fix issues
+- **Integration**: Runs automatically after `ProductionService` generates code (non-breaking, wrapped in try-catch)
+- **Entity**: `DevRequest` tracks `ValidationIterations`, `FixHistory` (JSON), `ValidationPassed`
+- **Frontend**: `ValidationProgress` shows real-time build validation phases; `FixHistoryDisplay` shows collapsible fix history
+- **Flow**: Code generated → validate → if issues, ask AI to fix → re-validate → repeat until pass or max retries
+
 ## Directory Structure
 
 ```

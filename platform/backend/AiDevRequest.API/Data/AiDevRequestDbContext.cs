@@ -56,6 +56,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WhiteLabelTenant> WhiteLabelTenants => Set<WhiteLabelTenant>();
     public DbSet<ResellerPartner> ResellerPartners => Set<ResellerPartner>();
     public DbSet<TenantUsage> TenantUsages => Set<TenantUsage>();
+    public DbSet<PlatformEvent> PlatformEvents => Set<PlatformEvent>();
+    public DbSet<GrowthSnapshot> GrowthSnapshots => Set<GrowthSnapshot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -845,6 +847,28 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<WhiteLabelTenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.TenantId);
             entity.HasIndex(e => e.RecordedAt);
+        });
+
+        modelBuilder.Entity<PlatformEvent>(entity =>
+        {
+            entity.ToTable("platform_events");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.EventType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.UserId).HasMaxLength(100);
+            entity.Property(e => e.SessionId).HasMaxLength(100);
+            entity.Property(e => e.Metadata).HasColumnType("jsonb");
+            entity.HasIndex(e => e.EventType);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<GrowthSnapshot>(entity =>
+        {
+            entity.ToTable("growth_snapshots");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Period).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ConversionRate).HasColumnType("decimal(10,4)");
+            entity.Property(e => e.ChurnRate).HasColumnType("decimal(10,4)");
+            entity.HasIndex(e => new { e.SnapshotDate, e.Period }).IsUnique();
         });
     }
 }

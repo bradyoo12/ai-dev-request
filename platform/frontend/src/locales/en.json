@@ -870,5 +870,19 @@
   "codePreview.files": "Files",
   "codePreview.editor": "Editor",
   "codePreview.livePreview": "Live Preview",
-  "codePreview.openPreview": "Preview Code"
+  "codePreview.openPreview": "Preview Code",
+  "growth.title": "Growth Metrics",
+  "growth.description": "Track visitor, trial, and paid user growth metrics.",
+  "growth.visitors": "Visitors",
+  "growth.registered": "Registered",
+  "growth.trialUsers": "Trial Users",
+  "growth.paidUsers": "Paid Users",
+  "growth.growthRate": "Growth Rate",
+  "growth.conversionRate": "Conversion Rate",
+  "growth.churnRate": "Churn Rate",
+  "growth.trends": "Monthly Trends",
+  "growth.funnel": "Conversion Funnel",
+  "growth.export": "Export CSV",
+  "growth.noData": "No data yet",
+  "growth.loading": "Loading growth data..."
 }

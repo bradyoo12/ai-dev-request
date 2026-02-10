@@ -18,6 +18,7 @@ const ProjectHealthPage = lazy(() => import('./pages/ProjectHealthPage'))
 const TeamPage = lazy(() => import('./pages/TeamPage'))
 const MicroservicesPage = lazy(() => import('./pages/MicroservicesPage'))
 const WhiteLabelPage = lazy(() => import('./pages/WhiteLabelPage'))
+const GrowthDashboardPage = lazy(() => import('./pages/GrowthDashboardPage'))
 const PreviewPage = lazy(() => import('./pages/PreviewPage'))
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/teams" element={<Suspense fallback={LazyFallback}><TeamPage /></Suspense>} />
             <Route path="/microservices" element={<Suspense fallback={LazyFallback}><MicroservicesPage /></Suspense>} />
             <Route path="/whitelabel" element={<Suspense fallback={LazyFallback}><WhiteLabelPage /></Suspense>} />
+            <Route path="/admin/growth" element={<Suspense fallback={LazyFallback}><GrowthDashboardPage /></Suspense>} />
             <Route path="/preview" element={<Suspense fallback={LazyFallback}><PreviewPage /></Suspense>} />
           </Route>
         </Routes>

@@ -34,6 +34,7 @@ function App() {
             <Route path="/settings" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/specifications" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/github-sync" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/settings/code-review" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />

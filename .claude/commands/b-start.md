@@ -67,7 +67,7 @@ Execute this workflow in sequence, then loop:
 
 ### Step 1: Load Policy and Design Documents
 
-Read and internalize the project guidelines:
+Read and internalize the project guidelines. These are living documents that get updated after each completed ticket (see Step 5e).
 
 1. **Read Policy** (`.claude/policy.md`):
    - Understand ticket management rules
@@ -286,6 +286,7 @@ Verify changes on staging using parallel agents.
   gh issue close <issue_number> --repo bradyoo12/ai-dev-request --reason completed
   ```
 - Add completion comment
+- **Update policy.md and design.md** to reflect the completed changes (see Step 5e)
 
 **If EITHER fails:**
 - Add failure comment with details from both agents
@@ -294,6 +295,53 @@ Verify changes on staging using parallel agents.
 #### Step 5d: Cleanup
 
 Shut down all agents, delete the team.
+
+#### Step 5e: Update Policy and Design Documents
+
+**Only runs when a ticket was moved to Done in Step 5c.**
+
+After a ticket is verified and completed, update the project documentation to reflect the changes:
+
+1. **Read the completed ticket** to understand what was implemented:
+   ```bash
+   gh issue view <issue_number> --repo bradyoo12/ai-dev-request
+   ```
+
+2. **Read the merged PR** to understand the actual code changes:
+   ```bash
+   gh pr list --repo bradyoo12/ai-dev-request --state merged --search "<issue_number>" --json number,title,body,files --limit 5
+   ```
+
+3. **Update `.claude/design.md`** if the ticket introduced:
+   - New components, pages, or routes
+   - New API endpoints or backend services
+   - New database tables or schema changes
+   - Changes to the architecture or data flow
+   - New integrations or third-party services
+   - Updated tech stack or dependencies
+
+4. **Update `.claude/policy.md`** if the ticket introduced:
+   - New development rules or conventions
+   - Changes to the build/test/deploy process
+   - New environment variables or configuration requirements
+   - Updated quality standards or review criteria
+   - New labels, workflows, or ticket management changes
+
+5. **How to update:**
+   - Read the current file
+   - Identify the relevant section(s) to update
+   - Make minimal, targeted edits — only add/change what the completed ticket affects
+   - Do NOT remove existing content unless it is now incorrect
+   - Do NOT rewrite entire sections — surgical updates only
+
+6. **Commit and push the documentation updates:**
+   ```bash
+   git add .claude/policy.md .claude/design.md
+   git commit -m "docs: update policy and design docs after completing #<issue_number>"
+   git push origin main
+   ```
+
+7. If neither file needs updating (e.g., the ticket was a minor bug fix with no architectural impact), skip this step and log: "No doc updates needed for #<issue_number>"
 
 ### Step 6: b-modernize — Research with Agent Team
 

@@ -69,6 +69,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ObservabilityTrace> ObservabilityTraces => Set<ObservabilityTrace>();
     public DbSet<ObservabilitySpan> ObservabilitySpans => Set<ObservabilitySpan>();
     public DbSet<WorkflowExecution> WorkflowExecutions => Set<WorkflowExecution>();
+    public DbSet<DevelopmentSpec> DevelopmentSpecs => Set<DevelopmentSpec>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1042,6 +1043,31 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.StepsJson).IsRequired().HasColumnType("jsonb");
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<DevelopmentSpec>(entity =>
+        {
+            entity.ToTable("development_specs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Phase).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.UserStories).HasColumnType("jsonb");
+            entity.Property(e => e.AcceptanceCriteria).HasColumnType("jsonb");
+            entity.Property(e => e.EdgeCases).HasColumnType("jsonb");
+            entity.Property(e => e.ArchitectureDecisions).HasColumnType("jsonb");
+            entity.Property(e => e.ApiContracts).HasColumnType("jsonb");
+            entity.Property(e => e.DataModels).HasColumnType("jsonb");
+            entity.Property(e => e.ComponentBreakdown).HasColumnType("jsonb");
+            entity.Property(e => e.TaskList).HasColumnType("jsonb");
+            entity.Property(e => e.DependencyOrder).HasColumnType("jsonb");
+            entity.Property(e => e.EstimatedFiles).HasColumnType("jsonb");
+            entity.Property(e => e.TraceabilityLinks).HasColumnType("jsonb");
+            entity.Property(e => e.RejectionFeedback).HasMaxLength(5000);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Phase);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });

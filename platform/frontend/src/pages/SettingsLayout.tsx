@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import SettingsPage from './SettingsPage'
 import UsagePage from './UsagePage'
 import BillingPage from './BillingPage'
@@ -15,21 +15,23 @@ import OAuthCompliancePage from './OAuthCompliancePage'
 import CompilerValidationPage from './CompilerValidationPage'
 import ObservabilityPage from './ObservabilityPage'
 import WorkflowPage from './WorkflowPage'
+import SpecificationPage from './SpecificationPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const location = useLocation()
   const { setTokenBalance } = useAuth()
   const tabParam = searchParams.get('tab') as SettingsTab | null
-  const [settingsTab, setSettingsTab] = useState<SettingsTab>(
-    tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens'
-  )
+  const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab : null
+  const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
   useEffect(() => {
     if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== settingsTab) {
@@ -161,6 +163,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.workflows', 'Workflows')}
         </button>
+        <button
+          onClick={() => setSettingsTab('specifications')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'specifications' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.specifications', 'Specifications')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -176,6 +186,7 @@ export default function SettingsLayout() {
       {settingsTab === 'compiler' && <CompilerValidationPage />}
       {settingsTab === 'observability' && <ObservabilityPage />}
       {settingsTab === 'workflows' && <WorkflowPage />}
+      {settingsTab === 'specifications' && <SpecificationPage />}
     </section>
   )
 }

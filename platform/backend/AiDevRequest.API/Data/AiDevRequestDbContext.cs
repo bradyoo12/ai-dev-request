@@ -76,6 +76,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<BillingAccount> BillingAccounts => Set<BillingAccount>();
     public DbSet<McpConnection> McpConnections => Set<McpConnection>();
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
+    public DbSet<MarketplaceTemplate> MarketplaceTemplates => Set<MarketplaceTemplate>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1176,6 +1177,26 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.EventType);
             entity.HasIndex(e => e.SessionId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<MarketplaceTemplate>(entity =>
+        {
+            entity.ToTable("marketplace_templates");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.TechStack).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.Tags).HasMaxLength(1000);
+            entity.Property(e => e.TemplateData).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.PreviewImageUrl).HasMaxLength(500);
+            entity.Property(e => e.Rating).HasColumnType("double precision");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.HasIndex(e => e.AuthorId);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.DownloadCount);
             entity.HasIndex(e => e.CreatedAt);
         });
     }

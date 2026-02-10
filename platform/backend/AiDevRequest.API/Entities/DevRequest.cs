@@ -59,6 +59,13 @@ public class DevRequest
 
     public bool ValidationPassed { get; set; }
 
+    // Model routing / cost tracking
+    /// <summary>JSON summary of which model tiers were used for this request.</summary>
+    public string? ModelTierUsage { get; set; }
+
+    /// <summary>Estimated cost savings vs single-model (Opus-only) approach (USD).</summary>
+    public decimal? EstimatedCostSavings { get; set; }
+
     // Timestamps
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

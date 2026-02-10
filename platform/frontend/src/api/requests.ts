@@ -568,6 +568,29 @@ export async function syncToGitHub(id: string, accessToken: string): Promise<Git
   return response.json();
 }
 
+// Cost Report Types
+export interface TierUsage {
+  tier: string;
+  category: string;
+  inputTokens: number;
+  outputTokens: number;
+  estimatedCost: number;
+}
+
+export interface CostReport {
+  totalEstimatedCost: number;
+  estimatedSavingsVsOpusOnly: number;
+  tierBreakdown: TierUsage[];
+}
+
+export async function getCostReport(requestId: string): Promise<CostReport | null> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/cost-report`, {
+    headers: authHeaders(),
+  });
+  if (!response.ok) return null;
+  return response.json();
+}
+
 // Expo Preview API
 export interface ExpoPreviewResponse {
   previewUrl: string

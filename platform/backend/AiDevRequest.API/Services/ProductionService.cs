@@ -13,16 +13,18 @@ public interface IProductionService
 public class ProductionService : IProductionService
 {
     private readonly AnthropicClient _client;
+    private readonly IModelRouterService _modelRouter;
     private readonly ILogger<ProductionService> _logger;
     private readonly string _projectsBasePath;
 
-    public ProductionService(IConfiguration configuration, ILogger<ProductionService> logger)
+    public ProductionService(IConfiguration configuration, IModelRouterService modelRouter, ILogger<ProductionService> logger)
     {
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
             ?? throw new InvalidOperationException("Anthropic API key not configured");
 
         _client = new AnthropicClient(apiKey);
+        _modelRouter = modelRouter;
         _logger = logger;
         _projectsBasePath = configuration["Projects:BasePath"] ?? "./projects";
     }
@@ -159,9 +161,22 @@ JSON만 응답하세요.";
                 messages = new List<Message> { new Message(RoleType.User, prompt) };
             }
 
+            // Model routing: Project generation complexity determines the tier.
+            // Complex/Enterprise → Opus (ComplexGeneration), Simple/Medium → Sonnet (StandardGeneration).
+            // Currently using a single configured model; the ModelRouterService provides the
+            // recommended tier for future multi-model support.
+            var taskCategory = complexity.ToLowerInvariant() is "complex" or "enterprise"
+                ? TaskCategory.ComplexGeneration
+                : TaskCategory.StandardGeneration;
+            var recommendedTier = _modelRouter.GetRecommendedTier(taskCategory);
+            var recommendedModelId = _modelRouter.GetModelId(recommendedTier);
+            _logger.LogInformation("Production task ({Complexity}): recommended tier={Tier}, model={Model}",
+                complexity, recommendedTier, recommendedModelId);
+
             var parameters = new MessageParameters
             {
                 Messages = messages,
+                // TODO: Switch to recommendedModelId once multi-model client support is available
                 Model = "claude-sonnet-4-20250514",
                 MaxTokens = thinkingBudget > 0 ? 16000 : 8000,
             };
@@ -294,6 +309,7 @@ public class ProductionResult
     public int? CodeQualityScore { get; set; }
     public string? CodeReviewSummary { get; set; }
     public int? CodeReviewIssueCount { get; set; }
+    public string? RecommendedModelTier { get; set; }
     public string? CiCdProvider { get; set; }
     public int? CiCdWorkflowCount { get; set; }
     public string? CiCdSummary { get; set; }

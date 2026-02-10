@@ -12,15 +12,17 @@ public interface IProposalService
 public class ProposalService : IProposalService
 {
     private readonly AnthropicClient _client;
+    private readonly IModelRouterService _modelRouter;
     private readonly ILogger<ProposalService> _logger;
 
-    public ProposalService(IConfiguration configuration, ILogger<ProposalService> logger)
+    public ProposalService(IConfiguration configuration, IModelRouterService modelRouter, ILogger<ProposalService> logger)
     {
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
             ?? throw new InvalidOperationException("Anthropic API key not configured");
 
         _client = new AnthropicClient(apiKey);
+        _modelRouter = modelRouter;
         _logger = logger;
     }
 
@@ -108,9 +110,17 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
                 new Message(RoleType.User, prompt)
             };
 
+            // Model routing: Proposal generation is standard generation → Sonnet tier recommended.
+            // Currently using a single configured model; the ModelRouterService provides the
+            // recommended tier for future multi-model support.
+            var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.StandardGeneration);
+            var recommendedModelId = _modelRouter.GetModelId(recommendedTier);
+            _logger.LogInformation("Proposal task: recommended tier={Tier}, model={Model}", recommendedTier, recommendedModelId);
+
             var parameters = new MessageParameters
             {
                 Messages = messages,
+                // TODO: Switch to recommendedModelId once multi-model client support is available
                 Model = "claude-sonnet-4-20250514",
                 MaxTokens = 4000,
                 Temperature = 0.4m

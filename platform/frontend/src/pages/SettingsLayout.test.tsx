@@ -118,6 +118,10 @@ vi.mock('./CollaborativeEditingPage', () => ({
   default: () => <div data-testid="collaborative-editing-page">CollaborativeEditingPage</div>,
 }))
 
+vi.mock('./OnboardingPage', () => ({
+  default: () => <div data-testid="onboarding-page">OnboardingPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

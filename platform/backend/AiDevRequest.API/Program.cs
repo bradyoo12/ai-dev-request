@@ -79,6 +79,7 @@ builder.Services.AddScoped<IAnalyticsDashboardService, AnalyticsDashboardService
 builder.Services.AddScoped<ITemplateMarketplaceService, TemplateMarketplaceService>();
 builder.Services.AddScoped<IContainerizationService, ContainerizationService>();
 builder.Services.AddScoped<ICollaborativeEditingService, CollaborativeEditingService>();
+builder.Services.AddScoped<IOnboardingService, OnboardingService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -253,7 +254,8 @@ app.UseExceptionHandler(errorApp =>
             "mcp_connections",
             "analytics_events",
             "marketplace_templates",
-            "container_configs" };
+            "container_configs",
+            "onboarding_progresses" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

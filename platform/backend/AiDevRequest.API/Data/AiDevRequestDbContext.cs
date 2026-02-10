@@ -80,6 +80,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ContainerConfig> ContainerConfigs => Set<ContainerConfig>();
     public DbSet<TestGenerationRecord> TestGenerationRecords => Set<TestGenerationRecord>();
     public DbSet<CollaborativeSession> CollaborativeSessions => Set<CollaborativeSession>();
+    public DbSet<OnboardingProgress> OnboardingProgresses => Set<OnboardingProgress>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1250,6 +1251,18 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<OnboardingProgress>(entity =>
+        {
+            entity.ToTable("onboarding_progresses");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CompletedStepsJson).HasColumnType("jsonb");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
+            entity.HasIndex(e => e.Status);
         });
     }
 }

@@ -1,32 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gh:*)",
-      "Bash(git:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(dotnet:*)",
-      "Bash(python:*)",
-      "Bash(cd:*)",
-      "Bash(cross-env:*)",
-      "Read",
-      "Edit",
-      "Write",
-      "Task",
-      "Bash(az keyvault secret set:*)",
-      "Bash(az keyvault list:*)",
-      "Bash(az group list:*)",
-      "Bash(az keyvault create:*)",
-      "Bash(az role assignment create:*)",
-      "Bash(az ad signed-in-user show:*)",
-      "Bash(az account show:*)",
-      "Bash(az account set:*)",
-      "Bash(az login:*)",
-      "Bash(find:*)",
-      "Bash(del \"e:\\\\Github\\\\bradyoo12\\\\ai-dev-request\\\\tmp_ticket.md\")",
-      "Bash(del \"e:\\\\Github\\\\bradyoo12\\\\ai-dev-request\\\\tmp_ticket_body.md\")",
-      "WebFetch(domain:icy-desert-07c08ba00.2.azurestaticapps.net)",
-      "Bash(VITE_API_URL=https://ai-dev-request-api.azurecontainerapps.io PLAYWRIGHT_BASE_URL=https://icy-desert-07c08ba00.2.azurestaticapps.net npx playwright test:*)"
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "Task(*)",
+      "TodoWrite(*)",
+      "NotebookEdit(*)"
     ]
   }
 }

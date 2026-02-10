@@ -71,6 +71,7 @@ builder.Services.AddScoped<IObservabilityService, ObservabilityService>();
 builder.Services.AddScoped<IWorkflowOrchestrationService, WorkflowOrchestrationService>();
 builder.Services.AddScoped<ISpecificationService, SpecificationService>();
 builder.Services.AddScoped<IGitHubSyncService, GitHubSyncService>();
+builder.Services.AddScoped<ICodeQualityReviewService, CodeQualityReviewService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -238,7 +239,8 @@ app.UseExceptionHandler(errorApp =>
             "observability_traces", "observability_spans",
             "workflow_executions",
             "development_specs",
-            "github_syncs" };
+            "github_syncs",
+            "code_quality_reviews" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

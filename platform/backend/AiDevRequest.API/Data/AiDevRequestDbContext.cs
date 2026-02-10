@@ -71,6 +71,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WorkflowExecution> WorkflowExecutions => Set<WorkflowExecution>();
     public DbSet<DevelopmentSpec> DevelopmentSpecs => Set<DevelopmentSpec>();
     public DbSet<GitHubSync> GitHubSyncs => Set<GitHubSync>();
+    public DbSet<CodeQualityReview> CodeQualityReviews => Set<CodeQualityReview>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1088,6 +1089,20 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.WebhookSecret).HasMaxLength(200);
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.ProjectId).IsUnique();
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<CodeQualityReview>(entity =>
+        {
+            entity.ToTable("code_quality_reviews");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.OverallScore).HasColumnType("double precision");
+            entity.Property(e => e.Findings).HasColumnType("jsonb");
+            entity.Property(e => e.AppliedFixes).HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });

@@ -58,6 +58,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TenantUsage> TenantUsages => Set<TenantUsage>();
     public DbSet<PlatformEvent> PlatformEvents => Set<PlatformEvent>();
     public DbSet<GrowthSnapshot> GrowthSnapshots => Set<GrowthSnapshot>();
+    public DbSet<SbomReport> SbomReports => Set<SbomReport>();
+    public DbSet<VulnerabilityResult> VulnerabilityResults => Set<VulnerabilityResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -872,6 +874,34 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ConversionRate).HasColumnType("decimal(10,4)");
             entity.Property(e => e.ChurnRate).HasColumnType("decimal(10,4)");
             entity.HasIndex(e => new { e.SnapshotDate, e.Period }).IsUnique();
+        });
+
+        modelBuilder.Entity<SbomReport>(entity =>
+        {
+            entity.ToTable("sbom_reports");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Format).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ComponentsJson).IsRequired().HasColumnType("jsonb");
+            entity.Property(e => e.LicensesSummaryJson).HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.GeneratedAt);
+        });
+
+        modelBuilder.Entity<VulnerabilityResult>(entity =>
+        {
+            entity.ToTable("vulnerability_results");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PackageName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.PackageVersion).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Ecosystem).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.VulnerabilityId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Severity).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Summary).HasMaxLength(2000);
+            entity.Property(e => e.FixedVersion).HasMaxLength(50);
+            entity.HasOne<SbomReport>().WithMany().HasForeignKey(e => e.SbomReportId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.SbomReportId);
+            entity.HasIndex(e => e.Severity);
         });
     }
 }

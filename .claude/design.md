@@ -92,6 +92,7 @@ User Request (natural language)
 | AnalyticsEvent | Platform analytics event for user behavior and funnel tracking |
 | MarketplaceTemplate | Community-driven project generation template in the marketplace |
 | ContainerConfig | Docker containerization configuration for a generated project |
+| OnboardingProgress | User onboarding wizard progress tracking with step completion milestones |
 
 ## Spec-Driven Development Pipeline
 
@@ -137,6 +138,20 @@ CRDT-based collaborative editing for dev requests with presence tracking and act
 - **Entity**: `CollaborativeSession` with participants JSON (userId, displayName, color), activity feed JSON, document content, version tracking
 - **Frontend**: `CollaborativeEditingPage` in Settings with create/join session panels, collaborative text editor with save, activity feed with action icons (created/joined/edited/ended), participant avatar circles with color coding, stats grid (participants/version/activities/last activity), session history
 - **Flow**: Create session → share with team → participants join → edit document collaboratively → activity tracked → end session → view history
+
+## Interactive Onboarding Wizard
+
+Guided first-request flow for new users with step-by-step milestone tracking:
+- **Backend**: `OnboardingService` manages user onboarding progress, step completion, skip, and reset operations
+- **Endpoints**:
+  - `GET /api/onboarding/progress` — get user's onboarding progress
+  - `POST /api/onboarding/step/{step}` — mark step completed
+  - `POST /api/onboarding/skip` — skip onboarding
+  - `POST /api/onboarding/reset` — restart onboarding
+- **Entity**: `OnboardingProgress` with userId (unique), currentStep, completedStepsJson (JSON array), status (active/completed/skipped), timestamps
+- **Milestones**: account_created → first_request → analysis_viewed → proposal_reviewed → build_completed → preview_deployed
+- **Frontend**: `OnboardingPage` in Settings with progress bar (color-coded), step-by-step checklist with icons and mark-complete buttons, skip/reset actions, stats grid (current step/completed/remaining/progress percentage)
+- **Flow**: User signs up → onboarding auto-created → complete steps sequentially → progress tracked → skip or complete → reset anytime
 
 ## AI-Powered Test Generation
 

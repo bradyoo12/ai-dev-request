@@ -90,6 +90,10 @@ vi.mock('./CodeReviewPage', () => ({
   default: () => <div data-testid="code-review-page">CodeReviewPage</div>,
 }))
 
+vi.mock('./StreamingGenerationPage', () => ({
+  default: () => <div data-testid="streaming-generation-page">StreamingGenerationPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

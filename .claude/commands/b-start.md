@@ -256,7 +256,17 @@ Merge PRs to main. This is a simple operation — no team needed.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
    ```
 6. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
-7. Cleanup: `git checkout main && git pull`
+7. Cleanup:
+   ```bash
+   git checkout main && git pull
+   ```
+8. **Delete stale branches** (local and remote) that have been fully merged:
+   ```bash
+   # Delete merged local branches (never delete main/master)
+   git branch --merged main | grep -vE '^\*|main|master' | xargs -r git branch -d
+   # Delete merged remote branches (never delete main/master)
+   git branch -r --merged main | grep -vE 'main|master' | sed 's/origin\///' | xargs -r -I {} git push origin --delete {}
+   ```
 
 ### Step 5: b-review — Verify with Agent Team
 

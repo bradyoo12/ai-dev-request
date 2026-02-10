@@ -7,6 +7,7 @@ const mockSearchParams = new URLSearchParams()
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   useSearchParams: () => [mockSearchParams],
+  useLocation: () => ({ pathname: '/settings', search: '', hash: '', state: null, key: 'default' }),
 }))
 
 vi.mock('react-i18next', () => ({
@@ -67,6 +68,18 @@ vi.mock('./OAuthCompliancePage', () => ({
 
 vi.mock('./CompilerValidationPage', () => ({
   default: () => <div data-testid="compiler-validation-page">CompilerValidationPage</div>,
+}))
+
+vi.mock('./ObservabilityPage', () => ({
+  default: () => <div data-testid="observability-page">ObservabilityPage</div>,
+}))
+
+vi.mock('./WorkflowPage', () => ({
+  default: () => <div data-testid="workflow-page">WorkflowPage</div>,
+}))
+
+vi.mock('./SpecificationPage', () => ({
+  default: () => <div data-testid="specification-page">SpecificationPage</div>,
 }))
 
 import SettingsLayout from './SettingsLayout'

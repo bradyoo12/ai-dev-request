@@ -4,22 +4,17 @@
   },
   "permissions": {
     "allow": [
-      "Bash(dotnet build:*)",
-      "Bash(dotnet test:*)",
-      "Bash(dotnet restore:*)",
-      "Bash(dotnet run:*)",
-      "Bash(dotnet ef:*)",
-      "Bash(dotnet ef migrations add:*)",
-      "Bash(docker-compose:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run:*)",
-      "Bash(npm test:*)",
-      "Bash(git status:*)",
-      "Bash(git log:*)",
-      "Bash(git diff:*)",
-      "Bash(git branch:*)",
-      "Bash(curl:*)",
-      "Bash(dir:*)"
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "Task(*)",
+      "TodoWrite(*)",
+      "NotebookEdit(*)"
     ]
   }
 }

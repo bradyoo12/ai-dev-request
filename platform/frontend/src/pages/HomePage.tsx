@@ -16,6 +16,7 @@ import FeaturesSection from '../components/FeaturesSection'
 import PricingSection from '../components/PricingSection'
 import StepIndicator from '../components/StepIndicator'
 import LivePreview from '../components/LivePreview'
+import MobilePreview from '../components/MobilePreview'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -986,31 +987,13 @@ export default function HomePage() {
               </div>
             )}
 
-            {productionResult.production.projectType?.includes('native') || productionResult.production.projectType?.includes('expo') ? (
-              <div className="bg-purple-900/30 border border-purple-700 rounded-xl p-6 mb-6">
-                <h4 className="font-bold mb-3 text-purple-400">{t('mobile.qrPreview')}</h4>
-                <div className="flex items-center gap-6">
-                  <div className="bg-white rounded-xl p-4 w-32 h-32 flex items-center justify-center">
-                    <div className="text-center text-gray-800 text-xs">
-                      <div className="text-4xl mb-1">📱</div>
-                      <div>{t('mobile.qrPlaceholder')}</div>
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-300 mb-2">{t('mobile.qrDescription')}</p>
-                    <div className="text-xs text-gray-400 space-y-1">
-                      <p>1. {t('mobile.qrStep1')}</p>
-                      <p>2. {t('mobile.qrStep2')}</p>
-                      <p>3. {t('mobile.qrStep3')}</p>
-                    </div>
-                    <div className="mt-3 flex gap-2">
-                      <span className="inline-block px-2 py-1 bg-purple-800 text-purple-200 rounded text-xs">{t('mobile.ios')}</span>
-                      <span className="inline-block px-2 py-1 bg-purple-800 text-purple-200 rounded text-xs">{t('mobile.android')}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
+            {submittedRequest && (
+              <MobilePreview
+                requestId={submittedRequest.id}
+                previewUrl={productionResult.production.stagingUrl}
+                platform={analysisResult?.platform || productionResult.production.projectType}
+              />
+            )}
 
             {submittedRequest && (
               <div className="mb-6">

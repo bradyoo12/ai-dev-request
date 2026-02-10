@@ -52,6 +52,7 @@ builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IMicroserviceService, MicroserviceService>();
 builder.Services.AddScoped<IWhiteLabelService, WhiteLabelService>();
 builder.Services.AddScoped<IGrowthService, GrowthService>();
+builder.Services.AddScoped<IExpoPreviewService, ExpoPreviewService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

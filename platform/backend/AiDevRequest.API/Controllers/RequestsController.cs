@@ -28,6 +28,7 @@ public class RequestsController : ControllerBase
     private readonly IExportService _exportService;
     private readonly IDatabaseSchemaService _databaseSchemaService;
     private readonly IProjectVersionService _versionService;
+    private readonly IExpoPreviewService _expoPreviewService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -44,6 +45,7 @@ public class RequestsController : ControllerBase
         IExportService exportService,
         IDatabaseSchemaService databaseSchemaService,
         IProjectVersionService versionService,
+        IExpoPreviewService expoPreviewService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -59,6 +61,7 @@ public class RequestsController : ControllerBase
         _exportService = exportService;
         _databaseSchemaService = databaseSchemaService;
         _versionService = versionService;
+        _expoPreviewService = expoPreviewService;
         _logger = logger;
     }
 
@@ -856,6 +859,62 @@ public class RequestsController : ControllerBase
             Source = result.Source,
             FileCount = result.FileCount,
             CreatedAt = result.CreatedAt
+        });
+    }
+
+    /// <summary>
+    /// Generate Expo Snack preview for a mobile project
+    /// </summary>
+    [HttpPost("{id:guid}/preview/expo")]
+    [ProducesResponseType(typeof(ExpoPreviewResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ExpoPreviewResult>> GenerateExpoPreview(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        if (string.IsNullOrEmpty(entity!.ProjectPath))
+        {
+            return BadRequest(new { error = "Project has not been built yet." });
+        }
+
+        _logger.LogInformation("Generating Expo preview for request {RequestId}", id);
+
+        var result = await _expoPreviewService.GeneratePreviewAsync(id);
+
+        if (!result.Success)
+        {
+            if (result.Error?.Contains("not a mobile project") == true)
+                return BadRequest(new { error = result.Error });
+
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get stored preview info for a request
+    /// </summary>
+    [HttpGet("{id:guid}/preview")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetPreview(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        if (string.IsNullOrEmpty(entity!.PreviewUrl))
+        {
+            return NotFound(new { error = "No preview has been generated for this request." });
+        }
+
+        return Ok(new
+        {
+            requestId = id,
+            previewUrl = entity.PreviewUrl,
+            hasPreview = true
         });
     }
 }

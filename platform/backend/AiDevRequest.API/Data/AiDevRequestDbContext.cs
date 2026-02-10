@@ -116,6 +116,9 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ProjectPath)
                 .HasMaxLength(500);
 
+            entity.Property(e => e.PreviewUrl)
+                .HasMaxLength(2000);
+
             entity.Property(e => e.GitHubRepoUrl)
                 .HasMaxLength(500);
 

@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import SettingsPage from './SettingsPage'
 import UsagePage from './UsagePage'
 import BillingPage from './BillingPage'
@@ -11,11 +11,23 @@ import { useAuth } from '../contexts/AuthContext'
 
 type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences'
 
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences']
+
 export default function SettingsLayout() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { setTokenBalance } = useAuth()
-  const [settingsTab, setSettingsTab] = useState<SettingsTab>('tokens')
+  const tabParam = searchParams.get('tab') as SettingsTab | null
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>(
+    tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens'
+  )
+
+  useEffect(() => {
+    if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== settingsTab) {
+      setSettingsTab(tabParam)
+    }
+  }, [tabParam, settingsTab])
 
   return (
     <section>

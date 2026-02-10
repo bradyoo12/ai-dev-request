@@ -81,6 +81,7 @@ User Request (natural language)
 | SbomReport | SBOM and vulnerability scan results for a generated project |
 | InfrastructureConfig | IaC configuration and generated Bicep templates for a project |
 | SecretScanResult | Secret detection scan results for a generated project |
+| PreviewDeployment | Edge preview deployment record for a generated project |
 
 ## Security & Compliance (SBOM)
 
@@ -107,6 +108,19 @@ AI-powered secret detection and secure config management for generated projects:
   - `GET /api/projects/{id}/secrets/config` — get generated config
 - **Frontend**: `SecretDetectionPage` in Settings with scan results, pattern list, config preview, Key Vault status
 - **Flow**: User prompt → sanitize secrets → generate code → post-scan for leaks → generate .env.example + gitignore + config module
+
+## Edge-First Preview Deployments
+
+Instant preview URLs for generated projects via edge deployment:
+- **Backend**: `PreviewDeploymentService` deploys projects to edge (Azure Static Web Apps pattern), manages preview lifecycle
+- **Endpoints**:
+  - `POST /api/projects/{id}/preview/deploy` — trigger preview deployment
+  - `GET /api/projects/{id}/preview/status` — deployment status
+  - `GET /api/projects/{id}/preview/url` — get preview URL
+  - `DELETE /api/projects/{id}/preview` — tear down preview
+  - `GET /api/projects/{id}/previews` — list all previews
+- **Frontend**: `PreviewDeploymentPage` in Settings with one-click deploy, URL display with copy, QR code for mobile, status indicator, preview history
+- **Flow**: Project generated → one-click deploy → edge deployment → live URL in <5 seconds → QR code for mobile testing
 
 ## Mobile Preview (Expo)
 

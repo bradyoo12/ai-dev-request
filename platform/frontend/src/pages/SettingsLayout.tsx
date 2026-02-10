@@ -26,11 +26,12 @@ import ContainerizationPage from './ContainerizationPage'
 import TestGenerationPage from './TestGenerationPage'
 import CollaborativeEditingPage from './CollaborativeEditingPage'
 import OnboardingPage from './OnboardingPage'
+import ProjectVersionPage from './ProjectVersionPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -50,7 +51,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/containerization' ? 'containerization' as SettingsTab
     : location.pathname === '/settings/test-generation' ? 'test-generation' as SettingsTab
     : location.pathname === '/settings/collaborative-editing' ? 'collaborative-editing' as SettingsTab
-    : location.pathname === '/settings/onboarding' ? 'onboarding' as SettingsTab : null
+    : location.pathname === '/settings/onboarding' ? 'onboarding' as SettingsTab
+    : location.pathname === '/settings/version-history' ? 'version-history' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -299,6 +301,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.onboarding', 'Onboarding')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('version-history')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'version-history' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            {t('settings.tabs.versionHistory', 'Versions')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -325,6 +338,7 @@ export default function SettingsLayout() {
       {settingsTab === 'test-generation' && <TestGenerationPage />}
       {settingsTab === 'collaborative-editing' && <CollaborativeEditingPage />}
       {settingsTab === 'onboarding' && <OnboardingPage />}
+      {settingsTab === 'version-history' && <ProjectVersionPage />}
     </section>
   )
 }

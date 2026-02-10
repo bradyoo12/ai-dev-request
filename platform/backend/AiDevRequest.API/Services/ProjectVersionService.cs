@@ -10,7 +10,22 @@ public interface IProjectVersionService
 {
     Task<ProjectVersion> CreateSnapshotAsync(Guid devRequestId, string projectPath, string label, string source = "build");
     Task<List<ProjectVersion>> GetVersionsAsync(Guid devRequestId);
+    Task<ProjectVersion?> GetVersionAsync(Guid devRequestId, Guid versionId);
+    Task<ProjectVersion?> GetLatestVersionAsync(Guid devRequestId);
+    Task<VersionDiff> GetDiffAsync(Guid devRequestId, Guid fromVersionId, Guid toVersionId);
     Task<ProjectVersion?> RollbackAsync(Guid devRequestId, Guid versionId);
+}
+
+public class VersionDiff
+{
+    public Guid FromVersionId { get; set; }
+    public Guid ToVersionId { get; set; }
+    public int FromVersionNumber { get; set; }
+    public int ToVersionNumber { get; set; }
+    public List<string> AddedFiles { get; set; } = new();
+    public List<string> RemovedFiles { get; set; } = new();
+    public List<string> ModifiedFiles { get; set; } = new();
+    public int TotalChanges => AddedFiles.Count + RemovedFiles.Count + ModifiedFiles.Count;
 }
 
 public class ProjectVersionService : IProjectVersionService
@@ -108,6 +123,53 @@ public class ProjectVersionService : IProjectVersionService
             .Where(v => v.DevRequestId == devRequestId)
             .OrderByDescending(v => v.VersionNumber)
             .ToListAsync();
+    }
+
+    public async Task<ProjectVersion?> GetVersionAsync(Guid devRequestId, Guid versionId)
+    {
+        return await _context.ProjectVersions
+            .FirstOrDefaultAsync(v => v.Id == versionId && v.DevRequestId == devRequestId);
+    }
+
+    public async Task<ProjectVersion?> GetLatestVersionAsync(Guid devRequestId)
+    {
+        return await _context.ProjectVersions
+            .Where(v => v.DevRequestId == devRequestId)
+            .OrderByDescending(v => v.VersionNumber)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<VersionDiff> GetDiffAsync(Guid devRequestId, Guid fromVersionId, Guid toVersionId)
+    {
+        var fromVersion = await _context.ProjectVersions
+            .FirstOrDefaultAsync(v => v.Id == fromVersionId && v.DevRequestId == devRequestId)
+            ?? throw new InvalidOperationException("From version not found");
+        var toVersion = await _context.ProjectVersions
+            .FirstOrDefaultAsync(v => v.Id == toVersionId && v.DevRequestId == devRequestId)
+            ?? throw new InvalidOperationException("To version not found");
+
+        var fromFiles = DeserializeFiles(fromVersion.ChangedFilesJson);
+        var toFiles = DeserializeFiles(toVersion.ChangedFilesJson);
+
+        var fromSet = new HashSet<string>(fromFiles);
+        var toSet = new HashSet<string>(toFiles);
+
+        return new VersionDiff
+        {
+            FromVersionId = fromVersionId,
+            ToVersionId = toVersionId,
+            FromVersionNumber = fromVersion.VersionNumber,
+            ToVersionNumber = toVersion.VersionNumber,
+            AddedFiles = toFiles.Where(f => !fromSet.Contains(f)).ToList(),
+            RemovedFiles = fromFiles.Where(f => !toSet.Contains(f)).ToList(),
+            ModifiedFiles = toFiles.Where(f => fromSet.Contains(f)).ToList()
+        };
+    }
+
+    private static List<string> DeserializeFiles(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) return new List<string>();
+        return JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
     }
 
     public async Task<ProjectVersion?> RollbackAsync(Guid devRequestId, Guid versionId)

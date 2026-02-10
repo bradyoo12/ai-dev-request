@@ -9,11 +9,12 @@ import MemoryPage from './MemoryPage'
 import PreferencePage from './PreferencePage'
 import InfrastructurePage from './InfrastructurePage'
 import SecretDetectionPage from './SecretDetectionPage'
+import PreviewDeploymentPage from './PreviewDeploymentPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -107,6 +108,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.secrets', 'Secrets')}
         </button>
+        <button
+          onClick={() => setSettingsTab('preview')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'preview' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.preview', 'Preview')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -116,6 +125,7 @@ export default function SettingsLayout() {
       {settingsTab === 'preferences' && <PreferencePage />}
       {settingsTab === 'infrastructure' && <InfrastructurePage />}
       {settingsTab === 'secrets' && <SecretDetectionPage />}
+      {settingsTab === 'preview' && <PreviewDeploymentPage />}
     </section>
   )
 }

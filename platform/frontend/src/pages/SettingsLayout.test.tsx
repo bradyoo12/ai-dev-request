@@ -53,6 +53,10 @@ vi.mock('./SecretDetectionPage', () => ({
   default: () => <div data-testid="secret-detection-page">SecretDetectionPage</div>,
 }))
 
+vi.mock('./PreviewDeploymentPage', () => ({
+  default: () => <div data-testid="preview-deployment-page">PreviewDeploymentPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

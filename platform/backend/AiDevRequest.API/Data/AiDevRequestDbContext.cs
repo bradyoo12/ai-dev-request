@@ -75,6 +75,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<GenerationStream> GenerationStreams => Set<GenerationStream>();
     public DbSet<BillingAccount> BillingAccounts => Set<BillingAccount>();
     public DbSet<McpConnection> McpConnections => Set<McpConnection>();
+    public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1159,6 +1160,22 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<AnalyticsEvent>(entity =>
+        {
+            entity.ToTable("analytics_events");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.EventType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.EventData).HasColumnType("jsonb");
+            entity.Property(e => e.SessionId).HasMaxLength(100);
+            entity.Property(e => e.Page).HasMaxLength(500);
+            entity.Property(e => e.Referrer).HasMaxLength(2000);
+            entity.Property(e => e.UserAgent).HasMaxLength(1000);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.EventType);
+            entity.HasIndex(e => e.SessionId);
             entity.HasIndex(e => e.CreatedAt);
         });
     }

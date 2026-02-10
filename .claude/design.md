@@ -89,6 +89,8 @@ User Request (natural language)
 | GenerationStream | Real-time streaming code generation session with SSE event tracking |
 | BillingAccount | Usage-based billing account with hybrid pricing (subscription + metered AI usage) |
 | McpConnection | MCP server connection record for platform and project-level tool integration |
+| AnalyticsEvent | Platform analytics event for user behavior and funnel tracking |
+| MarketplaceTemplate | Community-driven project generation template in the marketplace |
 
 ## Spec-Driven Development Pipeline
 
@@ -182,6 +184,33 @@ Model Context Protocol integration for platform tool exposure and external serve
 - **Transports**: SSE, stdio, gRPC
 - **Frontend**: `McpIntegrationPage` in Settings with platform tool catalog, external server management, tool discovery, connection health monitoring
 - **Flow**: External AI agents → call platform MCP tools → platform executes operations; Generated projects → connect to user's MCP servers → access external databases/APIs/services
+
+## Product Analytics Dashboard
+
+User behavior tracking and pipeline funnel analytics:
+- **Backend**: `AnalyticsDashboardService` records events, aggregates metrics, computes funnel conversions and time-series trends
+- **Endpoints**:
+  - `POST /api/analytics/events` — record analytics event
+  - `GET /api/analytics/dashboard` — aggregated metrics (active users, requests, completion rate, avg build time)
+  - `GET /api/analytics/funnel` — funnel conversion (request → analysis → proposal → build → deploy)
+  - `GET /api/analytics/usage` — feature usage breakdown
+  - `GET /api/analytics/trends` — time-series trends by metric
+- **Frontend**: `AnalyticsDashboardPage` in Settings with metrics cards, funnel visualization, usage breakdown, period-filtered trends
+
+## Template Marketplace
+
+Community-driven project scaffolding templates:
+- **Backend**: `TemplateMarketplaceService` manages template catalog with browsing, filtering, rating, and import
+- **Endpoints**:
+  - `GET /api/marketplace/templates` — browse with category/tech/search filters
+  - `GET /api/marketplace/templates/{id}` — template details
+  - `POST /api/marketplace/templates` — submit new template
+  - `POST /api/marketplace/templates/{id}/import` — import to new dev request
+  - `POST /api/marketplace/templates/{id}/rate` — rate template (1-5)
+  - `GET /api/marketplace/categories` — categories with counts
+  - `GET /api/marketplace/templates/popular` — most downloaded
+- **Categories**: Web App, API, Mobile, Automation, Data Pipeline
+- **Frontend**: `MarketplacePage` in Settings with search, category filters, template grid, detail view, star ratings, import button, submit form
 
 ## Security & Compliance (SBOM)
 

@@ -62,6 +62,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VulnerabilityResult> VulnerabilityResults => Set<VulnerabilityResult>();
     public DbSet<InfrastructureConfig> InfrastructureConfigs => Set<InfrastructureConfig>();
     public DbSet<SecretScanResult> SecretScanResults => Set<SecretScanResult>();
+    public DbSet<PreviewDeployment> PreviewDeployments => Set<PreviewDeployment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -936,6 +937,23 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.ScannedAt);
+        });
+
+        modelBuilder.Entity<PreviewDeployment>(entity =>
+        {
+            entity.ToTable("preview_deployments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PreviewUrl).HasMaxLength(500);
+            entity.Property(e => e.Provider).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
         });
     }
 }

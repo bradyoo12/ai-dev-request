@@ -73,6 +73,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<GitHubSync> GitHubSyncs => Set<GitHubSync>();
     public DbSet<CodeQualityReview> CodeQualityReviews => Set<CodeQualityReview>();
     public DbSet<GenerationStream> GenerationStreams => Set<GenerationStream>();
+    public DbSet<BillingAccount> BillingAccounts => Set<BillingAccount>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1121,6 +1122,25 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<BillingAccount>(entity =>
+        {
+            entity.ToTable("billing_accounts");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Plan).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.StripeCustomerId).HasMaxLength(200);
+            entity.Property(e => e.StripeSubscriptionId).HasMaxLength(200);
+            entity.Property(e => e.OverageCharges).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.MonthlyRate).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.PerRequestOverageRate).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.InvoiceHistory).HasColumnType("jsonb");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.UserId).IsUnique();
+            entity.HasIndex(e => e.Plan);
+            entity.HasIndex(e => e.Status);
         });
     }
 }

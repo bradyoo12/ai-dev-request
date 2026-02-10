@@ -111,6 +111,17 @@ Automated validate-fix loop that runs after AI code generation:
 - **Frontend**: `ValidationProgress` shows real-time build validation phases; `FixHistoryDisplay` shows collapsible fix history
 - **Flow**: Code generated → validate → if issues, ask AI to fix → re-validate → repeat until pass or max retries
 
+## Heterogeneous Model Architecture (Cost Optimization)
+
+Intelligent model routing to reduce AI costs by using the cheapest sufficient model tier per task:
+- **Backend**: `ModelRouterService` routes tasks to Haiku (simple), Sonnet (moderate), or Opus (complex) based on `TaskCategory`
+- **Backend**: `CostTrackingService` tracks per-request model tier usage and calculates savings vs all-Opus baseline
+- **Integration**: `AnalysisService`, `ProposalService`, `ProductionService` all use `IModelRouterService` to select model tier
+- **Endpoints**: `GET /api/requests/{id}/cost-report` — per-request cost breakdown with tier usage and estimated savings
+- **Entity**: `DevRequest` tracks `ModelTierUsage` (JSON), `EstimatedCostSavings` (decimal)
+- **Frontend**: `CostSavingsDisplay` component shows tier breakdown bar chart and estimated savings after build
+- **Flow**: Task submitted → classify category → route to cheapest sufficient tier → track usage → report savings
+
 ## Directory Structure
 
 ```

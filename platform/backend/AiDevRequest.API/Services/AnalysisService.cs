@@ -13,15 +13,17 @@ public interface IAnalysisService
 public class AnalysisService : IAnalysisService
 {
     private readonly AnthropicClient _client;
+    private readonly IModelRouterService _modelRouter;
     private readonly ILogger<AnalysisService> _logger;
 
-    public AnalysisService(IConfiguration configuration, ILogger<AnalysisService> logger)
+    public AnalysisService(IConfiguration configuration, IModelRouterService modelRouter, ILogger<AnalysisService> logger)
     {
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
             ?? throw new InvalidOperationException("Anthropic API key not configured");
 
         _client = new AnthropicClient(apiKey);
+        _modelRouter = modelRouter;
         _logger = logger;
     }
 
@@ -89,9 +91,17 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
                 messages = new List<Message> { new Message(RoleType.User, prompt) };
             }
 
+            // Model routing: Analysis is a lightweight task → Haiku tier recommended.
+            // Currently using a single configured model; the ModelRouterService provides the
+            // recommended tier for future multi-model support.
+            var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.Analysis);
+            var recommendedModelId = _modelRouter.GetModelId(recommendedTier);
+            _logger.LogInformation("Analysis task: recommended tier={Tier}, model={Model}", recommendedTier, recommendedModelId);
+
             var parameters = new MessageParameters
             {
                 Messages = messages,
+                // TODO: Switch to recommendedModelId once multi-model client support is available
                 Model = "claude-sonnet-4-20250514",
                 MaxTokens = 2000,
                 Temperature = 0.3m

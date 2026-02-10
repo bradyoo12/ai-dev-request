@@ -20,6 +20,10 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Add model routing & cost tracking (singleton: stateless or in-memory state)
+builder.Services.AddSingleton<IModelRouterService, ModelRouterService>();
+builder.Services.AddSingleton<ICostTrackingService, CostTrackingService>();
+
 // Add AI Services (singleton: reads API key once at startup; config changes require restart)
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();

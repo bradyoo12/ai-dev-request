@@ -19,6 +19,7 @@ import LivePreview from '../components/LivePreview'
 import MobilePreview from '../components/MobilePreview'
 import ValidationProgress from '../components/ValidationProgress'
 import FixHistoryDisplay from '../components/FixHistoryDisplay'
+import CostSavingsDisplay from '../components/CostSavingsDisplay'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -826,6 +827,10 @@ export default function HomePage() {
               validationPassed={productionResult.production.validationPassed ?? true}
               iterations={productionResult.production.validationIterations ?? 1}
             />
+
+            {submittedRequest && (
+              <CostSavingsDisplay requestId={submittedRequest.id} />
+            )}
 
             {productionResult.production.accessibilityScore != null && (
               <div className={`rounded-xl p-4 mb-4 ${

@@ -30,6 +30,7 @@ public class RequestsController : ControllerBase
     private readonly IProjectVersionService _versionService;
     private readonly IExpoPreviewService _expoPreviewService;
     private readonly ISelfHealingService _selfHealingService;
+    private readonly ICostTrackingService _costTrackingService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -48,6 +49,7 @@ public class RequestsController : ControllerBase
         IProjectVersionService versionService,
         IExpoPreviewService expoPreviewService,
         ISelfHealingService selfHealingService,
+        ICostTrackingService costTrackingService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -65,6 +67,7 @@ public class RequestsController : ControllerBase
         _versionService = versionService;
         _expoPreviewService = expoPreviewService;
         _selfHealingService = selfHealingService;
+        _costTrackingService = costTrackingService;
         _logger = logger;
     }
 
@@ -713,6 +716,21 @@ public class RequestsController : ControllerBase
             FixesApplied = verifications.Sum(v => v.FixesApplied),
             Iterations = verifications.Count
         });
+    }
+
+    /// <summary>
+    /// Get the AI cost report for a request, including tier breakdown and savings estimate.
+    /// </summary>
+    [HttpGet("{id:guid}/cost-report")]
+    [ProducesResponseType(typeof(CostReport), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CostReport>> GetCostReport(Guid id)
+    {
+        var (entity, error) = await GetOwnedEntityAsync(id);
+        if (error != null) return error;
+
+        var report = _costTrackingService.GetCostReport(id);
+        return Ok(report);
     }
 
     /// <summary>

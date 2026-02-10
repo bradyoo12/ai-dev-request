@@ -7,6 +7,9 @@ namespace AiDevRequest.Tests.Services;
 
 public class ProductionServiceTests
 {
+    private static IModelRouterService CreateModelRouter() =>
+        new ModelRouterService(new Mock<ILogger<ModelRouterService>>().Object);
+
     [Fact]
     public void Constructor_ThrowsWhenNoApiKey()
     {
@@ -19,7 +22,7 @@ public class ProductionServiceTests
         try
         {
             Environment.SetEnvironmentVariable("ANTHROPIC_API_KEY", null);
-            Assert.Throws<InvalidOperationException>(() => new ProductionService(config, logger.Object));
+            Assert.Throws<InvalidOperationException>(() => new ProductionService(config, CreateModelRouter(), logger.Object));
         }
         finally
         {
@@ -38,7 +41,7 @@ public class ProductionServiceTests
             .Build();
         var logger = new Mock<ILogger<ProductionService>>();
 
-        var service = new ProductionService(config, logger.Object);
+        var service = new ProductionService(config, CreateModelRouter(), logger.Object);
 
         Assert.NotNull(service);
     }
@@ -53,7 +56,7 @@ public class ProductionServiceTests
             })
             .Build();
         var logger = new Mock<ILogger<ProductionService>>();
-        var service = new ProductionService(config, logger.Object);
+        var service = new ProductionService(config, CreateModelRouter(), logger.Object);
 
         var status = await service.GetBuildStatusAsync("non-existent-project");
 

@@ -14,7 +14,16 @@
       "WebSearch(*)",
       "Task(*)",
       "TodoWrite(*)",
-      "NotebookEdit(*)"
+      "NotebookEdit(*)",
+      "AskUserQuestion(*)",
+      "Skill(*)",
+      "EnterPlanMode(*)",
+      "ExitPlanMode(*)",
+      "TeamCreate(*)",
+      "TeamDelete(*)",
+      "SendMessage(*)",
+      "TaskOutput(*)",
+      "TaskStop(*)"
     ]
   }
 }

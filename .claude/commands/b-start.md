@@ -384,9 +384,14 @@ After collecting findings from both scouts:
 3. Create max 3 suggestion tickets:
    ```bash
    gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body "{body}" --label "suggestion"
-   gh project item-add 26 --owner bradyoo12 --url {issue_url}
    ```
-4. Do NOT set any status — leave for human triage
+4. Add each ticket to the project and set status to **Ready**:
+   ```bash
+   ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
+   STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
+   READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
+   gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+   ```
 
 #### Step 6d: Cleanup
 
@@ -452,11 +457,16 @@ After collecting findings from both agents:
    ```
    - Use label `bug` for errors found by error-checker
    - Use label `enhancement` for improvements found by ux-reviewer
-4. Add tickets to the project:
+4. Add tickets to the project and set status to **Ready**:
    ```bash
-   gh project item-add 26 --owner bradyoo12 --url {issue_url}
+   # Add issue to project and capture the item ID
+   ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
+
+   # Set status to Ready
+   STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
+   READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
+   gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
    ```
-5. Set status to **Backlog** — leave for human triage or next b-start cycle to pick up
 
 #### Step 7d: Cleanup
 

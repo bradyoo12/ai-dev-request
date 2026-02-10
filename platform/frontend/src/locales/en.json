@@ -859,5 +859,16 @@
   "wl.breakdown": "Usage Breakdown",
   "api.error.tenantsFailed": "Failed to load tenants.",
   "api.error.tenantCreateFailed": "Failed to create tenant.",
-  "api.error.tenantDeleteFailed": "Failed to delete tenant."
+  "api.error.tenantDeleteFailed": "Failed to delete tenant.",
+  "codePreview.title": "Code Preview",
+  "codePreview.projectId": "Project ID",
+  "codePreview.viewport.desktop": "Desktop",
+  "codePreview.viewport.tablet": "Tablet",
+  "codePreview.viewport.mobile": "Mobile",
+  "codePreview.copyCode": "Copy Code",
+  "codePreview.copied": "Copied!",
+  "codePreview.files": "Files",
+  "codePreview.editor": "Editor",
+  "codePreview.livePreview": "Live Preview",
+  "codePreview.openPreview": "Preview Code"
 }

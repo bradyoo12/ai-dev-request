@@ -859,5 +859,16 @@
   "wl.breakdown": "사용량 분석",
   "api.error.tenantsFailed": "테넌트를 불러오는 데 실패했습니다.",
   "api.error.tenantCreateFailed": "테넌트 생성에 실패했습니다.",
-  "api.error.tenantDeleteFailed": "테넌트 삭제에 실패했습니다."
+  "api.error.tenantDeleteFailed": "테넌트 삭제에 실패했습니다.",
+  "codePreview.title": "코드 미리보기",
+  "codePreview.projectId": "프로젝트 ID",
+  "codePreview.viewport.desktop": "데스크톱",
+  "codePreview.viewport.tablet": "태블릿",
+  "codePreview.viewport.mobile": "모바일",
+  "codePreview.copyCode": "코드 복사",
+  "codePreview.copied": "복사됨!",
+  "codePreview.files": "파일",
+  "codePreview.editor": "에디터",
+  "codePreview.livePreview": "라이브 미리보기",
+  "codePreview.openPreview": "코드 미리보기"
 }

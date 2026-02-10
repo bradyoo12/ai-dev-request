@@ -64,8 +64,10 @@ if (string.IsNullOrEmpty(jwtSecret))
     }
     else
     {
-        throw new InvalidOperationException(
-            "Jwt:Secret must be configured. Set it in appsettings.json, environment variables, or appsettings.Local.json.");
+        // Generate a random secret so the app can start and remain accessible for diagnostics.
+        // Existing JWTs will be invalid after each restart; set Jwt__Secret in Azure App Settings to fix.
+        jwtSecret = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+        Console.WriteLine("WARNING: Jwt:Secret not configured — generated ephemeral secret. Set Jwt__Secret in App Settings.");
     }
 }
 

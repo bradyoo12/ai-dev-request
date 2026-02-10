@@ -21,7 +21,7 @@ const INTEREST_CATEGORIES = [
 export default function RecommendationsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { authUser } = useAuth()
   const [recommendations, setRecommendations] = useState<AppRecommendation[]>([])
   const [interests, setInterests] = useState<UserInterest[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,7 +97,7 @@ export default function RecommendationsPage() {
     navigate('/', { state: { prefill: promptTemplate } })
   }
 
-  if (!user) {
+  if (!authUser) {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="text-center py-16">

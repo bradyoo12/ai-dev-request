@@ -93,6 +93,7 @@ User Request (natural language)
 | MarketplaceTemplate | Community-driven project generation template in the marketplace |
 | ContainerConfig | Docker containerization configuration for a generated project |
 | OnboardingProgress | User onboarding wizard progress tracking with step completion milestones |
+| ProjectVersion | Versioned snapshot of a generated project with file-level diff capabilities |
 
 ## Spec-Driven Development Pipeline
 
@@ -138,6 +139,21 @@ CRDT-based collaborative editing for dev requests with presence tracking and act
 - **Entity**: `CollaborativeSession` with participants JSON (userId, displayName, color), activity feed JSON, document content, version tracking
 - **Frontend**: `CollaborativeEditingPage` in Settings with create/join session panels, collaborative text editor with save, activity feed with action icons (created/joined/edited/ended), participant avatar circles with color coding, stats grid (participants/version/activities/last activity), session history
 - **Flow**: Create session → share with team → participants join → edit document collaboratively → activity tracked → end session → view history
+
+## Project Version History with Visual Diff
+
+Browse, compare, and rollback project versions with file-level visual diffs:
+- **Backend**: `ProjectVersionController` provides dedicated REST endpoints for version management; `ProjectVersionService` extended with `GetVersionAsync`, `GetLatestVersionAsync`, `GetDiffAsync` methods and `VersionDiff` class for computing file-level diffs
+- **Endpoints**:
+  - `GET /api/projects/{id}/versions` — list all versions
+  - `GET /api/projects/{id}/versions/{versionId}` — get version details
+  - `GET /api/projects/{id}/versions/latest` — get latest version
+  - `GET /api/projects/{id}/versions/{fromId}/diff/{toId}` — diff between two versions
+  - `POST /api/projects/{id}/versions/{versionId}/rollback` — rollback to version
+- **Entity**: `ProjectVersion` with Id (Guid), DevRequestId, VersionNumber, Label, Source (build/rebuild/rollback), FileCount, SnapshotPath, ChangedFilesJson, CreatedAt
+- **Diff**: `VersionDiff` computes added, removed, and modified files between two version snapshots by comparing deserialized file lists
+- **Frontend**: `ProjectVersionPage` in Settings with project ID input, version timeline with color-coded source badges (blue=build, purple=rebuild, yellow=rollback), latest indicator, rollback buttons, interactive diff viewer with from/to version selectors, summary stats (added/removed/modified counts), and color-coded file lists
+- **Flow**: Enter project ID → load versions → browse timeline → select two versions → compare diffs → view file changes → rollback if needed
 
 ## Interactive Onboarding Wizard
 

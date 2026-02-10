@@ -78,15 +78,19 @@ gh project item-list 26 --owner bradyoo12 --format json --limit 200
 
 Filter to issues with "Ready" status and no `on hold` label. If none found, wait 5 seconds and retry.
 
-### Step 2: Move Ticket to In Progress
+### Step 2: Move Ticket to In Progress (Claim It)
 
 **Skip this step if the ticket was passed from b-start** (already moved to "In Progress" by the orchestrator).
 
-Only run this if b-ready auto-discovered the ticket in Step 1:
+Only run this if b-ready auto-discovered the ticket in Step 1.
+
+**CRITICAL: Do this IMMEDIATELY before reading ticket details or doing any other work. This prevents other b-start/b-ready instances on other machines from picking up the same ticket.**
 
 ```bash
 gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
 ```
+
+After claiming, re-fetch the project board and verify the ticket is now "In Progress". If another instance already claimed it (status is no longer "Ready"), skip this ticket and find the next one.
 
 ### Step 3: Read Ticket and Create Plan
 1. Fetch the issue details:

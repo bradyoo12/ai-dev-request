@@ -116,19 +116,28 @@ Check all tickets in the project to ensure they align with policy and design:
 
 Implement and locally test ONE Ready ticket using an Agent Team.
 
-#### Step 3a: Claim the Ticket
+#### Step 3a: Claim the Ticket (RACE-CONDITION SAFE)
 
-1. Find the top Ready ticket (no `on hold` label) from the project:
+**CRITICAL: Multiple b-start instances may run on different machines. The status change MUST happen BEFORE any other work on the ticket to prevent duplicate processing.**
+
+1. Fetch the project board:
    ```bash
    gh project item-list 26 --owner bradyoo12 --format json --limit 200
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
 3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
-4. **Immediately move the ticket to "In Progress"** to prevent other instances from picking it up:
+4. **IMMEDIATELY move the ticket to "In Progress"** — this is the FIRST action, before reading the ticket, classifying it, or doing anything else:
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
    ```
-5. Log: "Claimed ticket #<number> — moved to In Progress"
+5. **Verify the claim succeeded** — re-fetch the project item and confirm it is now "In Progress":
+   ```bash
+   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   ```
+   - If the ticket is already "In Progress" (claimed by another instance between your fetch and your edit), **skip this ticket** and go back to step 1 to find the next Ready ticket.
+6. Log: "Claimed ticket #<number> — moved to In Progress"
+
+**Do NOT read the ticket details, classify scope, or create teams until the claim is confirmed.**
 
 #### Step 3b: Read and Classify the Ticket
 
@@ -564,6 +573,7 @@ Log the current status of the project board:
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
 - **ONE ticket at a time** - teams parallelize WITHIN a ticket, not across tickets
+- **Multi-machine safe** - Multiple b-start instances can run on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.
 - Teams are created and destroyed per-step — no long-lived teams
 - 5-second delay between full cycles to avoid API rate limiting
 - Always check policy.md and design.md at the start of each cycle

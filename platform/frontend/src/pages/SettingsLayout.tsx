@@ -11,11 +11,12 @@ import InfrastructurePage from './InfrastructurePage'
 import SecretDetectionPage from './SecretDetectionPage'
 import PreviewDeploymentPage from './PreviewDeploymentPage'
 import GenerationManifestPage from './GenerationManifestPage'
+import OAuthCompliancePage from './OAuthCompliancePage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -125,6 +126,14 @@ export default function SettingsLayout() {
         >
           {t('settings.tabs.generation', 'Generation')}
         </button>
+        <button
+          onClick={() => setSettingsTab('oauth')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'oauth' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          {t('settings.tabs.oauth', 'OAuth')}
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -136,6 +145,7 @@ export default function SettingsLayout() {
       {settingsTab === 'secrets' && <SecretDetectionPage />}
       {settingsTab === 'preview' && <PreviewDeploymentPage />}
       {settingsTab === 'generation' && <GenerationManifestPage />}
+      {settingsTab === 'oauth' && <OAuthCompliancePage />}
     </section>
   )
 }

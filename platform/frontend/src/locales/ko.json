@@ -870,5 +870,19 @@
   "codePreview.files": "파일",
   "codePreview.editor": "에디터",
   "codePreview.livePreview": "라이브 미리보기",
-  "codePreview.openPreview": "코드 미리보기"
+  "codePreview.openPreview": "코드 미리보기",
+  "growth.title": "성장 지표",
+  "growth.description": "방문자, 체험, 유료 사용자 성장 지표를 추적하세요.",
+  "growth.visitors": "방문자",
+  "growth.registered": "가입자",
+  "growth.trialUsers": "체험 사용자",
+  "growth.paidUsers": "유료 회원",
+  "growth.growthRate": "성장률",
+  "growth.conversionRate": "전환율",
+  "growth.churnRate": "이탈률",
+  "growth.trends": "월별 추이",
+  "growth.funnel": "전환 퍼널",
+  "growth.export": "CSV 내보내기",
+  "growth.noData": "데이터가 없습니다",
+  "growth.loading": "성장 데이터를 불러오는 중..."
 }

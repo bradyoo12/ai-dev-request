@@ -565,6 +565,37 @@ export async function syncToGitHub(id: string, accessToken: string): Promise<Git
   return response.json();
 }
 
+// Expo Preview API
+export interface ExpoPreviewResponse {
+  previewUrl: string
+  snackUrl: string
+  success: boolean
+  error?: string
+}
+
+export async function generateExpoPreview(requestId: string): Promise<ExpoPreviewResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/preview/expo`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || 'Failed to generate Expo preview')
+  }
+
+  return response.json()
+}
+
+export async function getExpoPreview(requestId: string): Promise<{ previewUrl: string; snackUrl: string } | null> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/preview`, {
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) return null
+  return response.json()
+}
+
 export async function getTemplates(category?: string, framework?: string): Promise<ProjectTemplate[]> {
   const params = new URLSearchParams();
   if (category) params.set('category', category);

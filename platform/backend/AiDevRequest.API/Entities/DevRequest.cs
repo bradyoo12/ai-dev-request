@@ -44,6 +44,9 @@ public class DevRequest
 
     public string? ProjectPath { get; set; }
 
+    // Expo preview
+    public string? PreviewUrl { get; set; }
+
     // GitHub sync
     public string? GitHubRepoUrl { get; set; }
 

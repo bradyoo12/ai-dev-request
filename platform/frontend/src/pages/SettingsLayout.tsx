@@ -35,7 +35,8 @@ export default function SettingsLayout() {
   const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab
     : location.pathname === '/settings/github-sync' ? 'github-sync' as SettingsTab
     : location.pathname === '/settings/code-review' ? 'code-review' as SettingsTab
-    : location.pathname === '/settings/streaming-generation' ? 'streaming-generation' as SettingsTab : null
+    : location.pathname === '/settings/streaming-generation' ? 'streaming-generation' as SettingsTab
+    : location.pathname === '/settings/billing' ? 'billing' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -79,7 +80,10 @@ export default function SettingsLayout() {
             settingsTab === 'billing' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
-          {t('settings.tabs.billing')}
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            {t('settings.tabs.billing')}
+          </span>
         </button>
         <button
           onClick={() => setSettingsTab('payments')}

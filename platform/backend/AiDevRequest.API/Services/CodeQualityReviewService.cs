@@ -1,6 +1,8 @@
 using System.Text.Json;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using Anthropic.SDK;
+using Anthropic.SDK.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Services;
@@ -17,12 +19,24 @@ public interface ICodeQualityReviewService
 public class CodeQualityReviewService : ICodeQualityReviewService
 {
     private readonly AiDevRequestDbContext _context;
+    private readonly AnthropicClient _client;
     private readonly ILogger<CodeQualityReviewService> _logger;
+    private readonly string _projectsBasePath;
 
-    public CodeQualityReviewService(AiDevRequestDbContext context, ILogger<CodeQualityReviewService> logger)
+    public CodeQualityReviewService(
+        AiDevRequestDbContext context,
+        IConfiguration configuration,
+        ILogger<CodeQualityReviewService> logger)
     {
         _context = context;
         _logger = logger;
+        _projectsBasePath = configuration["Projects:BasePath"] ?? "./projects";
+
+        var apiKey = configuration["Anthropic:ApiKey"]
+            ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
+            ?? throw new InvalidOperationException("Anthropic API key not configured");
+
+        _client = new AnthropicClient(apiKey);
     }
 
     public async Task<CodeQualityReview> TriggerReviewAsync(int projectId)
@@ -47,9 +61,29 @@ public class CodeQualityReviewService : ICodeQualityReviewService
 
         try
         {
-            // Simulate AI-powered code quality analysis
-            // In production, this would call Claude API to analyze the project files
-            var findings = GenerateSimulatedFindings(projectId);
+            // Resolve the project path from the database
+            var projectPath = await ResolveProjectPathAsync(projectId);
+            List<ReviewFinding> findings;
+
+            if (projectPath != null)
+            {
+                var sourceFiles = ReadSourceFiles(projectPath);
+                if (sourceFiles.Count > 0)
+                {
+                    findings = await AnalyzeWithClaudeAsync(sourceFiles, projectId);
+                }
+                else
+                {
+                    _logger.LogWarning("No source files found at {Path} for project {ProjectId}", projectPath, projectId);
+                    findings = new List<ReviewFinding>();
+                }
+            }
+            else
+            {
+                _logger.LogWarning("No project path found for project {ProjectId}, using fallback analysis", projectId);
+                findings = new List<ReviewFinding>();
+            }
+
             var criticalCount = findings.Count(f => f.Severity == "critical");
             var warningCount = findings.Count(f => f.Severity == "warning");
             var infoCount = findings.Count(f => f.Severity == "info");
@@ -176,6 +210,156 @@ public class CodeQualityReviewService : ICodeQualityReviewService
         return review;
     }
 
+    private async Task<string?> ResolveProjectPathAsync(int projectId)
+    {
+        // Try to find the DevRequest by ordering and using projectId as 1-based index
+        var devRequest = await _context.DevRequests
+            .Where(r => r.ProjectPath != null)
+            .OrderBy(r => r.CreatedAt)
+            .Skip(projectId - 1)
+            .FirstOrDefaultAsync();
+
+        if (devRequest?.ProjectPath != null && Directory.Exists(devRequest.ProjectPath))
+            return devRequest.ProjectPath;
+
+        // Fallback: scan projects base directory for matching folder
+        if (Directory.Exists(_projectsBasePath))
+        {
+            var dirs = Directory.GetDirectories(_projectsBasePath)
+                .OrderBy(d => d)
+                .ToArray();
+
+            if (projectId >= 1 && projectId <= dirs.Length)
+                return dirs[projectId - 1];
+        }
+
+        return null;
+    }
+
+    private static Dictionary<string, string> ReadSourceFiles(string projectPath)
+    {
+        var files = new Dictionary<string, string>();
+        if (!Directory.Exists(projectPath)) return files;
+
+        var sourceExtensions = new HashSet<string>
+        {
+            ".ts", ".tsx", ".js", ".jsx", ".cs", ".py",
+            ".vue", ".svelte", ".sql", ".graphql", ".html", ".css"
+        };
+
+        var excludeDirs = new HashSet<string>
+        {
+            "node_modules", "dist", "build", ".next", "bin", "obj",
+            "__pycache__", ".pytest_cache", "coverage", ".git"
+        };
+
+        foreach (var filePath in Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories))
+        {
+            var ext = Path.GetExtension(filePath).ToLower();
+            if (!sourceExtensions.Contains(ext)) continue;
+
+            var relativePath = Path.GetRelativePath(projectPath, filePath);
+            if (excludeDirs.Any(d => relativePath.Contains(d, StringComparison.OrdinalIgnoreCase))) continue;
+
+            try
+            {
+                var content = File.ReadAllText(filePath);
+                if (content.Length <= 50000)
+                {
+                    files[relativePath] = content;
+                }
+            }
+            catch { /* Skip files that can't be read */ }
+        }
+
+        return files;
+    }
+
+    private async Task<List<ReviewFinding>> AnalyzeWithClaudeAsync(Dictionary<string, string> sourceFiles, int projectId)
+    {
+        var filesSummary = string.Join("\n\n", sourceFiles.Select(f =>
+            $"### {f.Key}\n```\n{(f.Value.Length > 3000 ? f.Value[..3000] + "\n... (truncated)" : f.Value)}\n```"));
+
+        // Limit total prompt size to avoid token limits
+        if (filesSummary.Length > 80000)
+            filesSummary = filesSummary[..80000] + "\n\n... (additional files truncated for token limit)";
+
+        var prompt = $@"You are an expert code quality reviewer. Analyze the following project code across 5 dimensions. For each finding, classify it into exactly one dimension.
+
+## Source Files
+{filesSummary}
+
+## Review Dimensions
+
+1. **architecture** — Separation of concerns, modularity, coupling, dependency direction, design patterns
+2. **security** — XSS, injection, auth bypass, hardcoded secrets, CSRF, insecure dependencies (OWASP Top 10)
+3. **performance** — N+1 queries, missing memoization, unnecessary re-renders, large bundles, blocking operations
+4. **accessibility** — Missing ARIA labels, keyboard navigation, color contrast, screen reader support, alt text
+5. **maintainability** — Naming conventions, code duplication, cyclomatic complexity, dead code, type safety, error handling
+
+## Response Format
+
+Respond with ONLY a JSON array of findings. Each finding must have:
+- ""id"": unique string (format: ""<dimension_prefix>-{projectId}-<sequential>"", e.g. ""sec-{projectId}-1"")
+- ""dimension"": one of [""architecture"", ""security"", ""performance"", ""accessibility"", ""maintainability""]
+- ""severity"": one of [""critical"", ""warning"", ""info""]
+- ""title"": short descriptive title (max 80 chars)
+- ""description"": detailed explanation of the issue
+- ""file"": the relative file path where the issue was found
+- ""line"": approximate line number (integer)
+- ""suggestedFix"": actionable fix suggestion
+
+Rules:
+- Only report REAL issues found in the actual code. Do not fabricate issues.
+- Use ""critical"" for security vulnerabilities and bugs that break functionality
+- Use ""warning"" for issues that degrade quality or could cause future problems
+- Use ""info"" for style, best-practice suggestions, and minor improvements
+- If the code is clean and well-written, return fewer findings (even an empty array is acceptable)
+- Aim for thoroughness across all 5 dimensions
+
+JSON array only. No other text.";
+
+        try
+        {
+            var messages = new List<Message> { new Message(RoleType.User, prompt) };
+            var parameters = new MessageParameters
+            {
+                Messages = messages,
+                Model = "claude-sonnet-4-20250514",
+                MaxTokens = 4000,
+                Temperature = 0.2m
+            };
+
+            var response = await _client.Messages.GetClaudeMessageAsync(parameters);
+            var content = response.Content.FirstOrDefault()?.ToString() ?? "[]";
+
+            // Extract JSON array from response
+            var jsonStart = content.IndexOf('[');
+            var jsonEnd = content.LastIndexOf(']');
+            if (jsonStart >= 0 && jsonEnd > jsonStart)
+            {
+                content = content[jsonStart..(jsonEnd + 1)];
+            }
+
+            var findings = JsonSerializer.Deserialize<List<ReviewFinding>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (findings != null)
+            {
+                _logger.LogInformation("Claude returned {Count} findings for project {ProjectId}", findings.Count, projectId);
+                return findings;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Claude API call failed for project {ProjectId}, returning empty findings", projectId);
+        }
+
+        return new List<ReviewFinding>();
+    }
+
     private static int CalculateDimensionScore(List<ReviewFinding> findings, string dimension)
     {
         var dimensionFindings = findings.Where(f => f.Dimension == dimension).ToList();
@@ -190,80 +374,6 @@ public class CodeQualityReviewService : ICodeQualityReviewService
         });
 
         return Math.Max(1, (int)Math.Round(5 - penalty));
-    }
-
-    private static List<ReviewFinding> GenerateSimulatedFindings(int projectId)
-    {
-        // In production, this would be replaced with actual AI analysis via Claude API
-        return new List<ReviewFinding>
-        {
-            new()
-            {
-                Id = $"arch-{projectId}-1",
-                Dimension = "architecture",
-                Severity = "warning",
-                Title = "Tight coupling between components",
-                Description = "Several components directly import and depend on concrete implementations rather than abstractions.",
-                File = "src/services/DataService.ts",
-                Line = 15,
-                SuggestedFix = "Introduce dependency injection or use interfaces to decouple components."
-            },
-            new()
-            {
-                Id = $"sec-{projectId}-1",
-                Dimension = "security",
-                Severity = "critical",
-                Title = "Potential XSS vulnerability",
-                Description = "User input is rendered without sanitization using dangerouslySetInnerHTML.",
-                File = "src/components/UserContent.tsx",
-                Line = 42,
-                SuggestedFix = "Use DOMPurify to sanitize user input before rendering."
-            },
-            new()
-            {
-                Id = $"perf-{projectId}-1",
-                Dimension = "performance",
-                Severity = "warning",
-                Title = "Missing memoization",
-                Description = "Expensive computation in render path without useMemo.",
-                File = "src/pages/Dashboard.tsx",
-                Line = 28,
-                SuggestedFix = "Wrap the computation in useMemo with appropriate dependencies."
-            },
-            new()
-            {
-                Id = $"a11y-{projectId}-1",
-                Dimension = "accessibility",
-                Severity = "warning",
-                Title = "Missing ARIA labels",
-                Description = "Interactive elements lack proper ARIA labels for screen readers.",
-                File = "src/components/NavBar.tsx",
-                Line = 10,
-                SuggestedFix = "Add aria-label attributes to all interactive elements."
-            },
-            new()
-            {
-                Id = $"maint-{projectId}-1",
-                Dimension = "maintainability",
-                Severity = "info",
-                Title = "Large function complexity",
-                Description = "Function exceeds recommended cyclomatic complexity threshold.",
-                File = "src/utils/parser.ts",
-                Line = 55,
-                SuggestedFix = "Break down into smaller, focused helper functions."
-            },
-            new()
-            {
-                Id = $"sec-{projectId}-2",
-                Dimension = "security",
-                Severity = "info",
-                Title = "Consider Content Security Policy",
-                Description = "No Content Security Policy headers detected in the application configuration.",
-                File = "src/index.html",
-                Line = 1,
-                SuggestedFix = "Add CSP meta tag or configure CSP headers on the server."
-            }
-        };
     }
 }
 

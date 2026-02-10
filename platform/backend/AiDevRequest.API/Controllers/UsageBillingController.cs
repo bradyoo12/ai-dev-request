@@ -61,12 +61,12 @@ public class UsageBillingController : ControllerBase
     }
 
     [HttpGet("usage")]
-    [ProducesResponseType(typeof(UsageSummaryDto), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UsageSummaryDto>> GetUsageSummary()
+    [ProducesResponseType(typeof(BillingUsageSummaryDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<BillingUsageSummaryDto>> GetUsageSummary()
     {
         var userId = GetUserId();
         var summary = await _usageBillingService.GetUsageSummaryAsync(userId);
-        return Ok(new UsageSummaryDto
+        return Ok(new BillingUsageSummaryDto
         {
             Plan = summary.Plan,
             Status = summary.Status,
@@ -101,11 +101,11 @@ public class UsageBillingController : ControllerBase
     }
 
     [HttpGet("plans")]
-    [ProducesResponseType(typeof(List<PricingPlanDto>), StatusCodes.Status200OK)]
-    public ActionResult<List<PricingPlanDto>> GetPlans()
+    [ProducesResponseType(typeof(List<BillingPricingPlanDto>), StatusCodes.Status200OK)]
+    public ActionResult<List<BillingPricingPlanDto>> GetPlans()
     {
         var plans = _usageBillingService.GetPlansAsync();
-        return Ok(plans.Select(p => new PricingPlanDto
+        return Ok(plans.Select(p => new BillingPricingPlanDto
         {
             Id = p.Id,
             Name = p.Name,
@@ -185,7 +185,7 @@ public record SubscribeDto
     public string Plan { get; init; } = "";
 }
 
-public record UsageSummaryDto
+public record BillingUsageSummaryDto
 {
     public string Plan { get; init; } = "";
     public string Status { get; init; } = "";
@@ -211,7 +211,7 @@ public record InvoiceDto
     public string? DownloadUrl { get; init; }
 }
 
-public record PricingPlanDto
+public record BillingPricingPlanDto
 {
     public string Id { get; init; } = "";
     public string Name { get; init; } = "";

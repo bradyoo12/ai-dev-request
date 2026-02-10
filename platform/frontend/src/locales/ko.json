@@ -991,5 +991,13 @@
   "compliance.licensesCompatible": "모든 라이선스가 호환됩니다",
   "compliance.licensesReview": "카피레프트 라이선스 감지 - 검토가 필요합니다",
   "compliance.uniqueLicenses": "고유 라이선스",
-  "compliance.more": "더 보기"
+  "compliance.more": "더 보기",
+  "validation.validating": "생성된 코드 검증 중...",
+  "validation.fixing": "문제 수정 중 (시도 {{current}}/{{max}})...",
+  "validation.passed": "코드 검증 통과!",
+  "validation.maxRetries": "최대 검증 재시도 횟수 도달",
+  "validation.iterations": "검증 반복 횟수",
+  "validation.fixHistory": "수정 이력",
+  "validation.issuesFound": "건의 이슈 발견",
+  "validation.fixApplied": "수정 적용"
 }

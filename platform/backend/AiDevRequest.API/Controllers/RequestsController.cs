@@ -29,6 +29,7 @@ public class RequestsController : ControllerBase
     private readonly IDatabaseSchemaService _databaseSchemaService;
     private readonly IProjectVersionService _versionService;
     private readonly IExpoPreviewService _expoPreviewService;
+    private readonly ISelfHealingService _selfHealingService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -46,6 +47,7 @@ public class RequestsController : ControllerBase
         IDatabaseSchemaService databaseSchemaService,
         IProjectVersionService versionService,
         IExpoPreviewService expoPreviewService,
+        ISelfHealingService selfHealingService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -62,6 +64,7 @@ public class RequestsController : ControllerBase
         _databaseSchemaService = databaseSchemaService;
         _versionService = versionService;
         _expoPreviewService = expoPreviewService;
+        _selfHealingService = selfHealingService;
         _logger = logger;
     }
 
@@ -525,6 +528,43 @@ public class RequestsController : ControllerBase
 
             if (result.Status == "generated")
             {
+                // Run self-healing validation loop on generated files
+                try
+                {
+                    var generatedFiles = ReadProjectFilesForValidation(result.ProjectPath);
+                    if (generatedFiles.Count > 0)
+                    {
+                        var selfHealingResult = await _selfHealingService.ValidateAndFixAsync(
+                            id, generatedFiles, result.ProjectType);
+
+                        result.ValidationPassed = selfHealingResult.Passed;
+                        result.ValidationIterations = selfHealingResult.IterationsUsed;
+                        result.ValidationSummary = selfHealingResult.Passed
+                            ? "Code validation passed"
+                            : $"Validation completed with {selfHealingResult.IterationsUsed} iteration(s)";
+
+                        // Write fixed files back to disk if fixes were applied
+                        if (selfHealingResult.FixHistory.Count > 0)
+                        {
+                            foreach (var (filePath, content) in selfHealingResult.Files)
+                            {
+                                var fullPath = Path.Combine(result.ProjectPath, filePath);
+                                var directory = Path.GetDirectoryName(fullPath);
+                                if (!string.IsNullOrEmpty(directory))
+                                {
+                                    Directory.CreateDirectory(directory);
+                                }
+                                await System.IO.File.WriteAllTextAsync(fullPath, content);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Self-healing validation failed for {RequestId}, continuing with original files", id);
+                    result.ValidationSummary = "Self-healing validation could not be completed";
+                }
+
                 // Run AI build verification
                 entity.Status = RequestStatus.Verifying;
                 await _context.SaveChangesAsync();
@@ -972,6 +1012,44 @@ public class RequestsController : ControllerBase
         }
 
         return Ok(new { files, projectName = entity.ProjectId });
+    }
+
+    private static Dictionary<string, string> ReadProjectFilesForValidation(string projectPath)
+    {
+        var files = new Dictionary<string, string>();
+        if (!Directory.Exists(projectPath)) return files;
+
+        var allowedExtensions = new HashSet<string>
+        {
+            ".ts", ".tsx", ".js", ".jsx", ".json", ".css", ".html",
+            ".cs", ".csproj", ".py", ".md", ".yaml", ".yml",
+            ".dart"
+        };
+
+        foreach (var filePath in Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories))
+        {
+            var ext = Path.GetExtension(filePath).ToLower();
+            if (!allowedExtensions.Contains(ext)) continue;
+
+            var relativePath = Path.GetRelativePath(projectPath, filePath);
+            if (relativePath.Contains("node_modules") || relativePath.Contains("dist") ||
+                relativePath.Contains("bin") || relativePath.Contains("obj")) continue;
+
+            try
+            {
+                var content = System.IO.File.ReadAllText(filePath);
+                if (content.Length <= 50000)
+                {
+                    files[relativePath] = content;
+                }
+            }
+            catch
+            {
+                // Skip unreadable files
+            }
+        }
+
+        return files;
     }
 }
 

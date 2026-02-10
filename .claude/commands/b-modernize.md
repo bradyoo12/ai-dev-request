@@ -118,13 +118,17 @@ For each qualifying technology, create a GitHub issue:
 gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body-file {draft-file} --label "suggestion"
 ```
 
-### Add to project with NO status
+### Add to project and set status to Ready
 
 ```bash
-gh project item-add 26 --owner bradyoo12 --url {issue-url}
-```
+# Add issue to project and capture the item ID
+ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format json --jq '.id')
 
-Do NOT set any status field — leave it for human triage.
+# Get the Status field ID and "Ready" option ID, then set it
+STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
+READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
+gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+```
 
 ## Step 5: Report Summary
 
@@ -136,7 +140,7 @@ Log a summary of findings and tickets created.
 
 - **Do NOT create duplicate tickets** — always check existing issues first
 - **Maximum 3 tickets per run** — focus on the most impactful suggestions
-- **No status on project board** — suggestions need human triage
+- **Set status to Ready** on the project board when adding tickets
 - **Label all tickets with `suggestion`**
 - If 4+ suggestion tickets already exist in Backlog, skip b-modernize entirely
 - In team mode, report findings — do NOT create tickets directly

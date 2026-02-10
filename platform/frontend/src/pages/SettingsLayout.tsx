@@ -28,7 +28,7 @@ export default function SettingsLayout() {
         </button>
         <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
       </div>
-      <div className="flex gap-1 mb-6 bg-gray-800 rounded-lg p-1">
+      <div className="flex gap-1 mb-6 bg-gray-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
         <button
           onClick={() => setSettingsTab('tokens')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${

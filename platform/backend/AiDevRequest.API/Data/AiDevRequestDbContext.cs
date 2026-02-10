@@ -77,6 +77,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<McpConnection> McpConnections => Set<McpConnection>();
     public DbSet<AnalyticsEvent> AnalyticsEvents => Set<AnalyticsEvent>();
     public DbSet<MarketplaceTemplate> MarketplaceTemplates => Set<MarketplaceTemplate>();
+    public DbSet<ContainerConfig> ContainerConfigs => Set<ContainerConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1197,6 +1198,26 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.DownloadCount);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<ContainerConfig>(entity =>
+        {
+            entity.ToTable("container_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DetectedStack).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Dockerfile).IsRequired().HasColumnType("text");
+            entity.Property(e => e.ComposeFile).HasColumnType("text");
+            entity.Property(e => e.K8sManifest).HasColumnType("text");
+            entity.Property(e => e.RegistryUrl).HasMaxLength(500);
+            entity.Property(e => e.ImageName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ImageTag).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.BuildStatus).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.BuildLogs).HasColumnType("jsonb");
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.BuildStatus);
             entity.HasIndex(e => e.CreatedAt);
         });
     }

@@ -22,11 +22,12 @@ import StreamingGenerationPage from './StreamingGenerationPage'
 import McpIntegrationPage from './McpIntegrationPage'
 import AnalyticsDashboardPage from './AnalyticsDashboardPage'
 import MarketplacePage from './MarketplacePage'
+import ContainerizationPage from './ContainerizationPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -42,7 +43,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/billing' ? 'billing' as SettingsTab
     : location.pathname === '/settings/mcp-integration' ? 'mcp-integration' as SettingsTab
     : location.pathname === '/settings/analytics' ? 'analytics' as SettingsTab
-    : location.pathname === '/settings/marketplace' ? 'marketplace' as SettingsTab : null
+    : location.pathname === '/settings/marketplace' ? 'marketplace' as SettingsTab
+    : location.pathname === '/settings/containerization' ? 'containerization' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -247,6 +249,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.marketplace', 'Marketplace')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('containerization')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'containerization' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            {t('settings.tabs.containerization', 'Containers')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -269,6 +282,7 @@ export default function SettingsLayout() {
       {settingsTab === 'mcp-integration' && <McpIntegrationPage />}
       {settingsTab === 'analytics' && <AnalyticsDashboardPage />}
       {settingsTab === 'marketplace' && <MarketplacePage />}
+      {settingsTab === 'containerization' && <ContainerizationPage />}
     </section>
   )
 }

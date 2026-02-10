@@ -20,6 +20,7 @@ const MicroservicesPage = lazy(() => import('./pages/MicroservicesPage'))
 const WhiteLabelPage = lazy(() => import('./pages/WhiteLabelPage'))
 const GrowthDashboardPage = lazy(() => import('./pages/GrowthDashboardPage'))
 const PreviewPage = lazy(() => import('./pages/PreviewPage'))
+const CompliancePage = lazy(() => import('./pages/CompliancePage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
             <Route path="/whitelabel" element={<Suspense fallback={LazyFallback}><WhiteLabelPage /></Suspense>} />
             <Route path="/admin/growth" element={<Suspense fallback={LazyFallback}><GrowthDashboardPage /></Suspense>} />
             <Route path="/preview" element={<Suspense fallback={LazyFallback}><PreviewPage /></Suspense>} />
+            <Route path="/compliance" element={<Suspense fallback={LazyFallback}><CompliancePage /></Suspense>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />
           </Route>
         </Routes>

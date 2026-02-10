@@ -86,6 +86,7 @@ User Request (natural language)
 | DevelopmentSpec | Structured specification (requirements/design/implementation) for a dev request |
 | GitHubSync | Bidirectional GitHub repository sync record for a generated project |
 | CodeQualityReview | AI-powered multi-dimensional code quality review result for a generated project |
+| GenerationStream | Real-time streaming code generation session with SSE event tracking |
 
 ## Spec-Driven Development Pipeline
 
@@ -130,6 +131,20 @@ Multi-dimensional AI code review scoring architecture, security, performance, ac
 - **Frontend**: `CodeReviewPage` in Settings with dimension score bars, overall score badge, findings list with severity filtering, per-finding "Apply Fix" button, bulk fix actions, review history
 - **Dimensions**: Architecture (separation of concerns), Security (XSS, auth), Performance (rendering, bundle), Accessibility (ARIA, keyboard), Maintainability (naming, types)
 - **Flow**: Code generated → trigger review → AI scores 5 dimensions → findings with severity → user applies fixes → re-review shows improvement
+
+## Real-Time Streaming Code Generation
+
+Token-by-token streaming output for AI code generation via Server-Sent Events:
+- **Backend**: `StreamingGenerationService` manages generation streams with `IAsyncEnumerable<StreamEvent>`, supports start/cancel/status operations
+- **Endpoints**:
+  - `GET /api/requests/{id}/generate/stream` — SSE endpoint (text/event-stream)
+  - `POST /api/requests/{id}/generate/start` — start generation stream
+  - `POST /api/requests/{id}/generate/cancel` — cancel active stream
+  - `GET /api/requests/{id}/generate/status` — stream status
+  - `GET /api/requests/{id}/generate/history` — stream history
+- **SSE Events**: `stream_start`, `file_start`, `code_chunk`, `file_complete`, `progress_update`, `stream_complete`, `error`
+- **Frontend**: `StreamingGenerationPage` in Settings with live code display, blinking cursor, file tabs with completion indicators, progress bar, token counter, cancel button, stream history
+- **Flow**: Start generation → SSE connection opened → tokens stream in real-time → file tabs update → progress bar fills → stream completes
 
 ## Security & Compliance (SBOM)
 

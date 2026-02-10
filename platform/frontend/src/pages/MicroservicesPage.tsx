@@ -23,7 +23,7 @@ const TYPE_COLORS: Record<string, string> = {
 export default function MicroservicesPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { authUser } = useAuth()
   const [blueprints, setBlueprints] = useState<BlueprintSummary[]>([])
   const [selected, setSelected] = useState<BlueprintDetail | null>(null)
   const [services, setServices] = useState<ServiceDef[]>([])
@@ -71,7 +71,7 @@ export default function MicroservicesPage() {
     }
   }
 
-  if (!user) {
+  if (!authUser) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('micro.title')}</h2>

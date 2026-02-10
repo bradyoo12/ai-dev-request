@@ -18,7 +18,7 @@ const TREND_CATEGORIES = ['ai_model', 'ui_framework', 'backend', 'security', 'in
 export default function ProjectHealthPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { authUser } = useAuth()
   const [activeTab, setActiveTab] = useState<'trends' | 'reviews'>('reviews')
   const [trends, setTrends] = useState<TrendReport[]>([])
   const [reviews, setReviews] = useState<ProjectReview[]>([])
@@ -86,7 +86,7 @@ export default function ProjectHealthPage() {
     return 'text-red-400'
   }
 
-  if (!user) {
+  if (!authUser) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('health.title')}</h2>

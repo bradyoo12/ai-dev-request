@@ -123,7 +123,7 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    gh project item-list 26 --owner bradyoo12 --format json --limit 200
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
-3. If no ticket found, skip to Step 4
+3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
 4. **Immediately move the ticket to "In Progress"** to prevent other instances from picking it up:
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
@@ -346,6 +346,8 @@ After a ticket is verified and completed, update the project documentation to re
 ### Step 6: b-modernize — Research with Agent Team
 
 Search for recent technologies and create suggestion tickets using parallel researchers.
+
+**This step also runs as an idle fallback:** If Steps 3–5 all found no tickets to process (no Ready tickets, no In Progress PRs to merge, no In Review tickets to verify), b-modernize runs automatically so the pipeline stays productive instead of looping empty cycles.
 
 #### Step 6a: Pre-check
 

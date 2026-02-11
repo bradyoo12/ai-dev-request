@@ -511,3 +511,16 @@ Unified 401 response handling across all authenticated frontend API calls:
 - **`settings.ts`**: Uses `authFetch` instead of raw `fetch` + `getAuthHeaders()`, ensuring all settings/tokens API calls (getTokenOverview, getTokenHistory, purchaseTokens, etc.) automatically handle expired/invalid tokens
 - **Flow**: Authenticated API call → 401 response → `authFetch` clears auth + dispatches event → `AuthContext` shows login modal → user re-authenticates
 - **Guard**: `loadTokenBalance` skips API call when `isAuthenticated()` returns false, preventing unnecessary 401s on unauthenticated pages
+
+## API Key Management for CLI/SDK Access
+
+Secure API key management enabling programmatic access to the platform:
+- **Backend**: `ApiKey` entity with SHA-256 key hashing, `ApiKeysController` with generate/list/revoke endpoints
+- **Endpoints**:
+  - `GET /api/apikeys` — list all API keys for current user
+  - `POST /api/apikeys` — generate new key (returns raw key once, stores hash)
+  - `DELETE /api/apikeys/{id}` — revoke an API key
+- **Entity**: `ApiKey` with Id (Guid), UserId, Name, KeyHash (SHA-256), KeyPrefix (`aidev_...xxxx`), Status (Active/Revoked), RequestCount, CreatedAt, LastUsedAt, RevokedAt
+- **Security**: Max 5 active keys per user, raw key shown only at creation, SHA-256 hashing for storage, unique index on KeyHash, cascade delete with User
+- **Frontend**: `ApiCliPage` in Settings with "API & CLI" tab — key list with status badges, generate form with name input, copy-to-clipboard on creation, revoke per key, cURL quick start guide
+- **Flow**: User opens Settings → API & CLI tab → enters key name → Generate Key → copy raw key (shown once) → use in API calls with `Authorization: Bearer` header

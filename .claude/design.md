@@ -750,3 +750,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `NlSchema` with Id (Guid), UserId, SchemaName, NaturalLanguageInput, GeneratedSql, TablesJson, RelationshipsJson, IndexesJson, RlsPoliciesJson, SeedDataJson, ConversationJson, ExportFormat, DatabaseType, TableCount, ColumnCount, RelationshipCount, RefinementCount, TokensUsed, EstimatedCost, GenerationTimeMs, IsPublic, ViewCount, ForkCount
 - **Frontend**: `NlSchemaDesignerPage` in Settings with "Schema AI" tab — 4 sub-tabs (Generate with NL textarea + schema name + DB type selector [PostgreSQL/MySQL/Supabase/SQLite] + ERD-style table preview with columns/types/PKs + relationship arrows + SQL viewer + export buttons + refinement chat, Schemas with list showing table/column/relation counts, Gallery with public schemas showing views/forks, Stats with 6 metric cards + recent schemas list)
 - **Flow**: User opens Generate tab → describes data model in plain language → selects database type → clicks Generate Schema → views ERD-style table preview with columns and relationships → reviews generated SQL DDL → exports in preferred format (SQL/Prisma/Drizzle/Supabase/TypeORM) → optionally refines via chat input → browses saved schemas in Schemas tab → explores community schemas in Gallery → views usage stats
+
+### #283 — TanStack Query Configuration & Server State Management
+- **Ticket**: #283 — `Migrate frontend data fetching to TanStack Query for server state management`
+- **PR**: #288 (638 insertions, squash-merged)
+- **Backend**: `QueryConfigController` with 5 endpoints:
+  - `GET /api/query-config/config` — get or create user's query config
+  - `PUT /api/query-config/config` — update caching, retry, and behavior preferences
+  - `GET /api/query-config/presets` — 4 caching presets (Aggressive, Balanced, Fresh, Offline First)
+  - `GET /api/query-config/query-patterns` — 6 code pattern examples (basic query, dependent, paginated, mutation, optimistic update, prefetch)
+  - `GET /api/query-config/stats` — cache hit rate, total queries/mutations, active preset
+- **Entity**: `QueryConfig` with Id (Guid), UserId, StaleTimeMs, CacheTimeMs, RetryCount, RetryDelayMs, RefetchOnWindowFocus, RefetchOnReconnect, RefetchOnMount, EnableDevtools, EnableGarbageCollection, EnableOptimisticUpdates, TotalQueries, TotalMutations, CacheHits, CacheMisses, QueryPatternsJson
+- **Frontend**: `QueryConfigPage` in Settings with "Query" tab — 4 sub-tabs (Configure with timing sliders [stale time/cache time/retry count/retry delay] + 6 behavior toggles [window focus/reconnect/mount/devtools/GC/optimistic], Presets with 4 caching strategy cards and one-click apply, Patterns with 6 categorized code examples [Fetching/Mutations/Advanced], Stats with 6 metric cards + current config summary)
+- **Flow**: User opens Configure tab → adjusts stale time via slider → adjusts cache time → sets retry count/delay → toggles behavior flags → applies a preset from Presets tab → browses code patterns in Patterns tab → monitors cache performance in Stats tab

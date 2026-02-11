@@ -320,6 +320,7 @@ public class ProductionResult
     public int? DatabaseRelationshipCount { get; set; }
     public string? DatabaseSummary { get; set; }
     public List<string>? DatabaseTables { get; set; }
+    public int? QualityConfidenceScore { get; set; }
 }
 
 public class GeneratedProject

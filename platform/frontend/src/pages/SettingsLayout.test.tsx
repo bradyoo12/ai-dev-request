@@ -155,6 +155,10 @@ vi.mock('./ApiDocsPage', () => ({
   default: () => <div data-testid="api-docs-page">ApiDocsPage</div>,
 }))
 
+vi.mock('./CodeMergePage', () => ({
+  default: () => <div data-testid="code-merge-page">CodeMergePage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

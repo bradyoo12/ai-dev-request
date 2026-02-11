@@ -896,3 +896,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `PlanningSession` with Id (Guid), UserId, DevRequestId, SessionName, Status (active/completed/archived), Mode, MessagesJson, PlanOutputJson, TotalMessages, UserMessages, AiMessages, TokensUsed, EstimatedSavings
 - **Frontend**: `PlanningModePage` in Settings with "Planning Mode" tab — 3 sub-tabs (Chat with session creation + message bubbles + mode selector, Sessions with past session list, Stats with metric cards)
 - **Flow**: Create session with mode → send planning messages → AI responds with mode-specific analysis → complete session → review plan output → monitor savings vs code generation
+
+### #314 — Auto-Generated Project Documentation with Interactive Q&A (PR #328)
+- **Backend**: `ProjectDocumentationController` with 6 endpoints for documentation generation, Q&A, and stats
+- **Endpoints**:
+  - `GET /api/project-docs` — list documentation (most recent 50)
+  - `GET /api/project-docs/{id}` — documentation detail
+  - `POST /api/project-docs/generate` — generate documentation from project name + description
+  - `POST /api/project-docs/{id}/ask` — Q&A: ask question about the project
+  - `DELETE /api/project-docs/{id}` — delete documentation
+  - `GET /api/project-docs/stats` — aggregate stats
+- **Entity**: `ProjectDocumentation` with Id (Guid), UserId, DevRequestId, ProjectName, Status, ArchitectureOverview, ComponentDocs, ApiReference, SetupGuide, QaHistoryJson, SourceFilesCount, TotalLinesAnalyzed, GenerationTimeMs, TokensUsed, EstimatedCost
+- **Frontend**: `ProjectDocsPage` in Settings with "Project Docs" tab — 4 sub-tabs (Generate with project input + expandable markdown sections, Q&A with question/answer history, Library with doc list, Stats with metric cards)
+- **Flow**: Enter project name + description → generate documentation → review architecture/components/API/setup sections → ask questions via Q&A → browse library of past docs

@@ -102,6 +102,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ViewTransitionConfig> ViewTransitionConfigs => Set<ViewTransitionConfig>();
     public DbSet<NlSchema> NlSchemas => Set<NlSchema>();
     public DbSet<QueryConfig> QueryConfigs => Set<QueryConfig>();
+    public DbSet<AgenticPlan> AgenticPlans => Set<AgenticPlan>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1623,6 +1624,20 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.QueryPatternsJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<AgenticPlan>(entity =>
+        {
+            entity.ToTable("agentic_plans");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PlanName).HasMaxLength(200);
+            entity.Property(e => e.UserPrompt).HasColumnType("text");
+            entity.Property(e => e.StepsJson).HasColumnType("text");
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.ExecutionLogJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

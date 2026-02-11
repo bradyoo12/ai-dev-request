@@ -95,6 +95,7 @@ User Request (natural language)
 | OnboardingProgress | User onboarding wizard progress tracking with step completion milestones |
 | ProjectVersion | Versioned snapshot of a generated project with file-level diff capabilities |
 | ComponentPreview | Visual component preview with conversational iteration for design refinement |
+| GenerationVariant | A/B variant of generated code with approach, metrics, rating, and selection status |
 
 ## Spec-Driven Development Pipeline
 
@@ -458,3 +459,17 @@ This project uses bradyoo-core for shared infrastructure:
 - **Auth**: Google/Kakao OAuth, JWT via BradYoo.Core.Auth
 - **AI**: Claude API client via BradYoo.Core.AI
 - **Data**: Base DbContext, shared entities via BradYoo.Core.Data
+
+## A/B Variant Generation & Comparison
+
+Prompt branching to generate multiple implementation variants from the same request:
+- **Backend**: `VariantGenerationService` generates 3 variants per request (minimal, balanced, feature-rich) with different code complexity, dependency counts, and model tiers. Stores results as `GenerationVariant` entities with JSON file storage.
+- **Endpoints**:
+  - `POST /api/requests/{id}/variants/generate` — generate 3 variants from a description
+  - `GET /api/requests/{id}/variants` — list all variants for a request
+  - `GET /api/requests/{id}/variants/{variantId}` — get specific variant details
+  - `POST /api/requests/{id}/variants/{variantId}/select` — select winning variant
+  - `POST /api/requests/{id}/variants/{variantId}/rate` — rate variant (1-5 stars)
+  - `DELETE /api/requests/{id}/variants` — delete all variants
+- **Frontend**: `VariantComparisonPage` in Settings with side-by-side 3-column variant cards showing approach badges, metrics (files, LOC, dependencies, bundle size), model tier, star ratings, file preview, and selection workflow
+- **Approaches**: Minimal (lean, few deps), Balanced (standard best practices), Feature-Rich (comprehensive with search, filter, stats, localStorage)

@@ -97,6 +97,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<MobileAppConfig> MobileAppConfigs => Set<MobileAppConfig>();
     public DbSet<BackgroundAgent> BackgroundAgents => Set<BackgroundAgent>();
     public DbSet<PlatformUpgrade> PlatformUpgrades => Set<PlatformUpgrade>();
+    public DbSet<VisualPromptUi> VisualPromptUis => Set<VisualPromptUi>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1538,6 +1539,26 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MigrationLogJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<VisualPromptUi>(entity =>
+        {
+            entity.ToTable("visual_prompt_uis");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ComponentName).HasMaxLength(200);
+            entity.Property(e => e.PromptText).HasColumnType("text");
+            entity.Property(e => e.GeneratedCode).HasColumnType("text");
+            entity.Property(e => e.GeneratedHtml).HasColumnType("text");
+            entity.Property(e => e.Framework).HasMaxLength(50);
+            entity.Property(e => e.StylingLibrary).HasMaxLength(50);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.Category).HasMaxLength(50);
+            entity.Property(e => e.Tags).HasMaxLength(500);
+            entity.Property(e => e.ConversationJson).HasColumnType("text");
+            entity.Property(e => e.ThemeTokensJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.UserId, e.Category });
         });
     }
 }

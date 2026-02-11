@@ -558,3 +558,20 @@ OpenAPI 3.1 specification generation and multi-language client SDK management fo
 - **Spec Generation**: Builds OpenAPI 3.1 JSON from endpoint metadata (path, method, summary, tag, requestBody, responseType)
 - **Frontend**: `ApiDocsPage` in Settings with "API Docs" tab — doc list with status badges, endpoint editor with HTTP method selector, SDK language toggle buttons, spec preview with JSON copy, color-coded HTTP methods (GET=green, POST=blue, PUT=yellow, PATCH=orange, DELETE=red)
 - **Flow**: User opens Settings → API Docs tab → create new → define endpoints → select SDK languages → save → generate OpenAPI spec → view/copy spec JSON
+
+### Incremental Code Regeneration with Smart Merge (#259)
+
+Code snapshot tracking and smart merge system that preserves user modifications when AI regenerates code:
+- **Backend**: `CodeSnapshot` entity tracking baseline vs user content, `CodeMergeController` with full CRUD + conflict resolution
+- **Endpoints**:
+  - `GET /api/codemerge/snapshots` — list snapshots (optional devRequestId filter)
+  - `GET /api/codemerge/snapshots/{id}` — get single snapshot
+  - `PUT /api/codemerge/snapshots/{id}/user-content` — save user modifications
+  - `PUT /api/codemerge/snapshots/{id}/lock` — toggle file lock to prevent overwrites
+  - `POST /api/codemerge/snapshots/{id}/resolve` — resolve conflict (keep-user, keep-ai, or custom merge)
+  - `GET /api/codemerge/stats` — merge statistics (total, synced, modified, conflicted, merged, locked)
+  - `POST /api/codemerge/snapshots` — create snapshot (auto-detects conflicts with existing user content)
+- **Entity**: `CodeSnapshot` with Id (Guid), UserId, DevRequestId, FilePath, BaselineContent, UserContent, IsLocked, Version, Status (Synced/UserModified/Conflicted/Merged), CreatedAt, UpdatedAt
+- **Conflict Detection**: When creating a snapshot for an existing file, if user has modifications (UserContent differs from BaselineContent), status is set to Conflicted instead of overwriting
+- **Frontend**: `CodeMergePage` in Settings with "Code Merge" tab — 6 stats cards (Total/Synced/Modified/Conflicts/Merged/Locked) with color coding, filter tabs (All/Modified/Conflicts/Locked), file list with status badges and version numbers, side-by-side diff viewer (AI baseline vs user version), conflict resolution buttons ("Keep My Changes" / "Keep AI Version")
+- **Flow**: AI generates code → snapshots created tracking baseline → user edits files → status changes to UserModified → AI regenerates → conflict detected → user resolves via side-by-side diff viewer

@@ -113,6 +113,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
     public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
     public DbSet<AiElementsConfig> AiElementsConfigs => Set<AiElementsConfig>();
+    public DbSet<CodeReviewPipeline> CodeReviewPipelines => Set<CodeReviewPipeline>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1785,6 +1786,20 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.PreviewHistoryJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<CodeReviewPipeline>(entity =>
+        {
+            entity.ToTable("code_review_pipelines");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProjectName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.LastRunStatus).HasMaxLength(50);
+            entity.Property(e => e.FindingsJson).HasColumnType("text");
+            entity.Property(e => e.GeneratedTestsJson).HasColumnType("text");
+            entity.Property(e => e.PipelineStepsJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

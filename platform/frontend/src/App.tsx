@@ -48,6 +48,7 @@ function App() {
             <Route path="/settings/component-preview" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/variant-comparison" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/performance" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/settings/schema-designer" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />

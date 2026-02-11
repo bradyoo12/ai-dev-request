@@ -591,3 +591,19 @@ Browser-native voice input using the Web Speech API for hands-free development r
 - **Speech Recognition**: Web Speech API (SpeechRecognition) — zero backend cost, browser-native, supports continuous dictation and interim results
 - **Frontend**: `VoicePage` in Settings with "Voice" tab — microphone button with pulse animation, real-time transcript display with interim text, copy/clear transcript controls, 3 stats cards (Sessions/Total Duration/Avg Duration), settings panel with language selector, toggle switches for continuous mode/auto-punctuate/TTS, TTS rate slider
 - **Flow**: User opens Settings → Voice tab → configure language → click microphone button → speak → see real-time transcript → copy text to use in dev requests
+
+### Multi-Model Intelligent Routing for AI Cost Optimization (#265)
+
+Automatically routes AI tasks to optimal model tiers (Fast/Standard/Premium) based on task complexity to reduce costs:
+- **Backend**: `ModelRoutingConfig` entity for per-user routing preferences, `ModelRoutingController` with config management, stats, tier info, and task types
+- **Endpoints**:
+  - `GET /api/model-routing/config` — get or create user routing configuration
+  - `PUT /api/model-routing/config` — update routing settings (enabled, default tier, task routing JSON, budget)
+  - `GET /api/model-routing/stats` — routing usage statistics (tokens per tier, decisions, cost, savings)
+  - `GET /api/model-routing/tiers` — available model tiers (Fast=Haiku/$0.00025, Standard=Sonnet/$0.003, Premium=Opus/$0.015)
+  - `GET /api/model-routing/task-types` — 15 supported task types with default tier assignments
+- **Entity**: `ModelRoutingConfig` with Id (Guid), UserId, Enabled, DefaultTier, TaskRoutingJson, MonthlyBudget, CurrentMonthCost, FastTierTokens, StandardTierTokens, PremiumTierTokens, TotalRoutingDecisions, EstimatedSavings, CreatedAt, UpdatedAt
+- **Model Tiers**: Fast (Claude Haiku, 500ms, $0.00025/1K), Standard (Claude Sonnet, 2000ms, $0.003/1K), Premium (Claude Opus, 5000ms, $0.015/1K)
+- **Task Types**: 15 types across 3 tiers — Fast (formatting, naming, boilerplate, comments, simple-refactor), Standard (code-generation, bug-fixing, testing, documentation, api-design), Premium (architecture, security-review, complex-refactor, system-design, optimization)
+- **Frontend**: `ModelRoutingPage` in Settings with "AI Models" tab — enable/disable toggle, 4 stats cards (Routing Decisions/Savings/Month Cost/Budget), token distribution by tier with color dots, 3 model tier cards with cost and latency info, task routing matrix with clickable tier selectors, budget settings with default tier dropdown and monthly budget input
+- **Flow**: User opens Settings → AI Models tab → enable routing → configure per-task tier assignments → set monthly budget → system routes tasks automatically and tracks savings

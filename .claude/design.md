@@ -869,3 +869,15 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `VisualOverlaySession` with Id (Guid), UserId, DevRequestId, ProjectName, SelectedElementPath, ModificationsJson, ComponentTreeJson, Status (active/paused/completed), TotalEdits, UndoCount, RedoCount, ViewportWidth, ViewportHeight, PreviewUrl
 - **Frontend**: `VisualOverlayPage` in Settings with "Visual Editor" tab — 3 sub-tabs (Editor with split layout: component tree + preview area + property panel + modification history with undo, Sessions with list showing project/edits/status, Stats with 6 metric cards)
 - **Flow**: Create session → browse component tree → select element → edit properties (text, color, spacing, fontSize, etc.) → changes tracked → undo if needed → view session history and stats
+
+### #312 — pgvector Semantic Search for Template Matching (PR #318)
+- **Backend**: `SemanticSearchController` with 5 endpoints for indexing, querying, and stats
+- **Endpoints**:
+  - `GET /api/semantic-search/index/{sourceType}` — list indexed items by source type
+  - `POST /api/semantic-search/index` — index a new item (generate embedding from text)
+  - `POST /api/semantic-search/query` — semantic search (find top-K similar items by cosine similarity)
+  - `DELETE /api/semantic-search/index/{id}` — remove an indexed item
+  - `GET /api/semantic-search/stats` — index statistics (total indexed, by source type, dimensions)
+- **Entity**: `SemanticIndex` with Id (Guid), UserId, SourceType (template/project/request), SourceId, Title, Content, ContentHash (SHA-256), EmbeddingJson (simulated float array), Dimensions (1536), IndexedAt, CreatedAt, UpdatedAt
+- **Frontend**: `SemanticSearchPage` in Settings with "Semantic Search" tab — 3 sub-tabs (Index with source type filter + indexed items list + index form, Search with query input + top-K slider + results with similarity scores and color-coded relevance bars, Stats with metric cards)
+- **Flow**: Select source type → index items with title + content → search with natural language query → see top-K results ranked by cosine similarity → monitor index stats

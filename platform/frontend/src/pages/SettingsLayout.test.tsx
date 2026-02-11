@@ -175,6 +175,10 @@ vi.mock('./DeploymentHealthPage', () => ({
   default: () => <div data-testid="deployment-health-page">DeploymentHealthPage</div>,
 }))
 
+vi.mock('./GenerativeUiPage', () => ({
+  default: () => <div data-testid="generative-ui-page">GenerativeUiPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

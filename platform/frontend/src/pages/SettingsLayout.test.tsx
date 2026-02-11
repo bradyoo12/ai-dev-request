@@ -214,6 +214,9 @@ vi.mock('./VisualRegressionPage', () => ({
 vi.mock('./McpGatewayPage', () => ({
   default: () => <div data-testid="mcp-gateway-page">McpGatewayPage</div>,
 }))
+vi.mock('./CodebaseMemoryPage', () => ({
+  default: () => <div data-testid="codebase-memory-page">CodebaseMemoryPage</div>,
+}))
 
 import SettingsLayout from './SettingsLayout'
 

@@ -110,6 +110,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ArenaComparison> ArenaComparisons => Set<ArenaComparison>();
     public DbSet<VisualOverlaySession> VisualOverlaySessions => Set<VisualOverlaySession>();
     public DbSet<SemanticIndex> SemanticIndexes => Set<SemanticIndex>();
+    public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

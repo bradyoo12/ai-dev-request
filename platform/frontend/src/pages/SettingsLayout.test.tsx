@@ -208,6 +208,9 @@ vi.mock('./QueryConfigPage', () => ({
 vi.mock('./AgenticPlannerPage', () => ({
   default: () => <div data-testid="agentic-planner-page">AgenticPlannerPage</div>,
 }))
+vi.mock('./VisualRegressionPage', () => ({
+  default: () => <div data-testid="visual-regression-page">VisualRegressionPage</div>,
+}))
 
 import SettingsLayout from './SettingsLayout'
 

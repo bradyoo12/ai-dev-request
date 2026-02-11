@@ -103,6 +103,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<NlSchema> NlSchemas => Set<NlSchema>();
     public DbSet<QueryConfig> QueryConfigs => Set<QueryConfig>();
     public DbSet<AgenticPlan> AgenticPlans => Set<AgenticPlan>();
+    public DbSet<VisualRegressionResult> VisualRegressionResults => Set<VisualRegressionResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1636,6 +1637,24 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.StepsJson).HasColumnType("text");
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.ExecutionLogJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<VisualRegressionResult>(entity =>
+        {
+            entity.ToTable("visual_regression_results");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProjectName).HasMaxLength(200);
+            entity.Property(e => e.PageUrl).HasMaxLength(500);
+            entity.Property(e => e.ViewportSize).HasMaxLength(20);
+            entity.Property(e => e.BaselineImageUrl).HasMaxLength(500);
+            entity.Property(e => e.ComparisonImageUrl).HasMaxLength(500);
+            entity.Property(e => e.DiffImageUrl).HasMaxLength(500);
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.IgnoreRegionsJson).HasColumnType("text");
+            entity.Property(e => e.MetadataJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
         });

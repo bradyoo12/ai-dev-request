@@ -922,3 +922,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `AiElementsConfig` with Id (Guid), UserId, StreamingEnabled, ReasoningPanelEnabled, LivePreviewEnabled, ResponseActionsEnabled, ThemeMode, ActiveModel, TotalStreams, TotalTokensStreamed, TotalComponentPreviews, PreviewHistoryJson, CreatedAt, UpdatedAt
 - **Frontend**: `AiElementsPage` in Settings with "AI Elements" tab — 3 sub-tabs (Stream with simulated token-by-token code output and syntax highlighting, Components with 5 AI element cards, Stats with metric cards)
 - **Flow**: Open AI Elements tab → configure streaming/reasoning/preview toggles → start streaming demo → watch token-by-token code generation → browse component catalog → view usage stats
+
+### #316 — Automated AI Code Review Pipeline (PR #337)
+- **Backend**: `ReviewPipelineController` with 6 endpoints for config, review execution, dimensions catalog, and stats
+- **Endpoints**:
+  - `GET /api/review-pipeline/config` — get or create user review pipeline config
+  - `PUT /api/review-pipeline/config` — update settings (per-dimension toggles, auto-fix, test generation, quality threshold)
+  - `POST /api/review-pipeline/review` — trigger code review on a project (simulated multi-dimensional scoring)
+  - `GET /api/review-pipeline/results/{reviewId}` — get review results with dimension scores and findings
+  - `GET /api/review-pipeline/dimensions` — list 5 review dimensions (security, performance, accessibility, architecture, maintainability)
+  - `GET /api/review-pipeline/stats` — aggregate stats (total reviews, auto-fixes, tests generated, avg quality score)
+- **Entity**: `ReviewPipelineConfig` with Id (Guid), UserId, AutoReviewEnabled, SecurityCheckEnabled, PerformanceCheckEnabled, AccessibilityCheckEnabled, ArchitectureCheckEnabled, MaintainabilityCheckEnabled, AutoFixEnabled, TestGenerationEnabled, QualityThreshold, TotalReviews, TotalAutoFixes, TotalTestsGenerated, AvgQualityScore, ReviewHistoryJson, CreatedAt, UpdatedAt
+- **Frontend**: `ReviewPipelinePage` in Settings with "Review Pipeline" tab — 3 sub-tabs (Review with project input + dimension score bars + findings list, Configure with dimension toggles + threshold slider, Stats with metric cards)
+- **Flow**: Open Review Pipeline tab → enter project name → run review → see dimension scores with color coding → review findings with severity → configure per-dimension toggles and quality threshold → view aggregate stats

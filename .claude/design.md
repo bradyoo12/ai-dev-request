@@ -650,3 +650,15 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `GenerativeUiSession` with Id (Guid), UserId, DevRequestId, SessionName, Status, TotalMessages, AiMessages, UserMessages, GeneratedComponents, ToolCallCount, StreamingEnabled, GenerativeUiEnabled, ActiveModel, TotalTokensUsed, EstimatedCost, MessagesJson, ToolDefinitionsJson, GeneratedComponentsJson, ReasoningStepsJson
 - **Frontend**: `GenerativeUiPage` in Settings with "Gen UI" tab — chat interface with message bubbles, component rendering, tool call display, typing indicator, 4 tabs (Chat/Components/Tools/Settings), model selector, streaming and generative UI toggles, session statistics
 - **Flow**: User enters project ID → starts chat session → sends messages → AI responds with text, generated components, and tool calls → user views generated components gallery → configures chat settings (model, streaming, generative UI toggle)
+
+### #272 — Mobile App Generation with React Native and App Store Publishing (PR #275)
+- **Endpoints**:
+  - `GET /api/mobile-app/config/{projectId}` — get or create mobile app configuration
+  - `PUT /api/mobile-app/config/{projectId}` — update app settings (name, bundle ID, version, platform toggles)
+  - `POST /api/mobile-app/build` — trigger build for iOS, Android, or both (simulates build + generates Expo QR URL)
+  - `POST /api/mobile-app/publish` — publish to App Store and/or Google Play
+  - `GET /api/mobile-app/screens/{projectId}` — list app screens
+  - `GET /api/mobile-app/builds/{projectId}` — build history
+- **Entity**: `MobileAppConfig` with Id (Guid), UserId, DevRequestId, AppName, BundleId, Platform (ios/android/both), Framework (react-native), Status, AppVersion, BuildNumber, IconUrl, SplashScreenUrl, ExpoEnabled, ExpoQrCodeUrl, PreviewUrl, IosEnabled, AndroidEnabled, IosBuildStatus, AndroidBuildStatus, IosPublishStatus, AndroidPublishStatus, TotalScreens, TotalComponents, NavigationStructureJson, ScreenListJson, BuildHistoryJson, PublishHistoryJson
+- **Frontend**: `MobileAppPage` in Settings with "Mobile" tab — app header with icon/name/bundle/version, platform status badges (iOS/Android), 5 tabs (Overview with stats + QR preview + quick build actions, Screens list, Builds history, Publish to App Store + Google Play, Settings with app config inputs and platform toggles)
+- **Flow**: User enters project ID → sees app config with platform badges → overview shows stats and QR preview → trigger builds for iOS/Android → view build history → publish to App Store/Google Play → configure app name, bundle ID, version, and platform toggles

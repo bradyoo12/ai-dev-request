@@ -12,6 +12,7 @@
   "stats.projects": "Projects Completed",
   "stats.users": "Active Users",
   "stats.analysisTime": "Avg. Analysis Time",
+  "stats.poweredBy": "Powered by",
   "form.label": "What would you like to build?",
   "form.placeholder": "e.g., I need a salon website where customers can book appointments...",
   "form.emailLabel": "Contact email (optional)",

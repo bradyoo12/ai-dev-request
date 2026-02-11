@@ -803,3 +803,18 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `McpGatewayServer` with Id (Guid), UserId, ServerName, ServerUrl, TransportType (stdio/sse/http), Description, Category (custom/database/api/design/devops/ai), IconUrl, Status (connected/disconnected/error), IsEnabled, ToolsJson, ResourcesJson, ToolCount, ResourceCount, TotalExecutions, SuccessfulExecutions, FailedExecutions, AvgLatencyMs, LastHealthCheck, HealthMessage, ConfigJson
 - **Frontend**: `McpGatewayPage` in Settings with "MCP Gateway" tab — 3 sub-tabs (Servers with add form [name/URL/transport/category/description] + server cards showing status/category badges + 4 metric cards [tools/executions/latency/success] + tool execution buttons + execution result display, Catalog with 8 community servers in grid cards with category badges and one-click Install, Stats with 6 metric cards [servers/connected/tools/executions/success rate/avg latency] + recent servers list)
 - **Flow**: User opens Servers tab → fills server name and URL → selects transport and category → clicks Add Server → sees server card with connected status → clicks tool buttons to execute → views execution results → browses Catalog tab → clicks Install on GitHub/Supabase/Figma → server auto-added to Servers tab → monitors health and execution metrics in Stats tab
+
+### #295 — Persistent Codebase Memory (PR #298)
+- **PR**: #298 (699 insertions, squash-merged)
+- **Backend**: `ProjectMemoryController` with 7 endpoints:
+  - `GET /api/project-memory/memories` — list memories with optional project/category filters (top 100 by confidence)
+  - `POST /api/project-memory/memories` — add new memory with type/category/content/summary
+  - `PUT /api/project-memory/memories/{id}` — update memory content/summary/category/active status
+  - `DELETE /api/project-memory/memories/{id}` — delete a memory
+  - `POST /api/project-memory/memories/{id}/reinforce` — reinforce memory (+5% confidence, increment reinforcement count)
+  - `POST /api/project-memory/memories/{id}/contradict` — contradict memory (-10% confidence, auto-deactivate below 20%)
+  - `GET /api/project-memory/stats` — aggregate stats (total/active memories, avg confidence, reinforcements/contradictions, by-category breakdown, recent memories)
+  - `GET /api/project-memory/projects` — list projects with memory counts
+- **Entity**: `ProjectMemory` with Id (Guid), UserId, ProjectName, MemoryType (convention/pattern/preference/feedback), Category (general/naming/architecture/style/review/testing/deployment), Content, Summary, SourceType (explicit/accepted_suggestion/rejected_suggestion/review_feedback/code_pattern), SourceRef, Confidence (0.0-1.0), Reinforcements, Contradictions, IsActive, TagsJson, EmbeddingJson, LastAppliedAt
+- **Frontend**: `CodebaseMemoryPage` in Settings with "Memory AI" tab — 3 sub-tabs (Memories with category filter + memory cards showing type/category/confidence badges + reinforce/contradict/delete buttons + source info, Add Memory with type/category/summary/content form, Stats with 5 metric cards [total/active/avg confidence/reinforcements/contradictions] + category breakdown + recent memories list)
+- **Flow**: User opens Memories tab → filters by category → sees existing patterns → clicks + to reinforce or - to contradict → switches to Add tab → fills in convention/pattern content with summary → clicks Add Memory → memory appears in list with 70% initial confidence → over time, reinforced memories gain confidence, contradicted memories lose confidence and auto-deactivate below 20%

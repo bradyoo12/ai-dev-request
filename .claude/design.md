@@ -881,3 +881,18 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `SemanticIndex` with Id (Guid), UserId, SourceType (template/project/request), SourceId, Title, Content, ContentHash (SHA-256), EmbeddingJson (simulated float array), Dimensions (1536), IndexedAt, CreatedAt, UpdatedAt
 - **Frontend**: `SemanticSearchPage` in Settings with "Semantic Search" tab — 3 sub-tabs (Index with source type filter + indexed items list + index form, Search with query input + top-K slider + results with similarity scores and color-coded relevance bars, Stats with metric cards)
 - **Flow**: Select source type → index items with title + content → search with natural language query → see top-K results ranked by cosine similarity → monitor index stats
+
+### #313 — Discussion/Planning Mode (PR #327)
+- **Backend**: `PlanningSessionController` with 8 endpoints for session management, chat messaging, and stats
+- **Endpoints**:
+  - `GET /api/planning/sessions` — list sessions (most recent 50)
+  - `GET /api/planning/sessions/{id}` — session detail
+  - `POST /api/planning/sessions` — create session (name + mode + optional devRequestId)
+  - `POST /api/planning/sessions/{id}/message` — send message with simulated AI response
+  - `POST /api/planning/sessions/{id}/complete` — complete session with summary plan
+  - `DELETE /api/planning/sessions/{id}` — delete session
+  - `GET /api/planning/stats` — aggregate stats (total sessions, messages, tokens, savings)
+  - `GET /api/planning/modes` — 4 modes: brainstorm, architecture, debug, requirements
+- **Entity**: `PlanningSession` with Id (Guid), UserId, DevRequestId, SessionName, Status (active/completed/archived), Mode, MessagesJson, PlanOutputJson, TotalMessages, UserMessages, AiMessages, TokensUsed, EstimatedSavings
+- **Frontend**: `PlanningModePage` in Settings with "Planning Mode" tab — 3 sub-tabs (Chat with session creation + message bubbles + mode selector, Sessions with past session list, Stats with metric cards)
+- **Flow**: Create session with mode → send planning messages → AI responds with mode-specific analysis → complete session → review plan output → monitor savings vs code generation

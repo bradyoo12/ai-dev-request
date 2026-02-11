@@ -94,6 +94,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ProjectIndex> ProjectIndexes => Set<ProjectIndex>();
     public DbSet<DeploymentHealth> DeploymentHealths => Set<DeploymentHealth>();
     public DbSet<GenerativeUiSession> GenerativeUiSessions => Set<GenerativeUiSession>();
+    public DbSet<MobileAppConfig> MobileAppConfigs => Set<MobileAppConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1473,6 +1474,30 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ToolDefinitionsJson).HasColumnType("text");
             entity.Property(e => e.GeneratedComponentsJson).HasColumnType("text");
             entity.Property(e => e.ReasoningStepsJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
+        });
+
+        modelBuilder.Entity<MobileAppConfig>(entity =>
+        {
+            entity.ToTable("mobile_app_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.AppName).HasMaxLength(200);
+            entity.Property(e => e.BundleId).HasMaxLength(100);
+            entity.Property(e => e.Platform).HasMaxLength(20);
+            entity.Property(e => e.Framework).HasMaxLength(20);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.AppDescription).HasMaxLength(500);
+            entity.Property(e => e.AppVersion).HasMaxLength(20);
+            entity.Property(e => e.IconUrl).HasMaxLength(500);
+            entity.Property(e => e.SplashScreenUrl).HasMaxLength(500);
+            entity.Property(e => e.ExpoQrCodeUrl).HasMaxLength(500);
+            entity.Property(e => e.PreviewUrl).HasMaxLength(500);
+            entity.Property(e => e.NavigationStructureJson).HasColumnType("text");
+            entity.Property(e => e.ScreenListJson).HasColumnType("text");
+            entity.Property(e => e.BuildHistoryJson).HasColumnType("text");
+            entity.Property(e => e.PublishHistoryJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
         });

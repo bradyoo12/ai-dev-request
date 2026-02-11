@@ -108,6 +108,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ProjectMemory> ProjectMemories => Set<ProjectMemory>();
     public DbSet<FigmaImport> FigmaImports => Set<FigmaImport>();
     public DbSet<ArenaComparison> ArenaComparisons => Set<ArenaComparison>();
+    public DbSet<VisualOverlaySession> VisualOverlaySessions => Set<VisualOverlaySession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1734,6 +1735,21 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.SelectedModel).HasMaxLength(100);
             entity.Property(e => e.SelectionReason).HasMaxLength(500);
             entity.Property(e => e.Status).HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<VisualOverlaySession>(entity =>
+        {
+            entity.ToTable("visual_overlay_sessions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProjectName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.SelectedElementPath).HasMaxLength(1000);
+            entity.Property(e => e.ModificationsJson).HasColumnType("text");
+            entity.Property(e => e.ComponentTreeJson).HasColumnType("text");
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.PreviewUrl).HasMaxLength(2000);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
         });

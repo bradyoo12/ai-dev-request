@@ -81,8 +81,8 @@ public class CodeQualityReviewService : ICodeQualityReviewService
                 {
                     findings = await AnalyzeWithClaudeAsync(sourceFiles, projectId);
 
-                    // Auto-fix critical findings
-                    await AutoFixCriticalFindingsAsync(sourceFiles, findings);
+                    // Auto-fix all findings that have file references
+                    await AutoFixFindingsAsync(sourceFiles, findings);
                 }
                 else
                 {
@@ -136,16 +136,15 @@ public class CodeQualityReviewService : ICodeQualityReviewService
         }
     }
 
-    private async Task AutoFixCriticalFindingsAsync(Dictionary<string, string> sourceFiles, List<ReviewFinding> findings)
+    private async Task AutoFixFindingsAsync(Dictionary<string, string> sourceFiles, List<ReviewFinding> findings)
     {
-        var criticalFindings = findings.Where(f => f.Severity == "critical" && !string.IsNullOrEmpty(f.File)).ToList();
-        if (criticalFindings.Count == 0) return;
+        var fixableFindings = findings.Where(f => !string.IsNullOrEmpty(f.File)).ToList();
+        if (fixableFindings.Count == 0) return;
 
-        foreach (var finding in criticalFindings)
+        foreach (var finding in fixableFindings)
         {
             try
             {
-                // Find the matching source file
                 var matchingFile = sourceFiles.Keys.FirstOrDefault(k =>
                     k.Equals(finding.File, StringComparison.OrdinalIgnoreCase) ||
                     k.EndsWith(finding.File ?? "", StringComparison.OrdinalIgnoreCase));
@@ -154,7 +153,16 @@ public class CodeQualityReviewService : ICodeQualityReviewService
 
                 var fileContent = sourceFiles[matchingFile];
 
-                var fixPrompt = $@"You are a code fix assistant. Fix the following critical issue in this file.
+                // Extract original code around the reported line
+                if (finding.Line.HasValue)
+                {
+                    var lines = fileContent.Split('\n');
+                    var startLine = Math.Max(0, finding.Line.Value - 4);
+                    var endLine = Math.Min(lines.Length, finding.Line.Value + 3);
+                    finding.OriginalCode = string.Join('\n', lines[startLine..endLine]);
+                }
+
+                var fixPrompt = $@"You are a code fix assistant. Fix the following {finding.Severity} issue in this file.
 
 ## Issue
 - **Title**: {finding.Title}
@@ -167,7 +175,11 @@ public class CodeQualityReviewService : ICodeQualityReviewService
 {(fileContent.Length > 5000 ? fileContent[..5000] + "\n... (truncated)" : fileContent)}
 ```
 
-Provide ONLY the specific code fix. Show the exact code change needed (before and after). Be concise.";
+Respond with ONLY a JSON object (no markdown, no other text):
+{{
+  ""fix"": ""the corrected code snippet (only the changed portion)"",
+  ""confidence"": <integer 0-100 representing how confident you are this fix is correct>
+}}";
 
                 var messages = new List<Message> { new Message(RoleType.User, fixPrompt) };
                 var parameters = new MessageParameters
@@ -183,11 +195,30 @@ Provide ONLY the specific code fix. Show the exact code change needed (before an
 
                 if (!string.IsNullOrEmpty(fixContent))
                 {
-                    finding.SuggestedFix = fixContent;
+                    try
+                    {
+                        var jsonStart = fixContent.IndexOf('{');
+                        var jsonEnd = fixContent.LastIndexOf('}');
+                        if (jsonStart >= 0 && jsonEnd > jsonStart)
+                        {
+                            var jsonStr = fixContent[jsonStart..(jsonEnd + 1)];
+                            var fixObj = JsonSerializer.Deserialize<JsonElement>(jsonStr);
+                            finding.SuggestedFix = fixObj.GetProperty("fix").GetString() ?? fixContent;
+                            finding.FixConfidence = fixObj.TryGetProperty("confidence", out var conf) ? conf.GetInt32() : null;
+                        }
+                        else
+                        {
+                            finding.SuggestedFix = fixContent;
+                        }
+                    }
+                    catch
+                    {
+                        finding.SuggestedFix = fixContent;
+                    }
                 }
 
-                _logger.LogInformation("Generated auto-fix for critical finding {FindingId} in {File}",
-                    finding.Id, finding.File);
+                _logger.LogInformation("Generated auto-fix for {Severity} finding {FindingId} in {File}",
+                    finding.Severity, finding.Id, finding.File);
             }
             catch (Exception ex)
             {
@@ -459,6 +490,8 @@ public class ReviewFinding
     public string? File { get; set; }
     public int? Line { get; set; }
     public string? SuggestedFix { get; set; }
+    public int? FixConfidence { get; set; }
+    public string? OriginalCode { get; set; }
 }
 
 public class ClaudeQualityResponse

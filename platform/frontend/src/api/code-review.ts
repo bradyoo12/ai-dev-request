@@ -20,6 +20,8 @@ export interface ReviewFinding {
   file?: string | null
   line?: number | null
   suggestedFix?: string | null
+  fixConfidence?: number | null
+  originalCode?: string | null
 }
 
 export interface CodeQualityReview {

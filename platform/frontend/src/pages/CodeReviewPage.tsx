@@ -23,6 +23,7 @@ export default function CodeReviewPage() {
   const [projectIdInput, setProjectIdInput] = useState('1')
   const [showHistory, setShowHistory] = useState(false)
   const [filterDimension, setFilterDimension] = useState<string>('all')
+  const [expandedDiff, setExpandedDiff] = useState<string | null>(null)
 
   const parseFindings = (reviewData: CodeQualityReview | null): ReviewFinding[] => {
     if (!reviewData?.findings) return []
@@ -140,6 +141,12 @@ export default function CodeReviewPage() {
       case 'info': return 'bg-blue-900/50 text-blue-400'
       default: return 'bg-gray-700 text-gray-400'
     }
+  }
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 80) return 'text-green-400'
+    if (confidence >= 50) return 'text-yellow-400'
+    return 'text-red-400'
   }
 
   const getDimensionLabel = (dimension: string) => {
@@ -345,6 +352,7 @@ export default function CodeReviewPage() {
               <div className="space-y-3">
                 {filteredFindings.map((finding) => {
                   const isFixed = appliedFixes.includes(finding.id)
+                  const isDiffExpanded = expandedDiff === finding.id
                   return (
                     <div
                       key={finding.id}
@@ -356,21 +364,38 @@ export default function CodeReviewPage() {
                             {finding.severity}
                           </span>
                           <span className="text-xs text-gray-500">{getDimensionLabel(finding.dimension)}</span>
+                          {finding.fixConfidence != null && (
+                            <span className={`text-xs font-medium ${getConfidenceColor(finding.fixConfidence)}`}>
+                              {finding.fixConfidence}% {t('codeReview.confidence', 'confidence')}
+                            </span>
+                          )}
                           {isFixed && (
                             <span className="text-xs text-green-400 font-medium">
                               {t('codeReview.fixed', 'Fixed')}
                             </span>
                           )}
                         </div>
-                        {!isFixed && finding.suggestedFix && (
-                          <button
-                            onClick={() => handleApplyFix(finding.id)}
-                            disabled={applyingFix !== null}
-                            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
-                          >
-                            {applyingFix === finding.id ? t('codeReview.applying', 'Applying...') : t('codeReview.applyFix', 'Apply Fix')}
-                          </button>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {finding.originalCode && finding.suggestedFix && (
+                            <button
+                              onClick={() => setExpandedDiff(isDiffExpanded ? null : finding.id)}
+                              className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded text-xs font-medium transition-colors"
+                            >
+                              {isDiffExpanded ? t('codeReview.hideDiff', 'Hide Diff') : t('codeReview.viewDiff', 'View Diff')}
+                            </button>
+                          )}
+                          {!isFixed && finding.suggestedFix && (
+                            <>
+                              <button
+                                onClick={() => handleApplyFix(finding.id)}
+                                disabled={applyingFix !== null}
+                                className="px-3 py-1 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
+                              >
+                                {applyingFix === finding.id ? t('codeReview.applying', 'Applying...') : t('codeReview.acceptFix', 'Accept')}
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <h4 className="text-sm font-medium text-white mb-1">{finding.title}</h4>
                       <p className="text-xs text-gray-400 mb-2">{finding.description}</p>
@@ -379,7 +404,21 @@ export default function CodeReviewPage() {
                           {finding.file}{finding.line ? `:${finding.line}` : ''}
                         </p>
                       )}
-                      {finding.suggestedFix && (
+                      {/* Inline diff viewer */}
+                      {isDiffExpanded && finding.originalCode && finding.suggestedFix && (
+                        <div className="mt-3 grid grid-cols-2 gap-2">
+                          <div className="bg-red-950/30 border border-red-900/40 rounded p-2">
+                            <p className="text-xs text-red-400 font-medium mb-1">{t('codeReview.originalCode', 'Original')}</p>
+                            <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono overflow-auto max-h-48">{finding.originalCode}</pre>
+                          </div>
+                          <div className="bg-green-950/30 border border-green-900/40 rounded p-2">
+                            <p className="text-xs text-green-400 font-medium mb-1">{t('codeReview.suggestedFix', 'Suggested Fix')}</p>
+                            <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono overflow-auto max-h-48">{finding.suggestedFix}</pre>
+                          </div>
+                        </div>
+                      )}
+                      {/* Collapsed suggested fix (when diff is not expanded) */}
+                      {!isDiffExpanded && finding.suggestedFix && !finding.originalCode && (
                         <div className="bg-gray-800 rounded p-2 mt-2">
                           <p className="text-xs text-gray-500 mb-1">{t('codeReview.suggestedFix', 'Suggested Fix')}:</p>
                           <p className="text-xs text-gray-300">{finding.suggestedFix}</p>

@@ -1176,6 +1176,12 @@
   "componentPreview.error.exportFailed": "컴포넌트 내보내기 실패",
   "componentPreview.error.deleteFailed": "컴포넌트 삭제 실패",
 
+  "codeReview.confidence": "신뢰도",
+  "codeReview.viewDiff": "변경 비교",
+  "codeReview.hideDiff": "비교 숨기기",
+  "codeReview.originalCode": "원본 코드",
+  "codeReview.acceptFix": "수정 적용",
+
   "qualityBadge.title": "품질 점수",
   "qualityBadge.excellent": "우수",
   "qualityBadge.good": "양호",

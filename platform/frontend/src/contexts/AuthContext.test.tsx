@@ -6,6 +6,7 @@ vi.mock('../api/auth', () => ({
   logout: vi.fn(),
   socialLogin: vi.fn(),
   isAuthenticated: vi.fn(() => false),
+  AUTH_EXPIRED_EVENT: 'auth-expired',
 }))
 
 vi.mock('../api/settings', () => ({
@@ -86,6 +87,7 @@ describe('AuthContext', () => {
   })
 
   it('loads token balance on mount', async () => {
+    vi.mocked(isAuthenticated).mockReturnValue(true)
     vi.mocked(getTokenOverview).mockResolvedValue({ balance: 250 } as any)
     await act(async () => {
       render(<AuthProvider><TestConsumer /></AuthProvider>)

@@ -62,6 +62,30 @@ export function getAuthHeaders(): Record<string, string> {
   return headers
 }
 
+export const AUTH_EXPIRED_EVENT = 'auth-expired'
+
+function handleAuthExpired(): void {
+  clearAuth()
+  window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT))
+}
+
+export async function authFetch(url: string, options?: RequestInit): Promise<Response> {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...getAuthHeaders(),
+      ...options?.headers,
+    },
+  })
+
+  if (response.status === 401) {
+    handleAuthExpired()
+    throw new Error(t('auth.error.sessionExpired'))
+  }
+
+  return response
+}
+
 export async function register(
   email: string,
   password: string,

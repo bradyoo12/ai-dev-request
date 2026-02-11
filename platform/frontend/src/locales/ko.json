@@ -325,6 +325,7 @@
   "auth.error.registerFailed": "회원가입에 실패했습니다. 다시 시도해주세요.",
   "auth.error.loginFailed": "로그인에 실패했습니다. 인증 정보를 확인해주세요.",
   "auth.error.unknown": "예기치 않은 오류가 발생했습니다.",
+  "auth.error.sessionExpired": "세션이 만료되었습니다. 다시 로그인해주세요.",
   "auth.continueWith": "{{provider}}로 계속하기",
   "auth.orContinueWith": "또는 이메일로 로그인",
   "settings.tabs.billing": "결제 관리",

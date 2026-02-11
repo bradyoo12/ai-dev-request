@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
-import { getStoredUser, logout as apiLogout, socialLogin, isAuthenticated } from '../api/auth'
+import { getStoredUser, logout as apiLogout, socialLogin, isAuthenticated, AUTH_EXPIRED_EVENT } from '../api/auth'
 import type { AuthUser, SocialProvider } from '../api/auth'
 import { getTokenOverview } from '../api/settings'
 
@@ -23,11 +23,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [tokenBalance, setTokenBalance] = useState<number | null>(null)
 
   const loadTokenBalance = useCallback(async () => {
+    if (!isAuthenticated()) return
     try {
       const overview = await getTokenOverview()
       setTokenBalance(overview.balance)
     } catch {
-      // Silently fail - header balance is optional
+      // Auth expiry is handled by authFetch via AUTH_EXPIRED_EVENT
     }
   }, [])
 
@@ -54,6 +55,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     loadTokenBalance()
   }, [loadTokenBalance])
+
+  // Handle auth expiration (401 responses)
+  useEffect(() => {
+    const handleExpired = () => {
+      setAuthUser(null)
+      setTokenBalance(null)
+      setShowLogin(true)
+    }
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired)
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired)
+  }, [])
 
   // Handle OAuth callback
   useEffect(() => {

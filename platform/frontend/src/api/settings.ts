@@ -1,5 +1,5 @@
 import i18n from '../i18n'
-import { getAuthHeaders } from './auth'
+import { authFetch } from './auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
@@ -15,10 +15,6 @@ export function getUserId(): string {
     localStorage.setItem('ai-dev-user-id', userId)
   }
   return userId
-}
-
-function authHeaders(): Record<string, string> {
-  return getAuthHeaders()
 }
 
 // Types
@@ -77,9 +73,7 @@ export interface TokenDeductResult {
 
 // API Functions
 export async function getTokenOverview(): Promise<TokenOverview> {
-  const response = await fetch(`${API_BASE_URL}/api/settings/tokens`, {
-    headers: authHeaders(),
-  })
+  const response = await authFetch(`${API_BASE_URL}/api/settings/tokens`)
 
   if (!response.ok) {
     throw new Error(t('api.error.tokenLoadFailed'))
@@ -98,9 +92,7 @@ export async function getTokenHistory(
     url += `&actionFilter=${encodeURIComponent(actionFilter)}`
   }
 
-  const response = await fetch(url, {
-    headers: authHeaders(),
-  })
+  const response = await authFetch(url)
 
   if (!response.ok) {
     throw new Error(t('api.error.tokenHistoryFailed'))
@@ -110,9 +102,7 @@ export async function getTokenHistory(
 }
 
 export async function getTokenPackages(): Promise<TokenPackage[]> {
-  const response = await fetch(`${API_BASE_URL}/api/settings/tokens/packages`, {
-    headers: authHeaders(),
-  })
+  const response = await authFetch(`${API_BASE_URL}/api/settings/tokens/packages`)
 
   if (!response.ok) {
     throw new Error(t('api.error.tokenPackagesFailed'))
@@ -122,9 +112,8 @@ export async function getTokenPackages(): Promise<TokenPackage[]> {
 }
 
 export async function purchaseTokens(packageId: number): Promise<TokenPurchaseResult> {
-  const response = await fetch(`${API_BASE_URL}/api/settings/tokens/purchase`, {
+  const response = await authFetch(`${API_BASE_URL}/api/settings/tokens/purchase`, {
     method: 'POST',
-    headers: authHeaders(),
     body: JSON.stringify({ packageId }),
   })
 
@@ -137,9 +126,8 @@ export async function purchaseTokens(packageId: number): Promise<TokenPurchaseRe
 }
 
 export async function checkTokens(actionType: string): Promise<TokenCheck> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/settings/tokens/check/${encodeURIComponent(actionType)}`,
-    { headers: authHeaders() }
+  const response = await authFetch(
+    `${API_BASE_URL}/api/settings/tokens/check/${encodeURIComponent(actionType)}`
   )
 
   if (!response.ok) {
@@ -153,9 +141,8 @@ export async function deductTokens(
   actionType: string,
   referenceId?: string
 ): Promise<TokenDeductResult> {
-  const response = await fetch(`${API_BASE_URL}/api/settings/tokens/deduct`, {
+  const response = await authFetch(`${API_BASE_URL}/api/settings/tokens/deduct`, {
     method: 'POST',
-    headers: authHeaders(),
     body: JSON.stringify({ actionType, referenceId }),
   })
 
@@ -230,9 +217,7 @@ export interface ProjectUsage {
 
 // Usage API Functions
 export async function getUsageSummary(): Promise<UsageSummary> {
-  const response = await fetch(`${API_BASE_URL}/api/settings/usage/summary`, {
-    headers: authHeaders(),
-  })
+  const response = await authFetch(`${API_BASE_URL}/api/settings/usage/summary`)
   if (!response.ok) throw new Error(t('api.error.usageFailed'))
   return response.json()
 }
@@ -255,18 +240,15 @@ export async function getUsageTransactions(params: {
   if (params.from) searchParams.set('from', params.from)
   if (params.to) searchParams.set('to', params.to)
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/settings/usage/transactions?${searchParams.toString()}`,
-    { headers: authHeaders() }
+  const response = await authFetch(
+    `${API_BASE_URL}/api/settings/usage/transactions?${searchParams.toString()}`
   )
   if (!response.ok) throw new Error(t('api.error.usageFailed'))
   return response.json()
 }
 
 export async function getUsageByProject(): Promise<ProjectUsage[]> {
-  const response = await fetch(`${API_BASE_URL}/api/settings/usage/by-project`, {
-    headers: authHeaders(),
-  })
+  const response = await authFetch(`${API_BASE_URL}/api/settings/usage/by-project`)
   if (!response.ok) throw new Error(t('api.error.usageFailed'))
   return response.json()
 }

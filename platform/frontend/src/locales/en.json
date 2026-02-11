@@ -325,6 +325,7 @@
   "auth.error.registerFailed": "Registration failed. Please try again.",
   "auth.error.loginFailed": "Login failed. Please check your credentials.",
   "auth.error.unknown": "An unexpected error occurred.",
+  "auth.error.sessionExpired": "Your session has expired. Please log in again.",
   "auth.continueWith": "Continue with {{provider}}",
   "auth.orContinueWith": "or continue with email",
   "settings.tabs.billing": "Billing",

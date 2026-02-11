@@ -25,6 +25,8 @@ import {
   clearAuth,
   isAuthenticated,
   getAuthHeaders,
+  authFetch,
+  AUTH_EXPIRED_EVENT,
   register,
   login,
   socialLogin,
@@ -280,6 +282,44 @@ describe('auth api', () => {
     it('returns callback URL for provider', () => {
       const url = getOAuthCallbackUrl('google')
       expect(url).toContain('/auth/callback/google')
+    })
+  })
+
+  describe('authFetch', () => {
+    it('attaches auth headers and returns response', async () => {
+      mockStorage['ai-dev-jwt'] = 'my-token'
+      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ data: 1 }) })
+
+      const response = await authFetch('http://localhost/api/test')
+      expect(response.ok).toBe(true)
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://localhost/api/test',
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: 'Bearer my-token' }),
+        })
+      )
+    })
+
+    it('clears auth and dispatches event on 401', async () => {
+      mockStorage['ai-dev-jwt'] = 'expired-token'
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 401 })
+
+      const eventListener = vi.fn()
+      window.addEventListener(AUTH_EXPIRED_EVENT, eventListener)
+
+      await expect(authFetch('http://localhost/api/test')).rejects.toThrow()
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith('ai-dev-jwt')
+      expect(eventListener).toHaveBeenCalled()
+
+      window.removeEventListener(AUTH_EXPIRED_EVENT, eventListener)
+    })
+
+    it('passes through non-401 errors without clearing auth', async () => {
+      mockStorage['ai-dev-jwt'] = 'valid-token'
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 500 })
+
+      const response = await authFetch('http://localhost/api/test')
+      expect(response.status).toBe(500)
     })
   })
 })

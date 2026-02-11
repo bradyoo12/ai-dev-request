@@ -5,7 +5,7 @@ vi.mock('../i18n', () => ({
 }))
 
 vi.mock('./auth', () => ({
-  getAuthHeaders: () => ({ 'Content-Type': 'application/json', Authorization: 'Bearer test' }),
+  authFetch: (url: string, options?: RequestInit) => fetch(url, options),
 }))
 
 const mockFetch = vi.fn()
@@ -89,7 +89,7 @@ describe('settings api', () => {
       await getTokenHistory(1, 20, 'purchase')
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('actionFilter=purchase'),
-        expect.anything()
+        undefined
       )
     })
 
@@ -204,7 +204,7 @@ describe('settings api', () => {
       expect(result).toEqual(data)
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('type=credit'),
-        expect.anything()
+        undefined
       )
     })
 

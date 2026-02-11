@@ -193,6 +193,9 @@ vi.mock('./PlatformUpgradePage', () => ({
 vi.mock('./VisualPromptPage', () => ({
   default: () => <div data-testid="visual-prompt-page">VisualPromptPage</div>,
 }))
+vi.mock('./MultiFrameworkPage', () => ({
+  default: () => <div data-testid="multi-framework-page">MultiFrameworkPage</div>,
+}))
 
 import SettingsLayout from './SettingsLayout'
 

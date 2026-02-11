@@ -818,3 +818,17 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `ProjectMemory` with Id (Guid), UserId, ProjectName, MemoryType (convention/pattern/preference/feedback), Category (general/naming/architecture/style/review/testing/deployment), Content, Summary, SourceType (explicit/accepted_suggestion/rejected_suggestion/review_feedback/code_pattern), SourceRef, Confidence (0.0-1.0), Reinforcements, Contradictions, IsActive, TagsJson, EmbeddingJson, LastAppliedAt
 - **Frontend**: `CodebaseMemoryPage` in Settings with "Memory AI" tab — 3 sub-tabs (Memories with category filter + memory cards showing type/category/confidence badges + reinforce/contradict/delete buttons + source info, Add Memory with type/category/summary/content form, Stats with 5 metric cards [total/active/avg confidence/reinforcements/contradictions] + category breakdown + recent memories list)
 - **Flow**: User opens Memories tab → filters by category → sees existing patterns → clicks + to reinforce or - to contradict → switches to Add tab → fills in convention/pattern content with summary → clicks Add Memory → memory appears in list with 70% initial confidence → over time, reinforced memories gain confidence, contradicted memories lose confidence and auto-deactivate below 20%
+
+### #296 — Figma-to-Code Import (PR #299)
+- **PR**: #299 (641 insertions, squash-merged)
+- **Backend**: `FigmaImportController` with 7 endpoints:
+  - `GET /api/figma-import/imports` — list user's imports (most recent 50)
+  - `POST /api/figma-import/import-url` — import from Figma URL (extracts file key, generates design tokens/component tree/code)
+  - `POST /api/figma-import/import-screenshot` — import from screenshot (simulated extraction)
+  - `GET /api/figma-import/imports/{id}/tokens` — get extracted design tokens and component tree
+  - `GET /api/figma-import/imports/{id}/code` — get generated code with framework/styling info
+  - `DELETE /api/figma-import/imports/{id}` — delete an import
+  - `GET /api/figma-import/stats` — aggregate stats (total/completed imports, total components/tokens, avg processing time, recent imports)
+- **Entity**: `FigmaImport` with Id (Guid), UserId, FigmaFileKey, FigmaNodeId, SourceType (url/screenshot/upload), SourceUrl, DesignName, DesignTokensJson, ComponentTreeJson, GeneratedCodeJson, Status (pending/extracting/generating/completed/failed), Framework (react/nextjs/vue), StylingLib (tailwind/css-modules/styled-components), ComponentCount, TokenCount, ProcessingTimeMs, ErrorMessage
+- **Frontend**: `FigmaImportPage` in Settings with "Figma" tab — 3 sub-tabs (Import with URL input + design name + framework/styling dropdowns + import/screenshot buttons + result preview showing component count/token count/processing time + extracted tokens JSON + generated code JSON, History with import list showing source type/framework/components/status + view/delete buttons, Stats with 5 metric cards + recent imports list)
+- **Flow**: User opens Figma tab → pastes Figma URL → optionally sets name/framework/styling → clicks Import from URL → sees processing result with design tokens and generated code → switches to History to review past imports → switches to Stats for aggregate metrics

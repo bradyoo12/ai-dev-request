@@ -220,6 +220,14 @@ export interface ProductionResult {
   validationIterations?: number;
   fixHistory?: Array<{ iteration: number; issues: string[]; fixDescription: string }>;
   validationPassed?: boolean;
+  qualityConfidenceScore?: number;
+  qualityReviewDimensions?: {
+    architecture: number;
+    security: number;
+    performance: number;
+    accessibility: number;
+    maintainability: number;
+  };
 }
 
 export interface ProductionResponse {

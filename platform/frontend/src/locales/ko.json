@@ -1173,5 +1173,14 @@
   "componentPreview.error.createFailed": "컴포넌트 생성 실패",
   "componentPreview.error.iterateFailed": "컴포넌트 업데이트 실패",
   "componentPreview.error.exportFailed": "컴포넌트 내보내기 실패",
-  "componentPreview.error.deleteFailed": "컴포넌트 삭제 실패"
+  "componentPreview.error.deleteFailed": "컴포넌트 삭제 실패",
+  "qualityBadge.title": "품질 점수",
+  "qualityBadge.excellent": "우수",
+  "qualityBadge.good": "양호",
+  "qualityBadge.needsWork": "개선 필요",
+  "qualityBadge.dimensions.architecture": "아키텍처",
+  "qualityBadge.dimensions.security": "보안",
+  "qualityBadge.dimensions.performance": "성능",
+  "qualityBadge.dimensions.accessibility": "접근성",
+  "qualityBadge.dimensions.maintainability": "유지보수성"
 }

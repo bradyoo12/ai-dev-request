@@ -1173,5 +1173,14 @@
   "componentPreview.error.createFailed": "Failed to create component",
   "componentPreview.error.iterateFailed": "Failed to update component",
   "componentPreview.error.exportFailed": "Failed to export component",
-  "componentPreview.error.deleteFailed": "Failed to delete component"
+  "componentPreview.error.deleteFailed": "Failed to delete component",
+  "qualityBadge.title": "Quality Score",
+  "qualityBadge.excellent": "Excellent",
+  "qualityBadge.good": "Good",
+  "qualityBadge.needsWork": "Needs Improvement",
+  "qualityBadge.dimensions.architecture": "Architecture",
+  "qualityBadge.dimensions.security": "Security",
+  "qualityBadge.dimensions.performance": "Performance",
+  "qualityBadge.dimensions.accessibility": "Accessibility",
+  "qualityBadge.dimensions.maintainability": "Maintainability"
 }

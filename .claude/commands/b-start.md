@@ -389,7 +389,40 @@ Search for recent technologies and create suggestion tickets using parallel rese
 
 **This step also runs as an idle fallback:** If Steps 3–5 all found no tickets to process (no Ready tickets, no In Progress PRs to merge, no In Review tickets to verify), b-modernize runs automatically so the pipeline stays productive instead of looping empty cycles.
 
-#### Step 6a: Pre-check
+#### Step 6a: Playwright UI Smoke Test (Idle Pre-check)
+
+Before researching new technologies, use Playwright to test all links and buttons on the live UI to catch any errors or unexpected results.
+
+1. Pull latest and install deps:
+   ```bash
+   git checkout main && git pull
+   cd platform/frontend && npm install
+   npx playwright install chromium
+   ```
+
+2. Run a Playwright smoke test that:
+   - Navigates to every discoverable page/route on the staging site
+   - Clicks all links and verifies they navigate correctly (no 404s, no broken routes)
+   - Clicks all buttons and checks for JavaScript errors, uncaught exceptions, or unexpected UI states
+   - Checks the browser console for any error-level messages
+   - Verifies no network requests return 4xx/5xx responses
+
+3. For each issue found:
+   - Create a ticket with a clear title and reproduction steps:
+     ```bash
+     gh issue create --repo bradyoo12/ai-dev-request --title "[UI Bug] {description}" --body "{detailed reproduction steps and error details}" --label "bug"
+     ```
+   - Add the ticket to the project and set status to **Ready**:
+     ```bash
+     ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
+     STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
+     READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
+     gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+     ```
+
+4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
+
+#### Step 6b: Pre-check
 
 1. Check existing open suggestion tickets:
    ```bash
@@ -397,7 +430,7 @@ Search for recent technologies and create suggestion tickets using parallel rese
    ```
 2. If 4+ suggestion tickets exist in Backlog, skip b-modernize entirely
 
-#### Step 6b: Create Research Team
+#### Step 6c: Create Research Team
 
 1. Create the team:
    ```
@@ -416,7 +449,7 @@ Search for recent technologies and create suggestion tickets using parallel rese
 
 4. Wait for both scouts to complete
 
-#### Step 6c: Create Tickets
+#### Step 6d: Create Tickets
 
 After collecting findings from both scouts:
 1. Filter for qualifying technologies (relevance >= 3, impact >= 3, effort <= 4)
@@ -433,7 +466,7 @@ After collecting findings from both scouts:
    gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
    ```
 
-#### Step 6d: Cleanup
+#### Step 6e: Cleanup
 
 Shut down all agents, delete the team.
 

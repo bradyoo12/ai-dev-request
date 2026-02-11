@@ -689,3 +689,19 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `PlatformUpgrade` with Id (Guid), UserId, CurrentDotNetVersion ("net10.0"), CurrentEfCoreVersion ("10.0"), CurrentCSharpVersion ("14.0"), VectorSearchEnabled, NativeJsonColumnsEnabled, LeftJoinLinqEnabled, PerformanceProfilingEnabled, AvgQueryTimeMs, P95QueryTimeMs, P99QueryTimeMs, TotalQueriesExecuted, CacheHitRate, MemoryUsageMb, CpuUsagePercent, ThroughputRequestsPerSec, VectorIndexCount, VectorDimensions, VectorSearchAvgMs, UpgradeStatus, FeatureFlagsJson, PerformanceHistoryJson, MigrationLogJson
 - **Frontend**: `PlatformUpgradePage` in Settings with "Platform Upgrade" tab — version badges (.NET 10 / EF Core 10 / C# 14), 5 sub-tabs (Overview with feature toggles, Performance with 8 metric cards, Vector Search with stats and status indicator, Features listing 10 .NET 10 features with category/status badges, Benchmark with .NET 9 vs 10 side-by-side comparison table)
 - **Flow**: User opens Overview → sees version badges → toggles features (vector search, JSON columns, LeftJoin LINQ, profiling) → switches to Performance tab → views real-time metrics → checks Vector Search stats → browses Features catalog → runs Benchmark to compare .NET 9 vs 10 improvements
+
+### #278 — Visual Prompt-to-UI Design Mode
+- **Ticket**: #278 — `Visual prompt-to-UI design mode with live component preview`
+- **PR**: #281 (1011 insertions, squash-merged)
+- **Backend**: `VisualPromptUiController` with 7 endpoints:
+  - `GET /api/visual-prompt/components` — list user's components (optional category filter)
+  - `GET /api/visual-prompt/components/{id}` — component detail with code, HTML, conversation history
+  - `POST /api/visual-prompt/generate` — generate component from text prompt (returns React + Tailwind code with live preview HTML)
+  - `POST /api/visual-prompt/components/{id}/refine` — iterative refinement via chat-style follow-up prompts
+  - `GET /api/visual-prompt/gallery` — browse generated components sorted by popularity
+  - `POST /api/visual-prompt/components/{id}/export` — export component to an existing project
+  - `GET /api/visual-prompt/stats` — aggregate stats (total components, iterations, tokens, cost, categories, exports)
+  - `GET /api/visual-prompt/categories` — 9 component categories (landing, dashboard, form, card, navigation, pricing, hero, modal, custom)
+- **Entity**: `VisualPromptUi` with Id (Guid), UserId, ComponentName, PromptText, GeneratedCode, GeneratedHtml, Framework, StylingLibrary, Status, IterationCount, ParentComponentId, ConversationJson, Category, Tags, ViewCount, ForkCount, LikeCount, IsPublic, ThumbnailUrl, ExportedToProjectId, ExportedFilePath, ThemeTokensJson, GenerationTimeMs, TokensUsed, EstimatedCost
+- **Frontend**: `VisualPromptPage` in Settings with "Visual UI" tab — 4 sub-tabs (Generate with prompt input + component name + category + live HTML preview + code viewer + copy button + iterative refinement chat, Gallery with category filter chips + component cards, Components list with status/category badges, Stats with 8 metric cards)
+- **Flow**: User enters prompt describing UI → clicks Generate → sees live preview + code → refines via follow-up chat messages → copies code or exports to project → browses gallery of past generations → views stats dashboard

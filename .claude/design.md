@@ -662,3 +662,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `MobileAppConfig` with Id (Guid), UserId, DevRequestId, AppName, BundleId, Platform (ios/android/both), Framework (react-native), Status, AppVersion, BuildNumber, IconUrl, SplashScreenUrl, ExpoEnabled, ExpoQrCodeUrl, PreviewUrl, IosEnabled, AndroidEnabled, IosBuildStatus, AndroidBuildStatus, IosPublishStatus, AndroidPublishStatus, TotalScreens, TotalComponents, NavigationStructureJson, ScreenListJson, BuildHistoryJson, PublishHistoryJson
 - **Frontend**: `MobileAppPage` in Settings with "Mobile" tab — app header with icon/name/bundle/version, platform status badges (iOS/Android), 5 tabs (Overview with stats + QR preview + quick build actions, Screens list, Builds history, Publish to App Store + Google Play, Settings with app config inputs and platform toggles)
 - **Flow**: User enters project ID → sees app config with platform badges → overview shows stats and QR preview → trigger builds for iOS/Android → view build history → publish to App Store/Google Play → configure app name, bundle ID, version, and platform toggles
+
+### #273 — Background Agent Workers for Parallel Autonomous Development (PR #276)
+- **Endpoints**:
+  - `GET /api/background-agents` — list agents (optional status filter)
+  - `GET /api/background-agents/{agentId}` — agent detail with steps, logs, resource usage
+  - `POST /api/background-agents/spawn` — spawn new agent (max 5 concurrent, auto-creates branch)
+  - `POST /api/background-agents/{agentId}/stop` — stop running agent
+  - `GET /api/background-agents/stats` — aggregate stats (total, active, completed, failed, tokens, cost, PRs, avg time)
+  - `GET /api/background-agents/types` — 5 agent types (general, frontend, backend, testing, refactor)
+- **Entity**: `BackgroundAgent` with Id (Guid), UserId, DevRequestId, AgentName, TaskDescription, Status (idle/starting/running/completed/failed/stopped), BranchName, AgentType, Priority, TotalSteps, CompletedSteps, ProgressPercent, FilesCreated, FilesModified, TestsPassed, TestsFailed, ErrorCount, SelfHealAttempts, CpuUsagePercent, MemoryUsageMb, TokensUsed, EstimatedCost, ElapsedSeconds, EstimatedRemainingSeconds, PullRequestUrl, PullRequestStatus, LogEntriesJson, StepsJson, InstalledPackagesJson
+- **7-Step Pipeline**: Initialize environment → Analyze requirements → Create branch & scaffold → Implement changes → Run tests → Self-review & fix → Open pull request
+- **Frontend**: `BackgroundAgentPage` in Settings with "Agents" tab — 4 sub-tabs (Dashboard with 8 stats cards + agent type grid, Agents list with status filter + progress bars + detail panel, Spawn form with type/priority selectors, Logs with terminal-style viewer)
+- **Flow**: User opens Dashboard → views active/completed/failed agent counts → switches to Spawn tab → selects agent type and priority → enters task description → spawns agent → monitors progress in Agents tab → views execution steps and resource usage → agent auto-creates PR on completion → views logs in terminal

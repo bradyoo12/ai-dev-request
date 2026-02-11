@@ -105,6 +105,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AgenticPlan> AgenticPlans => Set<AgenticPlan>();
     public DbSet<VisualRegressionResult> VisualRegressionResults => Set<VisualRegressionResult>();
     public DbSet<McpGatewayServer> McpGatewayServers => Set<McpGatewayServer>();
+    public DbSet<ProjectMemory> ProjectMemories => Set<ProjectMemory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1678,6 +1679,25 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ConfigJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<ProjectMemory>(entity =>
+        {
+            entity.ToTable("project_memories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProjectName).HasMaxLength(200);
+            entity.Property(e => e.MemoryType).HasMaxLength(50);
+            entity.Property(e => e.Category).HasMaxLength(50);
+            entity.Property(e => e.Content).HasColumnType("text");
+            entity.Property(e => e.Summary).HasMaxLength(500);
+            entity.Property(e => e.SourceType).HasMaxLength(50);
+            entity.Property(e => e.SourceRef).HasMaxLength(500);
+            entity.Property(e => e.TagsJson).HasColumnType("text");
+            entity.Property(e => e.EmbeddingJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.UserId, e.Category });
         });
     }
 }

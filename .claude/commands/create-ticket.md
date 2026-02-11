@@ -89,14 +89,20 @@ gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body-file {d
 
 ## Step 5: Add to AI Dev Request Project and Set Status to Ready
 
+**Important**: The project belongs to the `bradyoo12` GitHub account. Ensure this account is active before running project commands.
+
 ```bash
+# Switch to bradyoo12 account (project owner)
+gh auth switch --user bradyoo12 2>/dev/null || true
+
 # Add issue to project and capture the item ID
 ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format json --jq '.id')
 
-# Get the Status field ID and "Ready" option ID, then set it
-STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
-READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
-gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+# Set status to "Ready" using known project field IDs
+# Project ID: PVT_kwHNf9fOATn4hA (AI Dev Request #26)
+# Status field: PVTSSF_lAHNf9fOATn4hM4PS3yh
+# Ready option: 47fc9ee4
+gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
 ```
 
 Report the created issue URL and confirm it was added to the project with **Ready** status.

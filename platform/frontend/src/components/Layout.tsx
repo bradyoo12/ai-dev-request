@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Outlet, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
-import { Menu, X, Sparkles } from 'lucide-react'
+import { Menu, X, Sparkles, ChevronDown } from 'lucide-react'
 import LanguageSelector from './LanguageSelector'
 import LoginPage from '../pages/LoginPage'
 import FooterSection from './FooterSection'
@@ -12,9 +12,23 @@ export default function Layout() {
   const navigate = useNavigate()
   const { authUser, tokenBalance, showLogin, setShowLogin, handleLogin, handleLogout, requireAuth } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
+
+  // Close "More" dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setMoreMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const navigateProtected = (path: string) => {
     setMobileMenuOpen(false)
+    setMoreMenuOpen(false)
     if (requireAuth()) {
       navigate(path)
     }
@@ -24,21 +38,71 @@ export default function Layout() {
     return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
   }
 
-  const navItems = (
+  // --- Navigation item styling (standardized hover colors) ---
+  const navLinkClass = 'text-warm-400 hover:text-white transition-colors text-left'
+  const navLinkAccentClass = 'text-warm-400 hover:text-accent-blue transition-colors text-left'
+
+  // --- Public nav items (shown to unauthenticated users) ---
+  const publicDesktopNav = (
     <>
-      <button onClick={() => navigateProtected('/sites')} className="text-warm-400 hover:text-white transition-colors text-left">{t('header.mySites')}</button>
-      <button onClick={() => navigateProtected('/suggestions')} className="text-warm-400 hover:text-white transition-colors text-left">{t('header.suggestions')}</button>
-      <button onClick={() => navigateProtected('/recommendations')} className="text-warm-400 hover:text-accent-purple transition-colors text-left">{t('header.recommendations')}</button>
-      <button onClick={() => navigateProtected('/project-health')} className="text-warm-400 hover:text-accent-emerald transition-colors text-left">{t('header.projectHealth')}</button>
-      <button onClick={() => navigateProtected('/teams')} className="text-warm-400 hover:text-accent-cyan transition-colors text-left">{t('header.teams')}</button>
-      <button onClick={() => navigateProtected('/whitelabel')} className="text-warm-400 hover:text-accent-amber transition-colors text-left">{t('header.whitelabel')}</button>
-      {authUser?.isAdmin && (
-        <button onClick={() => navigateProtected('/admin/churn')} className="text-warm-400 hover:text-white transition-colors text-left">{t('header.adminChurn')}</button>
-      )}
-      <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className="text-warm-400 hover:text-white transition-colors">{t('header.pricing')}</Link>
-      <button onClick={() => navigateProtected('/settings')} className="text-warm-400 hover:text-white transition-colors text-left">{t('header.settings')}</button>
-      <a href="mailto:support@aidevrequest.com" className="text-warm-400 hover:text-white transition-colors">{t('header.contact')}</a>
+      <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
+      <Link to="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.howItWorks')}</Link>
+      <a href="mailto:support@aidevrequest.com" className={navLinkClass}>{t('header.contact')}</a>
     </>
+  )
+
+  const publicMobileNav = (
+    <>
+      <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
+      <Link to="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.howItWorks')}</Link>
+      <a href="mailto:support@aidevrequest.com" className={navLinkClass}>{t('header.contact')}</a>
+    </>
+  )
+
+  // --- Authenticated primary nav items (always visible) ---
+  const authPrimaryNav = (
+    <>
+      <button onClick={() => navigateProtected('/sites')} className={navLinkClass}>{t('header.mySites')}</button>
+      <button onClick={() => navigateProtected('/suggestions')} className={navLinkClass}>{t('header.suggestions')}</button>
+      <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
+      <button onClick={() => navigateProtected('/settings')} className={navLinkClass}>{t('header.settings')}</button>
+    </>
+  )
+
+  // --- Authenticated secondary nav items (inside "More" dropdown on desktop, flat on mobile) ---
+  const authSecondaryItems = (
+    <>
+      <button onClick={() => navigateProtected('/recommendations')} className={navLinkAccentClass}>{t('header.recommendations')}</button>
+      <button onClick={() => navigateProtected('/project-health')} className={navLinkAccentClass}>{t('header.projectHealth')}</button>
+      <button onClick={() => navigateProtected('/teams')} className={navLinkAccentClass}>{t('header.teams')}</button>
+      <button onClick={() => navigateProtected('/whitelabel')} className={navLinkAccentClass}>{t('header.whitelabel')}</button>
+      {authUser?.isAdmin && (
+        <button onClick={() => navigateProtected('/admin/churn')} className={navLinkAccentClass}>{t('header.adminChurn')}</button>
+      )}
+      <a href="mailto:support@aidevrequest.com" className={navLinkAccentClass}>{t('header.contact')}</a>
+    </>
+  )
+
+  // --- Desktop "More" dropdown ---
+  const moreDropdown = (
+    <div ref={moreMenuRef} className="relative">
+      <button
+        onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+        className="flex items-center gap-1 text-warm-400 hover:text-white transition-colors"
+        aria-expanded={moreMenuOpen}
+        aria-haspopup="true"
+      >
+        {t('header.more')}
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {moreMenuOpen && (
+        <div className="absolute right-0 top-full mt-2 py-2 px-1 min-w-[180px] glass rounded-xl shadow-premium-lg z-50">
+          <div className="flex flex-col gap-1">
+            {authSecondaryItems}
+          </div>
+        </div>
+      )}
+    </div>
   )
 
   return (
@@ -72,7 +136,14 @@ export default function Layout() {
             )}
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center space-x-4 text-sm">
-              {navItems}
+              {authUser ? (
+                <>
+                  {authPrimaryNav}
+                  {moreDropdown}
+                </>
+              ) : (
+                publicDesktopNav
+              )}
             </nav>
             <LanguageSelector />
             {authUser ? (
@@ -107,7 +178,16 @@ export default function Layout() {
         {/* Mobile menu overlay */}
         {mobileMenuOpen && (
           <nav className="lg:hidden mx-4 mb-4 p-4 glass rounded-2xl flex flex-col gap-3 text-sm">
-            {navItems}
+            {authUser ? (
+              <>
+                {authPrimaryNav}
+                <div className="pt-2 border-t border-warm-700/30 flex flex-col gap-3">
+                  {authSecondaryItems}
+                </div>
+              </>
+            ) : (
+              publicMobileNav
+            )}
             {authUser && (
               <div className="pt-3 border-t border-warm-700/30 flex items-center justify-between">
                 <span className="text-sm text-warm-400">{authUser.displayName || authUser.email}</span>

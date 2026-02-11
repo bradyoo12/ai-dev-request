@@ -93,6 +93,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ModelRoutingConfig> ModelRoutingConfigs => Set<ModelRoutingConfig>();
     public DbSet<ProjectIndex> ProjectIndexes => Set<ProjectIndex>();
     public DbSet<DeploymentHealth> DeploymentHealths => Set<DeploymentHealth>();
+    public DbSet<GenerativeUiSession> GenerativeUiSessions => Set<GenerativeUiSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1456,6 +1457,22 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).HasMaxLength(20);
             entity.Property(e => e.HealthEventsJson).HasColumnType("text");
             entity.Property(e => e.IncidentsJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
+        });
+
+        modelBuilder.Entity<GenerativeUiSession>(entity =>
+        {
+            entity.ToTable("generative_ui_sessions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SessionName).HasMaxLength(200);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.ActiveModel).HasMaxLength(50);
+            entity.Property(e => e.MessagesJson).HasColumnType("text");
+            entity.Property(e => e.ToolDefinitionsJson).HasColumnType("text");
+            entity.Property(e => e.GeneratedComponentsJson).HasColumnType("text");
+            entity.Property(e => e.ReasoningStepsJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
         });

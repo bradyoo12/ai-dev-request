@@ -607,3 +607,18 @@ Automatically routes AI tasks to optimal model tiers (Fast/Standard/Premium) bas
 - **Task Types**: 15 types across 3 tiers — Fast (formatting, naming, boilerplate, comments, simple-refactor), Standard (code-generation, bug-fixing, testing, documentation, api-design), Premium (architecture, security-review, complex-refactor, system-design, optimization)
 - **Frontend**: `ModelRoutingPage` in Settings with "AI Models" tab — enable/disable toggle, 4 stats cards (Routing Decisions/Savings/Month Cost/Budget), token distribution by tier with color dots, 3 model tier cards with cost and latency info, task routing matrix with clickable tier selectors, budget settings with default tier dropdown and monthly budget input
 - **Flow**: User opens Settings → AI Models tab → enable routing → configure per-task tier assignments → set monthly budget → system routes tasks automatically and tracks savings
+
+### Codebase Context Indexing with Vector Embeddings (#266)
+
+Indexes project files for intelligent context retrieval using embeddings, dependency graphs, and semantic search:
+- **Backend**: `ProjectIndex` entity for file-level indexing, `ProjectIndexController` with 6 endpoints for CRUD, retrieval, and dependency management
+- **Endpoints**:
+  - `GET /api/project-index/summary/{projectId}` — index summary (total files, indexed, stale, modified, size, languages)
+  - `GET /api/project-index/files/{projectId}` — all indexed files with metadata
+  - `POST /api/project-index/index` — index or re-index a single file (upsert by userId+projectId+filePath)
+  - `POST /api/project-index/retrieve` — retrieve top-K most relevant files for a query (simulated RAG, prioritizes user-modified files)
+  - `GET /api/project-index/dependencies/{projectId}` — dependency graph as edge list (from → to)
+  - `POST /api/project-index/mark-stale` — mark files as needing re-index after user modifications
+- **Entity**: `ProjectIndex` with Id (Guid), UserId, DevRequestId, FilePath, ContentHash (SHA-256), FileSize, Language, EmbeddingJson (vector), DependenciesJson, DependentsJson, Summary, ExportedSymbols, RelevanceScore, IsUserModified, NeedsReindex, IndexedAt, CreatedAt, UpdatedAt
+- **Frontend**: `ContextIndexPage` in Settings with "Context Index" tab — project ID input, 4 stats cards (Total Files/Indexed/Stale/Total Size), language tags with color coding, context retrieval search bar, 3 tabs (Files with filter all/indexed/stale/modified, Dependencies edge list, Retrieved ranked results), file list with status dots and metadata
+- **Flow**: User enters project ID → loads index summary → browses files by filter → views dependency graph → searches for relevant context via semantic query → results ranked by relevance

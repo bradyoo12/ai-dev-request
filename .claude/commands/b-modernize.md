@@ -1,5 +1,5 @@
 ---
-description: Web search for recent technologies and competitor features, then create suggestion tickets in the AI Dev Request project. Supports team mode for parallel research.
+description: Search tech news sites (Medium, dev.to, Hacker News, TechCrunch) for latest trends, recent technologies, and competitor features, then create suggestion tickets. Supports team mode for parallel research.
 allowed-prompts:
   - tool: Bash
     prompt: run gh commands for GitHub operations
@@ -10,8 +10,9 @@ allowed-prompts:
 ## Mission
 
 Search the web for:
-1. **Recent technologies** and frameworks that could benefit the AI Dev Request platform
-2. **Competitor features** from AI app builders and development automation platforms
+1. **Latest trends** from tech news sites and developer blogs (Medium, dev.to, Hacker News, etc.)
+2. **Recent technologies** and frameworks that could benefit the AI Dev Request platform
+3. **Competitor features** from AI app builders and development automation platforms
 
 Then create suggestion tickets for promising discoveries.
 
@@ -42,21 +43,23 @@ When spawned as part of an Agent Team by b-start:
 
 #### tech-scout
 Research scope:
-1. **AI Code Generation**: Recent AI coding tools, Claude Code alternatives, agentic coding frameworks
-2. **AI Agent Frameworks**: Agent orchestration tools, function-calling improvements, tool-use patterns
-3. **Backend/.NET Innovations**: Recent .NET 9 libraries, performance tools, new EF Core features
-4. **Frontend/React**: Recent React ecosystem tools, UI components, state management
-5. **DevOps & Infrastructure**: Deployment, monitoring, CI/CD innovations for small teams
+1. **Tech News & Trends**: Search Medium, dev.to, Hacker News, and tech blogs for trending topics in AI/SaaS development
+2. **AI Code Generation**: Recent AI coding tools, Claude Code alternatives, agentic coding frameworks
+3. **AI Agent Frameworks**: Agent orchestration tools, function-calling improvements, tool-use patterns
+4. **Backend/.NET Innovations**: Recent .NET 9 libraries, performance tools, new EF Core features
+5. **Frontend/React**: Recent React ecosystem tools, UI components, state management
+6. **DevOps & Infrastructure**: Deployment, monitoring, CI/CD innovations for small teams
 
-Report each finding with: name, description, relevance score (1-5), effort score (1-5), impact score (1-5).
+Report each finding with: name, description, source URL, relevance score (1-5), effort score (1-5), impact score (1-5).
 
 #### competitor-scout
 Research scope:
-1. **AI App Builder Competitors**: Replit, Base44, Bolt.new, v0.dev, Cursor features
-2. **AI Dev Request Competitors**: "AI development request platform", "automated software development SaaS"
-3. **Search queries**: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
+1. **Industry News & Analysis**: Search Medium, dev.to, TechCrunch, and tech blogs for latest AI SaaS trends and competitor launches
+2. **AI App Builder Competitors**: Replit, Base44, Bolt.new, v0.dev, Cursor features
+3. **AI Dev Request Competitors**: "AI development request platform", "automated software development SaaS"
+4. **Search queries**: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
 
-Report each finding with: name, description, differentiation (Yes/No/Partial), user value (1-5), feasibility (1-5), competitive edge (1-5).
+Report each finding with: name, description, source URL, differentiation (Yes/No/Partial), user value (1-5), feasibility (1-5), competitive edge (1-5).
 
 ## Step 1: Load Existing Tickets
 
@@ -70,21 +73,39 @@ Note all existing titles to avoid creating duplicate suggestions.
 
 **In team mode:** The team lead handles this check before spawning you. Your existing ticket list will be provided in the task prompt.
 
-## Step 2: Web Search for Recent Technologies
+## Step 2: Web Search for Trends and Technologies
 
 **In team mode, only search your assigned scope (tech-scout or competitor-scout).**
 
+Use `WebSearch` for broad queries and `WebFetch` to read specific articles from news sites. Prioritize recent content (last 3 months).
+
+### News & Blog Sites to Search
+
+Target these sites for trending articles and insights:
+- **medium.com** — Developer tutorials, trend analysis, architecture deep-dives
+- **dev.to** — Community posts on new tools, libraries, and best practices
+- **news.ycombinator.com** (Hacker News) — Trending launches, Show HN posts, discussions
+- **techcrunch.com** — Startup launches, funding rounds, product announcements
+- **thenewstack.io** — Cloud-native, DevOps, and platform engineering trends
+- **blog.pragmaticengineer.com** — Engineering leadership and industry trends
+
 ### Search Queries — tech-scout (run all)
-1. **AI Code Generation**: Recent AI coding tools, Claude Code alternatives, agentic coding frameworks
-2. **AI Agent Frameworks**: Agent orchestration tools, function-calling improvements, tool-use patterns
-3. **Backend/.NET Innovations**: Recent .NET 9 libraries, performance tools, new EF Core features
-4. **Frontend/React**: Recent React ecosystem tools, UI components, state management
-5. **DevOps & Infrastructure**: Deployment, monitoring, CI/CD innovations for small teams
+1. **Trending on News Sites**: `site:medium.com OR site:dev.to "AI development" OR "AI coding" 2026"`, `site:medium.com "React" OR ".NET" new framework 2026`
+2. **AI Code Generation**: Recent AI coding tools, Claude Code alternatives, agentic coding frameworks
+3. **AI Agent Frameworks**: Agent orchestration tools, function-calling improvements, tool-use patterns
+4. **Backend/.NET Innovations**: Recent .NET 9 libraries, performance tools, new EF Core features
+5. **Frontend/React**: Recent React ecosystem tools, UI components, state management
+6. **DevOps & Infrastructure**: Deployment, monitoring, CI/CD innovations for small teams
+
+When a search result links to a Medium, dev.to, or blog article, use `WebFetch` to read the full article and extract actionable insights.
 
 ### Search Queries — competitor-scout
-1. **AI App Builder Competitors**: Replit, Base44, Bolt.new, v0.dev, Cursor features
-2. **AI Dev Request Competitors**: "AI development request platform", "automated software development SaaS"
-3. **General**: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
+1. **Trending Competitor News**: `site:medium.com OR site:techcrunch.com "AI app builder" OR "AI code generation" 2026`, `site:dev.to "bolt.new" OR "v0.dev" OR "replit" OR "cursor" 2026`
+2. **AI App Builder Competitors**: Replit, Base44, Bolt.new, v0.dev, Cursor features
+3. **AI Dev Request Competitors**: "AI development request platform", "automated software development SaaS"
+4. **General**: "AI app builder platforms 2026", "no-code AI tools", "AI development automation"
+
+When a search result links to a competitor announcement, feature launch, or analysis article, use `WebFetch` to read the full content and identify specific features worth adopting.
 
 ### Evaluate Competitor Features
 For each discovered feature:

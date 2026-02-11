@@ -40,7 +40,7 @@ AI Dev Request is a SaaS platform that automates the software development lifecy
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 + Vite + TypeScript + shadcn/ui + Zustand + Tailwind CSS |
+| Frontend | React 18 + Vite + TypeScript + shadcn/ui + Zustand + Tailwind CSS + Framer Motion |
 | Backend | .NET 9 + BradYoo.Core (shared auth, AI, data) |
 | AI Engine | Claude API (analysis, code generation, deployment automation) |
 | Database | PostgreSQL |
@@ -832,3 +832,12 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `FigmaImport` with Id (Guid), UserId, FigmaFileKey, FigmaNodeId, SourceType (url/screenshot/upload), SourceUrl, DesignName, DesignTokensJson, ComponentTreeJson, GeneratedCodeJson, Status (pending/extracting/generating/completed/failed), Framework (react/nextjs/vue), StylingLib (tailwind/css-modules/styled-components), ComponentCount, TokenCount, ProcessingTimeMs, ErrorMessage
 - **Frontend**: `FigmaImportPage` in Settings with "Figma" tab — 3 sub-tabs (Import with URL input + design name + framework/styling dropdowns + import/screenshot buttons + result preview showing component count/token count/processing time + extracted tokens JSON + generated code JSON, History with import list showing source type/framework/components/status + view/delete buttons, Stats with 5 metric cards + recent imports list)
 - **Flow**: User opens Figma tab → pastes Figma URL → optionally sets name/framework/styling → clicks Import from URL → sees processing result with design tokens and generated code → switches to History to review past imports → switches to Stats for aggregate metrics
+
+### #300 — Premium UI Redesign (PR #304)
+- **Design System**: Custom warm color palette with CSS custom properties (HSL-based), semantic tokens for backgrounds, foregrounds, borders, accents
+- **Typography**: Inter for UI text, JetBrains Mono for code elements
+- **Motion**: Framer Motion integration with `FadeIn` and `StaggerChildren` reusable wrapper components in `src/components/motion/`
+- **Glassmorphism**: Backdrop-blur panels with semi-transparent backgrounds on hero, cards, and feature sections
+- **Hero Redesign**: Large conversational prompt input as centerpiece with template quick-start chips (SaaS, E-commerce, Blog, Mobile)
+- **Component Refactoring**: HomePage broken into HeroSection, FeaturesSection, PricingSection, StatsSection sub-components
+- **Utility**: `src/lib/utils.ts` with `cn()` helper for conditional classname merging (clsx + tailwind-merge pattern)

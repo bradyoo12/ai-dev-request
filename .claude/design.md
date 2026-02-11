@@ -94,6 +94,7 @@ User Request (natural language)
 | ContainerConfig | Docker containerization configuration for a generated project |
 | OnboardingProgress | User onboarding wizard progress tracking with step completion milestones |
 | ProjectVersion | Versioned snapshot of a generated project with file-level diff capabilities |
+| ComponentPreview | Visual component preview with conversational iteration for design refinement |
 
 ## Spec-Driven Development Pipeline
 
@@ -414,6 +415,22 @@ Fault-tolerant generation pipeline with step-level retry and cancellation:
 - **Frontend**: `WorkflowPage` in Settings with execution list, pipeline visualization, step details, retry/cancel, and metrics dashboard
 - **Entity**: `WorkflowExecution` tracks devRequestId, workflowType, status, steps (JSON), retryCount, timestamps
 - **Flow**: Dev request created -> start workflow -> execute steps sequentially -> on failure, user can retry step or cancel -> metrics track success rates
+
+## Visual Component Preview
+
+v0.dev-style visual component preview with conversational iteration for design refinement:
+- **Backend**: `ComponentPreviewService` manages preview lifecycle including creation (generates React/Tailwind component code from prompt), conversational iteration (applies style transformations via chat), export, and deletion
+- **Endpoints**:
+  - `GET /api/component-preview` — list user's component previews
+  - `GET /api/component-preview/{id}` — get specific preview
+  - `POST /api/component-preview` — create new component from name + prompt
+  - `POST /api/component-preview/{id}/iterate` — iterate on component via chat message
+  - `POST /api/component-preview/{id}/export` — export component for use in project
+  - `DELETE /api/component-preview/{id}` — delete preview
+- **Entity**: `ComponentPreview` with Id (Guid), UserId, ComponentName, Code (text), ChatHistoryJson (jsonb), IterationCount, Status (draft/generating/ready/exported), DesignTokensJson (jsonb), timestamps
+- **Frontend**: `ComponentPreviewPage` in Settings with create form (name + prompt), split layout — component list (left) with status badges and active preview (right) with code preview, live iframe sandbox with Tailwind CDN, and chat interface for conversational iteration
+- **Live Preview**: Sandboxed iframe rendering with `generatePreviewHtml()` (injects Tailwind CDN) and `extractJsx()` (extracts return JSX, converts className to class)
+- **Flow**: Enter component name + prompt → AI generates React component → live preview in iframe → iterate via chat → export when satisfied
 
 ## Directory Structure
 

@@ -575,3 +575,19 @@ Code snapshot tracking and smart merge system that preserves user modifications 
 - **Conflict Detection**: When creating a snapshot for an existing file, if user has modifications (UserContent differs from BaselineContent), status is set to Conflicted instead of overwriting
 - **Frontend**: `CodeMergePage` in Settings with "Code Merge" tab — 6 stats cards (Total/Synced/Modified/Conflicts/Merged/Locked) with color coding, filter tabs (All/Modified/Conflicts/Locked), file list with status badges and version numbers, side-by-side diff viewer (AI baseline vs user version), conflict resolution buttons ("Keep My Changes" / "Keep AI Version")
 - **Flow**: AI generates code → snapshots created tracking baseline → user edits files → status changes to UserModified → AI regenerates → conflict detected → user resolves via side-by-side diff viewer
+
+### Voice-Driven Development Input with Real-Time Speech-to-Text (#261)
+
+Browser-native voice input using the Web Speech API for hands-free development request creation:
+- **Backend**: `VoiceConfig` entity for user voice preferences, `VoiceController` with config management, transcription logging, and stats
+- **Endpoints**:
+  - `GET /api/voice/config` — get or create user voice configuration
+  - `PUT /api/voice/config` — update voice settings (language, continuous mode, auto-punctuate, TTS)
+  - `POST /api/voice/transcription` — log a voice transcription session (text, duration, language)
+  - `GET /api/voice/stats` — voice usage statistics (session count, total/avg duration)
+  - `GET /api/voice/languages` — list supported voice languages
+- **Entity**: `VoiceConfig` with Id (Guid), UserId, Language, ContinuousMode, AutoPunctuate, TtsEnabled, TtsVoice, TtsRate, TranscriptionHistoryJson, SessionCount, TotalDurationSeconds, CreatedAt, UpdatedAt
+- **Supported Languages**: English (US/UK), Korean, Japanese, Chinese, German, French, Spanish
+- **Speech Recognition**: Web Speech API (SpeechRecognition) — zero backend cost, browser-native, supports continuous dictation and interim results
+- **Frontend**: `VoicePage` in Settings with "Voice" tab — microphone button with pulse animation, real-time transcript display with interim text, copy/clear transcript controls, 3 stats cards (Sessions/Total Duration/Avg Duration), settings panel with language selector, toggle switches for continuous mode/auto-punctuate/TTS, TTS rate slider
+- **Flow**: User opens Settings → Voice tab → configure language → click microphone button → speak → see real-time transcript → copy text to use in dev requests

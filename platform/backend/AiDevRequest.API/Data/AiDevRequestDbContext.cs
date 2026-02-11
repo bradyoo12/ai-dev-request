@@ -111,6 +111,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VisualOverlaySession> VisualOverlaySessions => Set<VisualOverlaySession>();
     public DbSet<SemanticIndex> SemanticIndexes => Set<SemanticIndex>();
     public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
+    public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

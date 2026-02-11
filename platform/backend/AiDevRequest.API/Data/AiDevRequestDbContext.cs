@@ -101,6 +101,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<FrameworkConfig> FrameworkConfigs => Set<FrameworkConfig>();
     public DbSet<ViewTransitionConfig> ViewTransitionConfigs => Set<ViewTransitionConfig>();
     public DbSet<NlSchema> NlSchemas => Set<NlSchema>();
+    public DbSet<QueryConfig> QueryConfigs => Set<QueryConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1612,6 +1613,16 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.EstimatedCost).HasColumnType("decimal(10,6)");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<QueryConfig>(entity =>
+        {
+            entity.ToTable("query_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.QueryPatternsJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
     }
 }

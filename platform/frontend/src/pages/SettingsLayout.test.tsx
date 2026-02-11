@@ -202,6 +202,9 @@ vi.mock('./ViewTransitionPage', () => ({
 vi.mock('./NlSchemaDesignerPage', () => ({
   default: () => <div data-testid="nl-schema-designer-page">NlSchemaDesignerPage</div>,
 }))
+vi.mock('./QueryConfigPage', () => ({
+  default: () => <div data-testid="query-config-page">QueryConfigPage</div>,
+}))
 
 import SettingsLayout from './SettingsLayout'
 

@@ -655,6 +655,7 @@ Log the current status of the project board:
 ## Important Notes
 
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
+- **NEVER ask the user for permission to continue** - always proceed to the next cycle automatically. Do NOT say "Would you like me to continue?" or any variation. The loop is autonomous.
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
 - **ONE ticket at a time** - teams parallelize WITHIN a ticket, not across tickets
 - **Multi-instance safe** - Multiple b-start instances can run on the same machine (via git worktrees — see Step 0) or on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.

@@ -86,6 +86,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PerformanceProfile> PerformanceProfiles => Set<PerformanceProfile>();
     public DbSet<DataSchema> DataSchemas => Set<DataSchema>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+    public DbSet<DevPipeline> DevPipelines => Set<DevPipeline>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1348,6 +1349,21 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.KeyHash).IsUnique();
+        });
+
+        modelBuilder.Entity<DevPipeline>(entity =>
+        {
+            entity.ToTable("dev_pipelines");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.StepsJson).IsRequired().HasColumnType("text");
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.Property(e => e.TemplateCategory).HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.IsTemplate);
         });
     }
 }

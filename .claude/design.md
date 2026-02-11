@@ -833,6 +833,20 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Frontend**: `FigmaImportPage` in Settings with "Figma" tab — 3 sub-tabs (Import with URL input + design name + framework/styling dropdowns + import/screenshot buttons + result preview showing component count/token count/processing time + extracted tokens JSON + generated code JSON, History with import list showing source type/framework/components/status + view/delete buttons, Stats with 5 metric cards + recent imports list)
 - **Flow**: User opens Figma tab → pastes Figma URL → optionally sets name/framework/styling → clicks Import from URL → sees processing result with design tokens and generated code → switches to History to review past imports → switches to Stats for aggregate metrics
 
+### #297 — Multi-Model Arena Mode with Side-by-Side AI Comparison
+- **Ticket**: #297 — `Multi-model arena mode with side-by-side AI comparison and preference learning`
+- **Backend**: `ArenaController` with 6 endpoints:
+  - `GET /api/arena/comparisons` — list user's comparisons (most recent 50)
+  - `POST /api/arena/compare` — create comparison with simulated outputs from 3 models (Claude Sonnet, GPT-4o, Gemini Pro)
+  - `POST /api/arena/comparisons/{id}/select-winner` — select winning model with optional reason
+  - `GET /api/arena/stats` — aggregate stats (total comparisons, winners selected, avg cost, total tokens, model win rates, recent comparisons)
+  - `GET /api/arena/models` — available models with metadata (name, provider, cost per 1K tokens, avg latency, description, strengths)
+  - `GET /api/arena/leaderboard` — model leaderboard by task category with win rates
+- **Entity**: `ArenaComparison` with Id (Guid), UserId, PromptText, TaskCategory (code-generation/bug-fixing/architecture/refactoring/testing/documentation), ModelOutputsJson (JSON array of model/provider/output/latencyMs/tokenCount/cost), SelectedModel, SelectionReason, ModelCount, TotalCost, TotalTokens, TotalLatencyMs, Status (pending/completed/winner_selected), CreatedAt, CompletedAt
+- **Simulated Models**: Claude Sonnet ($0.003/1K, 200-2000ms), GPT-4o ($0.005/1K, 200-2000ms), Gemini Pro ($0.002/1K, 200-2000ms) — each generates distinct code style per task category
+- **Frontend**: `ArenaPage` in Settings with "Arena" tab — 4 sub-tabs (Compare with prompt input + task category selector + Run Arena button + 3-column side-by-side model output cards with color-coded headers and metadata [latency/tokens/cost] + Pick Winner button + winner badge, History with comparison list showing prompt/category/status/winner/cost/date, Leaderboard with category-grouped model rankings showing win rate progress bars, Stats with 6 metric cards [total comparisons/winners/avg cost/total tokens/fastest model/most selected] + win rate bars + recent comparisons list)
+- **Flow**: User opens Arena tab → selects task category → enters prompt → clicks Run Arena → sees 3 model outputs side-by-side → picks winner → leaderboard and stats update with preference data
+
 ### #300 — Premium UI Redesign (PR #304)
 - **Design System**: Custom warm color palette with CSS custom properties (HSL-based), semantic tokens for backgrounds, foregrounds, borders, accents
 - **Typography**: Inter for UI text, JetBrains Mono for code elements

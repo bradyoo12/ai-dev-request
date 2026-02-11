@@ -107,6 +107,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<McpGatewayServer> McpGatewayServers => Set<McpGatewayServer>();
     public DbSet<ProjectMemory> ProjectMemories => Set<ProjectMemory>();
     public DbSet<FigmaImport> FigmaImports => Set<FigmaImport>();
+    public DbSet<ArenaComparison> ArenaComparisons => Set<ArenaComparison>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1718,6 +1719,21 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Framework).HasMaxLength(50);
             entity.Property(e => e.StylingLib).HasMaxLength(50);
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<ArenaComparison>(entity =>
+        {
+            entity.ToTable("arena_comparisons");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PromptText).HasColumnType("text");
+            entity.Property(e => e.TaskCategory).HasMaxLength(100);
+            entity.Property(e => e.ModelOutputsJson).HasColumnType("text");
+            entity.Property(e => e.SelectedModel).HasMaxLength(100);
+            entity.Property(e => e.SelectionReason).HasMaxLength(500);
+            entity.Property(e => e.Status).HasMaxLength(50);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
         });

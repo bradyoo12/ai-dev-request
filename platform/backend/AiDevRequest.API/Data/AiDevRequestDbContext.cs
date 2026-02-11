@@ -112,6 +112,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<SemanticIndex> SemanticIndexes => Set<SemanticIndex>();
     public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
     public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
+    public DbSet<AiElementsConfig> AiElementsConfigs => Set<AiElementsConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1772,6 +1773,18 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.SourceType);
             entity.HasIndex(e => new { e.UserId, e.ContentHash }).IsUnique();
+        });
+
+        modelBuilder.Entity<AiElementsConfig>(entity =>
+        {
+            entity.ToTable("ai_elements_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ThemeMode).HasMaxLength(20);
+            entity.Property(e => e.ActiveModel).HasMaxLength(100);
+            entity.Property(e => e.PreviewHistoryJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
     }
 }

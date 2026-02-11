@@ -31,6 +31,7 @@ public class RequestsController : ControllerBase
     private readonly IExpoPreviewService _expoPreviewService;
     private readonly ISelfHealingService _selfHealingService;
     private readonly ICostTrackingService _costTrackingService;
+    private readonly ICodeQualityReviewService _codeQualityReviewService;
     private readonly ILogger<RequestsController> _logger;
 
     public RequestsController(
@@ -50,6 +51,7 @@ public class RequestsController : ControllerBase
         IExpoPreviewService expoPreviewService,
         ISelfHealingService selfHealingService,
         ICostTrackingService costTrackingService,
+        ICodeQualityReviewService codeQualityReviewService,
         ILogger<RequestsController> logger)
     {
         _context = context;
@@ -68,6 +70,7 @@ public class RequestsController : ControllerBase
         _expoPreviewService = expoPreviewService;
         _selfHealingService = selfHealingService;
         _costTrackingService = costTrackingService;
+        _codeQualityReviewService = codeQualityReviewService;
         _logger = logger;
     }
 
@@ -604,6 +607,18 @@ public class RequestsController : ControllerBase
                 result.CodeQualityScore = reviewResult.QualityScore;
                 result.CodeReviewSummary = reviewResult.Summary;
                 result.CodeReviewIssueCount = reviewResult.Issues.Count;
+
+                // 5-dimension quality review
+                try
+                {
+                    var qualityReview = await _codeQualityReviewService.TriggerReviewAsync(
+                        0, result.ProjectPath, result.ProjectType);
+                    result.QualityConfidenceScore = (int)Math.Round(qualityReview.OverallScore * 20); // Convert 1-5 to 0-100
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Quality review failed for {RequestId}, continuing", id);
+                }
 
                 // Generate CI/CD pipeline (GitHub Actions)
                 var ciCdResult = await _ciCdService.GeneratePipelineAsync(

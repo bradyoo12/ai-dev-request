@@ -10,6 +10,7 @@ namespace AiDevRequest.API.Services;
 public interface ICodeQualityReviewService
 {
     Task<CodeQualityReview> TriggerReviewAsync(int projectId);
+    Task<CodeQualityReview> TriggerReviewAsync(int projectId, string? projectPath, string? projectType);
     Task<CodeQualityReview?> GetReviewResultAsync(int projectId);
     Task<List<CodeQualityReview>> GetReviewHistoryAsync(int projectId);
     Task<CodeQualityReview> ApplyFixAsync(int projectId, string findingId);
@@ -41,6 +42,11 @@ public class CodeQualityReviewService : ICodeQualityReviewService
 
     public async Task<CodeQualityReview> TriggerReviewAsync(int projectId)
     {
+        return await TriggerReviewAsync(projectId, null, null);
+    }
+
+    public async Task<CodeQualityReview> TriggerReviewAsync(int projectId, string? projectPath, string? projectType)
+    {
         // Determine the next review version
         var latestVersion = await _context.CodeQualityReviews
             .Where(r => r.ProjectId == projectId)
@@ -61,20 +67,26 @@ public class CodeQualityReviewService : ICodeQualityReviewService
 
         try
         {
-            // Resolve the project path from the database
-            var projectPath = await ResolveProjectPathAsync(projectId);
+            // Resolve the project path: use provided path or resolve from database
+            var resolvedPath = !string.IsNullOrEmpty(projectPath)
+                ? projectPath
+                : await ResolveProjectPathAsync(projectId);
+
             List<ReviewFinding> findings;
 
-            if (projectPath != null)
+            if (resolvedPath != null)
             {
-                var sourceFiles = ReadSourceFiles(projectPath);
+                var sourceFiles = ReadSourceFiles(resolvedPath);
                 if (sourceFiles.Count > 0)
                 {
                     findings = await AnalyzeWithClaudeAsync(sourceFiles, projectId);
+
+                    // Auto-fix critical findings
+                    await AutoFixCriticalFindingsAsync(sourceFiles, findings);
                 }
                 else
                 {
-                    _logger.LogWarning("No source files found at {Path} for project {ProjectId}", projectPath, projectId);
+                    _logger.LogWarning("No source files found at {Path} for project {ProjectId}", resolvedPath, projectId);
                     findings = new List<ReviewFinding>();
                 }
             }
@@ -122,6 +134,131 @@ public class CodeQualityReviewService : ICodeQualityReviewService
             _logger.LogError(ex, "Code quality review failed for project {ProjectId}", projectId);
             throw;
         }
+    }
+
+    private async Task AutoFixCriticalFindingsAsync(Dictionary<string, string> sourceFiles, List<ReviewFinding> findings)
+    {
+        var criticalFindings = findings.Where(f => f.Severity == "critical" && !string.IsNullOrEmpty(f.File)).ToList();
+        if (criticalFindings.Count == 0) return;
+
+        foreach (var finding in criticalFindings)
+        {
+            try
+            {
+                // Find the matching source file
+                var matchingFile = sourceFiles.Keys.FirstOrDefault(k =>
+                    k.Equals(finding.File, StringComparison.OrdinalIgnoreCase) ||
+                    k.EndsWith(finding.File ?? "", StringComparison.OrdinalIgnoreCase));
+
+                if (matchingFile == null || !sourceFiles.ContainsKey(matchingFile)) continue;
+
+                var fileContent = sourceFiles[matchingFile];
+
+                var fixPrompt = $@"You are a code fix assistant. Fix the following critical issue in this file.
+
+## Issue
+- **Title**: {finding.Title}
+- **Description**: {finding.Description}
+- **File**: {finding.File}
+- **Line**: {finding.Line}
+
+## Current File Content
+```
+{(fileContent.Length > 5000 ? fileContent[..5000] + "\n... (truncated)" : fileContent)}
+```
+
+Provide ONLY the specific code fix. Show the exact code change needed (before and after). Be concise.";
+
+                var messages = new List<Message> { new Message(RoleType.User, fixPrompt) };
+                var parameters = new MessageParameters
+                {
+                    Messages = messages,
+                    Model = "claude-sonnet-4-20250514",
+                    MaxTokens = 2000,
+                    Temperature = 0.2m
+                };
+
+                var response = await _client.Messages.GetClaudeMessageAsync(parameters);
+                var fixContent = response.Content.FirstOrDefault()?.ToString() ?? "";
+
+                if (!string.IsNullOrEmpty(fixContent))
+                {
+                    finding.SuggestedFix = fixContent;
+                }
+
+                _logger.LogInformation("Generated auto-fix for critical finding {FindingId} in {File}",
+                    finding.Id, finding.File);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Auto-fix failed for finding {FindingId}, continuing", finding.Id);
+            }
+        }
+    }
+
+    private async Task<string?> ResolveProjectPathAsync(int projectId)
+    {
+        // Try to find the DevRequest by ordering and using projectId as 1-based index
+        var devRequest = await _context.DevRequests
+            .Where(r => r.ProjectPath != null)
+            .OrderBy(r => r.CreatedAt)
+            .Skip(projectId - 1)
+            .FirstOrDefaultAsync();
+
+        if (devRequest?.ProjectPath != null && Directory.Exists(devRequest.ProjectPath))
+            return devRequest.ProjectPath;
+
+        // Fallback: scan projects base directory for matching folder
+        if (Directory.Exists(_projectsBasePath))
+        {
+            var dirs = Directory.GetDirectories(_projectsBasePath)
+                .OrderBy(d => d)
+                .ToArray();
+
+            if (projectId >= 1 && projectId <= dirs.Length)
+                return dirs[projectId - 1];
+        }
+
+        return null;
+    }
+
+    private static Dictionary<string, string> ReadSourceFiles(string projectPath)
+    {
+        var files = new Dictionary<string, string>();
+        if (!Directory.Exists(projectPath)) return files;
+
+        var sourceExtensions = new HashSet<string>
+        {
+            ".ts", ".tsx", ".js", ".jsx", ".cs", ".py",
+            ".vue", ".svelte", ".sql", ".graphql", ".html", ".css"
+        };
+
+        var excludeDirs = new HashSet<string>
+        {
+            "node_modules", "dist", "build", ".next", "bin", "obj",
+            "__pycache__", ".pytest_cache", "coverage", ".git"
+        };
+
+        foreach (var filePath in Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories))
+        {
+            var ext = Path.GetExtension(filePath).ToLower();
+            if (!sourceExtensions.Contains(ext)) continue;
+
+            var relativePath = Path.GetRelativePath(projectPath, filePath);
+            if (excludeDirs.Any(d => relativePath.Contains(d, StringComparison.OrdinalIgnoreCase))) continue;
+
+            try
+            {
+                var content = File.ReadAllText(filePath);
+                if (content.Length <= 50000)
+                {
+                    files[relativePath] = content;
+                }
+            }
+            catch { /* Skip files that can't be read */ }
+        }
+
+        return files;
     }
 
     public async Task<CodeQualityReview?> GetReviewResultAsync(int projectId)
@@ -208,71 +345,6 @@ public class CodeQualityReviewService : ICodeQualityReviewService
             severity, matchingFindings.Count, projectId);
 
         return review;
-    }
-
-    private async Task<string?> ResolveProjectPathAsync(int projectId)
-    {
-        // Try to find the DevRequest by ordering and using projectId as 1-based index
-        var devRequest = await _context.DevRequests
-            .Where(r => r.ProjectPath != null)
-            .OrderBy(r => r.CreatedAt)
-            .Skip(projectId - 1)
-            .FirstOrDefaultAsync();
-
-        if (devRequest?.ProjectPath != null && Directory.Exists(devRequest.ProjectPath))
-            return devRequest.ProjectPath;
-
-        // Fallback: scan projects base directory for matching folder
-        if (Directory.Exists(_projectsBasePath))
-        {
-            var dirs = Directory.GetDirectories(_projectsBasePath)
-                .OrderBy(d => d)
-                .ToArray();
-
-            if (projectId >= 1 && projectId <= dirs.Length)
-                return dirs[projectId - 1];
-        }
-
-        return null;
-    }
-
-    private static Dictionary<string, string> ReadSourceFiles(string projectPath)
-    {
-        var files = new Dictionary<string, string>();
-        if (!Directory.Exists(projectPath)) return files;
-
-        var sourceExtensions = new HashSet<string>
-        {
-            ".ts", ".tsx", ".js", ".jsx", ".cs", ".py",
-            ".vue", ".svelte", ".sql", ".graphql", ".html", ".css"
-        };
-
-        var excludeDirs = new HashSet<string>
-        {
-            "node_modules", "dist", "build", ".next", "bin", "obj",
-            "__pycache__", ".pytest_cache", "coverage", ".git"
-        };
-
-        foreach (var filePath in Directory.GetFiles(projectPath, "*.*", SearchOption.AllDirectories))
-        {
-            var ext = Path.GetExtension(filePath).ToLower();
-            if (!sourceExtensions.Contains(ext)) continue;
-
-            var relativePath = Path.GetRelativePath(projectPath, filePath);
-            if (excludeDirs.Any(d => relativePath.Contains(d, StringComparison.OrdinalIgnoreCase))) continue;
-
-            try
-            {
-                var content = File.ReadAllText(filePath);
-                if (content.Length <= 50000)
-                {
-                    files[relativePath] = content;
-                }
-            }
-            catch { /* Skip files that can't be read */ }
-        }
-
-        return files;
     }
 
     private async Task<List<ReviewFinding>> AnalyzeWithClaudeAsync(Dictionary<string, string> sourceFiles, int projectId)
@@ -384,6 +456,23 @@ public class ReviewFinding
     public string Severity { get; set; } = "";
     public string Title { get; set; } = "";
     public string Description { get; set; } = "";
+    public string? File { get; set; }
+    public int? Line { get; set; }
+    public string? SuggestedFix { get; set; }
+}
+
+public class ClaudeQualityResponse
+{
+    public List<ClaudeQualityFinding> Findings { get; set; } = new();
+}
+
+public class ClaudeQualityFinding
+{
+    public string? Id { get; set; }
+    public string? Dimension { get; set; }
+    public string? Severity { get; set; }
+    public string? Title { get; set; }
+    public string? Description { get; set; }
     public string? File { get; set; }
     public int? Line { get; set; }
     public string? SuggestedFix { get; set; }

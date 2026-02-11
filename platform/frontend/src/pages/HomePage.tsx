@@ -20,6 +20,7 @@ import MobilePreview from '../components/MobilePreview'
 import ValidationProgress from '../components/ValidationProgress'
 import FixHistoryDisplay from '../components/FixHistoryDisplay'
 import CostSavingsDisplay from '../components/CostSavingsDisplay'
+import QualityConfidenceBadge from '../components/QualityConfidenceBadge'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -819,6 +820,15 @@ export default function HomePage() {
                     {productionResult.production.verificationPassed ? t('verification.passed') : t('verification.needsReview')}
                   </span>
                 </div>
+              </div>
+            )}
+
+            {productionResult.production.qualityConfidenceScore != null && (
+              <div className="mb-4">
+                <QualityConfidenceBadge
+                  score={productionResult.production.qualityConfidenceScore}
+                  dimensions={productionResult.production.qualityReviewDimensions}
+                />
               </div>
             )}
 

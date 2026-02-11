@@ -1175,6 +1175,16 @@
   "componentPreview.error.exportFailed": "컴포넌트 내보내기 실패",
   "componentPreview.error.deleteFailed": "컴포넌트 삭제 실패",
 
+  "qualityBadge.title": "품질 점수",
+  "qualityBadge.excellent": "우수",
+  "qualityBadge.good": "양호",
+  "qualityBadge.needsWork": "개선 필요",
+  "qualityBadge.dimensions.architecture": "아키텍처",
+  "qualityBadge.dimensions.security": "보안",
+  "qualityBadge.dimensions.performance": "성능",
+  "qualityBadge.dimensions.accessibility": "접근성",
+  "qualityBadge.dimensions.maintainability": "유지보수성",
+
   "settings.tabs.variantComparison": "변형 비교",
   "variantComparison.title": "A/B 변형 생성",
   "variantComparison.subtitle": "동일한 프롬프트로 여러 구현 변형을 생성하고 나란히 비교하세요",

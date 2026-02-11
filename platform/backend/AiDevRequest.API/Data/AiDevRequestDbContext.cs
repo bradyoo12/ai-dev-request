@@ -88,6 +88,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<DevPipeline> DevPipelines => Set<DevPipeline>();
     public DbSet<ApiDocConfig> ApiDocConfigs => Set<ApiDocConfig>();
+    public DbSet<CodeSnapshot> CodeSnapshots => Set<CodeSnapshot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1381,6 +1382,21 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
+        });
+
+        modelBuilder.Entity<CodeSnapshot>(entity =>
+        {
+            entity.ToTable("code_snapshots");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.FilePath).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.BaselineContent).IsRequired().HasColumnType("text");
+            entity.Property(e => e.UserContent).HasColumnType("text");
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => new { e.UserId, e.DevRequestId, e.FilePath }).IsUnique();
         });
     }
 }

@@ -909,3 +909,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `ProjectDocumentation` with Id (Guid), UserId, DevRequestId, ProjectName, Status, ArchitectureOverview, ComponentDocs, ApiReference, SetupGuide, QaHistoryJson, SourceFilesCount, TotalLinesAnalyzed, GenerationTimeMs, TokensUsed, EstimatedCost
 - **Frontend**: `ProjectDocsPage` in Settings with "Project Docs" tab — 4 sub-tabs (Generate with project input + expandable markdown sections, Q&A with question/answer history, Library with doc list, Stats with metric cards)
 - **Flow**: Enter project name + description → generate documentation → review architecture/components/API/setup sections → ask questions via Q&A → browse library of past docs
+
+### #315 — Vercel AI Elements + Generative UI Streaming Preview (PR #335)
+- **Backend**: `AiElementsController` with 6 endpoints for config, component catalog, streaming sessions, and stats
+- **Endpoints**:
+  - `GET /api/ai-elements/config` — get or create user AI Elements config
+  - `PUT /api/ai-elements/config` — update config (streaming, reasoning panel, live preview, response actions toggles)
+  - `GET /api/ai-elements/components` — list 5 available AI Element components (message-thread, reasoning-panel, code-block, response-actions, streaming-input)
+  - `POST /api/ai-elements/stream/start` — start simulated streaming session (returns stream ID + metadata)
+  - `GET /api/ai-elements/stream/{streamId}/status` — get stream status
+  - `GET /api/ai-elements/stats` — aggregate stats (total streams, tokens streamed, component previews, avg stream time)
+- **Entity**: `AiElementsConfig` with Id (Guid), UserId, StreamingEnabled, ReasoningPanelEnabled, LivePreviewEnabled, ResponseActionsEnabled, ThemeMode, ActiveModel, TotalStreams, TotalTokensStreamed, TotalComponentPreviews, PreviewHistoryJson, CreatedAt, UpdatedAt
+- **Frontend**: `AiElementsPage` in Settings with "AI Elements" tab — 3 sub-tabs (Stream with simulated token-by-token code output and syntax highlighting, Components with 5 AI element cards, Stats with metric cards)
+- **Flow**: Open AI Elements tab → configure streaming/reasoning/preview toggles → start streaming demo → watch token-by-token code generation → browse component catalog → view usage stats

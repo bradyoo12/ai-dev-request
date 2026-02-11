@@ -101,8 +101,8 @@ ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format js
 # Set status to "Ready" using known project field IDs
 # Project ID: PVT_kwHNf9fOATn4hA (AI Dev Request #26)
 # Status field: PVTSSF_lAHNf9fOATn4hM4PS3yh
-# Ready option: 47fc9ee4
-gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+# Ready option: 61e4505c | In progress: 47fc9ee4 | In review: df73e18b | Done: 98236657
+gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
 ```
 
 Report the created issue URL and confirm it was added to the project with **Ready** status.

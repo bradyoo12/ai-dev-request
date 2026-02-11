@@ -27,11 +27,12 @@ import TestGenerationPage from './TestGenerationPage'
 import CollaborativeEditingPage from './CollaborativeEditingPage'
 import OnboardingPage from './OnboardingPage'
 import ProjectVersionPage from './ProjectVersionPage'
+import ComponentPreviewPage from './ComponentPreviewPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -52,7 +53,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/test-generation' ? 'test-generation' as SettingsTab
     : location.pathname === '/settings/collaborative-editing' ? 'collaborative-editing' as SettingsTab
     : location.pathname === '/settings/onboarding' ? 'onboarding' as SettingsTab
-    : location.pathname === '/settings/version-history' ? 'version-history' as SettingsTab : null
+    : location.pathname === '/settings/version-history' ? 'version-history' as SettingsTab
+    : location.pathname === '/settings/component-preview' ? 'component-preview' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -312,6 +314,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.versionHistory', 'Versions')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('component-preview')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'component-preview' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            {t('settings.tabs.componentPreview', 'Preview')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -339,6 +352,7 @@ export default function SettingsLayout() {
       {settingsTab === 'collaborative-editing' && <CollaborativeEditingPage />}
       {settingsTab === 'onboarding' && <OnboardingPage />}
       {settingsTab === 'version-history' && <ProjectVersionPage />}
+      {settingsTab === 'component-preview' && <ComponentPreviewPage />}
     </section>
   )
 }

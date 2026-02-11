@@ -82,6 +82,7 @@ builder.Services.AddScoped<ICollaborativeEditingService, CollaborativeEditingSer
 builder.Services.AddScoped<IOnboardingService, OnboardingService>();
 builder.Services.AddScoped<IComponentPreviewService, ComponentPreviewService>();
 builder.Services.AddScoped<IVariantGenerationService, VariantGenerationService>();
+builder.Services.AddScoped<IPerformanceProfileService, PerformanceProfileService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -259,7 +260,8 @@ app.UseExceptionHandler(errorApp =>
             "container_configs",
             "onboarding_progresses",
             "component_previews",
-            "generation_variants" };
+            "generation_variants",
+            "performance_profiles" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

@@ -84,6 +84,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ComponentPreview> ComponentPreviews => Set<ComponentPreview>();
     public DbSet<GenerationVariant> GenerationVariants => Set<GenerationVariant>();
     public DbSet<PerformanceProfile> PerformanceProfiles => Set<PerformanceProfile>();
+    public DbSet<DataSchema> DataSchemas => Set<DataSchema>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1310,6 +1311,26 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<DataSchema>(entity =>
+        {
+            entity.ToTable("data_schemas");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Prompt).HasMaxLength(2000);
+            entity.Property(e => e.EntitiesJson).HasColumnType("jsonb");
+            entity.Property(e => e.RelationshipsJson).HasColumnType("jsonb");
+            entity.Property(e => e.ValidationJson).HasColumnType("jsonb");
+            entity.Property(e => e.GeneratedSql).HasColumnType("text");
+            entity.Property(e => e.GeneratedEntities).HasColumnType("text");
+            entity.Property(e => e.GeneratedControllers).HasColumnType("text");
+            entity.Property(e => e.GeneratedFrontend).HasColumnType("text");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
         });

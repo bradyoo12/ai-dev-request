@@ -138,6 +138,10 @@ vi.mock('./PerformanceProfilePage', () => ({
   default: () => <div data-testid="performance-profile-page">PerformanceProfilePage</div>,
 }))
 
+vi.mock('./SchemaDesignerPage', () => ({
+  default: () => <div data-testid="schema-designer-page">SchemaDesignerPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

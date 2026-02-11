@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { motion } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import type { PricingPlanData } from '../api/settings'
+import FadeIn from './motion/FadeIn'
+import StaggerChildren, { staggerItemVariants } from './motion/StaggerChildren'
 
 interface PricingSectionProps {
   plans: PricingPlanData[]
@@ -48,53 +51,65 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
   }
 
   return (
-    <section id="pricing" className="py-16 text-center">
-      <h3 className="text-3xl font-bold mb-4">{t('pricing.title')}</h3>
-      <p className="text-gray-400 mb-8">{t('pricing.subtitle')}</p>
+    <section id="pricing" className="py-20 text-center">
+      <FadeIn>
+        <h3 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">{t('pricing.title')}</h3>
+        <p className="text-warm-500 mb-10 max-w-md mx-auto">{t('pricing.subtitle')}</p>
+      </FadeIn>
 
       {/* Annual/Monthly toggle */}
-      <div className="flex justify-center items-center gap-3 mb-10">
-        <span className={`text-sm ${!annual ? 'text-white' : 'text-gray-400'}`}>{t('pricing.monthly')}</span>
-        <button
-          onClick={() => setAnnual(!annual)}
-          className={`relative w-14 h-7 rounded-full transition-colors ${annual ? 'bg-blue-600' : 'bg-gray-600'}`}
-        >
-          <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white transition-transform ${annual ? 'translate-x-7' : 'translate-x-0.5'}`} />
-        </button>
-        <span className={`text-sm ${annual ? 'text-white' : 'text-gray-400'}`}>
-          {t('pricing.annual')} <span className="text-green-400 text-xs">{t('pricing.annualDiscount')}</span>
-        </span>
-      </div>
+      <FadeIn delay={0.1}>
+        <div className="flex justify-center items-center gap-3 mb-12">
+          <span className={`text-sm font-medium transition-colors ${!annual ? 'text-white' : 'text-warm-500'}`}>{t('pricing.monthly')}</span>
+          <button
+            onClick={() => setAnnual(!annual)}
+            className={`relative w-14 h-7 rounded-full transition-all duration-300 ${annual ? 'bg-gradient-to-r from-accent-blue to-accent-purple shadow-glow-blue' : 'bg-warm-700'}`}
+          >
+            <motion.div
+              className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-premium-sm"
+              animate={{ x: annual ? 28 : 2 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            />
+          </button>
+          <span className={`text-sm font-medium transition-colors ${annual ? 'text-white' : 'text-warm-500'}`}>
+            {t('pricing.annual')} <span className="text-accent-emerald text-xs font-semibold">{t('pricing.annualDiscount')}</span>
+          </span>
+        </div>
+      </FadeIn>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <StaggerChildren staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {displayPlans.map((plan) => (
-          <div
+          <motion.div
             key={plan.id}
-            className={`rounded-2xl p-6 text-left transition-all hover:-translate-y-1 ${
+            variants={staggerItemVariants}
+            className={`relative rounded-2xl p-6 text-left transition-all duration-300 ${
               plan.isPopular
-                ? 'bg-blue-600 ring-2 ring-blue-400 shadow-xl shadow-blue-600/20'
-                : 'bg-gray-800'
+                ? 'bg-gradient-to-b from-accent-blue/20 to-accent-purple/10 ring-1 ring-accent-blue/40 shadow-glow-blue'
+                : 'glass-card'
             }`}
+            whileHover={{ y: -4 }}
           >
             {plan.isPopular && (
-              <div className="text-xs font-medium bg-blue-400 text-blue-900 px-2 py-0.5 rounded-full inline-block mb-3">
-                {t('pricing.popular')}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="text-xs font-semibold bg-gradient-to-r from-accent-blue to-accent-purple text-white px-4 py-1 rounded-full shadow-glow-blue">
+                  {t('pricing.popular')}
+                </span>
               </div>
             )}
-            <div className="text-lg font-bold mb-1">{getName(plan)}</div>
-            <div className="text-3xl font-bold mb-1">
+            <div className="text-lg font-bold mb-1 text-warm-100">{getName(plan)}</div>
+            <div className="text-3xl font-bold mb-1 text-white">
               {formatPrice(plan)}
             </div>
             {plan.priceMonthly > 0 && (
-              <div className={`text-sm mb-4 ${plan.isPopular ? 'text-blue-200' : 'text-gray-400'}`}>
+              <div className={`text-sm mb-4 ${plan.isPopular ? 'text-accent-blue' : 'text-warm-500'}`}>
                 {annual ? t('pricing.perMonthBilled') : t('pricing.perMonth')}
               </div>
             )}
-            {plan.priceMonthly === 0 && <div className="text-sm mb-4 text-gray-400">{t('pricing.forever')}</div>}
-            {plan.priceMonthly < 0 && <div className="text-sm mb-4 text-gray-400">{t('pricing.customPricing')}</div>}
+            {plan.priceMonthly === 0 && <div className="text-sm mb-4 text-warm-500">{t('pricing.forever')}</div>}
+            {plan.priceMonthly < 0 && <div className="text-sm mb-4 text-warm-500">{t('pricing.customPricing')}</div>}
 
             <div className="text-sm mb-4">
-              <span className="font-medium">
+              <span className="font-medium text-warm-300">
                 {plan.projectLimit < 0 ? t('pricing.unlimited') : t('pricing.projectLimit', { count: plan.projectLimit })}
               </span>
             </div>
@@ -103,11 +118,11 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
               {featureKeys.filter(f => planHasFeature(plan, f) || plan.id !== 'free').slice(0, 5).map((feature) => {
                 const has = planHasFeature(plan, feature)
                 return (
-                  <div key={feature} className={`flex items-center gap-2 text-sm ${has ? '' : 'text-gray-500'}`}>
+                  <div key={feature} className={`flex items-center gap-2 text-sm ${has ? 'text-warm-300' : 'text-warm-700'}`}>
                     {has ? (
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-accent-emerald flex-shrink-0" />
                     ) : (
-                      <X className="w-4 h-4 text-gray-600 flex-shrink-0" />
+                      <X className="w-4 h-4 text-warm-700 flex-shrink-0" />
                     )}
                     <span>{t(`pricing.feature.${feature}`)}</span>
                   </div>
@@ -115,20 +130,23 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
               })}
             </div>
 
-            <button
+            <motion.button
               onClick={() => onSelectPlan?.(plan.id)}
-              className={`w-full py-2.5 rounded-xl font-medium text-sm transition-colors ${
-              plan.isPopular
-                ? 'bg-white text-blue-600 hover:bg-blue-50'
-                : plan.priceMonthly < 0
-                  ? 'bg-gray-700 hover:bg-gray-600'
-                  : 'bg-blue-600 hover:bg-blue-700'
-            }`}>
+              className={`w-full py-2.5 rounded-xl font-medium text-sm transition-all btn-premium ${
+                plan.isPopular
+                  ? 'bg-gradient-to-r from-accent-blue to-accent-purple text-white shadow-glow-blue hover:shadow-lg'
+                  : plan.priceMonthly < 0
+                    ? 'glass text-warm-300 hover:text-white'
+                    : 'bg-warm-800 hover:bg-warm-700 text-warm-200'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
               {plan.priceMonthly < 0 ? t('pricing.contactUs') : t('pricing.getStarted')}
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         ))}
-      </div>
+      </StaggerChildren>
     </section>
   )
 }

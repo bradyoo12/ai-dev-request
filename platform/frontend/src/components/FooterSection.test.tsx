@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -7,33 +8,32 @@ vi.mock('react-i18next', () => ({
   }),
 }))
 
+vi.mock('lucide-react', () => ({
+  Sparkles: () => <span>Sparkles</span>,
+}))
+
 import FooterSection from './FooterSection'
 
 describe('FooterSection', () => {
   it('renders brand name', () => {
-    render(<FooterSection />)
+    render(<MemoryRouter><FooterSection /></MemoryRouter>)
     expect(screen.getByText('AI Dev Request')).toBeInTheDocument()
   })
 
   it('renders footer sections', () => {
-    render(<FooterSection />)
+    render(<MemoryRouter><FooterSection /></MemoryRouter>)
     expect(screen.getByText('footer.services')).toBeInTheDocument()
     expect(screen.getByText('footer.support')).toBeInTheDocument()
-    expect(screen.getByText('footer.newsletter')).toBeInTheDocument()
   })
 
   it('renders copyright', () => {
-    render(<FooterSection />)
+    render(<MemoryRouter><FooterSection /></MemoryRouter>)
     expect(screen.getByText('footer.copyright')).toBeInTheDocument()
   })
 
-  it('renders email input', () => {
-    render(<FooterSection />)
-    expect(screen.getByPlaceholderText('email@example.com')).toBeInTheDocument()
-  })
-
-  it('renders subscribe button', () => {
-    render(<FooterSection />)
-    expect(screen.getByText('footer.subscribe')).toBeInTheDocument()
+  it('renders service links', () => {
+    render(<MemoryRouter><FooterSection /></MemoryRouter>)
+    expect(screen.getByText('footer.link.getStarted')).toBeInTheDocument()
+    expect(screen.getByText('footer.link.pricing')).toBeInTheDocument()
   })
 })

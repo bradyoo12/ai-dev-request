@@ -1,4 +1,7 @@
 import { useTranslation } from 'react-i18next'
+import { motion } from 'framer-motion'
+import FadeIn from './motion/FadeIn'
+import StaggerChildren, { staggerItemVariants } from './motion/StaggerChildren'
 
 export default function StatsSection() {
   const { t } = useTranslation()
@@ -12,23 +15,28 @@ export default function StatsSection() {
   const techLogos = ['Claude AI', 'Azure', 'React', '.NET']
 
   return (
-    <section className="py-12">
-      <div className="grid grid-cols-3 gap-6 mb-8">
+    <section className="py-16">
+      <StaggerChildren staggerDelay={0.1} className="grid grid-cols-3 gap-6 mb-10">
         {stats.map((stat) => (
-          <div key={stat.label} className="text-center">
-            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          <motion.div key={stat.label} variants={staggerItemVariants} className="text-center">
+            <div className="text-4xl md:text-5xl font-bold gradient-text mb-1">
               {stat.value}
             </div>
-            <div className="text-gray-400 text-sm mt-1">{stat.label}</div>
-          </div>
+            <div className="text-warm-500 text-sm">{stat.label}</div>
+          </motion.div>
         ))}
-      </div>
-      <div className="flex justify-center items-center gap-6 text-sm text-gray-500">
-        <span>Powered by</span>
-        {techLogos.map((logo) => (
-          <span key={logo} className="px-3 py-1.5 bg-gray-800 rounded-lg text-gray-400">{logo}</span>
-        ))}
-      </div>
+      </StaggerChildren>
+
+      <FadeIn delay={0.3}>
+        <div className="flex justify-center items-center gap-4 text-sm text-warm-600">
+          <span className="font-medium">Powered by</span>
+          {techLogos.map((logo) => (
+            <span key={logo} className="px-3 py-1.5 glass-card rounded-xl text-warm-400 text-xs font-medium">
+              {logo}
+            </span>
+          ))}
+        </div>
+      </FadeIn>
     </section>
   )
 }

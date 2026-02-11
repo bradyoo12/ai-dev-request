@@ -1,15 +1,90 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* ============================================
+   Premium Design System - CSS Custom Properties
+   ============================================ */
+
+@theme {
+  /* Warm color palette */
+  --color-warm-50: oklch(0.985 0.002 75);
+  --color-warm-100: oklch(0.97 0.004 75);
+  --color-warm-200: oklch(0.92 0.008 75);
+  --color-warm-300: oklch(0.87 0.012 75);
+  --color-warm-400: oklch(0.7 0.015 75);
+  --color-warm-500: oklch(0.55 0.015 75);
+  --color-warm-600: oklch(0.45 0.015 75);
+  --color-warm-700: oklch(0.35 0.012 75);
+  --color-warm-800: oklch(0.25 0.01 75);
+  --color-warm-850: oklch(0.2 0.008 75);
+  --color-warm-900: oklch(0.16 0.008 75);
+  --color-warm-950: oklch(0.12 0.006 75);
+
+  /* Accent colors */
+  --color-accent-blue: oklch(0.7 0.15 250);
+  --color-accent-purple: oklch(0.7 0.15 300);
+  --color-accent-cyan: oklch(0.75 0.12 195);
+  --color-accent-amber: oklch(0.8 0.15 80);
+  --color-accent-rose: oklch(0.7 0.15 15);
+  --color-accent-emerald: oklch(0.75 0.15 160);
+
+  /* Typography */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Premium shadows */
+  --shadow-glow-blue: 0 0 20px oklch(0.7 0.15 250 / 0.3), 0 0 60px oklch(0.7 0.15 250 / 0.1);
+  --shadow-glow-purple: 0 0 20px oklch(0.7 0.15 300 / 0.3), 0 0 60px oklch(0.7 0.15 300 / 0.1);
+  --shadow-glow-cyan: 0 0 20px oklch(0.75 0.12 195 / 0.3), 0 0 60px oklch(0.75 0.12 195 / 0.1);
+  --shadow-premium-sm: 0 1px 2px oklch(0 0 0 / 0.15), 0 1px 3px oklch(0 0 0 / 0.1);
+  --shadow-premium-md: 0 4px 6px oklch(0 0 0 / 0.15), 0 2px 4px oklch(0 0 0 / 0.1);
+  --shadow-premium-lg: 0 10px 25px oklch(0 0 0 / 0.2), 0 4px 10px oklch(0 0 0 / 0.1);
+  --shadow-premium-xl: 0 20px 50px oklch(0 0 0 / 0.25), 0 8px 20px oklch(0 0 0 / 0.15);
+
+  /* Border radius */
+  --radius-premium: 1rem;
+  --radius-premium-lg: 1.25rem;
+  --radius-premium-xl: 1.5rem;
+
+  /* Animation timing */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Backdrop blur */
+  --blur-glass: 16px;
+  --blur-glass-heavy: 24px;
+}
+
+/* ============================================
+   Base styles
+   ============================================ */
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  line-height: 1.6;
   font-weight: 400;
+  color-scheme: dark;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Surface colors */
+  --surface-primary: var(--color-warm-950);
+  --surface-secondary: var(--color-warm-900);
+  --surface-tertiary: var(--color-warm-850);
+  --surface-elevated: var(--color-warm-800);
+  --surface-glass: oklch(0.16 0.008 75 / 0.6);
+  --surface-glass-light: oklch(0.2 0.008 75 / 0.4);
+
+  /* Text colors */
+  --text-primary: oklch(0.95 0.005 75);
+  --text-secondary: oklch(0.7 0.01 75);
+  --text-muted: oklch(0.5 0.01 75);
+
+  /* Border colors */
+  --border-default: oklch(0.3 0.01 75 / 0.5);
+  --border-subtle: oklch(0.25 0.008 75 / 0.3);
+  --border-accent: oklch(0.7 0.15 250 / 0.3);
+
+  color: var(--text-primary);
+  background-color: var(--surface-primary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -23,9 +98,150 @@ body {
   min-height: 100vh;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
+/* ============================================
+   Glassmorphism utilities
+   ============================================ */
+
+.glass {
+  background: var(--surface-glass);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-heavy {
+  background: var(--surface-glass);
+  backdrop-filter: blur(var(--blur-glass-heavy));
+  -webkit-backdrop-filter: blur(var(--blur-glass-heavy));
+  border: 1px solid var(--border-default);
+}
+
+.glass-card {
+  background: oklch(0.18 0.008 75 / 0.7);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  border: 1px solid oklch(0.35 0.01 75 / 0.2);
+  transition: all 0.3s var(--ease-premium);
+}
+
+.glass-card:hover {
+  background: oklch(0.2 0.01 75 / 0.8);
+  border-color: oklch(0.4 0.01 75 / 0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-premium-lg);
+}
+
+/* ============================================
+   Gradient text utility
+   ============================================ */
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-accent-blue), var(--color-accent-purple), var(--color-accent-cyan));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(135deg, var(--color-accent-amber), var(--color-accent-rose), var(--color-accent-purple));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================
+   Ambient glow effects
+   ============================================ */
+
+.ambient-glow {
+  position: relative;
+}
+
+.ambient-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(ellipse at center, var(--color-accent-blue) 0%, transparent 70%);
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(60px);
+}
+
+/* ============================================
+   Premium button styles
+   ============================================ */
+
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-premium);
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 40%, oklch(1 0 0 / 0.1) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.6s var(--ease-premium);
+}
+
+.btn-premium:hover::before {
+  transform: translateX(100%);
+}
+
+/* ============================================
+   Scrollbar styling
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.35 0.01 75 / 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.45 0.01 75 / 0.6);
+}
+
+/* ============================================
+   Selection styling
+   ============================================ */
+
+::selection {
+  background: oklch(0.7 0.15 250 / 0.3);
+  color: white;
+}
+
+/* ============================================
+   Focus ring styling
+   ============================================ */
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

@@ -113,6 +113,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
     public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
     public DbSet<AiElementsConfig> AiElementsConfigs => Set<AiElementsConfig>();
+    public DbSet<ReviewPipelineConfig> ReviewPipelineConfigs => Set<ReviewPipelineConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

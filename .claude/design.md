@@ -735,3 +735,18 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `ViewTransitionConfig` with Id (Guid), UserId, TransitionPreset, TransitionDurationMs, EasingFunction, EnableViewTransitions, EnableFramerMotion, EnablePageTransitions, EnableComponentAnimations, EnableLoadingAnimations, CustomCssJson, PresetHistoryJson, ProjectsWithTransitions
 - **Frontend**: `ViewTransitionPage` in Settings with "Transitions" tab — 4 sub-tabs (Presets with 11 presets grouped by category with selection highlight, Configure with duration slider + easing selector + 5 animation toggles, Preview with live demo navigation + generated CSS output viewer, Stats with preset/duration/browser support cards)
 - **Flow**: User opens Presets tab → browses 11 transition presets by category → selects preferred preset → Configure tab → adjusts duration via slider → picks easing function → toggles View Transitions API/Framer Motion/page/component/loading animations → Preview tab → clicks through demo pages with live animation → generates CSS code → copies for use in projects
+
+### #285 — AI Natural Language Database Schema Designer
+- **Ticket**: #285 — `AI natural language database schema designer with visual ERD preview`
+- **PR**: #287 (811 insertions, squash-merged)
+- **Backend**: `NlSchemaController` with 7 endpoints:
+  - `GET /api/nl-schema/schemas` — list user's schemas (optional dbType filter)
+  - `GET /api/nl-schema/schemas/{id}` — get schema detail
+  - `POST /api/nl-schema/generate` — generate schema from natural language description (simulated AI: detects keywords user/post/comment/tag/follow to generate tables, relationships, indexes, RLS policies, SQL DDL)
+  - `POST /api/nl-schema/schemas/{id}/refine` — iterative refinement via conversational chat
+  - `GET /api/nl-schema/export-formats` — 5 export formats (SQL, Prisma, Drizzle, Supabase, TypeORM)
+  - `GET /api/nl-schema/gallery` — public schema gallery sorted by popularity
+  - `GET /api/nl-schema/stats` — aggregate user stats (schemas, tables, relationships, refinements, tokens, favorite DB)
+- **Entity**: `NlSchema` with Id (Guid), UserId, SchemaName, NaturalLanguageInput, GeneratedSql, TablesJson, RelationshipsJson, IndexesJson, RlsPoliciesJson, SeedDataJson, ConversationJson, ExportFormat, DatabaseType, TableCount, ColumnCount, RelationshipCount, RefinementCount, TokensUsed, EstimatedCost, GenerationTimeMs, IsPublic, ViewCount, ForkCount
+- **Frontend**: `NlSchemaDesignerPage` in Settings with "Schema AI" tab — 4 sub-tabs (Generate with NL textarea + schema name + DB type selector [PostgreSQL/MySQL/Supabase/SQLite] + ERD-style table preview with columns/types/PKs + relationship arrows + SQL viewer + export buttons + refinement chat, Schemas with list showing table/column/relation counts, Gallery with public schemas showing views/forks, Stats with 6 metric cards + recent schemas list)
+- **Flow**: User opens Generate tab → describes data model in plain language → selects database type → clicks Generate Schema → views ERD-style table preview with columns and relationships → reviews generated SQL DDL → exports in preferred format (SQL/Prisma/Drizzle/Supabase/TypeORM) → optionally refines via chat input → browses saved schemas in Schemas tab → explores community schemas in Gallery → views usage stats

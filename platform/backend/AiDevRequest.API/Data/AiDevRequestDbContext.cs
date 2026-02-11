@@ -96,6 +96,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<GenerativeUiSession> GenerativeUiSessions => Set<GenerativeUiSession>();
     public DbSet<MobileAppConfig> MobileAppConfigs => Set<MobileAppConfig>();
     public DbSet<BackgroundAgent> BackgroundAgents => Set<BackgroundAgent>();
+    public DbSet<PlatformUpgrade> PlatformUpgrades => Set<PlatformUpgrade>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1521,6 +1522,22 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.InstalledPackagesJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => new { e.UserId, e.Status });
+        });
+
+        modelBuilder.Entity<PlatformUpgrade>(entity =>
+        {
+            entity.ToTable("platform_upgrades");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.CurrentDotNetVersion).HasMaxLength(50);
+            entity.Property(e => e.CurrentEfCoreVersion).HasMaxLength(50);
+            entity.Property(e => e.CurrentCSharpVersion).HasMaxLength(50);
+            entity.Property(e => e.UpgradeStatus).HasMaxLength(20);
+            entity.Property(e => e.FeatureFlagsJson).HasColumnType("text");
+            entity.Property(e => e.PerformanceHistoryJson).HasColumnType("text");
+            entity.Property(e => e.MigrationLogJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
     }
 }

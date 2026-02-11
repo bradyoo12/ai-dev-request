@@ -179,6 +179,10 @@ vi.mock('./GenerativeUiPage', () => ({
   default: () => <div data-testid="generative-ui-page">GenerativeUiPage</div>,
 }))
 
+vi.mock('./MobileAppPage', () => ({
+  default: () => <div data-testid="mobile-app-page">MobileAppPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

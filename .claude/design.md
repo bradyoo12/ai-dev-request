@@ -855,3 +855,17 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Hero Redesign**: Large conversational prompt input as centerpiece with template quick-start chips (SaaS, E-commerce, Blog, Mobile)
 - **Component Refactoring**: HomePage broken into HeroSection, FeaturesSection, PricingSection, StatsSection sub-components
 - **Utility**: `src/lib/utils.ts` with `cn()` helper for conditional classname merging (clsx + tailwind-merge pattern)
+
+### #303 — Visual Overlay Editor (PR #307)
+- **Backend**: `VisualOverlayController` with 8 endpoints for session management, element selection, property modification, undo, and stats
+- **Endpoints**:
+  - `GET /api/visual-overlay/sessions` — list sessions
+  - `POST /api/visual-overlay/sessions` — create session (projectName + previewUrl)
+  - `PUT /api/visual-overlay/sessions/{id}/select` — select element
+  - `PUT /api/visual-overlay/sessions/{id}/modify` — apply property modification
+  - `POST /api/visual-overlay/sessions/{id}/undo` — undo last modification
+  - `GET /api/visual-overlay/stats` — aggregate stats
+  - `GET /api/visual-overlay/properties` — available editable properties
+- **Entity**: `VisualOverlaySession` with Id (Guid), UserId, DevRequestId, ProjectName, SelectedElementPath, ModificationsJson, ComponentTreeJson, Status (active/paused/completed), TotalEdits, UndoCount, RedoCount, ViewportWidth, ViewportHeight, PreviewUrl
+- **Frontend**: `VisualOverlayPage` in Settings with "Visual Editor" tab — 3 sub-tabs (Editor with split layout: component tree + preview area + property panel + modification history with undo, Sessions with list showing project/edits/status, Stats with 6 metric cards)
+- **Flow**: Create session → browse component tree → select element → edit properties (text, color, spacing, fontSize, etc.) → changes tracked → undo if needed → view session history and stats

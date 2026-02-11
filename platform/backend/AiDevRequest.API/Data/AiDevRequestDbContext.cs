@@ -112,6 +112,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<SemanticIndex> SemanticIndexes => Set<SemanticIndex>();
     public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
     public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
+    public DbSet<StreamingPreview> StreamingPreviews => Set<StreamingPreview>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

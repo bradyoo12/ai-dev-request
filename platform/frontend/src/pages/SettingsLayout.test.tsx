@@ -183,6 +183,10 @@ vi.mock('./MobileAppPage', () => ({
   default: () => <div data-testid="mobile-app-page">MobileAppPage</div>,
 }))
 
+vi.mock('./BackgroundAgentPage', () => ({
+  default: () => <div data-testid="background-agent-page">BackgroundAgentPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

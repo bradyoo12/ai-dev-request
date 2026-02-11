@@ -163,6 +163,10 @@ vi.mock('./VoicePage', () => ({
   default: () => <div data-testid="voice-page">VoicePage</div>,
 }))
 
+vi.mock('./ModelRoutingPage', () => ({
+  default: () => <div data-testid="model-routing-page">ModelRoutingPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

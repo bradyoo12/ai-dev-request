@@ -90,6 +90,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ApiDocConfig> ApiDocConfigs => Set<ApiDocConfig>();
     public DbSet<CodeSnapshot> CodeSnapshots => Set<CodeSnapshot>();
     public DbSet<VoiceConfig> VoiceConfigs => Set<VoiceConfig>();
+    public DbSet<ModelRoutingConfig> ModelRoutingConfigs => Set<ModelRoutingConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1408,6 +1409,20 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Language).IsRequired().HasMaxLength(20);
             entity.Property(e => e.TtsVoice).HasMaxLength(100);
             entity.Property(e => e.TranscriptionHistoryJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<ModelRoutingConfig>(entity =>
+        {
+            entity.ToTable("model_routing_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DefaultTier).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.TaskRoutingJson).HasColumnType("text");
+            entity.Property(e => e.MonthlyBudget).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.CurrentMonthCost).HasColumnType("decimal(10,2)");
+            entity.Property(e => e.EstimatedSavings).HasColumnType("decimal(10,2)");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
         });

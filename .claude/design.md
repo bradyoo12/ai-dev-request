@@ -197,10 +197,11 @@ Multi-dimensional AI code review scoring architecture, security, performance, ac
   - `GET /api/projects/{id}/review/history` — review version history
   - `POST /api/projects/{id}/review/fix/{findingId}` — apply AI fix for specific finding
   - `POST /api/projects/{id}/review/fix-all` — apply all fixes by severity
-- **Frontend**: `CodeReviewPage` in Settings with dimension score bars, overall score badge, findings list with severity filtering, per-finding "Apply Fix" button, bulk fix actions, review history
+- **Frontend**: `CodeReviewPage` in Settings with dimension score bars, overall score badge, findings list with severity filtering, confidence badge per finding, side-by-side diff viewer (original vs suggested fix), "Accept" button, bulk fix actions, review history
+- **Intelligent Auto-Fix**: All findings with file references get auto-fix suggestions (not just critical). Claude API returns JSON with `fix` and `confidence` (0-100%). Original code context (±3 lines) extracted for diff comparison. Frontend displays confidence percentage with color coding (green ≥80%, yellow ≥50%, red <50%) and a toggleable diff viewer showing original code vs suggested fix side-by-side
 - **Dimensions**: Architecture (separation of concerns), Security (XSS, auth), Performance (rendering, bundle), Accessibility (ARIA, keyboard), Maintainability (naming, types)
 - **File Resolution**: `ResolveProjectPathAsync` looks up project path from DevRequest records or scans `Projects:BasePath` directory; `ReadSourceFiles` collects source files (excluding `node_modules`, `dist`, `build`, etc.) up to 50KB each
-- **Flow**: Code generated → trigger review → service reads project source files → Claude API analyzes across 5 dimensions → structured findings with severity → user applies fixes → re-review shows improvement
+- **Flow**: Code generated → trigger review → service reads project source files → Claude API analyzes across 5 dimensions → structured findings with severity → auto-fix generates suggested fixes with confidence scores → user views diff and accepts/rejects fixes → re-review shows improvement
 
 ## Real-Time Streaming Code Generation
 

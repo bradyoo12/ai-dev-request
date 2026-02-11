@@ -763,3 +763,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `QueryConfig` with Id (Guid), UserId, StaleTimeMs, CacheTimeMs, RetryCount, RetryDelayMs, RefetchOnWindowFocus, RefetchOnReconnect, RefetchOnMount, EnableDevtools, EnableGarbageCollection, EnableOptimisticUpdates, TotalQueries, TotalMutations, CacheHits, CacheMisses, QueryPatternsJson
 - **Frontend**: `QueryConfigPage` in Settings with "Query" tab — 4 sub-tabs (Configure with timing sliders [stale time/cache time/retry count/retry delay] + 6 behavior toggles [window focus/reconnect/mount/devtools/GC/optimistic], Presets with 4 caching strategy cards and one-click apply, Patterns with 6 categorized code examples [Fetching/Mutations/Advanced], Stats with 6 metric cards + current config summary)
 - **Flow**: User opens Configure tab → adjusts stale time via slider → adjusts cache time → sets retry count/delay → toggles behavior flags → applies a preset from Presets tab → browses code patterns in Patterns tab → monitors cache performance in Stats tab
+
+### #289 — Autonomous Agentic Planning System
+- **Ticket**: #289 — `Autonomous agentic planning system for multi-step code generation`
+- **PR**: #292 (630 insertions, squash-merged)
+- **Backend**: `AgenticPlanController` with 5 endpoints:
+  - `GET /api/agentic-plan/plans` — list user's plans (most recent 50)
+  - `POST /api/agentic-plan/generate` — generate plan from natural language prompt (simulated AI: keyword detection for api/backend/server, ui/frontend/page, auth/login, test, deploy to create relevant steps)
+  - `POST /api/agentic-plan/plans/{id}/approve` — approve plan for execution (sets IsApproved + status to approved)
+  - `POST /api/agentic-plan/plans/{id}/execute` — execute all steps (simulated: marks all steps completed with timing/token metrics)
+  - `GET /api/agentic-plan/stats` — aggregate stats (total plans, completed, success rate, steps executed, avg steps/plan, tokens used, recent plans)
+- **Entity**: `AgenticPlan` with Id (Guid), UserId, PlanName, UserPrompt, StepsJson, Status (draft/approved/running/completed/failed), TotalSteps, CompletedSteps, FailedSteps, RetryCount, TotalTokensUsed, TotalTimeMs, RequiresApproval, IsApproved, ExecutionLogJson
+- **Frontend**: `AgenticPlannerPage` in Settings with "Planner" tab — 3 sub-tabs (Create with prompt textarea + plan name input + generate button + step-by-step visualization with numbered circles and status colors + approve/execute buttons + progress bar + 4 metric cards [steps/completed/tokens/time], Plans with list showing status badges and step counts, Stats with 6 metric cards + recent plans list)
+- **Flow**: User opens Create tab → describes what to build in textarea → enters plan name → clicks Generate Plan → reviews step-by-step breakdown → clicks Approve Plan → clicks Execute Plan → watches progress bar fill → views completed steps with checkmarks and timing → browses saved plans in Plans tab → monitors success rate and token usage in Stats tab

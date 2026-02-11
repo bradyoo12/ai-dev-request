@@ -9,8 +9,8 @@ interface LoginPageProps {
 }
 
 const providerConfig: Record<SocialProvider, { icon: string; label: string; bg: string; hover: string }> = {
-  google: { icon: 'G', label: 'Google', bg: 'bg-white text-gray-800', hover: 'hover:bg-gray-100' },
-  apple: { icon: '\uF8FF', label: 'Apple', bg: 'bg-black text-white', hover: 'hover:bg-gray-900' },
+  google: { icon: 'G', label: 'Google', bg: 'bg-white text-warm-800', hover: 'hover:bg-warm-100' },
+  apple: { icon: '\uF8FF', label: 'Apple', bg: 'bg-black text-white', hover: 'hover:bg-warm-900' },
   kakao: { icon: '\uD83D\uDCAC', label: 'Kakao', bg: 'bg-[#FEE500] text-[#191919]', hover: 'hover:bg-[#F5DC00]' },
   line: { icon: '\uD83D\uDCAC', label: 'LINE', bg: 'bg-[#06C755] text-white', hover: 'hover:bg-[#05B34C]' },
 }

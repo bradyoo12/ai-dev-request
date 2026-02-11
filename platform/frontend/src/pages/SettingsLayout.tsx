@@ -32,11 +32,12 @@ import VariantComparisonPage from './VariantComparisonPage'
 import PerformanceProfilePage from './PerformanceProfilePage'
 import SchemaDesignerPage from './SchemaDesignerPage'
 import ApiCliPage from './ApiCliPage'
+import PipelineBuilderPage from './PipelineBuilderPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -62,7 +63,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/variant-comparison' ? 'variant-comparison' as SettingsTab
     : location.pathname === '/settings/performance' ? 'performance' as SettingsTab
     : location.pathname === '/settings/schema-designer' ? 'schema-designer' as SettingsTab
-    : location.pathname === '/settings/api-cli' ? 'api-cli' as SettingsTab : null
+    : location.pathname === '/settings/api-cli' ? 'api-cli' as SettingsTab
+    : location.pathname === '/settings/pipeline-builder' ? 'pipeline-builder' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -377,6 +379,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.apiCli', 'API & CLI')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('pipeline-builder')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'pipeline-builder' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>
+            {t('settings.tabs.pipelineBuilder', 'Pipelines')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -409,6 +422,7 @@ export default function SettingsLayout() {
       {settingsTab === 'performance' && <PerformanceProfilePage />}
       {settingsTab === 'schema-designer' && <SchemaDesignerPage />}
       {settingsTab === 'api-cli' && <ApiCliPage />}
+      {settingsTab === 'pipeline-builder' && <PipelineBuilderPage />}
     </section>
   )
 }

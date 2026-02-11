@@ -104,6 +104,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<QueryConfig> QueryConfigs => Set<QueryConfig>();
     public DbSet<AgenticPlan> AgenticPlans => Set<AgenticPlan>();
     public DbSet<VisualRegressionResult> VisualRegressionResults => Set<VisualRegressionResult>();
+    public DbSet<McpGatewayServer> McpGatewayServers => Set<McpGatewayServer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1655,6 +1656,26 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.IgnoreRegionsJson).HasColumnType("text");
             entity.Property(e => e.MetadataJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<McpGatewayServer>(entity =>
+        {
+            entity.ToTable("mcp_gateway_servers");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ServerName).HasMaxLength(200);
+            entity.Property(e => e.ServerUrl).HasMaxLength(500);
+            entity.Property(e => e.TransportType).HasMaxLength(20);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Category).HasMaxLength(50);
+            entity.Property(e => e.IconUrl).HasMaxLength(500);
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.ToolsJson).HasColumnType("text");
+            entity.Property(e => e.ResourcesJson).HasColumnType("text");
+            entity.Property(e => e.HealthMessage).HasMaxLength(500);
+            entity.Property(e => e.ConfigJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
         });

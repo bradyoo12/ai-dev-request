@@ -776,3 +776,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `AgenticPlan` with Id (Guid), UserId, PlanName, UserPrompt, StepsJson, Status (draft/approved/running/completed/failed), TotalSteps, CompletedSteps, FailedSteps, RetryCount, TotalTokensUsed, TotalTimeMs, RequiresApproval, IsApproved, ExecutionLogJson
 - **Frontend**: `AgenticPlannerPage` in Settings with "Planner" tab — 3 sub-tabs (Create with prompt textarea + plan name input + generate button + step-by-step visualization with numbered circles and status colors + approve/execute buttons + progress bar + 4 metric cards [steps/completed/tokens/time], Plans with list showing status badges and step counts, Stats with 6 metric cards + recent plans list)
 - **Flow**: User opens Create tab → describes what to build in textarea → enters plan name → clicks Generate Plan → reviews step-by-step breakdown → clicks Approve Plan → clicks Execute Plan → watches progress bar fill → views completed steps with checkmarks and timing → browses saved plans in Plans tab → monitors success rate and token usage in Stats tab
+
+### #290 — AI-Powered Visual Regression Testing
+- **Ticket**: #290 — `AI-powered visual regression testing for screenshot comparison`
+- **PR**: #293 (647 insertions, squash-merged)
+- **Backend**: `VisualRegressionController` with 5 endpoints:
+  - `GET /api/visual-regression/results` — list user's results (most recent 50)
+  - `POST /api/visual-regression/capture` — capture baseline screenshot (simulated with random capture time 200-800ms)
+  - `POST /api/visual-regression/compare` — run comparison against baseline (simulated with random mismatch 0-5%, pixel diff calculation, pass/fail based on threshold)
+  - `GET /api/visual-regression/viewports` — 5 viewport presets (Desktop 1920x1080, Laptop 1366x768, Tablet 768x1024, Mobile 375x812, Widescreen 2560x1440)
+  - `GET /api/visual-regression/stats` — aggregate stats (total tests, passed, failed, pass rate, avg mismatch, pixels analyzed, recent results)
+- **Entity**: `VisualRegressionResult` with Id (Guid), UserId, ProjectName, PageUrl, ViewportSize, BaselineImageUrl, ComparisonImageUrl, DiffImageUrl, MismatchPercentage, Threshold, Status (pending/baseline_captured/completed), Passed, PixelsDifferent, TotalPixels, IgnoreRegionsJson, MetadataJson, CaptureTimeMs, CompareTimeMs
+- **Frontend**: `VisualRegressionPage` in Settings with "Visual QA" tab — 3 sub-tabs (Capture with project name + page URL inputs + viewport selector dropdown + threshold slider 0-10% + Capture Baseline/Run Compare buttons + result card showing mismatch percentage with color-coded progress bar + pixel count + 4 metric cards [capture time/compare time/threshold/viewport], Results with list showing project names, URLs, viewports, mismatch percentages and status badges, Stats with 6 metric cards [total/passed/failed/pass rate/avg mismatch/pixels analyzed] + recent results list)
+- **Flow**: User opens Capture tab → enters project name → enters page URL → selects viewport from dropdown → adjusts threshold slider → clicks Capture Baseline → sees baseline_captured status → clicks Run Compare → sees mismatch percentage with pass/fail badge → reviews pixel diff metrics and timing → browses test history in Results tab → monitors pass rate and avg mismatch in Stats tab

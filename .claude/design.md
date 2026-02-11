@@ -97,6 +97,7 @@ User Request (natural language)
 | ComponentPreview | Visual component preview with conversational iteration for design refinement |
 | GenerationVariant | A/B variant of generated code with approach, metrics, rating, and selection status |
 | PerformanceProfile | Multi-dimensional performance profiling result with scores, suggestions, and optimization history |
+| DataSchema | NL-designed database schema with entities, relationships, validation, and multi-target code generation |
 
 ## Spec-Driven Development Pipeline
 
@@ -486,3 +487,17 @@ Automated performance analysis and AI-driven optimization for generated projects
   - `POST /api/projects/{id}/performance/optimize` — auto-apply selected optimizations
 - **Frontend**: `PerformanceProfilePage` in Settings with color-coded score cards (green ≥80, yellow ≥60, red <60), categorized suggestion cards with impact/effort indicators, individual and bulk "Fix All" optimization, profile history timeline
 - **Dimensions**: Bundle (tree-shaking, code-splitting, image optimization), Rendering (memoization, virtualization), Data Loading (caching, pagination), Accessibility (ARIA, keyboard nav), SEO (meta tags, semantic HTML)
+
+## Natural Language Database Schema Designer
+
+Describe data models in natural language, AI generates entities, relationships, SQL DDL, and full-stack code:
+- **Backend**: `SchemaDesignerService` parses NL prompts to extract entity keywords (user, post, comment, tag, product, order, etc.), generates typed columns per entity, infers relationships, validates schema consistency, and generates multi-target code (SQL DDL, EF Core entities, REST controllers, TypeScript/React hooks)
+- **Endpoints**:
+  - `POST /api/requests/{id}/schema/design` — design schema from NL prompt
+  - `GET /api/requests/{id}/schema` — get current schema
+  - `PUT /api/requests/{id}/schema/{schemaId}` — update entities/relationships manually
+  - `POST /api/requests/{id}/schema/{schemaId}/validate` — validate schema consistency
+  - `POST /api/requests/{id}/schema/{schemaId}/generate` — generate SQL + code artifacts
+- **Entity**: `DataSchema` with Prompt, EntitiesJson (jsonb), RelationshipsJson (jsonb), ValidationJson (jsonb), EntityCount, RelationshipCount, GeneratedSql (text), GeneratedEntities (text), GeneratedControllers (text), GeneratedFrontend (text), Status (designing/validated/generated)
+- **Frontend**: `SchemaDesignerPage` in Settings with NL prompt input, entity cards with column details, relationship visualization, validation issue display (color-coded by severity), tabbed code viewer (SQL DDL / EF Core / REST Controllers / TypeScript React)
+- **Flow**: Enter request ID + NL description → AI parses entities & relationships → visualize schema → validate → generate SQL + EF Core + REST + TypeScript code

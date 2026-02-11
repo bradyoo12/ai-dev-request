@@ -501,3 +501,12 @@ Describe data models in natural language, AI generates entities, relationships, 
 - **Entity**: `DataSchema` with Prompt, EntitiesJson (jsonb), RelationshipsJson (jsonb), ValidationJson (jsonb), EntityCount, RelationshipCount, GeneratedSql (text), GeneratedEntities (text), GeneratedControllers (text), GeneratedFrontend (text), Status (designing/validated/generated)
 - **Frontend**: `SchemaDesignerPage` in Settings with NL prompt input, entity cards with column details, relationship visualization, validation issue display (color-coded by severity), tabbed code viewer (SQL DDL / EF Core / REST Controllers / TypeScript React)
 - **Flow**: Enter request ID + NL description → AI parses entities & relationships → visualize schema → validate → generate SQL + EF Core + REST + TypeScript code
+
+## Centralized Auth Error Handling
+
+Unified 401 response handling across all authenticated frontend API calls:
+- **`authFetch` wrapper** (`auth.ts`): Wraps `fetch` to attach JWT Bearer headers and intercept 401 responses. On 401, clears localStorage auth data and dispatches `auth-expired` CustomEvent
+- **`AuthContext`**: Listens for `auth-expired` event to trigger logout (clear user state + token balance) and show login modal
+- **`settings.ts`**: Uses `authFetch` instead of raw `fetch` + `getAuthHeaders()`, ensuring all settings/tokens API calls (getTokenOverview, getTokenHistory, purchaseTokens, etc.) automatically handle expired/invalid tokens
+- **Flow**: Authenticated API call → 401 response → `authFetch` clears auth + dispatches event → `AuthContext` shows login modal → user re-authenticates
+- **Guard**: `loadTokenBalance` skips API call when `isAuthenticated()` returns false, preventing unnecessary 401s on unauthenticated pages

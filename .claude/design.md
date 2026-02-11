@@ -675,3 +675,17 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **7-Step Pipeline**: Initialize environment → Analyze requirements → Create branch & scaffold → Implement changes → Run tests → Self-review & fix → Open pull request
 - **Frontend**: `BackgroundAgentPage` in Settings with "Agents" tab — 4 sub-tabs (Dashboard with 8 stats cards + agent type grid, Agents list with status filter + progress bars + detail panel, Spawn form with type/priority selectors, Logs with terminal-style viewer)
 - **Flow**: User opens Dashboard → views active/completed/failed agent counts → switches to Spawn tab → selects agent type and priority → enters task description → spawns agent → monitors progress in Agents tab → views execution steps and resource usage → agent auto-creates PR on completion → views logs in terminal
+
+### #277 — .NET 10 + EF Core 10 Platform Upgrade Dashboard
+- **Ticket**: #277 — `.NET 10 + EF Core 10 with vector search and 25-50% performance boost`
+- **PR**: #280 (747 insertions, squash-merged)
+- **Backend**: `PlatformUpgradeController` with 6 endpoints:
+  - `GET /api/platform-upgrade/status` — get or create upgrade status (auto-creates on first visit)
+  - `PUT /api/platform-upgrade/settings` — update feature flags (vector search, native JSON, LeftJoin LINQ, profiling)
+  - `GET /api/platform-upgrade/performance` — performance metrics (avg/P95/P99 query time, throughput, cache hit rate, CPU, memory)
+  - `GET /api/platform-upgrade/vector-search` — vector search stats (index count, dimensions, avg search time)
+  - `GET /api/platform-upgrade/features` — 10 .NET 10/EF Core 10 features with categories and status
+  - `POST /api/platform-upgrade/run-benchmark` — benchmark .NET 9 vs 10 (query, serialization, startup, memory, vector search)
+- **Entity**: `PlatformUpgrade` with Id (Guid), UserId, CurrentDotNetVersion ("net10.0"), CurrentEfCoreVersion ("10.0"), CurrentCSharpVersion ("14.0"), VectorSearchEnabled, NativeJsonColumnsEnabled, LeftJoinLinqEnabled, PerformanceProfilingEnabled, AvgQueryTimeMs, P95QueryTimeMs, P99QueryTimeMs, TotalQueriesExecuted, CacheHitRate, MemoryUsageMb, CpuUsagePercent, ThroughputRequestsPerSec, VectorIndexCount, VectorDimensions, VectorSearchAvgMs, UpgradeStatus, FeatureFlagsJson, PerformanceHistoryJson, MigrationLogJson
+- **Frontend**: `PlatformUpgradePage` in Settings with "Platform Upgrade" tab — version badges (.NET 10 / EF Core 10 / C# 14), 5 sub-tabs (Overview with feature toggles, Performance with 8 metric cards, Vector Search with stats and status indicator, Features listing 10 .NET 10 features with category/status badges, Benchmark with .NET 9 vs 10 side-by-side comparison table)
+- **Flow**: User opens Overview → sees version badges → toggles features (vector search, JSON columns, LeftJoin LINQ, profiling) → switches to Performance tab → views real-time metrics → checks Vector Search stats → browses Features catalog → runs Benchmark to compare .NET 9 vs 10 improvements

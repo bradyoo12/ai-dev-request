@@ -81,6 +81,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TestGenerationRecord> TestGenerationRecords => Set<TestGenerationRecord>();
     public DbSet<CollaborativeSession> CollaborativeSessions => Set<CollaborativeSession>();
     public DbSet<OnboardingProgress> OnboardingProgresses => Set<OnboardingProgress>();
+    public DbSet<ComponentPreview> ComponentPreviews => Set<ComponentPreview>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1263,6 +1264,22 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<ComponentPreview>(entity =>
+        {
+            entity.ToTable("component_previews");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ComponentName).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Code).HasColumnType("text");
+            entity.Property(e => e.ChatHistoryJson).HasColumnType("jsonb");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.DesignTokensJson).HasColumnType("jsonb");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

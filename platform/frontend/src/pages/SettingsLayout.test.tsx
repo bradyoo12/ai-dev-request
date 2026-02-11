@@ -126,6 +126,10 @@ vi.mock('./ProjectVersionPage', () => ({
   default: () => <div data-testid="project-version-page">ProjectVersionPage</div>,
 }))
 
+vi.mock('./ComponentPreviewPage', () => ({
+  default: () => <div data-testid="component-preview-page">ComponentPreviewPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

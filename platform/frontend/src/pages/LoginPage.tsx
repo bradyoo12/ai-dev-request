@@ -74,14 +74,14 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex items-center justify-center p-6">
+    <div className="min-h-screen bg-warm-950 text-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">AI Dev Request</h1>
-          <p className="text-gray-400">{t('auth.subtitle')}</p>
+          <h1 className="text-3xl font-bold mb-2 gradient-text">AI Dev Request</h1>
+          <p className="text-warm-400">{t('auth.subtitle')}</p>
         </div>
 
-        <div className="bg-gray-800 rounded-2xl p-8 shadow-xl">
+        <div className="glass-card rounded-2xl p-8">
           {/* Social Login Buttons */}
           <div className="space-y-3 mb-6">
             {providers.map((provider) => {
@@ -107,19 +107,19 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-700"></div>
+              <div className="w-full border-t border-warm-700/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gray-800 text-gray-500">{t('auth.orContinueWith')}</span>
+              <span className="px-4 bg-transparent text-warm-500">{t('auth.orContinueWith')}</span>
             </div>
           </div>
 
           {/* Email/Password Form */}
-          <div className="flex gap-1 mb-4 bg-gray-900 rounded-lg p-1">
+          <div className="flex gap-1 mb-4 bg-warm-900 rounded-lg p-1">
             <button
               onClick={() => { setMode('login'); setError('') }}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                mode === 'login' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                mode === 'login' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
               }`}
             >
               {t('auth.login')}
@@ -127,7 +127,7 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
             <button
               onClick={() => { setMode('register'); setError('') }}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                mode === 'register' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                mode === 'register' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
               }`}
             >
               {t('auth.register')}
@@ -136,38 +136,38 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">{t('auth.email')}</label>
+              <label className="block text-sm font-medium text-warm-400 mb-1">{t('auth.email')}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@example.com"
-                className="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 bg-warm-900 border border-warm-700/50 rounded-xl text-white placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50"
                 autoComplete="email"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">{t('auth.password')}</label>
+              <label className="block text-sm font-medium text-warm-400 mb-1">{t('auth.password')}</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('auth.passwordPlaceholder')}
-                className="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 bg-warm-900 border border-warm-700/50 rounded-xl text-white placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50"
                 autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
               />
             </div>
 
             {mode === 'register' && (
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">{t('auth.displayName')}</label>
+                <label className="block text-sm font-medium text-warm-400 mb-1">{t('auth.displayName')}</label>
                 <input
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder={t('auth.displayNamePlaceholder')}
-                  className="w-full p-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 bg-warm-900 border border-warm-700/50 rounded-xl text-white placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50"
                 />
               </div>
             )}
@@ -181,7 +181,7 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-xl font-medium transition-colors"
+              className="w-full py-3 bg-gradient-to-r from-accent-blue to-accent-purple hover:from-accent-blue/90 hover:to-accent-purple/90 disabled:from-warm-600 disabled:to-warm-600 disabled:cursor-not-allowed rounded-xl font-medium transition-all btn-premium"
             >
               {loading
                 ? t('auth.processing')
@@ -194,7 +194,7 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
           <div className="mt-6 text-center">
             <button
               onClick={onSkip}
-              className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+              className="text-sm text-warm-500 hover:text-warm-300 transition-colors"
             >
               {t('auth.skipLogin')}
             </button>

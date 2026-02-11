@@ -540,3 +540,21 @@ Custom dev request pipeline builder with drag-and-drop step reordering:
 - **Templates**: Web App (6 steps), API Service (5 steps), Mobile App (5 steps)
 - **Frontend**: `PipelineBuilderPage` in Settings with "Pipelines" tab — pipeline list with status badges, template picker grid, drag-and-drop step editor with inline name editing, enable/disable toggles, add/remove steps, color-coded step types
 - **Flow**: User opens Settings → Pipelines tab → create from template or blank → drag steps to reorder → edit step names → toggle enable/disable → save pipeline
+
+### Auto-Generated OpenAPI Docs and Client SDK Management (#260)
+
+OpenAPI 3.1 specification generation and multi-language client SDK management for generated backend projects:
+- **Backend**: `ApiDocConfig` entity with endpoints JSON storage, `ApiDocsController` with CRUD + spec generation endpoint
+- **Endpoints**:
+  - `GET /api/apidocs` — list user API doc configs
+  - `GET /api/apidocs/{id}` — get single config
+  - `POST /api/apidocs` — create config (max 50 per user)
+  - `PUT /api/apidocs/{id}` — update config
+  - `DELETE /api/apidocs/{id}` — delete config
+  - `POST /api/apidocs/{id}/generate` — generate OpenAPI 3.1 spec from stored endpoints
+  - `GET /api/apidocs/sdk-languages` — list available SDK languages
+- **Entity**: `ApiDocConfig` with Id (Guid), UserId, ProjectName, Description, EndpointsJson (JSON array), OpenApiSpecJson, SdkLanguages (comma-separated), Status (Draft/Generated/Published), DevRequestId, CreatedAt, UpdatedAt
+- **SDK Languages**: TypeScript, Python, C#, Go, Java, Kotlin — each with package manager info
+- **Spec Generation**: Builds OpenAPI 3.1 JSON from endpoint metadata (path, method, summary, tag, requestBody, responseType)
+- **Frontend**: `ApiDocsPage` in Settings with "API Docs" tab — doc list with status badges, endpoint editor with HTTP method selector, SDK language toggle buttons, spec preview with JSON copy, color-coded HTTP methods (GET=green, POST=blue, PUT=yellow, PATCH=orange, DELETE=red)
+- **Flow**: User opens Settings → API Docs tab → create new → define endpoints → select SDK languages → save → generate OpenAPI spec → view/copy spec JSON

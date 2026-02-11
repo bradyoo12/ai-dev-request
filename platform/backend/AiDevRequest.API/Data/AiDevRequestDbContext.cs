@@ -91,6 +91,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CodeSnapshot> CodeSnapshots => Set<CodeSnapshot>();
     public DbSet<VoiceConfig> VoiceConfigs => Set<VoiceConfig>();
     public DbSet<ModelRoutingConfig> ModelRoutingConfigs => Set<ModelRoutingConfig>();
+    public DbSet<ProjectIndex> ProjectIndexes => Set<ProjectIndex>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1425,6 +1426,24 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.EstimatedSavings).HasColumnType("decimal(10,2)");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<ProjectIndex>(entity =>
+        {
+            entity.ToTable("project_indexes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.FilePath).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ContentHash).HasMaxLength(64);
+            entity.Property(e => e.Language).HasMaxLength(50);
+            entity.Property(e => e.EmbeddingJson).HasColumnType("text");
+            entity.Property(e => e.DependenciesJson).HasColumnType("text");
+            entity.Property(e => e.DependentsJson).HasColumnType("text");
+            entity.Property(e => e.Summary).HasMaxLength(1000);
+            entity.Property(e => e.ExportedSymbols).HasMaxLength(2000);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => new { e.UserId, e.DevRequestId, e.FilePath }).IsUnique();
         });
     }
 }

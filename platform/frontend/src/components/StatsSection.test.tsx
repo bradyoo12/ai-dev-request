@@ -41,6 +41,6 @@ describe('StatsSection', () => {
 
   it('renders powered by text', () => {
     render(<StatsSection />)
-    expect(screen.getByText('Powered by')).toBeInTheDocument()
+    expect(screen.getByText('stats.poweredBy')).toBeInTheDocument()
   })
 })

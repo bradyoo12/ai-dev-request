@@ -109,6 +109,9 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<FigmaImport> FigmaImports => Set<FigmaImport>();
     public DbSet<ArenaComparison> ArenaComparisons => Set<ArenaComparison>();
     public DbSet<VisualOverlaySession> VisualOverlaySessions => Set<VisualOverlaySession>();
+    public DbSet<SemanticIndex> SemanticIndexes => Set<SemanticIndex>();
+    public DbSet<PlanningSession> PlanningSessions => Set<PlanningSession>();
+    public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1752,6 +1755,23 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.PreviewUrl).HasMaxLength(2000);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<SemanticIndex>(entity =>
+        {
+            entity.ToTable("semantic_indexes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SourceType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.SourceId).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Content).HasColumnType("text");
+            entity.Property(e => e.ContentHash).IsRequired().HasMaxLength(64);
+            entity.Property(e => e.EmbeddingJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.SourceType);
+            entity.HasIndex(e => new { e.UserId, e.ContentHash }).IsUnique();
         });
     }
 }

@@ -89,14 +89,14 @@ export default function HeroSection({ onScrollToForm }: HeroSectionProps) {
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </span>
           </motion.button>
-          <motion.a
-            href="#how-it-works"
+          <motion.button
+            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
             className="px-8 py-4 rounded-2xl font-semibold text-lg glass-card hover:border-warm-500/40 text-warm-200 inline-flex items-center justify-center"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             {t('hero.cta.demo')}
-          </motion.a>
+          </motion.button>
         </div>
       </FadeIn>
 

@@ -190,6 +190,9 @@ vi.mock('./BackgroundAgentPage', () => ({
 vi.mock('./PlatformUpgradePage', () => ({
   default: () => <div data-testid="platform-upgrade-page">PlatformUpgradePage</div>,
 }))
+vi.mock('./VisualPromptPage', () => ({
+  default: () => <div data-testid="visual-prompt-page">VisualPromptPage</div>,
+}))
 
 import SettingsLayout from './SettingsLayout'
 

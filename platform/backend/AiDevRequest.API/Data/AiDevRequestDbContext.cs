@@ -87,6 +87,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DataSchema> DataSchemas => Set<DataSchema>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<DevPipeline> DevPipelines => Set<DevPipeline>();
+    public DbSet<ApiDocConfig> ApiDocConfigs => Set<ApiDocConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1364,6 +1365,22 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.IsTemplate);
+        });
+
+        modelBuilder.Entity<ApiDocConfig>(entity =>
+        {
+            entity.ToTable("api_doc_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ProjectName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.EndpointsJson).IsRequired().HasColumnType("text");
+            entity.Property(e => e.OpenApiSpecJson).HasColumnType("text");
+            entity.Property(e => e.SdkLanguages).HasMaxLength(200);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.DevRequestId);
         });
     }
 }

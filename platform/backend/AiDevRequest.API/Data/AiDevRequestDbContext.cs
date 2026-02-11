@@ -85,6 +85,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<GenerationVariant> GenerationVariants => Set<GenerationVariant>();
     public DbSet<PerformanceProfile> PerformanceProfiles => Set<PerformanceProfile>();
     public DbSet<DataSchema> DataSchemas => Set<DataSchema>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1333,6 +1334,20 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<ApiKey>(entity =>
+        {
+            entity.ToTable("api_keys");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.KeyHash).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.KeyPrefix).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.KeyHash).IsUnique();
         });
     }
 }

@@ -14,6 +14,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }))
 
 vi.mock('../contexts/AuthContext', () => ({
@@ -140,6 +141,10 @@ vi.mock('./PerformanceProfilePage', () => ({
 
 vi.mock('./SchemaDesignerPage', () => ({
   default: () => <div data-testid="schema-designer-page">SchemaDesignerPage</div>,
+}))
+
+vi.mock('./ApiCliPage', () => ({
+  default: () => <div data-testid="api-cli-page">ApiCliPage</div>,
 }))
 
 import SettingsLayout from './SettingsLayout'

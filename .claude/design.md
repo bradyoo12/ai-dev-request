@@ -622,3 +622,19 @@ Indexes project files for intelligent context retrieval using embeddings, depend
 - **Entity**: `ProjectIndex` with Id (Guid), UserId, DevRequestId, FilePath, ContentHash (SHA-256), FileSize, Language, EmbeddingJson (vector), DependenciesJson, DependentsJson, Summary, ExportedSymbols, RelevanceScore, IsUserModified, NeedsReindex, IndexedAt, CreatedAt, UpdatedAt
 - **Frontend**: `ContextIndexPage` in Settings with "Context Index" tab — project ID input, 4 stats cards (Total Files/Indexed/Stale/Total Size), language tags with color coding, context retrieval search bar, 3 tabs (Files with filter all/indexed/stale/modified, Dependencies edge list, Retrieved ranked results), file list with status dots and metadata
 - **Flow**: User enters project ID → loads index summary → browses files by filter → views dependency graph → searches for relevant context via semantic query → results ranked by relevance
+
+### AI-Powered Deployment Health Monitoring with Auto-Rollback (#267)
+
+Monitors deployed projects for uptime, errors, and performance degradation, with automatic rollback when problems are detected:
+- **Backend**: `DeploymentHealth` entity for per-project monitoring, `DeploymentHealthController` with 6 endpoints for config, stats, health checks, events, and incidents
+- **Endpoints**:
+  - `GET /api/deployment-health/config/{projectId}` — get or create health monitoring config
+  - `PUT /api/deployment-health/config/{projectId}` — update monitoring settings (URL, interval, thresholds, auto-rollback)
+  - `GET /api/deployment-health/stats/{projectId}` — health statistics (uptime, error rate, latencies, rollback count)
+  - `POST /api/deployment-health/check` — record a health check result (success/fail, response time, error)
+  - `GET /api/deployment-health/events/{projectId}` — recent health events timeline (last 100)
+  - `GET /api/deployment-health/incidents/{projectId}` — incident history (auto-rollbacks, outages)
+- **Entity**: `DeploymentHealth` with Id (Guid), UserId, DevRequestId, DeploymentUrl, Status (up/degraded/down/unknown), MonitoringEnabled, CheckIntervalSeconds, ErrorRateThreshold, LatencyThresholdMs, TotalChecks, SuccessfulChecks, FailedChecks, CurrentErrorRate, AvgResponseTimeMs, P95ResponseTimeMs, P99ResponseTimeMs, UptimePercentage, RollbackCount, AutoRollbackEnabled, LastGoodVersionId, HealthEventsJson, IncidentsJson
+- **Auto-Rollback Logic**: When error rate exceeds threshold (default 10%) after 5+ checks with auto-rollback enabled, triggers rollback and records incident
+- **Frontend**: `DeploymentHealthPage` in Settings with "Health" tab — status banner with animated pulse dot, 4 stats cards (Uptime/Avg Response/Error Rate/Total Checks), latency breakdown (P50/P95/P99), 4 tabs (Overview with config summary, Events timeline, Incidents history, Settings with toggles and threshold inputs)
+- **Flow**: User enters project ID → sees status banner (Healthy/Degraded/Down) → views stats and latency breakdown → browses health events → reviews incident history → configures monitoring settings and auto-rollback thresholds

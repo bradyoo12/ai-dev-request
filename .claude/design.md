@@ -96,6 +96,7 @@ User Request (natural language)
 | ProjectVersion | Versioned snapshot of a generated project with file-level diff capabilities |
 | ComponentPreview | Visual component preview with conversational iteration for design refinement |
 | GenerationVariant | A/B variant of generated code with approach, metrics, rating, and selection status |
+| PerformanceProfile | Multi-dimensional performance profiling result with scores, suggestions, and optimization history |
 
 ## Spec-Driven Development Pipeline
 
@@ -473,3 +474,15 @@ Prompt branching to generate multiple implementation variants from the same requ
   - `DELETE /api/requests/{id}/variants` — delete all variants
 - **Frontend**: `VariantComparisonPage` in Settings with side-by-side 3-column variant cards showing approach badges, metrics (files, LOC, dependencies, bundle size), model tier, star ratings, file preview, and selection workflow
 - **Approaches**: Minimal (lean, few deps), Balanced (standard best practices), Feature-Rich (comprehensive with search, filter, stats, localStorage)
+
+## AI Performance Profiling & Auto-Optimization
+
+Automated performance analysis and AI-driven optimization for generated projects:
+- **Backend**: `PerformanceProfileService` analyzes bundle size, rendering patterns, data loading, accessibility, and SEO — generating scores (0-100) and 11 categorized optimization suggestions with impact/effort ratings. `OptimizeAsync` applies fixes and recalculates scores.
+- **Endpoints**:
+  - `POST /api/projects/{id}/performance/profile` — run performance profiling
+  - `GET /api/projects/{id}/performance/results` — get latest profile results
+  - `GET /api/projects/{id}/performance/history` — optimization history
+  - `POST /api/projects/{id}/performance/optimize` — auto-apply selected optimizations
+- **Frontend**: `PerformanceProfilePage` in Settings with color-coded score cards (green ≥80, yellow ≥60, red <60), categorized suggestion cards with impact/effort indicators, individual and bulk "Fix All" optimization, profile history timeline
+- **Dimensions**: Bundle (tree-shaking, code-splitting, image optimization), Rendering (memoization, virtualization), Data Loading (caching, pagination), Accessibility (ARIA, keyboard nav), SEO (meta tags, semantic HTML)

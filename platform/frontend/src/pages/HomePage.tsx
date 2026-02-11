@@ -27,7 +27,7 @@ type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingP
 export default function HomePage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const { setTokenBalance } = useAuth()
+  const { setTokenBalance, requireAuth } = useAuth()
 
   const [request, setRequest] = useState('')
   const [email, setEmail] = useState('')
@@ -211,6 +211,7 @@ export default function HomePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!request.trim()) return
+    if (!requireAuth()) return
 
     setViewState('submitting')
     setErrorMessage('')

@@ -277,13 +277,28 @@ const t = (key: string) => i18n.t(key);
 
 // API Functions
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/requests`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/requests`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(data),
+    });
+  } catch {
+    throw new Error(t('api.error.networkError'));
+  }
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(t('api.error.loginRequired'));
+    }
+    if (response.status === 400) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || t('api.error.invalidRequest'));
+    }
+    if (response.status >= 500) {
+      throw new Error(t('api.error.serverError'));
+    }
     const error = await response.json().catch(() => ({}));
     throw new Error(error.message || t('api.error.createFailed'));
   }

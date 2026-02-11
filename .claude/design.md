@@ -524,3 +524,19 @@ Secure API key management enabling programmatic access to the platform:
 - **Security**: Max 5 active keys per user, raw key shown only at creation, SHA-256 hashing for storage, unique index on KeyHash, cascade delete with User
 - **Frontend**: `ApiCliPage` in Settings with "API & CLI" tab — key list with status badges, generate form with name input, copy-to-clipboard on creation, revoke per key, cURL quick start guide
 - **Flow**: User opens Settings → API & CLI tab → enters key name → Generate Key → copy raw key (shown once) → use in API calls with `Authorization: Bearer` header
+
+## Visual Drag-and-Drop Pipeline Builder
+
+Custom dev request pipeline builder with drag-and-drop step reordering:
+- **Backend**: `DevPipeline` entity with JSON steps storage, `PipelinesController` with full CRUD (list/get/create/update/delete)
+- **Endpoints**:
+  - `GET /api/pipelines` — list user pipelines + public templates
+  - `GET /api/pipelines/{id}` — get single pipeline
+  - `POST /api/pipelines` — create pipeline (max 20 per user)
+  - `PUT /api/pipelines/{id}` — update pipeline name/description/steps
+  - `DELETE /api/pipelines/{id}` — delete pipeline
+- **Entity**: `DevPipeline` with Id (Guid), UserId, Name, Description, StepsJson (JSON array), Status (Draft/Active/Archived), IsTemplate, TemplateCategory, ExecutionCount, CreatedAt, UpdatedAt
+- **Step Types**: analyze, design, generate, test, review, deploy, custom — each with color-coded border and icon
+- **Templates**: Web App (6 steps), API Service (5 steps), Mobile App (5 steps)
+- **Frontend**: `PipelineBuilderPage` in Settings with "Pipelines" tab — pipeline list with status badges, template picker grid, drag-and-drop step editor with inline name editing, enable/disable toggles, add/remove steps, color-coded step types
+- **Flow**: User opens Settings → Pipelines tab → create from template or blank → drag steps to reorder → edit step names → toggle enable/disable → save pipeline

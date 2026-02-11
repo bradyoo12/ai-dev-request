@@ -638,3 +638,15 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Auto-Rollback Logic**: When error rate exceeds threshold (default 10%) after 5+ checks with auto-rollback enabled, triggers rollback and records incident
 - **Frontend**: `DeploymentHealthPage` in Settings with "Health" tab — status banner with animated pulse dot, 4 stats cards (Uptime/Avg Response/Error Rate/Total Checks), latency breakdown (P50/P95/P99), 4 tabs (Overview with config summary, Events timeline, Incidents history, Settings with toggles and threshold inputs)
 - **Flow**: User enters project ID → sees status banner (Healthy/Degraded/Down) → views stats and latency breakdown → browses health events → reviews incident history → configures monitoring settings and auto-rollback thresholds
+
+### #271 — Streaming Generative UI Chat Interface (PR #274)
+- **Endpoints**:
+  - `GET /api/generative-ui/session/{projectId}` — get or create chat session
+  - `PUT /api/generative-ui/session/{projectId}` — update session settings (streaming, generative UI, model)
+  - `POST /api/generative-ui/message` — send message and get AI response with optional component generation and tool calls
+  - `GET /api/generative-ui/messages/{projectId}` — chat history (last N messages)
+  - `GET /api/generative-ui/components/{projectId}` — list generated UI components
+  - `GET /api/generative-ui/tools/{projectId}` — available tool definitions
+- **Entity**: `GenerativeUiSession` with Id (Guid), UserId, DevRequestId, SessionName, Status, TotalMessages, AiMessages, UserMessages, GeneratedComponents, ToolCallCount, StreamingEnabled, GenerativeUiEnabled, ActiveModel, TotalTokensUsed, EstimatedCost, MessagesJson, ToolDefinitionsJson, GeneratedComponentsJson, ReasoningStepsJson
+- **Frontend**: `GenerativeUiPage` in Settings with "Gen UI" tab — chat interface with message bubbles, component rendering, tool call display, typing indicator, 4 tabs (Chat/Components/Tools/Settings), model selector, streaming and generative UI toggles, session statistics
+- **Flow**: User enters project ID → starts chat session → sends messages → AI responds with text, generated components, and tool calls → user views generated components gallery → configures chat settings (model, streaming, generative UI toggle)

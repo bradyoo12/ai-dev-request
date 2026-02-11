@@ -37,11 +37,12 @@ import ApiDocsPage from './ApiDocsPage'
 import CodeMergePage from './CodeMergePage'
 import VoicePage from './VoicePage'
 import ModelRoutingPage from './ModelRoutingPage'
+import ContextIndexPage from './ContextIndexPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing' | 'context-index'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -72,7 +73,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/api-docs' ? 'api-docs' as SettingsTab
     : location.pathname === '/settings/code-merge' ? 'code-merge' as SettingsTab
     : location.pathname === '/settings/voice-input' ? 'voice-input' as SettingsTab
-    : location.pathname === '/settings/model-routing' ? 'model-routing' as SettingsTab : null
+    : location.pathname === '/settings/model-routing' ? 'model-routing' as SettingsTab
+    : location.pathname === '/settings/context-index' ? 'context-index' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -442,6 +444,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.modelRouting', 'AI Models')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('context-index')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'context-index' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            {t('settings.tabs.contextIndex', 'Context Index')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -479,6 +492,7 @@ export default function SettingsLayout() {
       {settingsTab === 'code-merge' && <CodeMergePage />}
       {settingsTab === 'voice-input' && <VoicePage />}
       {settingsTab === 'model-routing' && <ModelRoutingPage />}
+      {settingsTab === 'context-index' && <ContextIndexPage />}
     </section>
   )
 }

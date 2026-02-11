@@ -167,6 +167,10 @@ vi.mock('./ModelRoutingPage', () => ({
   default: () => <div data-testid="model-routing-page">ModelRoutingPage</div>,
 }))
 
+vi.mock('./ContextIndexPage', () => ({
+  default: () => <div data-testid="context-index-page">ContextIndexPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

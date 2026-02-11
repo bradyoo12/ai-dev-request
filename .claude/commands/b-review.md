@@ -142,14 +142,14 @@ Perform AI-simulated human testing:
 
 **If all tests PASS:**
 
-1. Move ticket to "Done" status:
+1. Move ticket to "Done" status (GraphQL — no REST alternative for projects):
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 98236657
    ```
 
-2. Close the issue:
+2. Close the issue (REST):
    ```bash
-   gh issue close <issue_number> --repo bradyoo12/ai-dev-request --reason completed
+   gh api --method PATCH "repos/bradyoo12/ai-dev-request/issues/<issue_number>" -f state=closed -f state_reason=completed
    ```
 
 3. Add a completion comment
@@ -157,9 +157,9 @@ Perform AI-simulated human testing:
 **If tests FAIL:**
 
 1. Add failure comment with details
-2. Add "on hold" label:
+2. Add "on hold" label (REST):
    ```bash
-   gh issue edit <issue_number> --repo bradyoo12/ai-dev-request --add-label "on hold"
+   gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/labels" -f "labels[]=on hold"
    ```
 
 ### Step 5: Cleanup

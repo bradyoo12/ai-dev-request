@@ -20,6 +20,8 @@ Project settings are defined in `.claude/policy.md` under "Project Settings" sec
 
 **IMPORTANT:** This orchestrator ONLY processes tickets from the GitHub Project defined in policy.md (Project 26 - AI Dev Request). Use `gh project item-list <PROJECT_ID> --owner <OWNER>` to fetch tickets.
 
+**IMPORTANT:** Follow the **GitHub API Rate Limit Strategy** in `policy.md`. Use REST (`gh api`) for all issue/PR operations. Only use GraphQL (`gh project`) for project board operations which have no REST alternative. Never call `gh project field-list` or `gh project view` — use hardcoded IDs from policy.md.
+
 ## Prerequisites (MUST RUN FIRST)
 
 **Before starting the pipeline, ensure the correct GitHub account is active:**
@@ -154,9 +156,9 @@ Check all tickets in the project to ensure they align with policy and design:
 
    **Hard Block** (needs human action) → add `on hold` label:
    - Security concerns, production-critical changes, unclear requirements, repeated test failures
-   - Add `on hold` label:
+   - Add `on hold` label (REST):
      ```bash
-     gh issue edit <issue_number> --repo bradyoo12/ai-dev-request --add-label "on hold"
+     gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/labels" -f "labels[]=on hold"
      ```
    - Add a comment explaining the concern
 
@@ -196,9 +198,9 @@ Implement and locally test ONE Ready ticket using an Agent Team.
 
 #### Step 3b: Read and Classify the Ticket
 
-1. Fetch the issue details:
+1. Fetch the issue details (REST):
    ```bash
-   gh issue view <issue_number> --repo bradyoo12/ai-dev-request
+   gh api "repos/bradyoo12/ai-dev-request/issues/<issue_number>"
    ```
 2. Classify the ticket scope:
    - **Full-stack**: Needs both frontend AND backend changes → use team
@@ -305,15 +307,16 @@ Merge PRs to main. This is a simple operation — no team needed.
 2. Find "In Progress" tickets with open PRs (no `on hold` label):
    ```bash
    gh project item-list 26 --owner bradyoo12 --format json --limit 200
-   gh pr list --repo bradyoo12/ai-dev-request --state open --json number,headRefName,url
+   gh api "repos/bradyoo12/ai-dev-request/pulls?state=open&per_page=100" --jq '[.[] | {number, headRefName: .head.ref, url: .html_url}]'
    ```
-3. Verify PR is mergeable:
+3. Verify PR is mergeable (REST):
    ```bash
-   gh pr view <pr_number> --repo bradyoo12/ai-dev-request --json mergeable,mergeStateStatus
+   gh api "repos/bradyoo12/ai-dev-request/pulls/<pr_number>" --jq '{mergeable, mergeable_state}'
    ```
-4. Merge:
+4. Merge (REST):
    ```bash
-   gh pr merge <pr_number> --repo bradyoo12/ai-dev-request --merge --delete-branch
+   gh api --method PUT "repos/bradyoo12/ai-dev-request/pulls/<pr_number>/merge" -f merge_method=merge
+   gh api --method DELETE "repos/bradyoo12/ai-dev-request/git/refs/heads/<branch_name>"
    ```
 5. Move ticket to "In Review":
    ```bash
@@ -376,9 +379,9 @@ Verify changes on staging using parallel agents.
   ```bash
   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 98236657
   ```
-- Close the issue:
+- Close the issue (REST):
   ```bash
-  gh issue close <issue_number> --repo bradyoo12/ai-dev-request --reason completed
+  gh api --method PATCH "repos/bradyoo12/ai-dev-request/issues/<issue_number>" -f state=closed -f state_reason=completed
   ```
 - Add completion comment
 - **Update policy.md and design.md** to reflect the completed changes (see Step 5e)
@@ -397,14 +400,16 @@ Shut down all agents, delete the team.
 
 After a ticket is verified and completed, update the project documentation to reflect the changes:
 
-1. **Read the completed ticket** to understand what was implemented:
+1. **Read the completed ticket** (REST):
    ```bash
-   gh issue view <issue_number> --repo bradyoo12/ai-dev-request
+   gh api "repos/bradyoo12/ai-dev-request/issues/<issue_number>"
    ```
 
-2. **Read the merged PR** to understand the actual code changes:
+2. **Read the merged PR** (REST — uses search rate limit, not GraphQL):
    ```bash
-   gh pr list --repo bradyoo12/ai-dev-request --state merged --search "<issue_number>" --json number,title,body,files --limit 5
+   gh api "search/issues?q=repo:bradyoo12/ai-dev-request+is:pr+is:merged+<issue_number>&per_page=5" --jq '.items[] | {number, title, body}'
+   # For changed files per PR:
+   gh api "repos/bradyoo12/ai-dev-request/pulls/<pr_number>/files" --jq '[.[] | .filename]'
    ```
 
 3. **Update `.claude/design.md`** if the ticket introduced:
@@ -463,25 +468,23 @@ Before researching new technologies, use Playwright to test all links and button
    - Verifies no network requests return 4xx/5xx responses
 
 3. For each issue found:
-   - Create a ticket with a clear title and reproduction steps:
+   - Create a ticket with a clear title and reproduction steps (REST):
      ```bash
-     gh issue create --repo bradyoo12/ai-dev-request --title "[UI Bug] {description}" --body "{detailed reproduction steps and error details}" --label "bug"
+     gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="[UI Bug] {description}" -f body="{detailed reproduction steps and error details}" -f "labels[]=bug"
      ```
-   - Add the ticket to the project and set status to **Ready**:
+   - Add the ticket to the project and set status to **Ready** (use hardcoded IDs — see policy.md):
      ```bash
      ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
-     STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
-     READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
-     gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+     gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
      ```
 
 4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
 
 #### Step 6b: Pre-check
 
-1. Check existing open suggestion tickets:
+1. Check existing open suggestion tickets (REST):
    ```bash
-   gh issue list --repo bradyoo12/ai-dev-request --state open --label suggestion --json number,title --limit 50
+   gh api "repos/bradyoo12/ai-dev-request/issues?state=open&labels=suggestion&per_page=50" --jq '[.[] | {number, title}]'
    ```
 2. If 4+ suggestion tickets exist in Backlog, skip b-modernize entirely
 
@@ -509,16 +512,14 @@ Before researching new technologies, use Playwright to test all links and button
 After collecting findings from both scouts:
 1. Filter for qualifying technologies (relevance >= 3, impact >= 3, effort <= 4)
 2. Deduplicate against existing tickets
-3. Create max 3 suggestion tickets:
+3. Create max 3 suggestion tickets (REST):
    ```bash
-   gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body "{body}" --label "suggestion"
+   gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="{body}" -f "labels[]=suggestion"
    ```
-4. Add each ticket to the project and set status to **Ready**:
+4. Add each ticket to the project and set status to **Ready** (use hardcoded IDs — see policy.md):
    ```bash
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
-   STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
-   READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
-   gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
    ```
 
 #### Step 6e: Cleanup
@@ -531,9 +532,9 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
 
 #### Step 7a: Pre-check
 
-1. Check existing open bug/improvement tickets to avoid duplicates:
+1. Check existing open bug/improvement tickets to avoid duplicates (REST):
    ```bash
-   gh issue list --repo bradyoo12/ai-dev-request --state open --json number,title,labels --limit 200
+   gh api "repos/bradyoo12/ai-dev-request/issues?state=open&per_page=100" --paginate --jq '[.[] | {number, title, labels: [.labels[].name]}]'
    ```
 2. Note all existing titles for dedup
 
@@ -579,21 +580,16 @@ After collecting findings from both agents:
    - **Errors** (from error-checker): Create tickets for all critical and major errors
    - **Improvements** (from ux-reviewer): Create tickets for findings with impact >= 3
 2. Deduplicate against existing open tickets
-3. Create max 5 tickets per cycle:
+3. Create max 5 tickets per cycle (REST):
    ```bash
-   gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body "{body}" --label "bug"
+   gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="{body}" -f "labels[]=bug"
    ```
    - Use label `bug` for errors found by error-checker
    - Use label `enhancement` for improvements found by ux-reviewer
-4. Add tickets to the project and set status to **Ready**:
+4. Add tickets to the project and set status to **Ready** (use hardcoded IDs — see policy.md):
    ```bash
-   # Add issue to project and capture the item ID
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
-
-   # Set status to Ready
-   STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
-   READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
-   gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
    ```
 
 #### Step 7d: Cleanup

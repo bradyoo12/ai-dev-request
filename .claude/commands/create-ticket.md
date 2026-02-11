@@ -84,7 +84,8 @@ For UI/UX related tickets, include ASCII art mockups (in addition to any uploade
 ## Step 4: Create GitHub Issue
 
 ```bash
-gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body-file {draft-file}
+# REST — avoids GraphQL rate limit. Read body from draft file:
+BODY=$(cat {draft-file}) && gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="$BODY"
 ```
 
 ## Step 5: Add to AI Dev Request Project and Set Status to Ready

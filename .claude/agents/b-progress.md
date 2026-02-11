@@ -55,9 +55,9 @@ Filter issues that:
 - Do NOT have the `on hold` label
 - Have an open PR
 
-To check for open PRs:
+To check for open PRs (REST):
 ```bash
-gh pr list --repo bradyoo12/ai-dev-request --state open --json number,headRefName,url
+gh api "repos/bradyoo12/ai-dev-request/pulls?state=open&per_page=100" --jq '[.[] | {number, headRefName: .head.ref, url: .html_url}]'
 ```
 
 Cross-reference tickets with open PRs by matching branch names (branch starts with ticket number).
@@ -65,9 +65,9 @@ Cross-reference tickets with open PRs by matching branch names (branch starts wi
 If no eligible tickets found, wait 5 seconds and restart (standalone) or return (called by b-start).
 
 ### Step 2: Verify PR Status
-1. Check the PR:
+1. Check the PR (REST):
    ```bash
-   gh pr view <pr_number> --repo bradyoo12/ai-dev-request --json mergeable,mergeStateStatus,statusCheckRollup
+   gh api "repos/bradyoo12/ai-dev-request/pulls/<pr_number>" --jq '{mergeable, mergeable_state}'
    ```
 2. Verify PR is mergeable, all checks pass, no conflicts
 
@@ -75,7 +75,10 @@ If not ready: add `on hold` label and move to next ticket.
 
 ### Step 3: Merge the Pull Request
 ```bash
-gh pr merge <pr_number> --repo bradyoo12/ai-dev-request --merge --delete-branch
+# REST — avoids GraphQL rate limit
+gh api --method PUT "repos/bradyoo12/ai-dev-request/pulls/<pr_number>/merge" -f merge_method=merge
+# Delete branch after merge
+gh api --method DELETE "repos/bradyoo12/ai-dev-request/git/refs/heads/<branch_name>"
 ```
 
 If merge fails: add `on hold` label and move to next ticket.

@@ -66,7 +66,8 @@ Report each finding with: name, description, source URL, differentiation (Yes/No
 Before searching, check what suggestion tickets already exist to avoid duplicates:
 
 ```bash
-gh issue list --repo bradyoo12/ai-dev-request --state open --json number,title,labels --limit 200
+# REST — avoids GraphQL rate limit
+gh api "repos/bradyoo12/ai-dev-request/issues?state=open&per_page=100" --paginate --jq '[.[] | {number, title, labels: [.labels[].name]}]'
 ```
 
 Note all existing titles to avoid creating duplicate suggestions.
@@ -136,19 +137,20 @@ For each discovered technology, evaluate:
 For each qualifying technology, create a GitHub issue:
 
 ```bash
-gh issue create --repo bradyoo12/ai-dev-request --title "{title}" --body-file {draft-file} --label "suggestion"
+# REST — avoids GraphQL rate limit. Read body from draft file:
+BODY=$(cat {draft-file}) && gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="$BODY" -f "labels[]=suggestion"
 ```
 
 ### Add to project and set status to Ready
 
+Use hardcoded Project Field IDs from `policy.md` — never call `gh project field-list` or `gh project view` (saves 3 GraphQL calls per ticket).
+
 ```bash
-# Add issue to project and capture the item ID
+# Add issue to project (GraphQL — no REST alternative)
 ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format json --jq '.id')
 
-# Get the Status field ID and "Ready" option ID, then set it
-STATUS_FIELD_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .id')
-READY_OPTION_ID=$(gh project field-list 26 --owner bradyoo12 --format json --jq '.fields[] | select(.name=="Status") | .options[] | select(.name=="Ready") | .id')
-gh project item-edit --project-id $(gh project view 26 --owner bradyoo12 --format json --jq '.id') --id $ITEM_ID --field-id $STATUS_FIELD_ID --single-select-option-id $READY_OPTION_ID
+# Set status to Ready using hardcoded IDs
+gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
 ```
 
 ## Step 5: Report Summary

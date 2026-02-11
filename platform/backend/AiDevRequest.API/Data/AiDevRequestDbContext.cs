@@ -106,6 +106,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VisualRegressionResult> VisualRegressionResults => Set<VisualRegressionResult>();
     public DbSet<McpGatewayServer> McpGatewayServers => Set<McpGatewayServer>();
     public DbSet<ProjectMemory> ProjectMemories => Set<ProjectMemory>();
+    public DbSet<FigmaImport> FigmaImports => Set<FigmaImport>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1698,6 +1699,27 @@ public class AiDevRequestDbContext : DbContext
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => new { e.UserId, e.Category });
+        });
+
+        modelBuilder.Entity<FigmaImport>(entity =>
+        {
+            entity.ToTable("figma_imports");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.FigmaFileKey).HasMaxLength(200);
+            entity.Property(e => e.FigmaNodeId).HasMaxLength(200);
+            entity.Property(e => e.SourceType).HasMaxLength(50);
+            entity.Property(e => e.SourceUrl).HasMaxLength(2000);
+            entity.Property(e => e.DesignName).HasMaxLength(500);
+            entity.Property(e => e.DesignTokensJson).HasColumnType("text");
+            entity.Property(e => e.ComponentTreeJson).HasColumnType("text");
+            entity.Property(e => e.GeneratedCodeJson).HasColumnType("text");
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Framework).HasMaxLength(50);
+            entity.Property(e => e.StylingLib).HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

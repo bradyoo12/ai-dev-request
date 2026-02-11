@@ -217,6 +217,9 @@ vi.mock('./McpGatewayPage', () => ({
 vi.mock('./CodebaseMemoryPage', () => ({
   default: () => <div data-testid="codebase-memory-page">CodebaseMemoryPage</div>,
 }))
+vi.mock('./FigmaImportPage', () => ({
+  default: () => <div data-testid="figma-import-page">FigmaImportPage</div>,
+}))
 
 import SettingsLayout from './SettingsLayout'
 

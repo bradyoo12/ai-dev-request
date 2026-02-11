@@ -29,7 +29,7 @@ export default function StatsSection() {
 
       <FadeIn delay={0.3}>
         <div className="flex justify-center items-center gap-4 text-sm text-warm-600">
-          <span className="font-medium">Powered by</span>
+          <span className="font-medium">{t('stats.poweredBy')}</span>
           {techLogos.map((logo) => (
             <span key={logo} className="px-3 py-1.5 glass-card rounded-xl text-warm-400 text-xs font-medium">
               {logo}

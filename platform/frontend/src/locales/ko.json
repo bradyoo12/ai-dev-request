@@ -12,6 +12,7 @@
   "stats.projects": "완료된 프로젝트",
   "stats.users": "활성 사용자",
   "stats.analysisTime": "평균 분석 시간",
+  "stats.poweredBy": "기술 스택",
   "form.label": "어떤 것을 만들고 싶으신가요?",
   "form.placeholder": "예: 고객 예약을 받을 수 있는 미용실 웹사이트가 필요해요...",
   "form.emailLabel": "연락받으실 이메일 (선택)",

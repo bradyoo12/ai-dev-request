@@ -705,3 +705,18 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `VisualPromptUi` with Id (Guid), UserId, ComponentName, PromptText, GeneratedCode, GeneratedHtml, Framework, StylingLibrary, Status, IterationCount, ParentComponentId, ConversationJson, Category, Tags, ViewCount, ForkCount, LikeCount, IsPublic, ThumbnailUrl, ExportedToProjectId, ExportedFilePath, ThemeTokensJson, GenerationTimeMs, TokensUsed, EstimatedCost
 - **Frontend**: `VisualPromptPage` in Settings with "Visual UI" tab — 4 sub-tabs (Generate with prompt input + component name + category + live HTML preview + code viewer + copy button + iterative refinement chat, Gallery with category filter chips + component cards, Components list with status/category badges, Stats with 8 metric cards)
 - **Flow**: User enters prompt describing UI → clicks Generate → sees live preview + code → refines via follow-up chat messages → copies code or exports to project → browses gallery of past generations → views stats dashboard
+
+### #279 — Multi-Framework Project Generation
+- **Ticket**: #279 — `Multi-framework project generation with tech stack selection`
+- **PR**: #282 (800 insertions, squash-merged)
+- **Backend**: `FrameworkConfigController` with 7 endpoints:
+  - `GET /api/framework/config` — get or create user's framework config (defaults: react-vite, no backend, no database)
+  - `PUT /api/framework/config` — update framework preferences (selected framework, backend, database, toggles)
+  - `GET /api/framework/frameworks` — 9 frameworks across 3 tiers (Tier 1: React+Vite, Next.js, Express; Tier 2: FastAPI, Django, Flutter; Tier 3: Vue+Nuxt, Go+Gin, ASP.NET)
+  - `GET /api/framework/backends` — 6 backend options (Express, FastAPI, Django, ASP.NET, Go Gin, Spring Boot)
+  - `GET /api/framework/databases` — 6 database options (PostgreSQL, MySQL, MongoDB, SQLite, Redis, Supabase)
+  - `POST /api/framework/generate-preview` — preview project structure for selected stack (returns file tree, estimated files/tokens/cost/time, features list)
+  - `GET /api/framework/stats` — generation stats with recent project history
+- **Entity**: `FrameworkConfig` with Id (Guid), UserId, SelectedFramework, SelectedBackend, SelectedDatabase, SelectedStyling, ProjectsGenerated, LastGeneratedProjectId, FavoriteFrameworks, CustomTemplateJson, FrameworkHistoryJson, AutoDetectStack, IncludeDocker, IncludeCI, IncludeTests
+- **Frontend**: `MultiFrameworkPage` in Settings with "Multi-Framework" tab — 4 sub-tabs (Frameworks with 9 framework cards showing tier/category/language badges + selection highlight + tier filter buttons, Configure with backend/database selector grids + 4 project option toggles, Preview with current stack display + generate preview button + project structure tree + 4 estimate cards + features list, Stats with 3 metric cards + recent projects list)
+- **Flow**: User opens Frameworks tab → browses 9 frameworks with tier filters → selects preferred framework → switches to Configure → picks backend + database → toggles Docker/CI/Tests/Auto-Detect options → goes to Preview → clicks Generate Preview → sees project structure tree + cost/time estimates → checks Stats for generation history

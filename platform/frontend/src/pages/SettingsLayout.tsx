@@ -29,11 +29,12 @@ import OnboardingPage from './OnboardingPage'
 import ProjectVersionPage from './ProjectVersionPage'
 import ComponentPreviewPage from './ComponentPreviewPage'
 import VariantComparisonPage from './VariantComparisonPage'
+import PerformanceProfilePage from './PerformanceProfilePage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -56,7 +57,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/onboarding' ? 'onboarding' as SettingsTab
     : location.pathname === '/settings/version-history' ? 'version-history' as SettingsTab
     : location.pathname === '/settings/component-preview' ? 'component-preview' as SettingsTab
-    : location.pathname === '/settings/variant-comparison' ? 'variant-comparison' as SettingsTab : null
+    : location.pathname === '/settings/variant-comparison' ? 'variant-comparison' as SettingsTab
+    : location.pathname === '/settings/performance' ? 'performance' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
@@ -338,6 +340,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.variantComparison', 'Variants')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('performance')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'performance' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            {t('settings.tabs.performance', 'Performance')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -367,6 +380,7 @@ export default function SettingsLayout() {
       {settingsTab === 'version-history' && <ProjectVersionPage />}
       {settingsTab === 'component-preview' && <ComponentPreviewPage />}
       {settingsTab === 'variant-comparison' && <VariantComparisonPage />}
+      {settingsTab === 'performance' && <PerformanceProfilePage />}
     </section>
   )
 }

@@ -83,6 +83,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<OnboardingProgress> OnboardingProgresses => Set<OnboardingProgress>();
     public DbSet<ComponentPreview> ComponentPreviews => Set<ComponentPreview>();
     public DbSet<GenerationVariant> GenerationVariants => Set<GenerationVariant>();
+    public DbSet<PerformanceProfile> PerformanceProfiles => Set<PerformanceProfile>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1295,6 +1296,20 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<PerformanceProfile>(entity =>
+        {
+            entity.ToTable("performance_profiles");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SuggestionsJson).HasColumnType("jsonb");
+            entity.Property(e => e.MetricsJson).HasColumnType("jsonb");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
         });

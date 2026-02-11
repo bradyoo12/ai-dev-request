@@ -99,6 +99,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PlatformUpgrade> PlatformUpgrades => Set<PlatformUpgrade>();
     public DbSet<VisualPromptUi> VisualPromptUis => Set<VisualPromptUi>();
     public DbSet<FrameworkConfig> FrameworkConfigs => Set<FrameworkConfig>();
+    public DbSet<ViewTransitionConfig> ViewTransitionConfigs => Set<ViewTransitionConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1574,6 +1575,19 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FavoriteFrameworks).HasMaxLength(500);
             entity.Property(e => e.CustomTemplateJson).HasColumnType("text");
             entity.Property(e => e.FrameworkHistoryJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<ViewTransitionConfig>(entity =>
+        {
+            entity.ToTable("view_transition_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.TransitionPreset).HasMaxLength(50);
+            entity.Property(e => e.EasingFunction).HasMaxLength(50);
+            entity.Property(e => e.CustomCssJson).HasColumnType("text");
+            entity.Property(e => e.PresetHistoryJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
         });

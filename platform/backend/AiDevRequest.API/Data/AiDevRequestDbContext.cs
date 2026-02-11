@@ -89,6 +89,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DevPipeline> DevPipelines => Set<DevPipeline>();
     public DbSet<ApiDocConfig> ApiDocConfigs => Set<ApiDocConfig>();
     public DbSet<CodeSnapshot> CodeSnapshots => Set<CodeSnapshot>();
+    public DbSet<VoiceConfig> VoiceConfigs => Set<VoiceConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1397,6 +1398,18 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => new { e.UserId, e.DevRequestId, e.FilePath }).IsUnique();
+        });
+
+        modelBuilder.Entity<VoiceConfig>(entity =>
+        {
+            entity.ToTable("voice_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Language).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.TtsVoice).HasMaxLength(100);
+            entity.Property(e => e.TranscriptionHistoryJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId).IsUnique();
         });
     }
 }

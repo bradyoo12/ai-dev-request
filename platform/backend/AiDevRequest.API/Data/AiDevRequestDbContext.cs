@@ -95,6 +95,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DeploymentHealth> DeploymentHealths => Set<DeploymentHealth>();
     public DbSet<GenerativeUiSession> GenerativeUiSessions => Set<GenerativeUiSession>();
     public DbSet<MobileAppConfig> MobileAppConfigs => Set<MobileAppConfig>();
+    public DbSet<BackgroundAgent> BackgroundAgents => Set<BackgroundAgent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1500,6 +1501,26 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.PublishHistoryJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
+        });
+
+        modelBuilder.Entity<BackgroundAgent>(entity =>
+        {
+            entity.ToTable("background_agents");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.AgentName).HasMaxLength(200);
+            entity.Property(e => e.TaskDescription).HasMaxLength(500);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.BranchName).HasMaxLength(200);
+            entity.Property(e => e.AgentType).HasMaxLength(20);
+            entity.Property(e => e.Priority).HasMaxLength(20);
+            entity.Property(e => e.PullRequestUrl).HasMaxLength(500);
+            entity.Property(e => e.PullRequestStatus).HasMaxLength(20);
+            entity.Property(e => e.LogEntriesJson).HasColumnType("text");
+            entity.Property(e => e.StepsJson).HasColumnType("text");
+            entity.Property(e => e.InstalledPackagesJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.UserId, e.Status });
         });
     }
 }

@@ -1176,6 +1176,12 @@
   "componentPreview.error.exportFailed": "Failed to export component",
   "componentPreview.error.deleteFailed": "Failed to delete component",
 
+  "codeReview.confidence": "confidence",
+  "codeReview.viewDiff": "View Diff",
+  "codeReview.hideDiff": "Hide Diff",
+  "codeReview.originalCode": "Original",
+  "codeReview.acceptFix": "Accept",
+
   "qualityBadge.title": "Quality Score",
   "qualityBadge.excellent": "Excellent",
   "qualityBadge.good": "Good",

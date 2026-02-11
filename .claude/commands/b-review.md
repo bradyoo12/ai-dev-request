@@ -92,11 +92,11 @@ If no eligible tickets found, log "No tickets ready for staging verification. Wa
 
 ### Step 2: Prepare for Staging Tests
 
-Pull the latest main to ensure test files are up to date:
+Pull the latest main to ensure test files are up to date (worktree-safe — never checks out the `main` branch):
 
 ```bash
 cd platform/frontend
-git checkout main && git pull
+git fetch origin && git checkout --detach origin/main
 npm install
 ```
 
@@ -168,9 +168,9 @@ Perform AI-simulated human testing:
 ### Step 6: Loop (Standalone Mode Only)
 1. Log "Cycle complete. Waiting 5 seconds before next iteration..."
 2. Wait 5 seconds
-3. Pull latest changes before starting the next iteration:
+3. Pull latest changes before starting the next iteration (worktree-safe):
    ```bash
-   git checkout main && git pull
+   git fetch origin && git checkout --detach origin/main
    ```
 4. Go back to Step 1
 

@@ -61,6 +61,61 @@ Teams are used within a single ticket to parallelize independent work:
 
 **Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
 
+## Step 0: Worktree Setup (Multi-Instance Safe)
+
+Each b-start instance MUST operate in its own dedicated git worktree so that multiple instances can run in parallel without conflicting on the same working directory.
+
+**Why**: Two instances sharing the same checkout will corrupt each other's state when switching branches, pulling, or running builds.
+
+### Setup Procedure
+
+1. **Prune stale worktrees** from crashed previous instances:
+   ```bash
+   git worktree prune
+   ```
+
+2. **List existing worktrees** to find the next available worker number:
+   ```bash
+   git worktree list
+   ```
+   Look for entries matching `ai-dev-request-worker-N`. Pick the next available N (starting from 1).
+
+3. **Create a new worktree** in detached HEAD state (avoids branch conflicts between worktrees):
+   ```bash
+   git fetch origin
+   git worktree add --detach ../ai-dev-request-worker-<N>
+   ```
+
+4. **Record the worktree path** as `WORKTREE_DIR` (absolute path). **All subsequent file operations, git commands, and builds must run inside `WORKTREE_DIR`.**
+
+5. **Install frontend dependencies** in the worktree:
+   ```bash
+   cd <WORKTREE_DIR>/platform/frontend && npm install
+   ```
+
+6. **Stale worktree cleanup on exit**: When the instance stops (Ctrl+C, error, or graceful shutdown), remove the worktree:
+   ```bash
+   git -C <MAIN_REPO_DIR> worktree remove <WORKTREE_DIR> --force
+   ```
+   If you forget, `git worktree prune` at the start of the next run will clean it up.
+
+### Git Pattern for Worktrees
+
+Since multiple worktrees cannot check out the same branch, **never check out the `main` branch**. Instead, use `origin/main` as a detached reference:
+
+| Old Pattern | New Pattern (Worktree-Safe) |
+|---|---|
+| `git checkout main && git pull` | `git fetch origin && git checkout --detach origin/main` |
+| `git checkout -b <branch>` | `git checkout -b <branch> origin/main` |
+
+This pattern works in both regular repos and worktrees, so all agents and commands can use it unconditionally.
+
+### Passing Worktree to Agents
+
+**When spawning any agent** (via Task tool), always include in the prompt:
+
+> Work in directory: `<WORKTREE_DIR>`. This is a git worktree. All file operations and git commands must happen in this directory. Never check out the `main` branch directly — use `git fetch origin && git checkout --detach origin/main` instead.
+
 ## Main Loop
 
 Execute this workflow in sequence, then loop:
@@ -239,7 +294,7 @@ If the team fails or gets stuck:
 2. Delete the team
 3. Add `on hold` label to the ticket
 4. Add a comment explaining the failure
-5. Checkout main, delete the branch
+5. Return to latest main: `git fetch origin && git checkout --detach origin/main`, delete the branch
 6. Proceed to Step 4
 
 ### Step 4: b-progress — Merge PR (No Team)
@@ -265,16 +320,16 @@ Merge PRs to main. This is a simple operation — no team needed.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
    ```
 6. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
-7. Cleanup:
+7. Cleanup (worktree-safe — never checks out `main` branch):
    ```bash
-   git checkout main && git pull
+   git fetch origin && git checkout --detach origin/main
    ```
 8. **Delete stale branches** (local and remote) that have been fully merged:
    ```bash
    # Delete merged local branches (never delete main/master)
-   git branch --merged main | grep -vE '^\*|main|master' | xargs -r git branch -d
+   git branch --merged origin/main | grep -vE '^\*|main|master' | xargs -r git branch -d
    # Delete merged remote branches (never delete main/master)
-   git branch -r --merged main | grep -vE 'main|master' | sed 's/origin\///' | xargs -r -I {} git push origin --delete {}
+   git branch -r --merged origin/main | grep -vE 'main|master' | sed 's/origin\///' | xargs -r -I {} git push origin --delete {}
    ```
 
 ### Step 5: b-review — Verify with Agent Team
@@ -293,9 +348,9 @@ Verify changes on staging using parallel agents.
    TeamCreate: review-<ticket_number>
    ```
 
-2. Pull latest and install deps:
+2. Pull latest and install deps (worktree-safe):
    ```bash
-   git checkout main && git pull
+   git fetch origin && git checkout --detach origin/main
    cd platform/frontend && npm install
    ```
 
@@ -374,11 +429,11 @@ After a ticket is verified and completed, update the project documentation to re
    - Do NOT remove existing content unless it is now incorrect
    - Do NOT rewrite entire sections — surgical updates only
 
-6. **Commit and push the documentation updates:**
+6. **Commit and push the documentation updates** (worktree-safe — push to main without checking it out):
    ```bash
    git add .claude/policy.md .claude/design.md
    git commit -m "docs: update policy and design docs after completing #<issue_number>"
-   git push origin main
+   git push origin HEAD:main
    ```
 
 7. If neither file needs updating (e.g., the ticket was a minor bug fix with no architectural impact), skip this step and log: "No doc updates needed for #<issue_number>"
@@ -393,9 +448,9 @@ Search for recent technologies and create suggestion tickets using parallel rese
 
 Before researching new technologies, use Playwright to test all links and buttons on the live UI to catch any errors or unexpected results.
 
-1. Pull latest and install deps:
+1. Pull latest and install deps (worktree-safe):
    ```bash
-   git checkout main && git pull
+   git fetch origin && git checkout --detach origin/main
    cd platform/frontend && npm install
    npx playwright install chromium
    ```
@@ -606,7 +661,8 @@ Log the current status of the project board:
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
 - **ONE ticket at a time** - teams parallelize WITHIN a ticket, not across tickets
-- **Multi-machine safe** - Multiple b-start instances can run on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.
+- **Multi-instance safe** - Multiple b-start instances can run on the same machine (via git worktrees — see Step 0) or on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.
+- **Worktree required** - Every b-start instance MUST run Step 0 to acquire a dedicated worktree. Never run directly in the main repository checkout. Never check out the `main` branch — always use `git fetch origin && git checkout --detach origin/main`.
 - Teams are created and destroyed per-step — no long-lived teams
 - 5-second delay between full cycles to avoid API rate limiting
 - Always check policy.md and design.md at the start of each cycle

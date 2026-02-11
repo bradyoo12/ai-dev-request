@@ -96,7 +96,7 @@ If merge fails: add `on hold` label and move to next ticket.
 
 ### Step 5: Cleanup
 ```bash
-git checkout main && git pull
+git fetch origin && git checkout --detach origin/main
 git branch -D <branch_name> 2>/dev/null || true
 ```
 

@@ -7,6 +7,20 @@ vi.mock('react-i18next', () => ({
   }),
 }))
 
+vi.mock('framer-motion', () => {
+  const React = require('react')
+  return {
+    motion: new Proxy({}, {
+      get: (_target: unknown, prop: string) => React.forwardRef((props: Record<string, unknown>, ref: unknown) => {
+        const { children, whileHover, whileTap, whileInView, viewport, initial, animate, transition, variants, custom, ...rest } = props
+        void whileHover; void whileTap; void whileInView; void viewport; void initial; void animate; void transition; void variants; void custom
+        return React.createElement(prop, { ...rest, ref }, children)
+      }),
+    }),
+    AnimatePresence: ({ children }: { children: unknown }) => children,
+  }
+})
+
 import StatsSection from './StatsSection'
 
 describe('StatsSection', () => {

@@ -5,7 +5,7 @@ import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import './App.css'
 
-const LazyFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" /></div>
+const LazyFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" /></div>
 const SettingsLayout = lazy(() => import('./pages/SettingsLayout'))
 const SitesPage = lazy(() => import('./pages/SitesPage'))
 const SuggestionsPage = lazy(() => import('./pages/SuggestionsPage'))
@@ -64,7 +64,7 @@ function App() {
             <Route path="/preview" element={<Suspense fallback={LazyFallback}><PreviewPage /></Suspense>} />
             <Route path="/compliance" element={<Suspense fallback={LazyFallback}><CompliancePage /></Suspense>} />
             <Route path="/infrastructure" element={<Suspense fallback={LazyFallback}><InfrastructurePage /></Suspense>} />
-            <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full" /></div>} />
+            <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" /></div>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />
           </Route>
         </Routes>

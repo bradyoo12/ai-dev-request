@@ -100,6 +100,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VisualPromptUi> VisualPromptUis => Set<VisualPromptUi>();
     public DbSet<FrameworkConfig> FrameworkConfigs => Set<FrameworkConfig>();
     public DbSet<ViewTransitionConfig> ViewTransitionConfigs => Set<ViewTransitionConfig>();
+    public DbSet<NlSchema> NlSchemas => Set<NlSchema>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1590,6 +1591,27 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.PresetHistoryJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<NlSchema>(entity =>
+        {
+            entity.ToTable("nl_schemas");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SchemaName).HasMaxLength(200);
+            entity.Property(e => e.NaturalLanguageInput).HasColumnType("text");
+            entity.Property(e => e.GeneratedSql).HasColumnType("text");
+            entity.Property(e => e.TablesJson).HasColumnType("text");
+            entity.Property(e => e.RelationshipsJson).HasColumnType("text");
+            entity.Property(e => e.IndexesJson).HasColumnType("text");
+            entity.Property(e => e.RlsPoliciesJson).HasColumnType("text");
+            entity.Property(e => e.SeedDataJson).HasColumnType("text");
+            entity.Property(e => e.ConversationJson).HasColumnType("text");
+            entity.Property(e => e.ExportFormat).HasMaxLength(50);
+            entity.Property(e => e.DatabaseType).HasMaxLength(50);
+            entity.Property(e => e.EstimatedCost).HasColumnType("decimal(10,6)");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

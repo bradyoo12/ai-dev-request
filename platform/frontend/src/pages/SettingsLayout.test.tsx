@@ -171,6 +171,10 @@ vi.mock('./ContextIndexPage', () => ({
   default: () => <div data-testid="context-index-page">ContextIndexPage</div>,
 }))
 
+vi.mock('./DeploymentHealthPage', () => ({
+  default: () => <div data-testid="deployment-health-page">DeploymentHealthPage</div>,
+}))
+
 import SettingsLayout from './SettingsLayout'
 
 describe('SettingsLayout', () => {

@@ -720,3 +720,18 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `FrameworkConfig` with Id (Guid), UserId, SelectedFramework, SelectedBackend, SelectedDatabase, SelectedStyling, ProjectsGenerated, LastGeneratedProjectId, FavoriteFrameworks, CustomTemplateJson, FrameworkHistoryJson, AutoDetectStack, IncludeDocker, IncludeCI, IncludeTests
 - **Frontend**: `MultiFrameworkPage` in Settings with "Multi-Framework" tab — 4 sub-tabs (Frameworks with 9 framework cards showing tier/category/language badges + selection highlight + tier filter buttons, Configure with backend/database selector grids + 4 project option toggles, Preview with current stack display + generate preview button + project structure tree + 4 estimate cards + features list, Stats with 3 metric cards + recent projects list)
 - **Flow**: User opens Frameworks tab → browses 9 frameworks with tier filters → selects preferred framework → switches to Configure → picks backend + database → toggles Docker/CI/Tests/Auto-Detect options → goes to Preview → clicks Generate Preview → sees project structure tree + cost/time estimates → checks Stats for generation history
+
+### #284 — React View Transitions & Animation Presets
+- **Ticket**: #284 — `Add React View Transitions and animation presets to generated projects`
+- **PR**: #286 (685 insertions, squash-merged)
+- **Backend**: `ViewTransitionController` with 6 endpoints:
+  - `GET /api/view-transitions/config` — get or create user's transition config
+  - `PUT /api/view-transitions/config` — update transition preferences (preset, duration, easing, toggles)
+  - `GET /api/view-transitions/presets` — 11 transition presets across 4 categories (Basic: fade/slide-left/slide-up/scale, Combined: fade-slide, Advanced: morph/crossfade/zoom, Framer Motion: spring/stagger/layout)
+  - `GET /api/view-transitions/easing-functions` — 6 easing functions with CSS curves
+  - `POST /api/view-transitions/generate-css` — generate keyframe CSS + View Transition API CSS for selected preset
+  - `GET /api/view-transitions/demo` — 5 demo pages for live preview
+  - `GET /api/view-transitions/stats` — current config stats and browser support info
+- **Entity**: `ViewTransitionConfig` with Id (Guid), UserId, TransitionPreset, TransitionDurationMs, EasingFunction, EnableViewTransitions, EnableFramerMotion, EnablePageTransitions, EnableComponentAnimations, EnableLoadingAnimations, CustomCssJson, PresetHistoryJson, ProjectsWithTransitions
+- **Frontend**: `ViewTransitionPage` in Settings with "Transitions" tab — 4 sub-tabs (Presets with 11 presets grouped by category with selection highlight, Configure with duration slider + easing selector + 5 animation toggles, Preview with live demo navigation + generated CSS output viewer, Stats with preset/duration/browser support cards)
+- **Flow**: User opens Presets tab → browses 11 transition presets by category → selects preferred preset → Configure tab → adjusts duration via slider → picks easing function → toggles View Transitions API/Framer Motion/page/component/loading animations → Preview tab → clicks through demo pages with live animation → generates CSS code → copies for use in projects

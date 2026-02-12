@@ -1108,3 +1108,10 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Root Cause**: Without backend running in E2E tests, `getPricingPlans()` and `getTemplates()` API calls fail/timeout, keeping network busy indefinitely
 - **Solution**: Replaced `page.waitForLoadState('networkidle')` with `page.locator('#root').toBeVisible()` wait strategy that confirms React app render without depending on network activity
 - **Impact**: All 21 E2E tests now pass in ~7s (previously 2 tests timed out at 30s)
+
+### #408 — Add Playwright E2E Test Creation to Automated Workflows (PR #410)
+- **Workflow Enhancement**: Added `e2e-test-analyst` agent to b-start/b-ready workflows
+- **Agent Sequence**: planner → frontend-dev + backend-dev → unit-test-analyst → **e2e-test-analyst** → tester
+- **E2E Test Coverage**: Agent automatically creates Playwright tests for new pages, forms, user workflows, API integrations, accessibility features, and i18n
+- **Test Patterns**: E2E tests follow existing patterns in `platform/frontend/e2e/` (accessibility.spec.ts, homepage.spec.ts, i18n.spec.ts, navigation.spec.ts, form.spec.ts)
+- **Documentation**: Updated `.claude/commands/b-start.md` and `.claude/agents/b-ready.md` with E2E test creation guidance

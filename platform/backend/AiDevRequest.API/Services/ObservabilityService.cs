@@ -7,12 +7,16 @@ namespace AiDevRequest.API.Services;
 public interface IObservabilityService
 {
     Task<ObservabilityTrace> StartTraceAsync(string userId, Guid? requestId = null, string? model = null);
+    Task<ObservabilityTrace> StartSpanAsync(string userId, string operationName, string? parentSpanId = null);
+    Task CompleteSpanAsync(int traceId, int inputTokens, int outputTokens, string? error = null);
     Task<ObservabilitySpan> AddSpanAsync(string traceId, string spanName, string? model, int inputTokens, int outputTokens, decimal cost, long latencyMs);
     Task<ObservabilityTrace> EndTraceAsync(string traceId);
     Task<ObservabilityTrace?> GetTraceAsync(string traceId);
     Task<List<ObservabilitySpan>> GetSpansForTraceAsync(int traceDbId);
-    Task<(List<ObservabilityTrace> Traces, int TotalCount)> GetTracesAsync(string userId, int page = 1, int pageSize = 20, string? status = null, string? model = null);
+    Task<(List<ObservabilityTrace> Traces, int TotalCount)> GetTracesAsync(string userId, int page = 1, int pageSize = 20, string? status = null, string? model = null, string? operation = null);
     Task<List<ObservabilityTrace>> GetTracesForRequestAsync(Guid requestId);
+    Task<ObservabilityStatsDto> GetStatsAsync(string userId);
+    Task<ObservabilityTrace> RecordTraceAsync(string userId, RecordTraceRequest request);
     Task<CostAnalyticsResult> GetCostAnalyticsAsync(string userId, DateTime startDate, DateTime endDate, string granularity = "daily");
     Task<PerformanceMetricsResult> GetPromptPerformanceAsync(string userId);
     Task<UsageAnalyticsResult> GetUsageAnalyticsAsync(string userId, DateTime startDate, DateTime endDate, string granularity = "daily");
@@ -36,6 +40,7 @@ public class ObservabilityService : IObservabilityService
             UserId = userId,
             DevRequestId = requestId,
             TraceId = Guid.NewGuid().ToString("N"),
+            SpanId = Guid.NewGuid().ToString("N")[..16],
             Model = model,
             Status = "running",
         };
@@ -44,6 +49,95 @@ public class ObservabilityService : IObservabilityService
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Trace started: {TraceId} for user {UserId}", trace.TraceId, userId);
+        return trace;
+    }
+
+    public async Task<ObservabilityTrace> StartSpanAsync(string userId, string operationName, string? parentSpanId = null)
+    {
+        var trace = new ObservabilityTrace
+        {
+            UserId = userId,
+            TraceId = Guid.NewGuid().ToString("N"),
+            SpanId = Guid.NewGuid().ToString("N")[..16],
+            ParentSpanId = parentSpanId,
+            OperationName = operationName,
+            Status = "running",
+            StartedAt = DateTime.UtcNow,
+        };
+
+        _context.ObservabilityTraces.Add(trace);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Span started: {TraceId} operation={Operation} for user {UserId}",
+            trace.TraceId, operationName, userId);
+        return trace;
+    }
+
+    public async Task CompleteSpanAsync(int traceId, int inputTokens, int outputTokens, string? error = null)
+    {
+        var trace = await _context.ObservabilityTraces
+            .FirstOrDefaultAsync(t => t.Id == traceId)
+            ?? throw new InvalidOperationException($"Trace with Id {traceId} not found.");
+
+        var now = DateTime.UtcNow;
+        trace.InputTokens = inputTokens;
+        trace.OutputTokens = outputTokens;
+        trace.TotalTokens = inputTokens + outputTokens;
+        trace.DurationMs = (int)(now - trace.StartedAt).TotalMilliseconds;
+        trace.LatencyMs = trace.DurationMs;
+        trace.CompletedAt = now;
+
+        if (!string.IsNullOrEmpty(error))
+        {
+            trace.Status = "error";
+            trace.ErrorMessage = error;
+        }
+        else
+        {
+            trace.Status = "ok";
+        }
+
+        // Estimate cost based on model tier
+        trace.EstimatedCost = EstimateCost(trace.ModelTier, inputTokens, outputTokens);
+        trace.TotalCost = trace.EstimatedCost;
+
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Span completed: {TraceId}, tokens={Tokens}, duration={Duration}ms",
+            trace.TraceId, trace.TotalTokens, trace.DurationMs);
+    }
+
+    public async Task<ObservabilityTrace> RecordTraceAsync(string userId, RecordTraceRequest request)
+    {
+        var trace = new ObservabilityTrace
+        {
+            UserId = userId,
+            TraceId = Guid.NewGuid().ToString("N"),
+            SpanId = Guid.NewGuid().ToString("N")[..16],
+            ParentSpanId = request.ParentSpanId,
+            OperationName = request.OperationName,
+            InputTokens = request.InputTokens,
+            OutputTokens = request.OutputTokens,
+            TotalTokens = request.InputTokens + request.OutputTokens,
+            DurationMs = request.DurationMs,
+            LatencyMs = request.DurationMs,
+            Model = request.Model,
+            ModelTier = request.ModelTier,
+            Status = request.Error != null ? "error" : "ok",
+            ErrorMessage = request.Error,
+            AttributesJson = request.AttributesJson,
+            StartedAt = DateTime.UtcNow.AddMilliseconds(-request.DurationMs),
+            CompletedAt = DateTime.UtcNow,
+        };
+
+        trace.EstimatedCost = EstimateCost(trace.ModelTier, trace.InputTokens, trace.OutputTokens);
+        trace.TotalCost = trace.EstimatedCost;
+
+        _context.ObservabilityTraces.Add(trace);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Trace recorded: {TraceId} operation={Operation} for user {UserId}",
+            trace.TraceId, request.OperationName, userId);
         return trace;
     }
 
@@ -86,8 +180,11 @@ public class ObservabilityService : IObservabilityService
             .ToListAsync();
 
         trace.TotalTokens = spans.Sum(s => s.TotalTokens);
+        trace.InputTokens = spans.Sum(s => s.InputTokens);
+        trace.OutputTokens = spans.Sum(s => s.OutputTokens);
         trace.TotalCost = spans.Sum(s => s.Cost);
         trace.LatencyMs = spans.Sum(s => s.LatencyMs);
+        trace.DurationMs = (int)(DateTime.UtcNow - trace.StartedAt).TotalMilliseconds;
         trace.Status = spans.Any(s => s.Status == "error") ? "error" : "completed";
         trace.CompletedAt = DateTime.UtcNow;
 
@@ -113,7 +210,7 @@ public class ObservabilityService : IObservabilityService
     }
 
     public async Task<(List<ObservabilityTrace> Traces, int TotalCount)> GetTracesAsync(
-        string userId, int page = 1, int pageSize = 20, string? status = null, string? model = null)
+        string userId, int page = 1, int pageSize = 20, string? status = null, string? model = null, string? operation = null)
     {
         var query = _context.ObservabilityTraces.Where(t => t.UserId == userId);
 
@@ -121,6 +218,8 @@ public class ObservabilityService : IObservabilityService
             query = query.Where(t => t.Status == status);
         if (!string.IsNullOrEmpty(model))
             query = query.Where(t => t.Model == model);
+        if (!string.IsNullOrEmpty(operation))
+            query = query.Where(t => t.OperationName == operation);
 
         var totalCount = await query.CountAsync();
         var traces = await query
@@ -138,6 +237,47 @@ public class ObservabilityService : IObservabilityService
             .Where(t => t.DevRequestId == requestId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
+    }
+
+    public async Task<ObservabilityStatsDto> GetStatsAsync(string userId)
+    {
+        var allTraces = await _context.ObservabilityTraces
+            .Where(t => t.UserId == userId)
+            .ToListAsync();
+
+        if (allTraces.Count == 0)
+        {
+            return new ObservabilityStatsDto
+            {
+                TotalTraces = 0,
+                TotalTokens = 0,
+                TotalCost = 0,
+                AvgDurationMs = 0,
+                ErrorRate = 0,
+                TracesByOperation = new Dictionary<string, int>(),
+            };
+        }
+
+        var errorCount = allTraces.Count(t => t.Status == "error");
+        var completedTraces = allTraces.Where(t => t.DurationMs > 0 || t.LatencyMs > 0).ToList();
+        var avgDuration = completedTraces.Count > 0
+            ? completedTraces.Average(t => t.DurationMs > 0 ? t.DurationMs : t.LatencyMs)
+            : 0;
+
+        var tracesByOp = allTraces
+            .Where(t => !string.IsNullOrEmpty(t.OperationName))
+            .GroupBy(t => t.OperationName!)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        return new ObservabilityStatsDto
+        {
+            TotalTraces = allTraces.Count,
+            TotalTokens = allTraces.Sum(t => t.TotalTokens),
+            TotalCost = allTraces.Sum(t => t.TotalCost),
+            AvgDurationMs = (long)avgDuration,
+            ErrorRate = allTraces.Count > 0 ? (double)errorCount / allTraces.Count * 100 : 0,
+            TracesByOperation = tracesByOp,
+        };
     }
 
     public async Task<CostAnalyticsResult> GetCostAnalyticsAsync(
@@ -177,7 +317,7 @@ public class ObservabilityService : IObservabilityService
     public async Task<PerformanceMetricsResult> GetPromptPerformanceAsync(string userId)
     {
         var traces = await _context.ObservabilityTraces
-            .Where(t => t.UserId == userId && t.Status == "completed")
+            .Where(t => t.UserId == userId && (t.Status == "completed" || t.Status == "ok"))
             .OrderByDescending(t => t.CreatedAt)
             .Take(500)
             .ToListAsync();
@@ -187,7 +327,7 @@ public class ObservabilityService : IObservabilityService
             return new PerformanceMetricsResult();
         }
 
-        var latencies = traces.Select(t => t.LatencyMs).OrderBy(l => l).ToList();
+        var latencies = traces.Select(t => t.LatencyMs > 0 ? t.LatencyMs : (long)t.DurationMs).OrderBy(l => l).ToList();
         var allTraces = await _context.ObservabilityTraces
             .Where(t => t.UserId == userId)
             .CountAsync();
@@ -249,6 +389,20 @@ public class ObservabilityService : IObservabilityService
         };
     }
 
+    private static decimal EstimateCost(string? modelTier, int inputTokens, int outputTokens)
+    {
+        // Cost per 1M tokens (input/output)
+        var (inputRate, outputRate) = (modelTier?.ToLower()) switch
+        {
+            "haiku" => (0.25m, 1.25m),
+            "sonnet" => (3.0m, 15.0m),
+            "opus" => (15.0m, 75.0m),
+            _ => (3.0m, 15.0m), // default to sonnet pricing
+        };
+
+        return (inputTokens * inputRate + outputTokens * outputRate) / 1_000_000m;
+    }
+
     private static Dictionary<string, List<T>> GroupByGranularity<T>(
         List<T> items, string granularity, Func<T, DateTime> dateSelector)
     {
@@ -275,6 +429,29 @@ public class ObservabilityService : IObservabilityService
 }
 
 #region DTOs
+
+public class ObservabilityStatsDto
+{
+    public int TotalTraces { get; set; }
+    public int TotalTokens { get; set; }
+    public decimal TotalCost { get; set; }
+    public long AvgDurationMs { get; set; }
+    public double ErrorRate { get; set; }
+    public Dictionary<string, int> TracesByOperation { get; set; } = new();
+}
+
+public class RecordTraceRequest
+{
+    public string OperationName { get; set; } = "";
+    public string? ParentSpanId { get; set; }
+    public int InputTokens { get; set; }
+    public int OutputTokens { get; set; }
+    public int DurationMs { get; set; }
+    public string? Model { get; set; }
+    public string? ModelTier { get; set; }
+    public string? Error { get; set; }
+    public string? AttributesJson { get; set; }
+}
 
 public class CostAnalyticsResult
 {

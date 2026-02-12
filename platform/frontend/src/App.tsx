@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider } from './contexts/AuthContext'
+import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
 import './App.css'
@@ -35,6 +36,7 @@ function App() {
   }, [i18n.language])
 
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <AuthProvider>
         <Routes>
@@ -85,6 +87,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 

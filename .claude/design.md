@@ -987,6 +987,20 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Frontend**: `AiModelPage` in Settings with "AI Model" tab — 3 sub-tabs (Models with model selector cards showing capabilities/pricing, Configure with extended thinking toggle + budget slider + streaming toggle, Stats with usage metrics)
 - **Flow**: Open AI Model tab → select model (Opus 4.6 for complex tasks, Sonnet 4.5 for speed) → enable extended thinking with budget → configure streaming → view per-model usage stats
 
+### #357 — Purchasable Credit System with Multi-Currency Support (PR #369)
+- **Backend**: `ExchangeRateService` manages exchange rate caching (IMemoryCache, 24h TTL) and dynamic credit calculation; `CreditController` provides credit-specific API
+- **Endpoints**:
+  - `GET /api/credits/packages?currency=KRW` — packages with fixed local prices + dynamically calculated credit amounts
+  - `GET /api/credits/balance` — user credit balance (reads from TokenBalance)
+  - `GET /api/credits/history` — credit transaction history (reads from TokenTransaction)
+  - `GET /api/credits/rates` — all exchange rates
+  - `POST /api/credits/checkout` — Stripe checkout in local currency
+- **Entities**: `ExchangeRate` (CurrencyCode, RateToUsd, FetchedAt), `CreditPackagePrice` (TokenPackageId FK, CurrencyCode, Price, IsActive)
+- **Credit Formula**: `credits = floor(localPrice ÷ exchangeRate × 100)` — $1 USD = 100 credits base rate
+- **Currencies**: USD, KRW (₩2,900-₩49,000), JPY (¥300-¥7,800), EUR (€1.99-€49.99)
+- **Frontend**: `BuyCreditsPage` at `/buy-credits` — auto-detects currency from `navigator.language`, package card grid with dynamic credit amounts, `Intl.NumberFormat` for locale-aware formatting, balance display, i18n (en/ko)
+- **Flow**: User visits /buy-credits → currency auto-detected → packages shown with fixed local prices + dynamic credits → purchase via Stripe → credits awarded based on rate at purchase time
+
 ### #173 — Platform Growth Metrics Dashboard (PR #180)
 - **Backend**: `GrowthService` manages growth metrics tracking, funnel analysis, and snapshot generation; `AdminGrowthController` with admin-only endpoints
 - **Endpoints**:

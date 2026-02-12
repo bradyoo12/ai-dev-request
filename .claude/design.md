@@ -948,3 +948,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `OAuthConnector` with Id (Guid), UserId, Provider, DisplayName, Status (connected/disconnected/expired), Scopes, AccessTokenHash, RefreshTokenHash, TokenExpiresAt, ConnectedAt, LastUsedAt, TotalApiCalls, FailedApiCalls, IconUrl, Category (payments/productivity/communication/development/database), CreatedAt, UpdatedAt
 - **Frontend**: `OAuthConnectorsPage` in Settings with "OAuth Connectors" tab — 3 sub-tabs (Connectors with 6 provider cards + connect/disconnect, Connected with active connections list, Stats with metric cards)
 - **Flow**: Open OAuth Connectors tab → browse 6 providers by category → click Connect → provider added to Connected tab → manage connections → view usage stats
+
+### #332 — MCP Tool Integration for Code Generation (PR #340)
+- **Backend**: `McpToolIntegrationController` with 6 endpoints for config, tool catalog, execution, history, and stats
+- **Endpoints**:
+  - `GET /api/mcp-tools/config` — get or create user MCP tool config
+  - `PUT /api/mcp-tools/config` — update config (enabled tools, auto-attach, context depth)
+  - `GET /api/mcp-tools/tools` — list 8 built-in MCP tools (file_read, file_write, search_docs, resolve_deps, query_db, run_tests, lint_code, browse_web)
+  - `POST /api/mcp-tools/execute` — execute a tool (simulated results)
+  - `GET /api/mcp-tools/history` — tool execution history
+  - `GET /api/mcp-tools/stats` — aggregate stats (executions, success rate, latency, tokens saved)
+- **Entity**: `McpToolIntegration` with Id (Guid), UserId, McpEnabled, AutoAttachTools, ContextDepthLevel, per-tool enable flags, TotalExecutions, SuccessfulExecutions, FailedExecutions, AvgLatencyMs, TokensSaved, ExecutionHistoryJson, CustomServersJson, CreatedAt, UpdatedAt
+- **Frontend**: `McpToolIntegrationPage` in Settings with "MCP Tools" tab — 3 sub-tabs (Tools with 8 tool cards + toggles + execute, History with execution log, Stats with metric cards)
+- **Flow**: Open MCP Tools tab → enable/disable individual tools → set context depth → execute tools → view results → browse history → monitor stats

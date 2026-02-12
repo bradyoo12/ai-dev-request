@@ -14,10 +14,15 @@ public class ProductionService : IProductionService
 {
     private readonly AnthropicClient _client;
     private readonly IModelRouterService _modelRouter;
+    private readonly IEnumerable<IModelProviderService> _providers;
     private readonly ILogger<ProductionService> _logger;
     private readonly string _projectsBasePath;
 
-    public ProductionService(IConfiguration configuration, IModelRouterService modelRouter, ILogger<ProductionService> logger)
+    public ProductionService(
+        IConfiguration configuration,
+        IModelRouterService modelRouter,
+        IEnumerable<IModelProviderService> providers,
+        ILogger<ProductionService> logger)
     {
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
@@ -25,6 +30,7 @@ public class ProductionService : IProductionService
 
         _client = new AnthropicClient(apiKey);
         _modelRouter = modelRouter;
+        _providers = providers;
         _logger = logger;
         _projectsBasePath = configuration["Projects:BasePath"] ?? "./projects";
     }
@@ -138,66 +144,77 @@ JSON만 응답하세요.";
 
         try
         {
-            List<Message> messages;
+            string content;
 
-            if (!string.IsNullOrEmpty(screenshotBase64))
+            // Advanced features (screenshot or extended thinking): Use Claude client directly
+            if (!string.IsNullOrEmpty(screenshotBase64) || thinkingBudget > 0)
             {
-                var contentBlocks = new List<ContentBase>
+                List<Message> messages;
+
+                if (!string.IsNullOrEmpty(screenshotBase64))
                 {
-                    new ImageContent
+                    var contentBlocks = new List<ContentBase>
                     {
-                        Source = new ImageSource
+                        new ImageContent
                         {
-                            MediaType = screenshotMediaType ?? "image/png",
-                            Data = screenshotBase64,
-                        }
-                    },
-                    new TextContent { Text = prompt + "\n\n사용자가 첨부한 디자인 스크린샷을 참고하여 UI를 최대한 동일하게 구현해주세요." }
+                            Source = new ImageSource
+                            {
+                                MediaType = screenshotMediaType ?? "image/png",
+                                Data = screenshotBase64,
+                            }
+                        },
+                        new TextContent { Text = prompt + "\n\n사용자가 첨부한 디자인 스크린샷을 참고하여 UI를 최대한 동일하게 구현해주세요." }
+                    };
+                    messages = new List<Message> { new Message { Role = RoleType.User, Content = contentBlocks } };
+                }
+                else
+                {
+                    messages = new List<Message> { new Message(RoleType.User, prompt) };
+                }
+
+                var parameters = new MessageParameters
+                {
+                    Messages = messages,
+                    Model = "claude-sonnet-4-20250514",
+                    MaxTokens = thinkingBudget > 0 ? 16000 : 8000,
                 };
-                messages = new List<Message> { new Message { Role = RoleType.User, Content = contentBlocks } };
+
+                if (thinkingBudget > 0)
+                {
+                    parameters.Temperature = 1.0m;
+                    parameters.Thinking = new ThinkingParameters { BudgetTokens = thinkingBudget };
+                    _logger.LogInformation("Extended thinking enabled with {Budget} token budget for {ProjectId}", thinkingBudget, projectId);
+                }
+                else
+                {
+                    parameters.Temperature = 0.3m;
+                }
+
+                var response = await _client.Messages.GetClaudeMessageAsync(parameters);
+                content = string.Join("", response.Content
+                    .Where(c => c is TextContent)
+                    .Select(c => c.ToString())) ?? "{}";
             }
+            // Simple text-only generation: Use provider abstraction with tier-based routing
             else
             {
-                messages = new List<Message> { new Message(RoleType.User, prompt) };
+                var taskCategory = complexity.ToLowerInvariant() is "complex" or "enterprise"
+                    ? TaskCategory.ComplexGeneration
+                    : TaskCategory.StandardGeneration;
+                var recommendedTier = _modelRouter.GetRecommendedTier(taskCategory);
+                var qualifiedModelId = _modelRouter.GetModelId(recommendedTier);
+                _logger.LogInformation("Production task ({Complexity}): tier={Tier}, model={Model}",
+                    complexity, recommendedTier, qualifiedModelId);
+
+                var (providerName, modelId) = ParseModelId(qualifiedModelId);
+                var provider = _providers.FirstOrDefault(p => p.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase))
+                               ?? _providers.FirstOrDefault(p => p.ProviderName == "claude");
+
+                if (provider == null)
+                    throw new InvalidOperationException("No AI provider available");
+
+                content = await provider.GenerateAsync(prompt, modelId);
             }
-
-            // Model routing: Project generation complexity determines the tier.
-            // Complex/Enterprise → Opus (ComplexGeneration), Simple/Medium → Sonnet (StandardGeneration).
-            // Currently using a single configured model; the ModelRouterService provides the
-            // recommended tier for future multi-model support.
-            var taskCategory = complexity.ToLowerInvariant() is "complex" or "enterprise"
-                ? TaskCategory.ComplexGeneration
-                : TaskCategory.StandardGeneration;
-            var recommendedTier = _modelRouter.GetRecommendedTier(taskCategory);
-            var recommendedModelId = _modelRouter.GetModelId(recommendedTier);
-            _logger.LogInformation("Production task ({Complexity}): recommended tier={Tier}, model={Model}",
-                complexity, recommendedTier, recommendedModelId);
-
-            var parameters = new MessageParameters
-            {
-                Messages = messages,
-                // TODO: Switch to recommendedModelId once multi-model client support is available
-                Model = "claude-sonnet-4-20250514",
-                MaxTokens = thinkingBudget > 0 ? 16000 : 8000,
-            };
-
-            if (thinkingBudget > 0)
-            {
-                // Extended thinking requires Temperature = 1
-                parameters.Temperature = 1.0m;
-                parameters.Thinking = new ThinkingParameters { BudgetTokens = thinkingBudget };
-                _logger.LogInformation("Extended thinking enabled with {Budget} token budget for {ProjectId}", thinkingBudget, projectId);
-            }
-            else
-            {
-                parameters.Temperature = 0.3m;
-            }
-
-            var response = await _client.Messages.GetClaudeMessageAsync(parameters);
-            // Extract text content (skip thinking blocks)
-            var content = string.Join("", response.Content
-                .Where(c => c is TextContent)
-                .Select(c => c.ToString())) ?? "{}";
 
             var generatedProject = StructuredOutputHelper.DeserializeResponse<GeneratedProject>(content);
 
@@ -260,6 +277,12 @@ JSON만 응답하세요.";
             return Task.FromResult("completed");
         }
         return Task.FromResult("not_found");
+    }
+
+    private static (string provider, string model) ParseModelId(string qualifiedModelId)
+    {
+        var parts = qualifiedModelId.Split(':', 2);
+        return parts.Length == 2 ? (parts[0], parts[1]) : ("claude", qualifiedModelId);
     }
 }
 

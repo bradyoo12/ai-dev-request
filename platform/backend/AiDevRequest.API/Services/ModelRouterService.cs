@@ -47,19 +47,35 @@ public interface IModelRouterService
     /// Returns the estimated cost per 1 million tokens for a given tier (USD).
     /// </summary>
     decimal GetEstimatedCostPerToken(ModelTier tier);
+
+    /// <summary>
+    /// Returns the provider service that supports the given model ID.
+    /// Model ID format: "provider:model" (e.g., "claude:claude-sonnet-4-5-20250929")
+    /// </summary>
+    IModelProviderService GetProviderForModel(string modelId);
+
+    /// <summary>
+    /// Returns all registered provider services.
+    /// </summary>
+    IEnumerable<IModelProviderService> GetAllProviders();
 }
 
 /// <summary>
 /// Default implementation of <see cref="IModelRouterService"/>.
 /// Maps task categories to model tiers and provides model metadata.
+/// Supports multi-provider routing for Claude and Gemini models.
 /// </summary>
 public class ModelRouterService : IModelRouterService
 {
     private readonly ILogger<ModelRouterService> _logger;
+    private readonly IEnumerable<IModelProviderService> _providers;
 
-    public ModelRouterService(ILogger<ModelRouterService> logger)
+    public ModelRouterService(
+        ILogger<ModelRouterService> logger,
+        IEnumerable<IModelProviderService> providers)
     {
         _logger = logger;
+        _providers = providers;
     }
 
     /// <inheritdoc />
@@ -83,12 +99,13 @@ public class ModelRouterService : IModelRouterService
     /// <inheritdoc />
     public string GetModelId(ModelTier tier)
     {
+        // Returns provider-qualified model ID (format: "provider:model")
         return tier switch
         {
-            ModelTier.Haiku => "claude-haiku-4-5-20251001",
-            ModelTier.Sonnet => "claude-sonnet-4-5-20250929",
-            ModelTier.Opus => "claude-opus-4-6",
-            _ => "claude-sonnet-4-5-20250929"
+            ModelTier.Haiku => "claude:claude-haiku-4-5-20251001",
+            ModelTier.Sonnet => "claude:claude-sonnet-4-5-20250929",
+            ModelTier.Opus => "claude:claude-opus-4-6",
+            _ => "claude:claude-sonnet-4-5-20250929"
         };
     }
 
@@ -103,5 +120,36 @@ public class ModelRouterService : IModelRouterService
             ModelTier.Opus => 15.00m,
             _ => 3.00m
         };
+    }
+
+    /// <inheritdoc />
+    public IModelProviderService GetProviderForModel(string modelId)
+    {
+        // Parse provider-qualified model ID (format: "provider:model")
+        var parts = modelId.Split(':', 2);
+        if (parts.Length != 2)
+        {
+            _logger.LogWarning("Invalid model ID format: {ModelId}. Expected 'provider:model'. Falling back to Claude.", modelId);
+            return _providers.FirstOrDefault(p => p.ProviderName == "claude")
+                   ?? throw new InvalidOperationException("No Claude provider registered");
+        }
+
+        var providerName = parts[0];
+        var provider = _providers.FirstOrDefault(p => p.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase));
+
+        if (provider == null)
+        {
+            _logger.LogWarning("Provider not found: {ProviderName}. Falling back to Claude.", providerName);
+            return _providers.FirstOrDefault(p => p.ProviderName == "claude")
+                   ?? throw new InvalidOperationException("No Claude provider registered");
+        }
+
+        return provider;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IModelProviderService> GetAllProviders()
+    {
+        return _providers;
     }
 }

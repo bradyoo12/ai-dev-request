@@ -11,11 +11,17 @@ public class AiModelConfig
     public required string UserId { get; set; }
 
     /// <summary>
-    /// Selected AI model identifier: "claude-sonnet-4-5" or "claude-opus-4-6"
+    /// Selected AI model identifier (provider-qualified): "claude:claude-sonnet-4-5-20250929" or "gemini:gemini-1.5-pro"
     /// </summary>
     [Required]
-    [MaxLength(50)]
+    [MaxLength(100)]
     public string SelectedModel { get; set; } = "claude-sonnet-4-5";
+
+    /// <summary>
+    /// Preferred AI provider: "claude", "gemini", etc.
+    /// </summary>
+    [MaxLength(50)]
+    public string? PreferredProvider { get; set; }
 
     /// <summary>
     /// Whether extended thinking is enabled (only available for Opus 4.6)

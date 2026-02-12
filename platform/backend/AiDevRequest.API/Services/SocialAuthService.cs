@@ -162,29 +162,46 @@ public class SocialAuthService : ISocialAuthService
         // Exchange code for tokens
         var tokenParams = new Dictionary<string, string>
         {
-            ["code"] = code,
+            ["grant_type"] = "authorization_code",
             ["client_id"] = clientId,
             ["redirect_uri"] = redirectUri,
-            ["grant_type"] = "authorization_code"
+            ["code"] = code
         };
         if (!string.IsNullOrEmpty(clientSecret))
             tokenParams["client_secret"] = clientSecret;
+
+        _logger.LogInformation("Kakao OAuth token exchange - RedirectUri: {RedirectUri}, ClientId: {ClientId}, HasClientSecret: {HasClientSecret}",
+            redirectUri, clientId, !string.IsNullOrEmpty(clientSecret));
 
         var tokenResponse = await client.PostAsync("https://kauth.kakao.com/oauth/token",
             new FormUrlEncodedContent(tokenParams));
 
         var tokenJson = await tokenResponse.Content.ReadAsStringAsync();
         if (!tokenResponse.IsSuccessStatusCode)
-            throw new InvalidOperationException($"Kakao token exchange failed: {tokenJson}");
+        {
+            _logger.LogError("Kakao token exchange failed - Status: {StatusCode}, Response: {Response}, RedirectUri: {RedirectUri}",
+                (int)tokenResponse.StatusCode, tokenJson, redirectUri);
+            throw new InvalidOperationException($"Kakao token exchange failed (HTTP {(int)tokenResponse.StatusCode}): {tokenJson}");
+        }
 
         var tokenData = JsonSerializer.Deserialize<JsonElement>(tokenJson);
         var accessToken = tokenData.GetProperty("access_token").GetString()!;
+
+        _logger.LogInformation("Kakao OAuth token exchange successful - AccessToken received");
 
         // Get user info
         var userInfoRequest = new HttpRequestMessage(HttpMethod.Get, "https://kapi.kakao.com/v2/user/me");
         userInfoRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         var userInfoResponse = await client.SendAsync(userInfoRequest);
         var userInfoJson = await userInfoResponse.Content.ReadAsStringAsync();
+
+        if (!userInfoResponse.IsSuccessStatusCode)
+        {
+            _logger.LogError("Kakao user info request failed - Status: {StatusCode}, Response: {Response}",
+                (int)userInfoResponse.StatusCode, userInfoJson);
+            throw new InvalidOperationException($"Kakao user info request failed (HTTP {(int)userInfoResponse.StatusCode}): {userInfoJson}");
+        }
+
         var userInfo = JsonSerializer.Deserialize<JsonElement>(userInfoJson);
 
         var kakaoId = userInfo.GetProperty("id").GetInt64().ToString();

@@ -46,7 +46,7 @@ export default function QualityConfidenceBadge({ score, dimensions, size = 'md' 
   ]
 
   return (
-    <div className="bg-gray-800 rounded-xl p-5">
+    <div className="bg-warm-800 rounded-xl p-5">
       <div className={`flex items-center ${config.gap}`}>
         {/* Circular badge */}
         <div className={`${config.circle} rounded-full border-2 ${colors.border} ring-4 ${colors.ring} flex flex-col items-center justify-center flex-shrink-0`}>
@@ -54,7 +54,7 @@ export default function QualityConfidenceBadge({ score, dimensions, size = 'md' 
         </div>
 
         <div className="ml-2">
-          <p className={`${config.label} text-gray-400`}>{t('qualityBadge.title', 'Quality Score')}</p>
+          <p className={`${config.label} text-warm-400`}>{t('qualityBadge.title', 'Quality Score')}</p>
           <p className={`${config.label} font-medium ${colors.text}`}>{getLabel(score, t)}</p>
         </div>
       </div>
@@ -67,8 +67,8 @@ export default function QualityConfidenceBadge({ score, dimensions, size = 'md' 
             const dimColors = getScoreColor(value)
             return (
               <div key={dim.key} className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 w-28 text-right">{t(dim.labelKey, dim.fallback)}</span>
-                <div className="flex-1 bg-gray-700 rounded-full overflow-hidden">
+                <span className="text-xs text-warm-400 w-28 text-right">{t(dim.labelKey, dim.fallback)}</span>
+                <div className="flex-1 bg-warm-700 rounded-full overflow-hidden">
                   <div
                     className={`${config.bar} rounded-full transition-all ${dimColors.bg}`}
                     style={{ width: `${value}%` }}

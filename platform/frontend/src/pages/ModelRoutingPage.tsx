@@ -78,7 +78,7 @@ export default function ModelRoutingPage() {
   }
 
   if (loading) {
-    return <div className="text-center py-12 text-gray-400">{t('modelRouting.loading')}</div>
+    return <div className="text-center py-12 text-warm-400">{t('modelRouting.loading')}</div>
   }
 
   return (
@@ -86,13 +86,13 @@ export default function ModelRoutingPage() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-white">{t('modelRouting.title')}</h3>
-          <p className="text-sm text-gray-400 mt-1">{t('modelRouting.description')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('modelRouting.description')}</p>
         </div>
         {config && (
           <button
             onClick={() => handleConfigChange({ enabled: !config.enabled })}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              config.enabled ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+              config.enabled ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-warm-700 hover:bg-warm-600 text-warm-300'
             }`}
           >
             {config.enabled ? t('modelRouting.enabled') : t('modelRouting.disabled')}
@@ -110,68 +110,68 @@ export default function ModelRoutingPage() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-blue-400">{stats.totalRoutingDecisions}</div>
-            <div className="text-sm text-gray-400">{t('modelRouting.stats.decisions')}</div>
+            <div className="text-sm text-warm-400">{t('modelRouting.stats.decisions')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-green-400">${stats.estimatedSavings.toFixed(2)}</div>
-            <div className="text-sm text-gray-400">{t('modelRouting.stats.savings')}</div>
+            <div className="text-sm text-warm-400">{t('modelRouting.stats.savings')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-yellow-400">${stats.currentMonthCost.toFixed(2)}</div>
-            <div className="text-sm text-gray-400">{t('modelRouting.stats.monthCost')}</div>
+            <div className="text-sm text-warm-400">{t('modelRouting.stats.monthCost')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-purple-400">
               {stats.monthlyBudget > 0 ? `$${stats.monthlyBudget.toFixed(0)}` : '\u221E'}
             </div>
-            <div className="text-sm text-gray-400">{t('modelRouting.stats.budget')}</div>
+            <div className="text-sm text-warm-400">{t('modelRouting.stats.budget')}</div>
           </div>
         </div>
       )}
 
       {/* Token Distribution */}
       {stats && (stats.fastTierTokens > 0 || stats.standardTierTokens > 0 || stats.premiumTierTokens > 0) && (
-        <div className="bg-gray-800 rounded-lg p-4">
+        <div className="bg-warm-800 rounded-lg p-4">
           <h4 className="font-medium text-white mb-3">{t('modelRouting.tokenDistribution')}</h4>
           <div className="flex gap-4">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-green-400"></span>
-              <span className="text-sm text-gray-300">Fast: {formatTokens(stats.fastTierTokens)}</span>
+              <span className="text-sm text-warm-300">Fast: {formatTokens(stats.fastTierTokens)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-blue-400"></span>
-              <span className="text-sm text-gray-300">Standard: {formatTokens(stats.standardTierTokens)}</span>
+              <span className="text-sm text-warm-300">Standard: {formatTokens(stats.standardTierTokens)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-purple-400"></span>
-              <span className="text-sm text-gray-300">Premium: {formatTokens(stats.premiumTierTokens)}</span>
+              <span className="text-sm text-warm-300">Premium: {formatTokens(stats.premiumTierTokens)}</span>
             </div>
           </div>
         </div>
       )}
 
       {/* Model Tiers */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-warm-800 rounded-lg p-6">
         <h4 className="font-medium text-white mb-4">{t('modelRouting.tiersTitle')}</h4>
         <div className="grid grid-cols-3 gap-4">
           {tiers.map(tier => (
-            <div key={tier.id} className={`border rounded-lg p-4 ${TIER_COLORS[tier.id] || 'border-gray-600'}`}>
+            <div key={tier.id} className={`border rounded-lg p-4 ${TIER_COLORS[tier.id] || 'border-warm-600'}`}>
               <div className="flex items-center gap-2 mb-2">
-                <span className={`w-2 h-2 rounded-full ${TIER_DOT_COLORS[tier.id] || 'bg-gray-400'}`}></span>
+                <span className={`w-2 h-2 rounded-full ${TIER_DOT_COLORS[tier.id] || 'bg-warm-400'}`}></span>
                 <span className="font-medium">{tier.name}</span>
               </div>
-              <p className="text-xs text-gray-400 mb-2">{tier.model}</p>
-              <p className="text-xs text-gray-500 mb-3">{tier.description}</p>
+              <p className="text-xs text-warm-400 mb-2">{tier.model}</p>
+              <p className="text-xs text-warm-500 mb-3">{tier.description}</p>
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{t('modelRouting.cost')}</span>
-                  <span className="text-gray-300">${tier.costPer1kTokens}/1K tokens</span>
+                  <span className="text-warm-500">{t('modelRouting.cost')}</span>
+                  <span className="text-warm-300">${tier.costPer1kTokens}/1K tokens</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{t('modelRouting.latency')}</span>
-                  <span className="text-gray-300">{tier.avgLatencyMs}ms</span>
+                  <span className="text-warm-500">{t('modelRouting.latency')}</span>
+                  <span className="text-warm-300">{tier.avgLatencyMs}ms</span>
                 </div>
               </div>
             </div>
@@ -180,12 +180,12 @@ export default function ModelRoutingPage() {
       </div>
 
       {/* Task Routing Configuration */}
-      <div className="bg-gray-800 rounded-lg p-6">
+      <div className="bg-warm-800 rounded-lg p-6">
         <h4 className="font-medium text-white mb-4">{t('modelRouting.taskRoutingTitle')}</h4>
         <div className="space-y-3">
           {taskTypes.map(taskType => (
-            <div key={taskType.id} className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0">
-              <span className="text-sm text-gray-300">{taskType.name}</span>
+            <div key={taskType.id} className="flex items-center justify-between py-2 border-b border-warm-700 last:border-0">
+              <span className="text-sm text-warm-300">{taskType.name}</span>
               <div className="flex gap-1">
                 {tiers.map(tier => (
                   <button
@@ -194,7 +194,7 @@ export default function ModelRoutingPage() {
                     className={`px-3 py-1 text-xs rounded transition-colors ${
                       (taskRouting[taskType.id] || taskType.defaultTier) === tier.id
                         ? `${TIER_COLORS[tier.id]} border`
-                        : 'bg-gray-700 text-gray-500 hover:text-gray-300'
+                        : 'bg-warm-700 text-warm-500 hover:text-warm-300'
                     }`}
                   >
                     {tier.name}
@@ -208,18 +208,18 @@ export default function ModelRoutingPage() {
 
       {/* Budget Settings */}
       {config && (
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className="bg-warm-800 rounded-lg p-6">
           <h4 className="font-medium text-white mb-4">{t('modelRouting.budgetTitle')}</h4>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm text-gray-300">{t('modelRouting.defaultTier')}</label>
-                <p className="text-xs text-gray-500">{t('modelRouting.defaultTierDesc')}</p>
+                <label className="text-sm text-warm-300">{t('modelRouting.defaultTier')}</label>
+                <p className="text-xs text-warm-500">{t('modelRouting.defaultTierDesc')}</p>
               </div>
               <select
                 value={config.defaultTier}
                 onChange={(e) => handleConfigChange({ defaultTier: e.target.value })}
-                className="bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-sm text-white"
+                className="bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white"
               >
                 {tiers.map(tier => (
                   <option key={tier.id} value={tier.id}>{tier.name} ({tier.model})</option>
@@ -228,18 +228,18 @@ export default function ModelRoutingPage() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm text-gray-300">{t('modelRouting.monthlyBudget')}</label>
-                <p className="text-xs text-gray-500">{t('modelRouting.monthlyBudgetDesc')}</p>
+                <label className="text-sm text-warm-300">{t('modelRouting.monthlyBudget')}</label>
+                <p className="text-xs text-warm-500">{t('modelRouting.monthlyBudgetDesc')}</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-400">$</span>
+                <span className="text-warm-400">$</span>
                 <input
                   type="number"
                   min="0"
                   step="5"
                   value={config.monthlyBudget}
                   onChange={(e) => handleConfigChange({ monthlyBudget: parseFloat(e.target.value) || 0 })}
-                  className="w-20 bg-gray-700 border border-gray-600 rounded px-2 py-1.5 text-sm text-white text-right"
+                  className="w-20 bg-warm-700 border border-warm-600 rounded px-2 py-1.5 text-sm text-white text-right"
                 />
               </div>
             </div>

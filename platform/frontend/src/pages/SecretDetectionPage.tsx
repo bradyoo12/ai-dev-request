@@ -122,7 +122,7 @@ export default function SecretDetectionPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('secrets.title', 'Secret Detection')}</h2>
-        <p className="text-gray-400">{t('secrets.loginRequired', 'Please log in to manage secrets.')}</p>
+        <p className="text-warm-400">{t('secrets.loginRequired', 'Please log in to manage secrets.')}</p>
       </div>
     )
   }
@@ -131,7 +131,7 @@ export default function SecretDetectionPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('secrets.title', 'Secret Detection')}</h2>
-        <p className="text-gray-400">{t('secrets.noProjectDesc', 'No project selected. Go to your project to scan for secrets.')}</p>
+        <p className="text-warm-400">{t('secrets.noProjectDesc', 'No project selected. Go to your project to scan for secrets.')}</p>
         <button
           onClick={() => navigate('/')}
           className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm transition-colors"
@@ -146,12 +146,12 @@ export default function SecretDetectionPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">
           &larr;
         </button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{t('secrets.title', 'Secret Detection & Configuration')}</h2>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-warm-400 mt-1">
             {t('secrets.description', 'Scan for hardcoded secrets and generate secure configuration files')}
           </p>
         </div>
@@ -180,22 +180,22 @@ export default function SecretDetectionPage() {
             { label: 'Medium', count: scanResults.findings.filter(f => f.severity === 'medium').length, color: 'text-yellow-400' },
             { label: 'Low', count: scanResults.findings.filter(f => f.severity === 'low').length, color: 'text-blue-400' },
           ].map(({ label, count, color }) => (
-            <div key={label} className="bg-gray-800 rounded-lg p-4 text-center">
+            <div key={label} className="bg-warm-800 rounded-lg p-4 text-center">
               <div className={`text-2xl font-bold ${color}`}>{count}</div>
-              <div className="text-xs text-gray-400 mt-1">{label}</div>
+              <div className="text-xs text-warm-400 mt-1">{label}</div>
             </div>
           ))}
         </div>
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+      <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
         {(['scan', 'patterns', 'config'] as ActiveTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              activeTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
             }`}
           >
             {tab === 'scan' && t('secrets.tab.scan', 'Scan Results')}
@@ -209,12 +209,12 @@ export default function SecretDetectionPage() {
       {activeTab === 'scan' && (
         <div className="space-y-4">
           {loading && (
-            <div className="text-center py-8 text-gray-400">{t('secrets.loading', 'Loading...')}</div>
+            <div className="text-center py-8 text-warm-400">{t('secrets.loading', 'Loading...')}</div>
           )}
 
           {!loading && !scanResults && (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">
                 {t('secrets.noResults', 'No scan results yet. Click "Run Scan" to detect hardcoded secrets.')}
               </p>
             </div>
@@ -225,35 +225,35 @@ export default function SecretDetectionPage() {
               <div className="text-green-400 text-lg font-medium mb-1">
                 {t('secrets.noFindings', 'No secrets detected')}
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-warm-400">
                 {t('secrets.cleanProject', 'Your project code appears clean of hardcoded secrets.')}
               </p>
             </div>
           )}
 
           {scanResults && scanResults.findings.length > 0 && (
-            <div className="bg-gray-800 rounded-xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-700">
+            <div className="bg-warm-800 rounded-xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-warm-700">
                 <span className="text-sm font-medium text-white">
                   {t('secrets.findingsCount', `${scanResults.findingCount} findings`)}
                 </span>
-                <span className="text-xs text-gray-400 ml-2">
+                <span className="text-xs text-warm-400 ml-2">
                   {t('secrets.scannedAt', `Scanned ${new Date(scanResults.scannedAt).toLocaleString()}`)}
                 </span>
               </div>
-              <div className="divide-y divide-gray-700">
+              <div className="divide-y divide-warm-700">
                 {scanResults.findings.map((finding, idx) => (
-                  <div key={idx} className="px-4 py-3 hover:bg-gray-700/50">
+                  <div key={idx} className="px-4 py-3 hover:bg-warm-700/50">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${SEVERITY_STYLES[finding.severity] || 'bg-gray-600 text-white'}`}>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${SEVERITY_STYLES[finding.severity] || 'bg-warm-600 text-white'}`}>
                         {finding.severity.toUpperCase()}
                       </span>
                       <span className="text-sm font-medium text-white">{finding.patternName}</span>
                     </div>
-                    <div className="text-xs text-gray-400 mb-1">{finding.description}</div>
+                    <div className="text-xs text-warm-400 mb-1">{finding.description}</div>
                     <div className="flex items-center gap-4 text-xs">
-                      <span className="text-gray-500">{finding.location}</span>
-                      <code className="text-red-300 bg-gray-900 px-2 py-0.5 rounded">{finding.matchPreview}</code>
+                      <span className="text-warm-500">{finding.location}</span>
+                      <code className="text-red-300 bg-warm-900 px-2 py-0.5 rounded">{finding.matchPreview}</code>
                     </div>
                   </div>
                 ))}
@@ -265,22 +265,22 @@ export default function SecretDetectionPage() {
 
       {/* Patterns Tab */}
       {activeTab === 'patterns' && (
-        <div className="bg-gray-800 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-700">
+        <div className="bg-warm-800 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-warm-700">
             <span className="text-sm font-medium text-white">
               {t('secrets.patternsTitle', `${patterns.length} detection patterns active`)}
             </span>
           </div>
-          <div className="divide-y divide-gray-700">
+          <div className="divide-y divide-warm-700">
             {patterns.map((pattern) => (
               <div key={pattern.id} className="px-4 py-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${SEVERITY_STYLES[pattern.severity] || 'bg-gray-600 text-white'}`}>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${SEVERITY_STYLES[pattern.severity] || 'bg-warm-600 text-white'}`}>
                     {pattern.severity.toUpperCase()}
                   </span>
                   <span className="text-sm font-medium text-white">{pattern.name}</span>
                 </div>
-                <div className="text-xs text-gray-400">{pattern.description}</div>
+                <div className="text-xs text-warm-400">{pattern.description}</div>
               </div>
             ))}
           </div>
@@ -294,7 +294,7 @@ export default function SecretDetectionPage() {
             <select
               value={configLanguage}
               onChange={(e) => setConfigLanguage(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+              className="bg-warm-800 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white"
             >
               {CONFIG_LANGUAGES.map((lang) => (
                 <option key={lang.id} value={lang.id}>{lang.label}</option>
@@ -310,8 +310,8 @@ export default function SecretDetectionPage() {
           </div>
 
           {!configResult && (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">
                 {t('secrets.noConfig', 'No config files generated yet. Click "Generate Config Files" to create secure configuration templates.')}
               </p>
             </div>
@@ -320,9 +320,9 @@ export default function SecretDetectionPage() {
           {configResult && (
             <div className="space-y-4">
               {/* .env.example */}
-              <div className="bg-gray-800 rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-                  <span className="text-xs font-mono text-gray-400">.env.example</span>
+              <div className="bg-warm-800 rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-warm-700">
+                  <span className="text-xs font-mono text-warm-400">.env.example</span>
                   <button
                     onClick={() => navigator.clipboard.writeText(configResult.envTemplate)}
                     className="text-xs text-blue-400 hover:text-blue-300"
@@ -330,15 +330,15 @@ export default function SecretDetectionPage() {
                     {t('secrets.copy', 'Copy')}
                   </button>
                 </div>
-                <pre className="p-4 text-xs text-gray-300 font-mono whitespace-pre overflow-auto max-h-64">
+                <pre className="p-4 text-xs text-warm-300 font-mono whitespace-pre overflow-auto max-h-64">
                   {configResult.envTemplate}
                 </pre>
               </div>
 
               {/* .gitignore */}
-              <div className="bg-gray-800 rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-                  <span className="text-xs font-mono text-gray-400">.gitignore (secrets section)</span>
+              <div className="bg-warm-800 rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-warm-700">
+                  <span className="text-xs font-mono text-warm-400">.gitignore (secrets section)</span>
                   <button
                     onClick={() => navigator.clipboard.writeText(configResult.gitignore)}
                     className="text-xs text-blue-400 hover:text-blue-300"
@@ -346,15 +346,15 @@ export default function SecretDetectionPage() {
                     {t('secrets.copy', 'Copy')}
                   </button>
                 </div>
-                <pre className="p-4 text-xs text-gray-300 font-mono whitespace-pre overflow-auto max-h-64">
+                <pre className="p-4 text-xs text-warm-300 font-mono whitespace-pre overflow-auto max-h-64">
                   {configResult.gitignore}
                 </pre>
               </div>
 
               {/* Config Module */}
-              <div className="bg-gray-800 rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-                  <span className="text-xs font-mono text-gray-400">config module ({configResult.language})</span>
+              <div className="bg-warm-800 rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-warm-700">
+                  <span className="text-xs font-mono text-warm-400">config module ({configResult.language})</span>
                   <button
                     onClick={() => navigator.clipboard.writeText(configResult.configModule)}
                     className="text-xs text-blue-400 hover:text-blue-300"
@@ -362,15 +362,15 @@ export default function SecretDetectionPage() {
                     {t('secrets.copy', 'Copy')}
                   </button>
                 </div>
-                <pre className="p-4 text-xs text-gray-300 font-mono whitespace-pre overflow-auto max-h-64">
+                <pre className="p-4 text-xs text-warm-300 font-mono whitespace-pre overflow-auto max-h-64">
                   {configResult.configModule}
                 </pre>
               </div>
 
               {/* Key Vault Config */}
-              <div className="bg-gray-800 rounded-xl overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
-                  <span className="text-xs font-mono text-gray-400">Azure Key Vault integration</span>
+              <div className="bg-warm-800 rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-warm-700">
+                  <span className="text-xs font-mono text-warm-400">Azure Key Vault integration</span>
                   <button
                     onClick={() => navigator.clipboard.writeText(configResult.keyVaultConfig)}
                     className="text-xs text-blue-400 hover:text-blue-300"
@@ -378,7 +378,7 @@ export default function SecretDetectionPage() {
                     {t('secrets.copy', 'Copy')}
                   </button>
                 </div>
-                <pre className="p-4 text-xs text-gray-300 font-mono whitespace-pre overflow-auto max-h-64">
+                <pre className="p-4 text-xs text-warm-300 font-mono whitespace-pre overflow-auto max-h-64">
                   {configResult.keyVaultConfig}
                 </pre>
               </div>

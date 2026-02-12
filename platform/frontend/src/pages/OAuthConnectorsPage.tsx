@@ -65,7 +65,7 @@ export default function OAuthConnectorsPage() {
       development: 'bg-green-900/30 text-green-400 border-green-800/50',
       database: 'bg-cyan-900/30 text-cyan-400 border-cyan-800/50',
     }
-    return map[cat] || 'bg-gray-900/30 text-gray-400 border-gray-800/50'
+    return map[cat] || 'bg-warm-900/30 text-warm-400 border-warm-800/50'
   }
 
   const categoryLabel = (cat: string) => {
@@ -95,12 +95,12 @@ export default function OAuthConnectorsPage() {
     const colors: Record<string, string> = {
       stripe: 'from-violet-600 to-indigo-700',
       google: 'from-red-500 to-yellow-500',
-      notion: 'from-gray-700 to-gray-900',
+      notion: 'from-warm-700 to-warm-900',
       slack: 'from-green-500 to-teal-600',
-      github: 'from-gray-600 to-gray-800',
+      github: 'from-warm-600 to-warm-800',
       supabase: 'from-emerald-500 to-green-700',
     }
-    return colors[name] || 'from-gray-600 to-gray-800'
+    return colors[name] || 'from-warm-600 to-warm-800'
   }
 
   const connectedConnectors = connectors.filter(c => c.status === 'connected')
@@ -117,7 +117,7 @@ export default function OAuthConnectorsPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-1">{t('oauthConnectors.title', 'OAuth Connectors')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('oauthConnectors.subtitle', 'One-click third-party integrations with platform-managed credentials')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('oauthConnectors.subtitle', 'One-click third-party integrations with platform-managed credentials')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['connectors', 'connected', 'stats'] as Tab[]).map((t2) => (
@@ -125,7 +125,7 @@ export default function OAuthConnectorsPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-orange-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-orange-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t2 === 'connectors' ? t('oauthConnectors.tabs.connectors', 'Connectors')
@@ -153,8 +153,8 @@ export default function OAuthConnectorsPage() {
                   const connected = isProviderConnected(provider.name)
                   const connector = getConnectorForProvider(provider.name)
                   return (
-                    <div key={provider.name} className={`bg-gray-800/50 rounded-xl p-5 border transition-all ${
-                      connected ? 'border-green-800/60 shadow-green-900/10 shadow-lg' : 'border-gray-700/50 hover:border-gray-600'
+                    <div key={provider.name} className={`bg-warm-800/50 rounded-xl p-5 border transition-all ${
+                      connected ? 'border-green-800/60 shadow-green-900/10 shadow-lg' : 'border-warm-700/50 hover:border-warm-600'
                     }`}>
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-3">
@@ -175,12 +175,12 @@ export default function OAuthConnectorsPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-400 text-sm mb-3 leading-relaxed">{provider.description}</p>
+                      <p className="text-warm-400 text-sm mb-3 leading-relaxed">{provider.description}</p>
                       <div className="mb-4">
-                        <p className="text-xs text-gray-500 mb-1">Scopes:</p>
+                        <p className="text-xs text-warm-500 mb-1">Scopes:</p>
                         <div className="flex flex-wrap gap-1">
                           {provider.scopes.map(scope => (
-                            <span key={scope} className="text-xs px-1.5 py-0.5 bg-gray-700/50 text-gray-300 rounded">
+                            <span key={scope} className="text-xs px-1.5 py-0.5 bg-warm-700/50 text-warm-300 rounded">
                               {scope}
                             </span>
                           ))}
@@ -210,7 +210,7 @@ export default function OAuthConnectorsPage() {
             </div>
           ))}
           {providers.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-warm-500">
               <p className="text-lg mb-1">Loading providers...</p>
               <p className="text-sm">Fetching available OAuth connectors</p>
             </div>
@@ -222,8 +222,8 @@ export default function OAuthConnectorsPage() {
       {tab === 'connected' && (
         <div>
           {connectedConnectors.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center">
+            <div className="text-center py-12 text-warm-500">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-warm-800 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
               </div>
               <p className="text-lg mb-1">No connected services</p>
@@ -232,7 +232,7 @@ export default function OAuthConnectorsPage() {
           ) : (
             <div className="space-y-3">
               {connectedConnectors.map(connector => (
-                <div key={connector.id} className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 flex items-center justify-between">
+                <div key={connector.id} className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${providerColor(connector.provider)} flex items-center justify-center text-white font-bold text-sm`}>
                       {providerIcon(connector.provider)}
@@ -246,13 +246,13 @@ export default function OAuthConnectorsPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-4 mt-1">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-warm-500">
                           Connected: {connector.connectedAt ? new Date(connector.connectedAt).toLocaleDateString() : 'N/A'}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-warm-500">
                           Last used: {connector.lastUsedAt ? new Date(connector.lastUsedAt).toLocaleDateString() : 'Never'}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-warm-500">
                           API calls: {connector.totalApiCalls}
                         </span>
                         <span className={`text-xs px-1.5 py-0.5 rounded border ${categoryColor(connector.category)}`}>
@@ -265,7 +265,7 @@ export default function OAuthConnectorsPage() {
                     <button
                       onClick={() => handleRefresh(connector.id)}
                       disabled={refreshing === connector.id}
-                      className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors disabled:opacity-50"
+                      className="px-3 py-1.5 rounded-lg text-sm font-medium bg-warm-700 text-warm-300 hover:bg-warm-600 transition-colors disabled:opacity-50"
                     >
                       {refreshing === connector.id ? 'Refreshing...' : 'Refresh Token'}
                     </button>
@@ -290,39 +290,39 @@ export default function OAuthConnectorsPage() {
           {stats ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total Connected</p>
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
+                  <p className="text-xs text-warm-500 uppercase tracking-wide mb-1">Total Connected</p>
                   <p className="text-3xl font-bold text-orange-400">{stats.totalConnected}</p>
-                  <p className="text-xs text-gray-500 mt-1">active integrations</p>
+                  <p className="text-xs text-warm-500 mt-1">active integrations</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total API Calls</p>
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
+                  <p className="text-xs text-warm-500 uppercase tracking-wide mb-1">Total API Calls</p>
                   <p className="text-3xl font-bold text-blue-400">{stats.totalApiCalls.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500 mt-1">across all connectors</p>
+                  <p className="text-xs text-warm-500 mt-1">across all connectors</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Failed Calls</p>
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
+                  <p className="text-xs text-warm-500 uppercase tracking-wide mb-1">Failed Calls</p>
                   <p className="text-3xl font-bold text-red-400">{stats.failedApiCalls.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500 mt-1">errors encountered</p>
+                  <p className="text-xs text-warm-500 mt-1">errors encountered</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Success Rate</p>
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
+                  <p className="text-xs text-warm-500 uppercase tracking-wide mb-1">Success Rate</p>
                   <p className="text-3xl font-bold text-green-400">
                     {stats.totalApiCalls > 0
                       ? `${((1 - stats.failedApiCalls / stats.totalApiCalls) * 100).toFixed(1)}%`
                       : 'N/A'}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">reliability score</p>
+                  <p className="text-xs text-warm-500 mt-1">reliability score</p>
                 </div>
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Categories</p>
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
+                  <p className="text-xs text-warm-500 uppercase tracking-wide mb-1">Categories</p>
                   <p className="text-3xl font-bold text-purple-400">{stats.byCategory.length}</p>
-                  <p className="text-xs text-gray-500 mt-1">integration types</p>
+                  <p className="text-xs text-warm-500 mt-1">integration types</p>
                 </div>
               </div>
 
               {stats.byCategory.length > 0 && (
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
                   <h4 className="font-semibold text-white mb-4">Connections by Category</h4>
                   <div className="space-y-3">
                     {stats.byCategory.map(cat => (
@@ -331,13 +331,13 @@ export default function OAuthConnectorsPage() {
                           {categoryLabel(cat.category)}
                         </span>
                         <div className="flex items-center gap-3">
-                          <div className="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
+                          <div className="w-32 h-2 bg-warm-700 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-orange-500 rounded-full transition-all"
                               style={{ width: `${stats.totalConnected > 0 ? (cat.count / stats.totalConnected) * 100 : 0}%` }}
                             />
                           </div>
-                          <span className="text-sm text-gray-400 w-8 text-right">{cat.count}</span>
+                          <span className="text-sm text-warm-400 w-8 text-right">{cat.count}</span>
                         </div>
                       </div>
                     ))}
@@ -346,12 +346,12 @@ export default function OAuthConnectorsPage() {
               )}
 
               {stats.connectors.length > 0 && (
-                <div className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
+                <div className="bg-warm-800/50 rounded-xl p-5 border border-warm-700/50">
                   <h4 className="font-semibold text-white mb-4">All Connectors</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-left text-gray-500 border-b border-gray-700">
+                        <tr className="text-left text-warm-500 border-b border-warm-700">
                           <th className="pb-2 pr-4">Provider</th>
                           <th className="pb-2 pr-4">Status</th>
                           <th className="pb-2 pr-4">Category</th>
@@ -362,13 +362,13 @@ export default function OAuthConnectorsPage() {
                       </thead>
                       <tbody>
                         {stats.connectors.map((c, i) => (
-                          <tr key={i} className="border-b border-gray-800 text-gray-300">
+                          <tr key={i} className="border-b border-warm-800 text-warm-300">
                             <td className="py-2 pr-4 font-medium text-white">{c.displayName}</td>
                             <td className="py-2 pr-4">
                               <span className={`text-xs px-2 py-0.5 rounded-full ${
                                 c.status === 'connected' ? 'bg-green-900/30 text-green-400'
                                   : c.status === 'expired' ? 'bg-yellow-900/30 text-yellow-400'
-                                  : 'bg-gray-900/30 text-gray-400'
+                                  : 'bg-warm-900/30 text-warm-400'
                               }`}>{c.status}</span>
                             </td>
                             <td className="py-2 pr-4">
@@ -378,7 +378,7 @@ export default function OAuthConnectorsPage() {
                             </td>
                             <td className="py-2 pr-4">{c.totalApiCalls.toLocaleString()}</td>
                             <td className="py-2 pr-4 text-red-400">{c.failedApiCalls}</td>
-                            <td className="py-2 text-gray-500">{c.connectedAt ? new Date(c.connectedAt).toLocaleDateString() : '-'}</td>
+                            <td className="py-2 text-warm-500">{c.connectedAt ? new Date(c.connectedAt).toLocaleDateString() : '-'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -388,7 +388,7 @@ export default function OAuthConnectorsPage() {
               )}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-warm-500">
               <p>Loading statistics...</p>
             </div>
           )}

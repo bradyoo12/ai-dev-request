@@ -179,7 +179,7 @@ export default function McpToolIntegrationPage() {
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-bold text-white">{t('mcpTools.title', 'MCP Tool Integration')}</h3>
-        <p className="text-gray-400 text-sm mt-1">{t('mcpTools.subtitle', 'Model Context Protocol tools for AI-augmented code generation')}</p>
+        <p className="text-warm-400 text-sm mt-1">{t('mcpTools.subtitle', 'Model Context Protocol tools for AI-augmented code generation')}</p>
       </div>
 
       {/* Sub-tabs */}
@@ -189,7 +189,7 @@ export default function McpToolIntegrationPage() {
             key={tabId}
             onClick={() => setTab(tabId)}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              tab === tabId ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === tabId ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`mcpTools.tabs.${tabId}`, tabId === 'tools' ? 'Tools' : tabId === 'history' ? 'History' : 'Stats')}
@@ -201,16 +201,16 @@ export default function McpToolIntegrationPage() {
       {tab === 'tools' && (
         <div className="space-y-4">
           {/* Global Controls */}
-          <div className="bg-gray-800 rounded-lg p-6 space-y-4">
+          <div className="bg-warm-800 rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-white font-medium">{t('mcpTools.mcpEnabled', 'MCP Protocol')}</h4>
-                <p className="text-gray-400 text-xs mt-1">{t('mcpTools.mcpEnabledDesc', 'Enable Model Context Protocol for tool-augmented AI generation')}</p>
+                <p className="text-warm-400 text-xs mt-1">{t('mcpTools.mcpEnabledDesc', 'Enable Model Context Protocol for tool-augmented AI generation')}</p>
               </div>
               <button
                 onClick={() => handleToggleMcp(!config?.mcpEnabled)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  config?.mcpEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                  config?.mcpEnabled ? 'bg-blue-600' : 'bg-warm-600'
                 }`}
               >
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -222,12 +222,12 @@ export default function McpToolIntegrationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-white font-medium">{t('mcpTools.autoAttach', 'Auto-Attach Tools')}</h4>
-                <p className="text-gray-400 text-xs mt-1">{t('mcpTools.autoAttachDesc', 'Automatically attach enabled tools to every generation request')}</p>
+                <p className="text-warm-400 text-xs mt-1">{t('mcpTools.autoAttachDesc', 'Automatically attach enabled tools to every generation request')}</p>
               </div>
               <button
                 onClick={() => handleToggleAutoAttach(!config?.autoAttachTools)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  config?.autoAttachTools ? 'bg-blue-600' : 'bg-gray-600'
+                  config?.autoAttachTools ? 'bg-blue-600' : 'bg-warm-600'
                 }`}
               >
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -246,14 +246,14 @@ export default function McpToolIntegrationPage() {
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                       config?.contextDepthLevel === level
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-700 text-gray-400 hover:text-white'
+                        : 'bg-warm-700 text-warm-400 hover:text-white'
                     }`}
                   >
                     {level.charAt(0).toUpperCase() + level.slice(1)}
                   </button>
                 ))}
               </div>
-              <p className="text-gray-500 text-xs mt-2">
+              <p className="text-warm-500 text-xs mt-2">
                 {config?.contextDepthLevel === 'shallow' && t('mcpTools.depthShallow', 'Minimal context: file names and structure only')}
                 {config?.contextDepthLevel === 'standard' && t('mcpTools.depthStandard', 'Standard context: file contents and relevant dependencies')}
                 {config?.contextDepthLevel === 'deep' && t('mcpTools.depthDeep', 'Deep context: full project analysis including tests and docs')}
@@ -269,17 +269,17 @@ export default function McpToolIntegrationPage() {
               const isExecuting = executingTool === tool.id
 
               return (
-                <div key={tool.id} className="bg-gray-800 rounded-lg p-4 space-y-3">
+                <div key={tool.id} className="bg-warm-800 rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-warm-700 rounded-lg flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
                           <path d={TOOL_ICONS[tool.icon] || TOOL_ICONS['globe']} />
                         </svg>
                       </div>
                       <div>
                         <h5 className="text-white font-medium text-sm">{tool.name}</h5>
-                        <span className={`px-2 py-0.5 rounded-full text-xs ${CATEGORY_COLORS[tool.category] || 'bg-gray-700 text-gray-300'}`}>
+                        <span className={`px-2 py-0.5 rounded-full text-xs ${CATEGORY_COLORS[tool.category] || 'bg-warm-700 text-warm-300'}`}>
                           {tool.category}
                         </span>
                       </div>
@@ -287,7 +287,7 @@ export default function McpToolIntegrationPage() {
                     <button
                       onClick={() => handleToggleTool(getToolEnabledField(tool.id), !enabled)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        enabled ? 'bg-blue-600' : 'bg-gray-600'
+                        enabled ? 'bg-blue-600' : 'bg-warm-600'
                       }`}
                     >
                       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -296,7 +296,7 @@ export default function McpToolIntegrationPage() {
                     </button>
                   </div>
 
-                  <p className="text-gray-400 text-xs">{tool.description}</p>
+                  <p className="text-warm-400 text-xs">{tool.description}</p>
 
                   {enabled && (
                     <div className="space-y-2">
@@ -305,7 +305,7 @@ export default function McpToolIntegrationPage() {
                         value={toolInputs[tool.id] || ''}
                         onChange={e => setToolInputs(prev => ({ ...prev, [tool.id]: e.target.value }))}
                         placeholder={getToolPlaceholder(tool.id)}
-                        className="w-full bg-gray-700 border border-gray-600 text-white rounded-md px-3 py-2 text-sm"
+                        className="w-full bg-warm-700 border border-warm-600 text-white rounded-md px-3 py-2 text-sm"
                       />
                       <button
                         onClick={() => handleExecute(tool.id)}
@@ -325,7 +325,7 @@ export default function McpToolIntegrationPage() {
                         <span className={result.success ? 'text-green-400' : 'text-red-400'}>
                           {result.success ? 'Success' : 'Failed'}
                         </span>
-                        <span className="text-gray-400">{result.latencyMs}ms | {result.tokensSaved} tokens saved</span>
+                        <span className="text-warm-400">{result.latencyMs}ms | {result.tokensSaved} tokens saved</span>
                       </div>
                       {result.output}
                     </div>
@@ -345,13 +345,13 @@ export default function McpToolIntegrationPage() {
               <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto" />
             </div>
           ) : history.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-warm-500">
               {t('mcpTools.noHistory', 'No execution history yet. Execute a tool to see results here.')}
             </div>
           ) : (
             <div className="space-y-2">
               {history.map((entry, idx) => (
-                <div key={idx} className="bg-gray-800 rounded-lg p-4 space-y-2">
+                <div key={idx} className="bg-warm-800 rounded-lg p-4 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${entry.success ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -360,17 +360,17 @@ export default function McpToolIntegrationPage() {
                         {entry.success ? 'Success' : 'Failed'}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <div className="flex items-center gap-3 text-xs text-warm-400">
                       <span>{entry.latencyMs}ms</span>
                       <span>{new Date(entry.timestamp).toLocaleString()}</span>
                     </div>
                   </div>
                   {entry.input && (
-                    <div className="text-xs text-gray-400">
-                      <span className="text-gray-500">{t('mcpTools.input', 'Input')}:</span> {entry.input}
+                    <div className="text-xs text-warm-400">
+                      <span className="text-warm-500">{t('mcpTools.input', 'Input')}:</span> {entry.input}
                     </div>
                   )}
-                  <div className="bg-gray-900 rounded-md p-2 text-xs font-mono text-gray-300 whitespace-pre-wrap max-h-32 overflow-y-auto">
+                  <div className="bg-warm-900 rounded-md p-2 text-xs font-mono text-warm-300 whitespace-pre-wrap max-h-32 overflow-y-auto">
                     {entry.output}
                   </div>
                 </div>
@@ -391,52 +391,52 @@ export default function McpToolIntegrationPage() {
             <>
               {/* Metric Cards */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-gray-400 text-xs uppercase tracking-wider">{t('mcpTools.totalExecs', 'Total Executions')}</div>
+                <div className="bg-warm-800 rounded-lg p-4">
+                  <div className="text-warm-400 text-xs uppercase tracking-wider">{t('mcpTools.totalExecs', 'Total Executions')}</div>
                   <div className="text-2xl font-bold text-white mt-1">{stats.totalExecutions}</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-gray-400 text-xs uppercase tracking-wider">{t('mcpTools.successRate', 'Success Rate')}</div>
+                <div className="bg-warm-800 rounded-lg p-4">
+                  <div className="text-warm-400 text-xs uppercase tracking-wider">{t('mcpTools.successRate', 'Success Rate')}</div>
                   <div className="text-2xl font-bold text-white mt-1">{stats.successRate}%</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-gray-400 text-xs uppercase tracking-wider">{t('mcpTools.avgLatency', 'Avg Latency')}</div>
+                <div className="bg-warm-800 rounded-lg p-4">
+                  <div className="text-warm-400 text-xs uppercase tracking-wider">{t('mcpTools.avgLatency', 'Avg Latency')}</div>
                   <div className="text-2xl font-bold text-white mt-1">{stats.avgLatencyMs}ms</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-gray-400 text-xs uppercase tracking-wider">{t('mcpTools.tokensSaved', 'Tokens Saved')}</div>
+                <div className="bg-warm-800 rounded-lg p-4">
+                  <div className="text-warm-400 text-xs uppercase tracking-wider">{t('mcpTools.tokensSaved', 'Tokens Saved')}</div>
                   <div className="text-2xl font-bold text-white mt-1">
                     {stats.tokensSaved > 1000 ? `${(stats.tokensSaved / 1000).toFixed(1)}K` : stats.tokensSaved}
                   </div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-gray-400 text-xs uppercase tracking-wider">{t('mcpTools.mostUsed', 'Most Used Tool')}</div>
+                <div className="bg-warm-800 rounded-lg p-4">
+                  <div className="text-warm-400 text-xs uppercase tracking-wider">{t('mcpTools.mostUsed', 'Most Used Tool')}</div>
                   <div className="text-lg font-bold text-white mt-1">{stats.mostUsedTool || 'N/A'}</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="text-gray-400 text-xs uppercase tracking-wider">{t('mcpTools.customServers', 'Custom Servers')}</div>
+                <div className="bg-warm-800 rounded-lg p-4">
+                  <div className="text-warm-400 text-xs uppercase tracking-wider">{t('mcpTools.customServers', 'Custom Servers')}</div>
                   <div className="text-2xl font-bold text-white mt-1">{stats.customServers}</div>
                 </div>
               </div>
 
               {/* By Tool Type Breakdown */}
-              <div className="bg-gray-800 rounded-lg p-6">
+              <div className="bg-warm-800 rounded-lg p-6">
                 <h4 className="text-white font-medium mb-4">{t('mcpTools.byToolType', 'By Tool Type')}</h4>
                 {stats.byToolType.length === 0 ? (
-                  <p className="text-gray-500 text-sm">{t('mcpTools.noToolData', 'No execution data yet')}</p>
+                  <p className="text-warm-500 text-sm">{t('mcpTools.noToolData', 'No execution data yet')}</p>
                 ) : (
                   <div className="space-y-3">
                     {stats.byToolType.map(entry => (
                       <div key={entry.toolName} className="flex items-center gap-3">
                         <span className="text-white text-sm min-w-[120px]">{entry.toolName}</span>
-                        <div className="flex-1 bg-gray-700 rounded-full h-3">
+                        <div className="flex-1 bg-warm-700 rounded-full h-3">
                           <div
                             className="bg-blue-500 h-3 rounded-full transition-all"
                             style={{ width: `${stats.totalExecutions > 0 ? (entry.count / stats.totalExecutions) * 100 : 0}%` }}
                           />
                         </div>
-                        <span className="text-gray-400 text-xs min-w-[60px] text-right">{entry.count} calls</span>
-                        <span className="text-gray-400 text-xs min-w-[60px] text-right">{entry.avgLatency}ms</span>
+                        <span className="text-warm-400 text-xs min-w-[60px] text-right">{entry.count} calls</span>
+                        <span className="text-warm-400 text-xs min-w-[60px] text-right">{entry.avgLatency}ms</span>
                       </div>
                     ))}
                   </div>
@@ -444,7 +444,7 @@ export default function McpToolIntegrationPage() {
               </div>
             </>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-warm-500">
               {t('mcpTools.noStats', 'No statistics available')}
             </div>
           )}

@@ -11,7 +11,7 @@ export default function SitesPage() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/')}
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-warm-400 hover:text-white transition-colors"
         >
           &larr;
         </button>

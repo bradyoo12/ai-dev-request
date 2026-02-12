@@ -79,9 +79,9 @@ export default function ProjectVersionPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gray-900 rounded-lg p-6">
+      <div className="bg-warm-900 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-2">{t('versionHistory.title')}</h3>
-        <p className="text-gray-400 text-sm mb-4">{t('versionHistory.subtitle')}</p>
+        <p className="text-warm-400 text-sm mb-4">{t('versionHistory.subtitle')}</p>
 
         {error && (
           <div className="bg-red-900/20 border border-red-700 rounded p-3 mb-4 text-red-200 text-sm">
@@ -95,7 +95,7 @@ export default function ProjectVersionPage() {
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
             placeholder={t('versionHistory.projectId')}
-            className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
+            className="flex-1 bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm"
           />
           <button
             onClick={loadVersions}
@@ -109,28 +109,28 @@ export default function ProjectVersionPage() {
 
       {/* Version Timeline */}
       {versions.length > 0 && (
-        <div className="bg-gray-900 rounded-lg p-6">
+        <div className="bg-warm-900 rounded-lg p-6">
           <h4 className="text-md font-semibold mb-4">{t('versionHistory.timeline')}</h4>
           <div className="space-y-3">
             {versions.map((v, index) => (
               <div
                 key={v.id}
-                className="flex items-start gap-4 p-4 rounded-lg border border-gray-700/50 bg-gray-800/30"
+                className="flex items-start gap-4 p-4 rounded-lg border border-warm-700/50 bg-warm-800/30"
               >
                 <div className="flex flex-col items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                    index === 0 ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'
+                    index === 0 ? 'bg-green-600 text-white' : 'bg-warm-700 text-warm-300'
                   }`}>
                     v{v.versionNumber}
                   </div>
                   {index < versions.length - 1 && (
-                    <div className="w-0.5 h-6 bg-gray-700 mt-1" />
+                    <div className="w-0.5 h-6 bg-warm-700 mt-1" />
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-white">{v.label || `Version ${v.versionNumber}`}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sourceColors[v.source] || 'bg-gray-600/20 text-gray-400'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sourceColors[v.source] || 'bg-warm-600/20 text-warm-400'}`}>
                       {v.source}
                     </span>
                     {index === 0 && (
@@ -139,11 +139,11 @@ export default function ProjectVersionPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-warm-400">
                     {v.fileCount} {t('versionHistory.files')} &middot; {new Date(v.createdAt).toLocaleString()}
                   </p>
                   {v.changedFiles.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-warm-500 mt-1">
                       {v.changedFiles.length} {t('versionHistory.changedFiles')}
                     </p>
                   )}
@@ -165,23 +165,23 @@ export default function ProjectVersionPage() {
 
       {/* Diff Viewer */}
       {versions.length >= 2 && (
-        <div className="bg-gray-900 rounded-lg p-6">
+        <div className="bg-warm-900 rounded-lg p-6">
           <h4 className="text-md font-semibold mb-4">{t('versionHistory.diffTitle')}</h4>
           <div className="flex gap-3 mb-4">
             <select
               value={diffFrom}
               onChange={(e) => setDiffFrom(e.target.value)}
-              className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
+              className="flex-1 bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm"
             >
               {versions.map((v) => (
                 <option key={v.id} value={v.id}>v{v.versionNumber} - {v.label || `Version ${v.versionNumber}`}</option>
               ))}
             </select>
-            <span className="text-gray-400 self-center">&rarr;</span>
+            <span className="text-warm-400 self-center">&rarr;</span>
             <select
               value={diffTo}
               onChange={(e) => setDiffTo(e.target.value)}
-              className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
+              className="flex-1 bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm"
             >
               {versions.map((v) => (
                 <option key={v.id} value={v.id}>v{v.versionNumber} - {v.label || `Version ${v.versionNumber}`}</option>
@@ -201,22 +201,22 @@ export default function ProjectVersionPage() {
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-green-900/20 border border-green-700/50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-green-400">{selectedDiff.addedFiles.length}</p>
-                  <p className="text-sm text-gray-400">{t('versionHistory.added')}</p>
+                  <p className="text-sm text-warm-400">{t('versionHistory.added')}</p>
                 </div>
                 <div className="bg-red-900/20 border border-red-700/50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-red-400">{selectedDiff.removedFiles.length}</p>
-                  <p className="text-sm text-gray-400">{t('versionHistory.removed')}</p>
+                  <p className="text-sm text-warm-400">{t('versionHistory.removed')}</p>
                 </div>
                 <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-3 text-center">
                   <p className="text-2xl font-bold text-yellow-400">{selectedDiff.modifiedFiles.length}</p>
-                  <p className="text-sm text-gray-400">{t('versionHistory.modified')}</p>
+                  <p className="text-sm text-warm-400">{t('versionHistory.modified')}</p>
                 </div>
               </div>
 
               {selectedDiff.addedFiles.length > 0 && (
                 <div>
                   <h5 className="text-sm font-medium text-green-400 mb-2">+ {t('versionHistory.addedFiles')}</h5>
-                  <div className="bg-gray-800/50 rounded p-2 space-y-1">
+                  <div className="bg-warm-800/50 rounded p-2 space-y-1">
                     {selectedDiff.addedFiles.map((f) => (
                       <p key={f} className="text-xs text-green-300 font-mono">+ {f}</p>
                     ))}
@@ -227,7 +227,7 @@ export default function ProjectVersionPage() {
               {selectedDiff.removedFiles.length > 0 && (
                 <div>
                   <h5 className="text-sm font-medium text-red-400 mb-2">- {t('versionHistory.removedFiles')}</h5>
-                  <div className="bg-gray-800/50 rounded p-2 space-y-1">
+                  <div className="bg-warm-800/50 rounded p-2 space-y-1">
                     {selectedDiff.removedFiles.map((f) => (
                       <p key={f} className="text-xs text-red-300 font-mono">- {f}</p>
                     ))}
@@ -238,7 +238,7 @@ export default function ProjectVersionPage() {
               {selectedDiff.modifiedFiles.length > 0 && (
                 <div>
                   <h5 className="text-sm font-medium text-yellow-400 mb-2">~ {t('versionHistory.modifiedFiles')}</h5>
-                  <div className="bg-gray-800/50 rounded p-2 space-y-1">
+                  <div className="bg-warm-800/50 rounded p-2 space-y-1">
                     {selectedDiff.modifiedFiles.map((f) => (
                       <p key={f} className="text-xs text-yellow-300 font-mono">~ {f}</p>
                     ))}
@@ -252,8 +252,8 @@ export default function ProjectVersionPage() {
 
       {/* Empty state */}
       {!loading && versions.length === 0 && projectId && (
-        <div className="bg-gray-900 rounded-lg p-8 text-center">
-          <p className="text-gray-400">{t('versionHistory.empty')}</p>
+        <div className="bg-warm-900 rounded-lg p-8 text-center">
+          <p className="text-warm-400">{t('versionHistory.empty')}</p>
         </div>
       )}
     </div>

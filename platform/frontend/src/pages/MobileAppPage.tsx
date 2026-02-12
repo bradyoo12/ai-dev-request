@@ -86,18 +86,18 @@ export default function MobileAppPage() {
   }
 
   const statusColor = (status: string | null) => {
-    if (!status) return 'bg-gray-100 text-gray-600'
+    if (!status) return 'bg-warm-100 text-warm-600'
     if (status === 'success' || status === 'published') return 'bg-green-100 text-green-700'
     if (status === 'building' || status === 'submitted') return 'bg-yellow-100 text-yellow-700'
     if (status === 'failed' || status === 'rejected') return 'bg-red-100 text-red-700'
-    return 'bg-gray-100 text-gray-600'
+    return 'bg-warm-100 text-warm-600'
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">{t('mobileApp.title')}</h2>
-        <p className="text-gray-500 mt-1">{t('mobileApp.description')}</p>
+        <p className="text-warm-500 mt-1">{t('mobileApp.description')}</p>
       </div>
 
       {!config ? (
@@ -128,7 +128,7 @@ export default function MobileAppPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{config.appName}</h3>
-                  <p className="text-sm text-gray-500">{config.bundleId} · v{config.appVersion} ({config.buildNumber})</p>
+                  <p className="text-sm text-warm-500">{config.bundleId} · v{config.appVersion} ({config.buildNumber})</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export default function MobileAppPage() {
           <div className="flex gap-2 border-b pb-2">
             {(['overview', 'screens', 'builds', 'publish', 'settings'] as const).map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${activeTab === tab ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${activeTab === tab ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'text-warm-500 hover:text-warm-700'}`}
               >{t(`mobileApp.tab.${tab}`)}</button>
             ))}
           </div>
@@ -166,15 +166,15 @@ export default function MobileAppPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-blue-600">{config.totalScreens}</p>
-                  <p className="text-sm text-gray-500">{t('mobileApp.stats.screens')}</p>
+                  <p className="text-sm text-warm-500">{t('mobileApp.stats.screens')}</p>
                 </div>
                 <div className="bg-white rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-green-600">{config.totalComponents}</p>
-                  <p className="text-sm text-gray-500">{t('mobileApp.stats.components')}</p>
+                  <p className="text-sm text-warm-500">{t('mobileApp.stats.components')}</p>
                 </div>
                 <div className="bg-white rounded-lg border p-4 text-center">
                   <p className="text-3xl font-bold text-purple-600">{config.buildNumber}</p>
-                  <p className="text-sm text-gray-500">{t('mobileApp.stats.builds')}</p>
+                  <p className="text-sm text-warm-500">{t('mobileApp.stats.builds')}</p>
                 </div>
               </div>
 
@@ -182,15 +182,15 @@ export default function MobileAppPage() {
               {config.expoQrCodeUrl && (
                 <div className="bg-white rounded-lg border p-6 text-center">
                   <h3 className="font-semibold mb-3">{t('mobileApp.qrPreview')}</h3>
-                  <div className="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                  <div className="w-48 h-48 mx-auto bg-warm-100 rounded-lg flex items-center justify-center border-2 border-dashed border-warm-300">
                     <div className="text-center">
-                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="mx-auto h-12 w-12 text-warm-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                       </svg>
-                      <p className="text-xs text-gray-400 mt-2">{t('mobileApp.scanQr')}</p>
+                      <p className="text-xs text-warm-400 mt-2">{t('mobileApp.scanQr')}</p>
                     </div>
                   </div>
-                  <p className="mt-3 text-sm text-gray-500">{t('mobileApp.expoGoHint')}</p>
+                  <p className="mt-3 text-sm text-warm-500">{t('mobileApp.expoGoHint')}</p>
                 </div>
               )}
 
@@ -204,7 +204,7 @@ export default function MobileAppPage() {
                     {building ? t('mobileApp.building') : t('mobileApp.buildBoth')}
                   </button>
                   <button onClick={() => handleBuild('ios')} disabled={building || !config.iosEnabled}
-                    className="px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:opacity-50">
+                    className="px-4 py-3 bg-warm-800 text-white rounded-lg hover:bg-warm-900 disabled:opacity-50">
                     {t('mobileApp.buildIos')}
                   </button>
                   <button onClick={() => handleBuild('android')} disabled={building || !config.androidEnabled}
@@ -221,13 +221,13 @@ export default function MobileAppPage() {
             <div className="bg-white rounded-lg border p-6">
               <h3 className="font-semibold mb-4">{t('mobileApp.screensTitle')}</h3>
               {config.totalScreens === 0 ? (
-                <p className="text-gray-400 text-center py-8">{t('mobileApp.noScreens')}</p>
+                <p className="text-warm-400 text-center py-8">{t('mobileApp.noScreens')}</p>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {Array.from({ length: config.totalScreens }, (_, i) => (
                     <div key={i} className="border rounded-lg p-3">
-                      <div className="w-full h-32 bg-gray-50 rounded mb-2 flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="w-full h-32 bg-warm-50 rounded mb-2 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-warm-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                       </div>
@@ -244,18 +244,18 @@ export default function MobileAppPage() {
             <div className="bg-white rounded-lg border p-6">
               <h3 className="font-semibold mb-4">{t('mobileApp.buildsTitle')}</h3>
               {builds.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">{t('mobileApp.noBuilds')}</p>
+                <p className="text-warm-400 text-center py-8">{t('mobileApp.noBuilds')}</p>
               ) : (
                 <div className="space-y-3">
                   {builds.slice().reverse().map((b, i) => (
                     <div key={i} className="border rounded-lg p-4 flex items-center justify-between">
                       <div>
                         <span className="font-medium">Build #{b.buildNumber}</span>
-                        <span className="text-sm text-gray-500 ml-3">{b.platform}</span>
+                        <span className="text-sm text-warm-500 ml-3">{b.platform}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`px-2 py-1 rounded text-xs ${statusColor(b.status)}`}>{b.status}</span>
-                        <span className="text-xs text-gray-400">{new Date(b.startedAt).toLocaleString()}</span>
+                        <span className="text-xs text-warm-400">{new Date(b.startedAt).toLocaleString()}</span>
                       </div>
                     </div>
                   ))}
@@ -268,20 +268,20 @@ export default function MobileAppPage() {
           {activeTab === 'publish' && (
             <div className="bg-white rounded-lg border p-6 space-y-6">
               <h3 className="font-semibold">{t('mobileApp.publishTitle')}</h3>
-              <p className="text-sm text-gray-500">{t('mobileApp.publishDesc')}</p>
+              <p className="text-sm text-warm-500">{t('mobileApp.publishDesc')}</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* iOS */}
                 <div className="border rounded-lg p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-white font-bold text-sm">iOS</div>
+                    <div className="w-10 h-10 bg-warm-900 rounded-lg flex items-center justify-center text-white font-bold text-sm">iOS</div>
                     <div>
                       <p className="font-medium">App Store</p>
-                      <p className="text-xs text-gray-500">{t('mobileApp.iosStatus')}: {config.iosPublishStatus || t('mobileApp.notPublished')}</p>
+                      <p className="text-xs text-warm-500">{t('mobileApp.iosStatus')}: {config.iosPublishStatus || t('mobileApp.notPublished')}</p>
                     </div>
                   </div>
                   <button onClick={() => handlePublish('ios')} disabled={publishing || !config.iosEnabled || config.status === 'draft'}
-                    className="w-full py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50">
+                    className="w-full py-2 bg-warm-900 text-white rounded-lg hover:bg-warm-800 disabled:opacity-50">
                     {publishing ? t('mobileApp.publishing') : t('mobileApp.publishToAppStore')}
                   </button>
                 </div>
@@ -292,7 +292,7 @@ export default function MobileAppPage() {
                     <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">GP</div>
                     <div>
                       <p className="font-medium">Google Play</p>
-                      <p className="text-xs text-gray-500">{t('mobileApp.androidStatus')}: {config.androidPublishStatus || t('mobileApp.notPublished')}</p>
+                      <p className="text-xs text-warm-500">{t('mobileApp.androidStatus')}: {config.androidPublishStatus || t('mobileApp.notPublished')}</p>
                     </div>
                   </div>
                   <button onClick={() => handlePublish('android')} disabled={publishing || !config.androidEnabled || config.status === 'draft'}
@@ -336,10 +336,10 @@ export default function MobileAppPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">{t('mobileApp.enableIos')}</p>
-                    <p className="text-xs text-gray-500">{t('mobileApp.enableIosDesc')}</p>
+                    <p className="text-xs text-warm-500">{t('mobileApp.enableIosDesc')}</p>
                   </div>
                   <button onClick={() => handleUpdateSettings({ iosEnabled: !config.iosEnabled })}
-                    className={`w-12 h-6 rounded-full transition-colors ${config.iosEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                    className={`w-12 h-6 rounded-full transition-colors ${config.iosEnabled ? 'bg-blue-600' : 'bg-warm-300'}`}>
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${config.iosEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                 </div>
@@ -347,10 +347,10 @@ export default function MobileAppPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">{t('mobileApp.enableAndroid')}</p>
-                    <p className="text-xs text-gray-500">{t('mobileApp.enableAndroidDesc')}</p>
+                    <p className="text-xs text-warm-500">{t('mobileApp.enableAndroidDesc')}</p>
                   </div>
                   <button onClick={() => handleUpdateSettings({ androidEnabled: !config.androidEnabled })}
-                    className={`w-12 h-6 rounded-full transition-colors ${config.androidEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                    className={`w-12 h-6 rounded-full transition-colors ${config.androidEnabled ? 'bg-blue-600' : 'bg-warm-300'}`}>
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${config.androidEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                 </div>
@@ -358,10 +358,10 @@ export default function MobileAppPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-sm">{t('mobileApp.enableExpo')}</p>
-                    <p className="text-xs text-gray-500">{t('mobileApp.enableExpoDesc')}</p>
+                    <p className="text-xs text-warm-500">{t('mobileApp.enableExpoDesc')}</p>
                   </div>
                   <button onClick={() => handleUpdateSettings({ expoEnabled: !config.expoEnabled })}
-                    className={`w-12 h-6 rounded-full transition-colors ${config.expoEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                    className={`w-12 h-6 rounded-full transition-colors ${config.expoEnabled ? 'bg-blue-600' : 'bg-warm-300'}`}>
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${config.expoEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                 </div>

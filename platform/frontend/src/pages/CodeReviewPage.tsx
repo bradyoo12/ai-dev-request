@@ -139,7 +139,7 @@ export default function CodeReviewPage() {
       case 'critical': return 'bg-red-900/50 text-red-400'
       case 'warning': return 'bg-yellow-900/50 text-yellow-400'
       case 'info': return 'bg-blue-900/50 text-blue-400'
-      default: return 'bg-gray-700 text-gray-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -165,8 +165,8 @@ export default function CodeReviewPage() {
       case 'completed': return 'bg-green-900/50 text-green-400'
       case 'reviewing': return 'bg-yellow-900/50 text-yellow-400'
       case 'failed': return 'bg-red-900/50 text-red-400'
-      case 'pending': return 'bg-gray-700 text-gray-400'
-      default: return 'bg-gray-700 text-gray-400'
+      case 'pending': return 'bg-warm-700 text-warm-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -186,7 +186,7 @@ export default function CodeReviewPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('codeReview.loading', 'Loading review data...')}</p>
+        <p className="text-warm-400">{t('codeReview.loading', 'Loading review data...')}</p>
       </div>
     )
   }
@@ -201,14 +201,14 @@ export default function CodeReviewPage() {
       )}
 
       {/* Project ID Selector & Actions */}
-      <div className="bg-gray-800 rounded-xl p-4">
+      <div className="bg-warm-800 rounded-xl p-4">
         <div className="flex items-center gap-3">
-          <label className="text-sm text-gray-400">{t('codeReview.projectId', 'Project ID')}:</label>
+          <label className="text-sm text-warm-400">{t('codeReview.projectId', 'Project ID')}:</label>
           <input
             type="number"
             value={projectIdInput}
             onChange={(e) => setProjectIdInput(e.target.value)}
-            className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24"
+            className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1.5 text-sm text-white w-24"
             min={1}
           />
           <button
@@ -227,7 +227,7 @@ export default function CodeReviewPage() {
           {history.length > 0 && (
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="ml-auto px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
+              className="ml-auto px-3 py-1.5 bg-warm-700 hover:bg-warm-600 text-warm-300 rounded-lg text-xs font-medium transition-colors"
             >
               {showHistory ? t('codeReview.hideHistory', 'Hide History') : t('codeReview.showHistory', 'Show History')} ({history.length})
             </button>
@@ -238,14 +238,14 @@ export default function CodeReviewPage() {
       {review && review.status === 'completed' && (
         <>
           {/* Overall Score Badge */}
-          <div className="bg-gray-800 rounded-xl p-5">
+          <div className="bg-warm-800 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold">{t('codeReview.overviewTitle', 'Code Quality Overview')}</h3>
               <div className="flex items-center gap-3">
                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(review.status)}`}>
                   {review.status}
                 </span>
-                <span className="text-xs text-gray-500">v{review.reviewVersion}</span>
+                <span className="text-xs text-warm-500">v{review.reviewVersion}</span>
               </div>
             </div>
 
@@ -255,7 +255,7 @@ export default function CodeReviewPage() {
                 <span className="text-2xl font-bold">{review.overallScore}</span>
               </div>
               <div>
-                <p className="text-sm text-gray-300">{t('codeReview.overallScore', 'Overall Score')}</p>
+                <p className="text-sm text-warm-300">{t('codeReview.overallScore', 'Overall Score')}</p>
                 <div className="flex items-center gap-4 mt-1">
                   <span className="text-xs bg-red-900/50 text-red-400 px-2 py-0.5 rounded">
                     {review.criticalCount} {t('codeReview.critical', 'Critical')}
@@ -279,8 +279,8 @@ export default function CodeReviewPage() {
             <div className="space-y-3">
               {dimensions.map((dim) => (
                 <div key={dim.key} className="flex items-center gap-3">
-                  <span className="text-xs text-gray-400 w-28 text-right">{dim.label}</span>
-                  <div className="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden">
+                  <span className="text-xs text-warm-400 w-28 text-right">{dim.label}</span>
+                  <div className="flex-1 h-3 bg-warm-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${getScoreBarColor(dim.score)}`}
                       style={{ width: `${(dim.score / 5) * 100}%` }}
@@ -293,14 +293,14 @@ export default function CodeReviewPage() {
           </div>
 
           {/* Findings Section */}
-          <div className="bg-gray-800 rounded-xl p-5">
+          <div className="bg-warm-800 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold">{t('codeReview.findingsTitle', 'Findings')}</h3>
               <div className="flex items-center gap-2">
                 <select
                   value={filterDimension}
                   onChange={(e) => setFilterDimension(e.target.value)}
-                  className="bg-gray-900 border border-gray-700 rounded-lg px-2 py-1 text-xs text-white"
+                  className="bg-warm-900 border border-warm-700 rounded-lg px-2 py-1 text-xs text-white"
                 >
                   <option value="all">{t('codeReview.allDimensions', 'All Dimensions')}</option>
                   <option value="architecture">{getDimensionLabel('architecture')}</option>
@@ -345,7 +345,7 @@ export default function CodeReviewPage() {
 
             {/* Findings List */}
             {filteredFindings.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-6">
+              <p className="text-sm text-warm-500 text-center py-6">
                 {t('codeReview.noFindings', 'No findings for this filter.')}
               </p>
             ) : (
@@ -356,14 +356,14 @@ export default function CodeReviewPage() {
                   return (
                     <div
                       key={finding.id}
-                      className={`bg-gray-900 rounded-lg p-4 ${isFixed ? 'opacity-60' : ''}`}
+                      className={`bg-warm-900 rounded-lg p-4 ${isFixed ? 'opacity-60' : ''}`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className={`px-2 py-0.5 rounded text-xs font-medium ${getSeverityBadge(finding.severity)}`}>
                             {finding.severity}
                           </span>
-                          <span className="text-xs text-gray-500">{getDimensionLabel(finding.dimension)}</span>
+                          <span className="text-xs text-warm-500">{getDimensionLabel(finding.dimension)}</span>
                           {finding.fixConfidence != null && (
                             <span className={`text-xs font-medium ${getConfidenceColor(finding.fixConfidence)}`}>
                               {finding.fixConfidence}% {t('codeReview.confidence', 'confidence')}
@@ -379,7 +379,7 @@ export default function CodeReviewPage() {
                           {finding.originalCode && finding.suggestedFix && (
                             <button
                               onClick={() => setExpandedDiff(isDiffExpanded ? null : finding.id)}
-                              className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded text-xs font-medium transition-colors"
+                              className="px-2 py-1 bg-warm-700 hover:bg-warm-600 text-warm-300 rounded text-xs font-medium transition-colors"
                             >
                               {isDiffExpanded ? t('codeReview.hideDiff', 'Hide Diff') : t('codeReview.viewDiff', 'View Diff')}
                             </button>
@@ -398,9 +398,9 @@ export default function CodeReviewPage() {
                         </div>
                       </div>
                       <h4 className="text-sm font-medium text-white mb-1">{finding.title}</h4>
-                      <p className="text-xs text-gray-400 mb-2">{finding.description}</p>
+                      <p className="text-xs text-warm-400 mb-2">{finding.description}</p>
                       {(finding.file || finding.line) && (
-                        <p className="text-xs font-mono text-gray-500 mb-2">
+                        <p className="text-xs font-mono text-warm-500 mb-2">
                           {finding.file}{finding.line ? `:${finding.line}` : ''}
                         </p>
                       )}
@@ -409,19 +409,19 @@ export default function CodeReviewPage() {
                         <div className="mt-3 grid grid-cols-2 gap-2">
                           <div className="bg-red-950/30 border border-red-900/40 rounded p-2">
                             <p className="text-xs text-red-400 font-medium mb-1">{t('codeReview.originalCode', 'Original')}</p>
-                            <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono overflow-auto max-h-48">{finding.originalCode}</pre>
+                            <pre className="text-xs text-warm-300 whitespace-pre-wrap font-mono overflow-auto max-h-48">{finding.originalCode}</pre>
                           </div>
                           <div className="bg-green-950/30 border border-green-900/40 rounded p-2">
                             <p className="text-xs text-green-400 font-medium mb-1">{t('codeReview.suggestedFix', 'Suggested Fix')}</p>
-                            <pre className="text-xs text-gray-300 whitespace-pre-wrap font-mono overflow-auto max-h-48">{finding.suggestedFix}</pre>
+                            <pre className="text-xs text-warm-300 whitespace-pre-wrap font-mono overflow-auto max-h-48">{finding.suggestedFix}</pre>
                           </div>
                         </div>
                       )}
                       {/* Collapsed suggested fix (when diff is not expanded) */}
                       {!isDiffExpanded && finding.suggestedFix && !finding.originalCode && (
-                        <div className="bg-gray-800 rounded p-2 mt-2">
-                          <p className="text-xs text-gray-500 mb-1">{t('codeReview.suggestedFix', 'Suggested Fix')}:</p>
-                          <p className="text-xs text-gray-300">{finding.suggestedFix}</p>
+                        <div className="bg-warm-800 rounded p-2 mt-2">
+                          <p className="text-xs text-warm-500 mb-1">{t('codeReview.suggestedFix', 'Suggested Fix')}:</p>
+                          <p className="text-xs text-warm-300">{finding.suggestedFix}</p>
                         </div>
                       )}
                     </div>
@@ -434,24 +434,24 @@ export default function CodeReviewPage() {
       )}
 
       {review && review.status === 'reviewing' && (
-        <div className="bg-gray-800 rounded-xl p-6 text-center">
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
           <div className="animate-spin w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-300">{t('codeReview.inProgress', 'AI code review in progress...')}</p>
-          <p className="text-xs text-gray-500 mt-1">{t('codeReview.inProgressDetail', 'Analyzing architecture, security, performance, accessibility, and maintainability')}</p>
+          <p className="text-warm-300">{t('codeReview.inProgress', 'AI code review in progress...')}</p>
+          <p className="text-xs text-warm-500 mt-1">{t('codeReview.inProgressDetail', 'Analyzing architecture, security, performance, accessibility, and maintainability')}</p>
         </div>
       )}
 
       {review && review.status === 'failed' && (
         <div className="bg-red-900/20 border border-red-800 rounded-xl p-5">
           <h4 className="text-sm font-bold text-red-400 mb-2">{t('codeReview.failedTitle', 'Review Failed')}</h4>
-          <p className="text-sm text-gray-400">{t('codeReview.failedMessage', 'The code quality review could not be completed. Please try running a new review.')}</p>
+          <p className="text-sm text-warm-400">{t('codeReview.failedMessage', 'The code quality review could not be completed. Please try running a new review.')}</p>
         </div>
       )}
 
       {!review && !loading && (
-        <div className="bg-gray-800 rounded-xl p-6 text-center">
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
           <h4 className="text-sm font-bold mb-2">{t('codeReview.noReview', 'No Review Yet')}</h4>
-          <p className="text-sm text-gray-400 mb-4">
+          <p className="text-sm text-warm-400 mb-4">
             {t('codeReview.noReviewDescription', 'Run an AI-powered code quality review to analyze architecture, security, performance, accessibility, and maintainability.')}
           </p>
           <button
@@ -466,13 +466,13 @@ export default function CodeReviewPage() {
 
       {/* Review History */}
       {showHistory && history.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-5">
+        <div className="bg-warm-800 rounded-xl p-5">
           <h3 className="text-sm font-bold mb-3">{t('codeReview.historyTitle', 'Review History')}</h3>
           <div className="space-y-2">
             {history.map((entry) => (
-              <div key={entry.id} className="bg-gray-900 rounded-lg p-3 flex items-center justify-between">
+              <div key={entry.id} className="bg-warm-900 rounded-lg p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-300">v{entry.reviewVersion}</span>
+                  <span className="text-sm text-warm-300">v{entry.reviewVersion}</span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(entry.status)}`}>
                     {entry.status}
                   </span>
@@ -489,7 +489,7 @@ export default function CodeReviewPage() {
                     </div>
                   )}
                 </div>
-                <span className="text-xs text-gray-500">{new Date(entry.createdAt).toLocaleString()}</span>
+                <span className="text-xs text-warm-500">{new Date(entry.createdAt).toLocaleString()}</span>
               </div>
             ))}
           </div>

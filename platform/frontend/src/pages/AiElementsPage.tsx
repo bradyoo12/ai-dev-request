@@ -45,12 +45,12 @@ export function StreamingPreview({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="rounded-xl border border-white/10 bg-gray-900/80 backdrop-blur-sm overflow-hidden"
+          className="rounded-xl border border-white/10 bg-warm-900/80 backdrop-blur-sm overflow-hidden"
         >
           <div className="flex items-center justify-between px-4 py-2 border-b border-white/5">
-            <span className="text-xs text-gray-400 font-mono">{language}</span>
+            <span className="text-xs text-warm-400 font-mono">{language}</span>
             <div className="flex gap-2">
-              <button onClick={onCopy} className="text-xs text-gray-400 hover:text-white transition-colors">
+              <button onClick={onCopy} className="text-xs text-warm-400 hover:text-white transition-colors">
                 Copy
               </button>
               <button onClick={onDeploy} className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
@@ -58,7 +58,7 @@ export function StreamingPreview({
               </button>
             </div>
           </div>
-          <pre className="p-4 text-sm font-mono text-gray-200 overflow-x-auto">
+          <pre className="p-4 text-sm font-mono text-warm-200 overflow-x-auto">
             <code>{code}</code>
           </pre>
         </motion.div>
@@ -210,7 +210,7 @@ export default function AiElementsPage() {
   }
 
   if (loading) {
-    return <div className="text-center py-12 text-gray-400">Loading AI Elements...</div>
+    return <div className="text-center py-12 text-warm-400">Loading AI Elements...</div>
   }
 
   return (
@@ -219,7 +219,7 @@ export default function AiElementsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-white">AI Elements & Streaming Preview</h3>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-warm-400 mt-1">
             Vercel AI-powered streaming code generation with live preview and reasoning panels
           </p>
         </div>
@@ -233,11 +233,11 @@ export default function AiElementsPage() {
       )}
 
       {/* Sub-tab Navigation */}
-      <div className="flex gap-1 bg-gray-800/50 rounded-lg p-1">
+      <div className="flex gap-1 bg-warm-800/50 rounded-lg p-1">
         <button
           onClick={() => setSubTab('stream')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            subTab === 'stream' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            subTab === 'stream' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-2 justify-center">
@@ -248,7 +248,7 @@ export default function AiElementsPage() {
         <button
           onClick={() => setSubTab('components')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            subTab === 'components' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            subTab === 'components' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-2 justify-center">
@@ -259,7 +259,7 @@ export default function AiElementsPage() {
         <button
           onClick={() => setSubTab('stats')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            subTab === 'stats' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            subTab === 'stats' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-2 justify-center">
@@ -274,18 +274,18 @@ export default function AiElementsPage() {
         <div className="space-y-4">
           {/* Settings toggles */}
           {config && (
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <h4 className="font-medium text-white mb-3">Stream Settings</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm text-gray-300">Streaming Display</label>
-                    <p className="text-xs text-gray-500">Token-by-token code output</p>
+                    <label className="text-sm text-warm-300">Streaming Display</label>
+                    <p className="text-xs text-warm-500">Token-by-token code output</p>
                   </div>
                   <button
                     onClick={() => handleConfigChange({ streamingEnabled: !config.streamingEnabled })}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
-                      config.streamingEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                      config.streamingEnabled ? 'bg-blue-600' : 'bg-warm-600'
                     }`}
                   >
                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -295,13 +295,13 @@ export default function AiElementsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm text-gray-300">Reasoning Panel</label>
-                    <p className="text-xs text-gray-500">Show AI thought process</p>
+                    <label className="text-sm text-warm-300">Reasoning Panel</label>
+                    <p className="text-xs text-warm-500">Show AI thought process</p>
                   </div>
                   <button
                     onClick={() => handleConfigChange({ reasoningPanelEnabled: !config.reasoningPanelEnabled })}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
-                      config.reasoningPanelEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                      config.reasoningPanelEnabled ? 'bg-blue-600' : 'bg-warm-600'
                     }`}
                   >
                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -311,13 +311,13 @@ export default function AiElementsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm text-gray-300">Live Preview</label>
-                    <p className="text-xs text-gray-500">Sandboxed component preview</p>
+                    <label className="text-sm text-warm-300">Live Preview</label>
+                    <p className="text-xs text-warm-500">Sandboxed component preview</p>
                   </div>
                   <button
                     onClick={() => handleConfigChange({ livePreviewEnabled: !config.livePreviewEnabled })}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
-                      config.livePreviewEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                      config.livePreviewEnabled ? 'bg-blue-600' : 'bg-warm-600'
                     }`}
                   >
                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -327,13 +327,13 @@ export default function AiElementsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <label className="text-sm text-gray-300">Response Actions</label>
-                    <p className="text-xs text-gray-500">Copy, edit, deploy buttons</p>
+                    <label className="text-sm text-warm-300">Response Actions</label>
+                    <p className="text-xs text-warm-500">Copy, edit, deploy buttons</p>
                   </div>
                   <button
                     onClick={() => handleConfigChange({ responseActionsEnabled: !config.responseActionsEnabled })}
                     className={`w-11 h-6 rounded-full transition-colors relative ${
-                      config.responseActionsEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                      config.responseActionsEnabled ? 'bg-blue-600' : 'bg-warm-600'
                     }`}
                   >
                     <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -346,11 +346,11 @@ export default function AiElementsPage() {
           )}
 
           {/* Prompt Input */}
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium text-white">Streaming Code Generation</h4>
               {config && (
-                <span className="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">
+                <span className="text-xs text-warm-500 bg-warm-700 px-2 py-1 rounded">
                   {config.activeModel}
                 </span>
               )}
@@ -359,7 +359,7 @@ export default function AiElementsPage() {
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Describe the component you want to generate... (e.g., 'Create a streaming preview component with copy and deploy actions')"
-              className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 placeholder-gray-500 resize-none focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full bg-warm-900 border border-warm-700 rounded-lg p-3 text-sm text-warm-200 placeholder-warm-500 resize-none focus:outline-none focus:border-blue-500 transition-colors"
               rows={3}
             />
             <div className="flex items-center justify-between mt-3">
@@ -367,7 +367,7 @@ export default function AiElementsPage() {
                 <button
                   onClick={() => setShowReasoning(!showReasoning)}
                   className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                    showReasoning ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30' : 'bg-gray-700 text-gray-400'
+                    showReasoning ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30' : 'bg-warm-700 text-warm-400'
                   }`}
                 >
                   Reasoning {showReasoning ? 'On' : 'Off'}
@@ -378,13 +378,13 @@ export default function AiElementsPage() {
                 disabled={isStreaming}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                   isStreaming
-                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                    ? 'bg-warm-700 text-warm-400 cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20'
                 }`}
               >
                 {isStreaming ? (
                   <span className="flex items-center gap-2">
-                    <span className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    <span className="w-3 h-3 border-2 border-warm-400 border-t-transparent rounded-full animate-spin" />
                     Streaming...
                   </span>
                 ) : (
@@ -399,7 +399,7 @@ export default function AiElementsPage() {
 
           {/* Reasoning Panel */}
           {showReasoning && (isStreaming || streamedCode) && (
-            <div className="bg-gray-800/50 border border-purple-500/20 rounded-lg p-4">
+            <div className="bg-warm-800/50 border border-purple-500/20 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400">
                   <path d="M12 2a3 3 0 0 0-3 3c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/><path d="M19 9H5a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2z"/><path d="M12 14v8"/><path d="M8 18h8"/>
@@ -414,11 +414,11 @@ export default function AiElementsPage() {
                   <div
                     key={i}
                     className={`flex items-start gap-2 text-sm transition-opacity ${
-                      i === reasoningStep && isStreaming ? 'text-purple-300' : 'text-gray-400'
+                      i === reasoningStep && isStreaming ? 'text-purple-300' : 'text-warm-400'
                     }`}
                   >
                     <span className={`mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                      i <= reasoningStep ? 'bg-purple-400' : 'bg-gray-600'
+                      i <= reasoningStep ? 'bg-purple-400' : 'bg-warm-600'
                     }`} />
                     {step}
                   </div>
@@ -429,15 +429,15 @@ export default function AiElementsPage() {
 
           {/* Code Streaming Output */}
           {(isStreaming || streamedCode) && (
-            <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700 bg-gray-800/50">
+            <div className="bg-warm-900 rounded-lg border border-warm-700 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-warm-700 bg-warm-800/50">
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1.5">
                     <span className="w-3 h-3 rounded-full bg-red-500/60" />
                     <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
                     <span className="w-3 h-3 rounded-full bg-green-500/60" />
                   </div>
-                  <span className="text-xs text-gray-400 font-mono">StreamingPreview.tsx</span>
+                  <span className="text-xs text-warm-400 font-mono">StreamingPreview.tsx</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {isStreaming && (
@@ -452,7 +452,7 @@ export default function AiElementsPage() {
               </div>
               <pre
                 ref={codeDisplayRef}
-                className="p-4 text-sm font-mono text-gray-200 overflow-auto max-h-[400px] leading-relaxed"
+                className="p-4 text-sm font-mono text-warm-200 overflow-auto max-h-[400px] leading-relaxed"
               >
                 <code>
                   {streamedCode}
@@ -462,14 +462,14 @@ export default function AiElementsPage() {
 
               {/* Response Actions */}
               {!isStreaming && streamedCode && config?.responseActionsEnabled && (
-                <div className="flex items-center gap-2 px-4 py-3 border-t border-gray-700 bg-gray-800/30">
+                <div className="flex items-center gap-2 px-4 py-3 border-t border-warm-700 bg-warm-800/30">
                   <button
                     onClick={handleCopy}
-                    className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors"
+                    className="px-3 py-1.5 text-xs bg-warm-700 hover:bg-warm-600 text-warm-300 rounded-md transition-colors"
                   >
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
-                  <button className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-md transition-colors">
+                  <button className="px-3 py-1.5 text-xs bg-warm-700 hover:bg-warm-600 text-warm-300 rounded-md transition-colors">
                     Edit
                   </button>
                   <button className="px-3 py-1.5 text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 rounded-md transition-colors">
@@ -485,18 +485,18 @@ export default function AiElementsPage() {
 
           {/* Live Preview iframe */}
           {!isStreaming && streamedCode && config?.livePreviewEnabled && (
-            <div className="bg-gray-800 rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-gray-700">
+            <div className="bg-warm-800 rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-warm-700">
                 <h4 className="text-sm font-medium text-white">Live Component Preview</h4>
                 <span className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded border border-green-500/30">
                   Sandboxed
                 </span>
               </div>
-              <div className="p-4 bg-gray-900/50">
+              <div className="p-4 bg-warm-900/50">
                 <iframe
                   title="Component Preview"
                   sandbox="allow-scripts"
-                  className="w-full h-[200px] rounded-lg border border-gray-700 bg-white"
+                  className="w-full h-[200px] rounded-lg border border-warm-700 bg-white"
                   srcDoc={`<!DOCTYPE html><html><head><style>body{font-family:system-ui;padding:20px;background:#1a1a2e;color:#e0e0e0;display:flex;align-items:center;justify-content:center;height:80vh;margin:0}.preview{background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:24px;text-align:center;max-width:400px;backdrop-filter:blur(10px)}.badge{background:rgba(59,130,246,0.2);color:#60a5fa;padding:4px 12px;border-radius:20px;font-size:12px;display:inline-block;margin-bottom:12px;border:1px solid rgba(59,130,246,0.3)}.title{font-size:18px;font-weight:600;margin:8px 0}.desc{color:#94a3b8;font-size:14px;line-height:1.5}</style></head><body><div class="preview"><span class="badge">Live Preview</span><div class="title">StreamingPreview Component</div><p class="desc">Component rendered successfully with streaming code generation and response actions.</p></div></body></html>`}
                 />
               </div>
@@ -510,16 +510,16 @@ export default function AiElementsPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-medium text-white">Available AI Element Components</h4>
-            <span className="text-xs text-gray-500">{components.length} components</span>
+            <span className="text-xs text-warm-500">{components.length} components</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {components.map((comp) => (
               <div
                 key={comp.id}
-                className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-gray-600 transition-colors"
+                className="bg-warm-800 rounded-lg p-5 border border-warm-700 hover:border-warm-600 transition-colors"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className={`p-2 rounded-lg ${CATEGORY_COLORS[comp.category] || 'bg-gray-700 text-gray-400'}`}>
+                  <div className={`p-2 rounded-lg ${CATEGORY_COLORS[comp.category] || 'bg-warm-700 text-warm-400'}`}>
                     {ICON_MAP[comp.icon] || ICON_MAP['code']}
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full ${
@@ -531,21 +531,21 @@ export default function AiElementsPage() {
                   </span>
                 </div>
                 <h5 className="text-white font-medium mb-1">{comp.name}</h5>
-                <p className="text-sm text-gray-400 leading-relaxed">{comp.description}</p>
+                <p className="text-sm text-warm-400 leading-relaxed">{comp.description}</p>
                 <div className="mt-3 flex items-center gap-2">
-                  <span className={`text-xs px-2 py-0.5 rounded border ${CATEGORY_COLORS[comp.category] || 'border-gray-600 text-gray-400'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded border ${CATEGORY_COLORS[comp.category] || 'border-warm-600 text-warm-400'}`}>
                     {comp.category}
                   </span>
-                  <span className="text-xs text-gray-500 font-mono">{comp.id}</span>
+                  <span className="text-xs text-warm-500 font-mono">{comp.id}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Component Integration Guide */}
-          <div className="bg-gray-800 rounded-lg p-5 border border-gray-700">
+          <div className="bg-warm-800 rounded-lg p-5 border border-warm-700">
             <h4 className="font-medium text-white mb-3">Integration Guide</h4>
-            <pre className="bg-gray-900 rounded-lg p-4 text-sm font-mono text-gray-300 overflow-x-auto">
+            <pre className="bg-warm-900 rounded-lg p-4 text-sm font-mono text-warm-300 overflow-x-auto">
 {`import { MessageThread, ReasoningPanel, CodeBlock } from '@ai-elements/react'
 
 function StreamingPreview({ streamId }) {
@@ -574,58 +574,58 @@ function StreamingPreview({ streamId }) {
         <div className="space-y-4">
           {/* Metric Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="text-2xl font-bold text-blue-400">{stats.totalStreams}</div>
-              <div className="text-sm text-gray-400">Total Streams</div>
+              <div className="text-sm text-warm-400">Total Streams</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="text-2xl font-bold text-green-400">{formatTokens(stats.totalTokensStreamed)}</div>
-              <div className="text-sm text-gray-400">Tokens Streamed</div>
+              <div className="text-sm text-warm-400">Tokens Streamed</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="text-2xl font-bold text-purple-400">{stats.totalComponentPreviews}</div>
-              <div className="text-sm text-gray-400">Component Previews</div>
+              <div className="text-sm text-warm-400">Component Previews</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="text-2xl font-bold text-amber-400">{formatTokens(stats.averageStreamTokens)}</div>
-              <div className="text-sm text-gray-400">Avg Tokens/Stream</div>
+              <div className="text-sm text-warm-400">Avg Tokens/Stream</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="text-2xl font-bold text-cyan-400">{stats.activeModel.split('-').slice(0, 2).join(' ')}</div>
-              <div className="text-sm text-gray-400">Active Model</div>
+              <div className="text-sm text-warm-400">Active Model</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="text-2xl font-bold text-pink-400 capitalize">{stats.themeMode}</div>
-              <div className="text-sm text-gray-400">Theme Mode</div>
+              <div className="text-sm text-warm-400">Theme Mode</div>
             </div>
           </div>
 
           {/* Configuration Summary */}
           {config && (
-            <div className="bg-gray-800 rounded-lg p-5">
+            <div className="bg-warm-800 rounded-lg p-5">
               <h4 className="font-medium text-white mb-3">Feature Status</h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
-                  <span className="text-sm text-gray-300">Streaming Display</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${config.streamingEnabled ? 'bg-green-500/10 text-green-400' : 'bg-gray-700 text-gray-500'}`}>
+                <div className="flex items-center justify-between bg-warm-900/50 rounded-lg p-3">
+                  <span className="text-sm text-warm-300">Streaming Display</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${config.streamingEnabled ? 'bg-green-500/10 text-green-400' : 'bg-warm-700 text-warm-500'}`}>
                     {config.streamingEnabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
-                  <span className="text-sm text-gray-300">Reasoning Panel</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${config.reasoningPanelEnabled ? 'bg-green-500/10 text-green-400' : 'bg-gray-700 text-gray-500'}`}>
+                <div className="flex items-center justify-between bg-warm-900/50 rounded-lg p-3">
+                  <span className="text-sm text-warm-300">Reasoning Panel</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${config.reasoningPanelEnabled ? 'bg-green-500/10 text-green-400' : 'bg-warm-700 text-warm-500'}`}>
                     {config.reasoningPanelEnabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
-                  <span className="text-sm text-gray-300">Live Preview</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${config.livePreviewEnabled ? 'bg-green-500/10 text-green-400' : 'bg-gray-700 text-gray-500'}`}>
+                <div className="flex items-center justify-between bg-warm-900/50 rounded-lg p-3">
+                  <span className="text-sm text-warm-300">Live Preview</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${config.livePreviewEnabled ? 'bg-green-500/10 text-green-400' : 'bg-warm-700 text-warm-500'}`}>
                     {config.livePreviewEnabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
-                <div className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
-                  <span className="text-sm text-gray-300">Response Actions</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${config.responseActionsEnabled ? 'bg-green-500/10 text-green-400' : 'bg-gray-700 text-gray-500'}`}>
+                <div className="flex items-center justify-between bg-warm-900/50 rounded-lg p-3">
+                  <span className="text-sm text-warm-300">Response Actions</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${config.responseActionsEnabled ? 'bg-green-500/10 text-green-400' : 'bg-warm-700 text-warm-500'}`}>
                     {config.responseActionsEnabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -635,27 +635,27 @@ function StreamingPreview({ streamId }) {
 
           {/* Recent Streams */}
           {stats.recentStreams.length > 0 && (
-            <div className="bg-gray-800 rounded-lg p-5">
+            <div className="bg-warm-800 rounded-lg p-5">
               <h4 className="font-medium text-white mb-3">Recent Streams</h4>
               <div className="space-y-2">
                 {stats.recentStreams.map((stream, i) => (
-                  <div key={i} className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
+                  <div key={i} className="flex items-center justify-between bg-warm-900/50 rounded-lg p-3">
                     <div className="flex items-center gap-3">
                       <span className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 text-xs font-mono">
                         {stream.language.substring(0, 2).toUpperCase()}
                       </span>
                       <div>
-                        <div className="text-sm text-gray-200 truncate max-w-[300px]">
+                        <div className="text-sm text-warm-200 truncate max-w-[300px]">
                           {stream.prompt || 'Stream session'}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-warm-500">
                           {new Date(stream.startedAt).toLocaleString()}
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-gray-300">{formatTokens(stream.tokenCount)} tokens</div>
-                      <div className="text-xs text-gray-500">{stream.language}</div>
+                      <div className="text-sm text-warm-300">{formatTokens(stream.tokenCount)} tokens</div>
+                      <div className="text-xs text-warm-500">{stream.language}</div>
                     </div>
                   </div>
                 ))}

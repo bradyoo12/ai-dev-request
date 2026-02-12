@@ -96,7 +96,7 @@ export default function OnboardingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gray-900 rounded-lg p-6">
+      <div className="bg-warm-900 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">{t('onboarding.title')}</h3>
           {isCompleted ? (
@@ -113,7 +113,7 @@ export default function OnboardingPage() {
             </span>
           )}
         </div>
-        <p className="text-gray-400 text-sm mb-4">{t('onboarding.description')}</p>
+        <p className="text-warm-400 text-sm mb-4">{t('onboarding.description')}</p>
 
         {error && (
           <div className="bg-red-900/20 border border-red-700 rounded p-3 mb-4 text-red-200 text-sm">
@@ -123,11 +123,11 @@ export default function OnboardingPage() {
 
         {/* Progress bar */}
         <div className="mb-2">
-          <div className="flex justify-between text-sm text-gray-400 mb-1">
+          <div className="flex justify-between text-sm text-warm-400 mb-1">
             <span>{t('onboarding.progress')}</span>
             <span>{completionPercent}%</span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-3">
+          <div className="w-full bg-warm-700 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all duration-500 ${
                 completionPercent === 100 ? 'bg-green-500' : 'bg-blue-500'
@@ -136,13 +136,13 @@ export default function OnboardingPage() {
             />
           </div>
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-warm-500">
           {completedSteps.length} / {STEPS.length} {t('onboarding.stepsCompleted')}
         </p>
       </div>
 
       {/* Steps checklist */}
-      <div className="bg-gray-900 rounded-lg p-6">
+      <div className="bg-warm-900 rounded-lg p-6">
         <h4 className="text-md font-semibold mb-4">{t('onboarding.checklist')}</h4>
         <div className="space-y-3">
           {STEPS.map((step, index) => {
@@ -156,7 +156,7 @@ export default function OnboardingPage() {
                     ? 'border-green-700/50 bg-green-900/10'
                     : isCurrent
                     ? 'border-blue-700/50 bg-blue-900/10'
-                    : 'border-gray-700/50 bg-gray-800/30'
+                    : 'border-warm-700/50 bg-warm-800/30'
                 }`}
               >
                 <div
@@ -165,17 +165,17 @@ export default function OnboardingPage() {
                       ? 'bg-green-600 text-white'
                       : isCurrent
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-700 text-gray-400'
+                      : 'bg-warm-700 text-warm-400'
                   }`}
                 >
                   {isDone ? '✓' : index + 1}
                 </div>
                 <div className="flex-1">
-                  <p className={`font-medium ${isDone ? 'text-green-300' : isCurrent ? 'text-white' : 'text-gray-400'}`}>
+                  <p className={`font-medium ${isDone ? 'text-green-300' : isCurrent ? 'text-white' : 'text-warm-400'}`}>
                     <span className="mr-2">{step.icon}</span>
                     {t(`onboarding.steps.${step.key}.title`)}
                   </p>
-                  <p className="text-sm text-gray-500">{t(`onboarding.steps.${step.key}.description`)}</p>
+                  <p className="text-sm text-warm-500">{t(`onboarding.steps.${step.key}.description`)}</p>
                 </div>
                 {isCurrent && !isCompleted && !isSkipped && (
                   <button
@@ -193,7 +193,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Actions */}
-      <div className="bg-gray-900 rounded-lg p-6">
+      <div className="bg-warm-900 rounded-lg p-6">
         <h4 className="text-md font-semibold mb-4">{t('onboarding.actions')}</h4>
         <div className="flex gap-3">
           {!isCompleted && !isSkipped && (
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
             <button
               onClick={handleReset}
               disabled={saving}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-warm-700 hover:bg-warm-600 text-white rounded-md text-sm transition-colors disabled:opacity-50"
             >
               {t('onboarding.resetButton')}
             </button>
@@ -220,21 +220,21 @@ export default function OnboardingPage() {
       {/* Stats */}
       {progress && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-900 rounded-lg p-4 text-center">
+          <div className="bg-warm-900 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-blue-400">{progress.currentStep}</p>
-            <p className="text-sm text-gray-400">{t('onboarding.stats.currentStep')}</p>
+            <p className="text-sm text-warm-400">{t('onboarding.stats.currentStep')}</p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4 text-center">
+          <div className="bg-warm-900 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-green-400">{completedSteps.length}</p>
-            <p className="text-sm text-gray-400">{t('onboarding.stats.completed')}</p>
+            <p className="text-sm text-warm-400">{t('onboarding.stats.completed')}</p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4 text-center">
+          <div className="bg-warm-900 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-purple-400">{STEPS.length - completedSteps.length}</p>
-            <p className="text-sm text-gray-400">{t('onboarding.stats.remaining')}</p>
+            <p className="text-sm text-warm-400">{t('onboarding.stats.remaining')}</p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4 text-center">
+          <div className="bg-warm-900 rounded-lg p-4 text-center">
             <p className="text-2xl font-bold text-yellow-400">{completionPercent}%</p>
-            <p className="text-sm text-gray-400">{t('onboarding.stats.progress')}</p>
+            <p className="text-sm text-warm-400">{t('onboarding.stats.progress')}</p>
           </div>
         </div>
       )}

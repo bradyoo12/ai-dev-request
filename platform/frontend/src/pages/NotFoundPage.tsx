@@ -7,9 +7,9 @@ export default function NotFoundPage() {
 
   return (
     <section className="text-center py-20">
-      <div className="text-8xl mb-6 text-gray-600">404</div>
+      <div className="text-8xl mb-6 text-warm-600">404</div>
       <h2 className="text-3xl font-bold mb-4">{t('notFound.title')}</h2>
-      <p className="text-gray-400 mb-8 max-w-md mx-auto">
+      <p className="text-warm-400 mb-8 max-w-md mx-auto">
         {t('notFound.message')}
       </p>
       <button

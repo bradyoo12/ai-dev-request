@@ -112,19 +112,19 @@ export default function ReviewPipelinePage() {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-white">AI Code Review Pipeline</h3>
-            <p className="text-sm text-gray-400">Automated multi-dimensional code quality assurance before deployment</p>
+            <p className="text-sm text-warm-400">Automated multi-dimensional code quality assurance before deployment</p>
           </div>
         </div>
       </div>
 
       {/* Sub-tabs */}
-      <div className="flex gap-1 bg-gray-800/50 rounded-lg p-1">
+      <div className="flex gap-1 bg-warm-800/50 rounded-lg p-1">
         {(['review', 'configure', 'stats'] as SubTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setSubTab(tab)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              subTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              subTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
             }`}
           >
             {tab === 'review' ? 'Review' : tab === 'configure' ? 'Configure' : 'Stats'}
@@ -150,7 +150,7 @@ export default function ReviewPipelinePage() {
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="Enter project name..."
-                className="flex-1 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-warm-400 focus:outline-none transition-colors"
+                className="flex-1 px-4 py-2 rounded-lg bg-warm-800 border border-warm-700 text-white placeholder-warm-500 focus:border-warm-400 focus:outline-none transition-colors"
                 onKeyDown={(e) => e.key === 'Enter' && handleRunReview()}
               />
               <button
@@ -198,20 +198,20 @@ export default function ReviewPipelinePage() {
                     <div className={`text-4xl font-bold ${scoreColor(reviewResult.overallScore)}`}>
                       {reviewResult.overallScore}
                     </div>
-                    <div className="text-xs text-gray-400 mt-1">Overall Score</div>
+                    <div className="text-xs text-warm-400 mt-1">Overall Score</div>
                   </div>
                   <div className="flex-1 grid grid-cols-3 gap-3">
-                    <div className="text-center p-3 rounded-lg bg-gray-800/50">
+                    <div className="text-center p-3 rounded-lg bg-warm-800/50">
                       <div className="text-lg font-semibold text-white">{reviewResult.findings.length}</div>
-                      <div className="text-xs text-gray-400">Findings</div>
+                      <div className="text-xs text-warm-400">Findings</div>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-gray-800/50">
+                    <div className="text-center p-3 rounded-lg bg-warm-800/50">
                       <div className="text-lg font-semibold text-emerald-400">{reviewResult.autoFixCount}</div>
-                      <div className="text-xs text-gray-400">Auto-Fixed</div>
+                      <div className="text-xs text-warm-400">Auto-Fixed</div>
                     </div>
-                    <div className="text-center p-3 rounded-lg bg-gray-800/50">
+                    <div className="text-center p-3 rounded-lg bg-warm-800/50">
                       <div className="text-lg font-semibold text-blue-400">{reviewResult.testsGenerated}</div>
-                      <div className="text-xs text-gray-400">Tests Generated</div>
+                      <div className="text-xs text-warm-400">Tests Generated</div>
                     </div>
                   </div>
                 </div>
@@ -226,10 +226,10 @@ export default function ReviewPipelinePage() {
                     { key: 'maintainability', label: 'Maintainability', score: reviewResult.maintainabilityScore },
                   ].map(({ key, label, score }) => (
                     <div key={key} className="flex items-center gap-3">
-                      <span className={`text-sm w-28 ${DIMENSION_COLORS[key]?.text || 'text-gray-400'}`}>{label}</span>
-                      <div className="flex-1 h-3 rounded-full bg-gray-800 overflow-hidden">
+                      <span className={`text-sm w-28 ${DIMENSION_COLORS[key]?.text || 'text-warm-400'}`}>{label}</span>
+                      <div className="flex-1 h-3 rounded-full bg-warm-800 overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${DIMENSION_COLORS[key]?.bar || 'bg-gray-500'}`}
+                          className={`h-full rounded-full transition-all duration-500 ${DIMENSION_COLORS[key]?.bar || 'bg-warm-500'}`}
                           style={{ width: `${score}%` }}
                         />
                       </div>
@@ -249,7 +249,7 @@ export default function ReviewPipelinePage() {
                   </h4>
                   <div className="space-y-3">
                     {reviewResult.findings.map((finding: ReviewFinding) => (
-                      <div key={finding.id} className="p-4 rounded-lg bg-gray-800/50 border border-gray-700/50">
+                      <div key={finding.id} className="p-4 rounded-lg bg-warm-800/50 border border-warm-700/50">
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <span
@@ -261,8 +261,8 @@ export default function ReviewPipelinePage() {
                             </span>
                             <span
                               className={`px-2 py-0.5 rounded text-xs ${
-                                DIMENSION_COLORS[finding.dimension]?.bg || 'bg-gray-500/10'
-                              } ${DIMENSION_COLORS[finding.dimension]?.text || 'text-gray-400'}`}
+                                DIMENSION_COLORS[finding.dimension]?.bg || 'bg-warm-500/10'
+                              } ${DIMENSION_COLORS[finding.dimension]?.text || 'text-warm-400'}`}
                             >
                               {finding.dimension}
                             </span>
@@ -274,17 +274,17 @@ export default function ReviewPipelinePage() {
                           </div>
                         </div>
                         <h5 className="text-sm font-medium text-white mb-1">{finding.title}</h5>
-                        <p className="text-xs text-gray-400 mb-2">{finding.description}</p>
+                        <p className="text-xs text-warm-400 mb-2">{finding.description}</p>
                         {finding.file && (
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <div className="flex items-center gap-2 text-xs text-warm-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                             <span className="font-mono">{finding.file}{finding.line > 0 ? `:${finding.line}` : ''}</span>
                           </div>
                         )}
                         {finding.suggestedFix && (
-                          <div className="mt-2 p-2 rounded bg-gray-900/50 border border-gray-700/30">
-                            <span className="text-xs text-gray-500">Suggested fix:</span>
-                            <pre className="text-xs text-gray-300 font-mono mt-1">{finding.suggestedFix}</pre>
+                          <div className="mt-2 p-2 rounded bg-warm-900/50 border border-warm-700/30">
+                            <span className="text-xs text-warm-500">Suggested fix:</span>
+                            <pre className="text-xs text-warm-300 font-mono mt-1">{finding.suggestedFix}</pre>
                           </div>
                         )}
                       </div>
@@ -311,15 +311,15 @@ export default function ReviewPipelinePage() {
                 { key: 'architectureCheckEnabled' as const, label: 'Architecture Check', desc: 'Verify design patterns, dependency structure, and module boundaries' },
                 { key: 'maintainabilityCheckEnabled' as const, label: 'Maintainability Check', desc: 'Analyze code complexity, duplication, and type safety' },
               ].map(({ key, label, desc }) => (
-                <div key={key} className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
+                <div key={key} className="flex items-center justify-between p-3 rounded-lg bg-warm-800/50">
                   <div>
                     <div className="text-sm font-medium text-white">{label}</div>
-                    <div className="text-xs text-gray-400">{desc}</div>
+                    <div className="text-xs text-warm-400">{desc}</div>
                   </div>
                   <button
                     onClick={() => handleConfigChange({ [key]: !config[key] })}
                     className={`relative w-11 h-6 rounded-full transition-colors ${
-                      config[key] ? 'bg-warm-500' : 'bg-gray-600'
+                      config[key] ? 'bg-warm-500' : 'bg-warm-600'
                     }`}
                   >
                     <span
@@ -341,15 +341,15 @@ export default function ReviewPipelinePage() {
                 { key: 'autoFixEnabled' as const, label: 'Auto-Fix Common Issues', desc: 'Automatically apply safe fixes for non-critical issues' },
                 { key: 'testGenerationEnabled' as const, label: 'Auto Test Generation', desc: 'Generate test files for every reviewed file' },
               ].map(({ key, label, desc }) => (
-                <div key={key} className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
+                <div key={key} className="flex items-center justify-between p-3 rounded-lg bg-warm-800/50">
                   <div>
                     <div className="text-sm font-medium text-white">{label}</div>
-                    <div className="text-xs text-gray-400">{desc}</div>
+                    <div className="text-xs text-warm-400">{desc}</div>
                   </div>
                   <button
                     onClick={() => handleConfigChange({ [key]: !config[key] })}
                     className={`relative w-11 h-6 rounded-full transition-colors ${
-                      config[key] ? 'bg-warm-500' : 'bg-gray-600'
+                      config[key] ? 'bg-warm-500' : 'bg-warm-600'
                     }`}
                   >
                     <span
@@ -368,7 +368,7 @@ export default function ReviewPipelinePage() {
             <h4 className="text-sm font-semibold text-white mb-4">Quality Threshold</h4>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Minimum score to pass review</span>
+                <span className="text-sm text-warm-400">Minimum score to pass review</span>
                 <span className={`text-lg font-bold ${scoreColor(config.qualityThreshold)}`}>
                   {config.qualityThreshold}
                 </span>
@@ -379,9 +379,9 @@ export default function ReviewPipelinePage() {
                 max={100}
                 value={config.qualityThreshold}
                 onChange={(e) => handleConfigChange({ qualityThreshold: parseInt(e.target.value) })}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-gray-700 accent-warm-500"
+                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-warm-700 accent-warm-500"
               />
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-warm-500">
                 <span>0 (Lenient)</span>
                 <span>50</span>
                 <span>100 (Strict)</span>
@@ -405,7 +405,7 @@ export default function ReviewPipelinePage() {
               { label: 'Quality Threshold', value: stats.qualityThreshold, color: 'text-warm-400' },
             ].map(({ label, value, color }) => (
               <div key={label} className="glass-card p-4">
-                <div className="text-xs text-gray-400 mb-1">{label}</div>
+                <div className="text-xs text-warm-400 mb-1">{label}</div>
                 <div className={`text-2xl font-bold ${color}`}>{value}</div>
               </div>
             ))}
@@ -415,11 +415,11 @@ export default function ReviewPipelinePage() {
           <div className="glass-card p-6">
             <h4 className="text-sm font-semibold text-white mb-4">Recent Reviews</h4>
             {stats.recentReviews.length === 0 ? (
-              <p className="text-sm text-gray-400">No reviews yet. Run your first code review to see history.</p>
+              <p className="text-sm text-warm-400">No reviews yet. Run your first code review to see history.</p>
             ) : (
               <div className="space-y-3">
                 {stats.recentReviews.map((entry) => (
-                  <div key={entry.reviewId} className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50 border border-gray-700/50">
+                  <div key={entry.reviewId} className="flex items-center justify-between p-3 rounded-lg bg-warm-800/50 border border-warm-700/50">
                     <div className="flex items-center gap-3">
                       <span
                         className={`w-2 h-2 rounded-full ${
@@ -428,7 +428,7 @@ export default function ReviewPipelinePage() {
                       />
                       <div>
                         <div className="text-sm font-medium text-white">{entry.projectName}</div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-warm-400">
                           {new Date(entry.reviewedAt).toLocaleDateString()} - {entry.findingsCount} findings, {entry.autoFixCount} fixes
                         </div>
                       </div>

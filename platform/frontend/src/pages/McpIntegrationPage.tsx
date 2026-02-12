@@ -153,9 +153,9 @@ export default function McpIntegrationPage() {
     switch (status) {
       case 'connected': return 'bg-green-500'
       case 'connecting': return 'bg-yellow-500'
-      case 'disconnected': return 'bg-gray-500'
+      case 'disconnected': return 'bg-warm-500'
       case 'error': return 'bg-red-500'
-      default: return 'bg-gray-500'
+      default: return 'bg-warm-500'
     }
   }
 
@@ -163,9 +163,9 @@ export default function McpIntegrationPage() {
     switch (status) {
       case 'connected': return 'bg-green-900/50 text-green-400'
       case 'connecting': return 'bg-yellow-900/50 text-yellow-400'
-      case 'disconnected': return 'bg-gray-700 text-gray-400'
+      case 'disconnected': return 'bg-warm-700 text-warm-400'
       case 'error': return 'bg-red-900/50 text-red-400'
-      default: return 'bg-gray-700 text-gray-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -176,7 +176,7 @@ export default function McpIntegrationPage() {
 
   if (loading) {
     return (
-      <div className="text-center py-12 text-gray-400">
+      <div className="text-center py-12 text-warm-400">
         {t('mcp.loading', 'Loading MCP integration...')}
       </div>
     )
@@ -192,20 +192,20 @@ export default function McpIntegrationPage() {
       )}
 
       {/* Platform Tools Section */}
-      <div className="bg-gray-900 rounded-xl p-6">
+      <div className="bg-warm-900 rounded-xl p-6">
         <h3 className="text-lg font-bold mb-4">
           <span className="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
             {t('mcp.platformTools', 'Platform MCP Tools')}
           </span>
         </h3>
-        <p className="text-sm text-gray-400 mb-4">
+        <p className="text-sm text-warm-400 mb-4">
           {t('mcp.platformToolsDesc', 'Built-in tools exposed by the AI Dev Request platform via MCP protocol.')}
         </p>
 
         <div className="space-y-3">
           {tools.map((tool) => (
-            <div key={tool.name} className="bg-gray-800 rounded-lg p-4">
+            <div key={tool.name} className="bg-warm-800 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <span className="font-mono text-sm text-blue-400">{tool.name}</span>
@@ -218,12 +218,12 @@ export default function McpIntegrationPage() {
                   {testingTool === tool.name ? t('mcp.testing', 'Testing...') : t('mcp.testTool', 'Test Tool')}
                 </button>
               </div>
-              <p className="text-sm text-gray-400 mb-2">{tool.description}</p>
+              <p className="text-sm text-warm-400 mb-2">{tool.description}</p>
               <details className="text-xs">
-                <summary className="text-gray-500 cursor-pointer hover:text-gray-300">
+                <summary className="text-warm-500 cursor-pointer hover:text-warm-300">
                   {t('mcp.inputSchema', 'Input Schema')}
                 </summary>
-                <pre className="mt-2 bg-gray-900 rounded p-2 text-gray-400 overflow-x-auto">
+                <pre className="mt-2 bg-warm-900 rounded p-2 text-warm-400 overflow-x-auto">
                   {JSON.stringify(JSON.parse(tool.inputSchema), null, 2)}
                 </pre>
               </details>
@@ -237,7 +237,7 @@ export default function McpIntegrationPage() {
             <div className="text-sm font-medium mb-1">
               {toolResult.success ? t('mcp.toolSuccess', 'Tool executed successfully') : t('mcp.toolError', 'Tool execution failed')}
             </div>
-            <pre className="text-xs text-gray-400 overflow-x-auto">
+            <pre className="text-xs text-warm-400 overflow-x-auto">
               {toolResult.success ? toolResult.result : toolResult.error}
             </pre>
           </div>
@@ -245,7 +245,7 @@ export default function McpIntegrationPage() {
       </div>
 
       {/* External Servers Section */}
-      <div className="bg-gray-900 rounded-xl p-6">
+      <div className="bg-warm-900 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">
             <span className="flex items-center gap-2">
@@ -263,36 +263,36 @@ export default function McpIntegrationPage() {
 
         {/* Add Server Form */}
         {showAddForm && (
-          <form onSubmit={handleAddServer} className="bg-gray-800 rounded-lg p-4 mb-4 space-y-3">
+          <form onSubmit={handleAddServer} className="bg-warm-800 rounded-lg p-4 mb-4 space-y-3">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('mcp.serverName', 'Server Name')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('mcp.serverName', 'Server Name')}</label>
               <input
                 type="text"
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
                 required
                 placeholder="My MCP Server"
-                className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm border border-gray-600 focus:outline-none focus:border-blue-500"
+                className="w-full bg-warm-700 text-white rounded-lg px-3 py-2 text-sm border border-warm-600 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('mcp.serverUrl', 'Server URL')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('mcp.serverUrl', 'Server URL')}</label>
               <input
                 type="url"
                 value={newUrl}
                 onChange={e => setNewUrl(e.target.value)}
                 required
                 placeholder="https://mcp-server.example.com"
-                className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm border border-gray-600 focus:outline-none focus:border-blue-500"
+                className="w-full bg-warm-700 text-white rounded-lg px-3 py-2 text-sm border border-warm-600 focus:outline-none focus:border-blue-500"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('mcp.transport', 'Transport')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('mcp.transport', 'Transport')}</label>
                 <select
                   value={newTransport}
                   onChange={e => setNewTransport(e.target.value)}
-                  className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm border border-gray-600"
+                  className="w-full bg-warm-700 text-white rounded-lg px-3 py-2 text-sm border border-warm-600"
                 >
                   <option value="sse">SSE</option>
                   <option value="stdio">stdio</option>
@@ -300,11 +300,11 @@ export default function McpIntegrationPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('mcp.authType', 'Auth Type')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('mcp.authType', 'Auth Type')}</label>
                 <select
                   value={newAuthType}
                   onChange={e => setNewAuthType(e.target.value)}
-                  className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm border border-gray-600"
+                  className="w-full bg-warm-700 text-white rounded-lg px-3 py-2 text-sm border border-warm-600"
                 >
                   <option value="none">None</option>
                   <option value="bearer">Bearer Token</option>
@@ -314,13 +314,13 @@ export default function McpIntegrationPage() {
             </div>
             {newAuthType !== 'none' && (
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('mcp.authToken', 'Auth Token')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('mcp.authToken', 'Auth Token')}</label>
                 <input
                   type="password"
                   value={newAuthToken}
                   onChange={e => setNewAuthToken(e.target.value)}
                   placeholder="Enter token or API key"
-                  className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm border border-gray-600 focus:outline-none focus:border-blue-500"
+                  className="w-full bg-warm-700 text-white rounded-lg px-3 py-2 text-sm border border-warm-600 focus:outline-none focus:border-blue-500"
                 />
               </div>
             )}
@@ -336,14 +336,14 @@ export default function McpIntegrationPage() {
 
         {/* Servers List */}
         {servers.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-warm-400">
             <p>{t('mcp.noServers', 'No external MCP servers registered.')}</p>
             <p className="text-sm mt-1">{t('mcp.noServersHint', 'Click "Add Server" to connect an external MCP server.')}</p>
           </div>
         ) : (
           <div className="space-y-3">
             {servers.map((server) => (
-              <div key={server.id} className="bg-gray-800 rounded-lg p-4">
+              <div key={server.id} className="bg-warm-800 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full ${getStatusColor(server.status)}`} />
@@ -355,7 +355,7 @@ export default function McpIntegrationPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleCheckStatus(server.id)}
-                      className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded text-xs transition-colors"
+                      className="px-3 py-1 bg-warm-700 hover:bg-warm-600 text-white rounded text-xs transition-colors"
                     >
                       {t('mcp.status', 'Status')}
                     </button>
@@ -374,7 +374,7 @@ export default function McpIntegrationPage() {
                     </button>
                   </div>
                 </div>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-warm-400">
                   <span className="font-mono text-xs">{server.serverUrl}</span>
                   <span className="mx-2">|</span>
                   <span className="text-xs">{server.transport.toUpperCase()}</span>
@@ -389,13 +389,13 @@ export default function McpIntegrationPage() {
                 {/* Available tools from this server */}
                 {server.availableTools && (
                   <div className="mt-3">
-                    <div className="text-xs text-gray-500 mb-2">{t('mcp.availableTools', 'Available Tools')}:</div>
+                    <div className="text-xs text-warm-500 mb-2">{t('mcp.availableTools', 'Available Tools')}:</div>
                     <div className="flex flex-wrap gap-2">
                       {parseJsonTools(server.availableTools).map((tool) => (
                         <button
                           key={tool.name}
                           onClick={() => handleCallExternalTool(server.id, tool.name)}
-                          className="px-2 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded text-xs transition-colors"
+                          className="px-2 py-1 bg-warm-700 hover:bg-warm-600 text-warm-300 rounded text-xs transition-colors"
                           title={tool.description}
                         >
                           {tool.name}
@@ -407,24 +407,24 @@ export default function McpIntegrationPage() {
 
                 {/* Server status details */}
                 {selectedServer === server.id && serverStatus && (
-                  <div className="mt-3 bg-gray-900/50 rounded-lg p-3">
-                    <div className="text-xs font-medium text-gray-300 mb-2">{t('mcp.serverDetails', 'Server Details')}</div>
+                  <div className="mt-3 bg-warm-900/50 rounded-lg p-3">
+                    <div className="text-xs font-medium text-warm-300 mb-2">{t('mcp.serverDetails', 'Server Details')}</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                       <div>
-                        <span className="text-gray-500">{t('mcp.toolCount', 'Tools')}:</span>
-                        <span className="ml-1 text-gray-300">{serverStatus.toolCount}</span>
+                        <span className="text-warm-500">{t('mcp.toolCount', 'Tools')}:</span>
+                        <span className="ml-1 text-warm-300">{serverStatus.toolCount}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">{t('mcp.resourceCount', 'Resources')}:</span>
-                        <span className="ml-1 text-gray-300">{serverStatus.resourceCount}</span>
+                        <span className="text-warm-500">{t('mcp.resourceCount', 'Resources')}:</span>
+                        <span className="ml-1 text-warm-300">{serverStatus.resourceCount}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">{t('mcp.totalCalls', 'Total Calls')}:</span>
-                        <span className="ml-1 text-gray-300">{serverStatus.toolCallCount}</span>
+                        <span className="text-warm-500">{t('mcp.totalCalls', 'Total Calls')}:</span>
+                        <span className="ml-1 text-warm-300">{serverStatus.toolCallCount}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">{t('mcp.lastConnected', 'Last Connected')}:</span>
-                        <span className="ml-1 text-gray-300">
+                        <span className="text-warm-500">{t('mcp.lastConnected', 'Last Connected')}:</span>
+                        <span className="ml-1 text-warm-300">
                           {serverStatus.lastConnectedAt
                             ? new Date(serverStatus.lastConnectedAt).toLocaleString()
                             : t('mcp.never', 'Never')}

@@ -81,8 +81,8 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
       case 'implemented': return { color: 'bg-green-600', label: t('feedback.status.implemented') }
       case 'resolved': return { color: 'bg-green-600', label: t('feedback.status.resolved') }
       case 'on_hold': return { color: 'bg-orange-600', label: t('feedback.status.on_hold') }
-      case 'closed': return { color: 'bg-gray-600', label: t('feedback.status.closed') }
-      default: return { color: 'bg-gray-600', label: status }
+      case 'closed': return { color: 'bg-warm-600', label: t('feedback.status.closed') }
+      default: return { color: 'bg-warm-600', label: status }
     }
   }
 
@@ -94,7 +94,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold">{t('suggestions.boardTitle')}</h3>
-          <p className="text-gray-400 text-sm mt-1">{t('suggestions.boardDescription')}</p>
+          <p className="text-warm-400 text-sm mt-1">{t('suggestions.boardDescription')}</p>
         </div>
       </div>
 
@@ -110,7 +110,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
         <select
           value={category}
           onChange={(e) => { setCategory(e.target.value); setPage(1) }}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-warm-800 border border-warm-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">{t('suggestions.filter.all')}</option>
           <option value="feature_request">{t('suggestions.category.featureRequest')}</option>
@@ -121,13 +121,13 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
         <select
           value={sort}
           onChange={(e) => { setSort(e.target.value); setPage(1) }}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-warm-800 border border-warm-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="newest">{t('suggestions.sort.newest')}</option>
           <option value="popular">{t('suggestions.sort.popular')}</option>
           <option value="oldest">{t('suggestions.sort.oldest')}</option>
         </select>
-        <div className="ml-auto text-sm text-gray-400">
+        <div className="ml-auto text-sm text-warm-400">
           {t('suggestions.totalCount', { count: total })}
         </div>
       </div>
@@ -136,24 +136,24 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-400">{t('suggestions.loading')}</p>
+          <p className="text-warm-400">{t('suggestions.loading')}</p>
         </div>
       ) : suggestions.length === 0 ? (
-        <div className="text-center py-12 bg-gray-800 rounded-xl">
+        <div className="text-center py-12 bg-warm-800 rounded-xl">
           <div className="text-4xl mb-3">💡</div>
-          <p className="text-gray-400">{t('suggestions.empty')}</p>
+          <p className="text-warm-400">{t('suggestions.empty')}</p>
         </div>
       ) : (
         <div className="space-y-3">
           {suggestions.map((suggestion) => {
             const statusBadge = getStatusBadge(suggestion.status)
             return (
-              <div key={suggestion.id} className="bg-gray-800 rounded-xl p-4 flex gap-4">
+              <div key={suggestion.id} className="bg-warm-800 rounded-xl p-4 flex gap-4">
                 {/* Vote button */}
                 <div className="flex flex-col items-center gap-1 min-w-[48px]">
                   <button
                     onClick={() => handleVote(suggestion.id)}
-                    className="p-1.5 rounded-lg hover:bg-gray-700 transition-colors text-gray-400 hover:text-blue-400"
+                    className="p-1.5 rounded-lg hover:bg-warm-700 transition-colors text-warm-400 hover:text-blue-400"
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M10 3L3 13h14L10 3z" />
@@ -175,8 +175,8 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
                       {statusBadge.label}
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm mt-1 line-clamp-2">{suggestion.description}</p>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                  <p className="text-warm-400 text-sm mt-1 line-clamp-2">{suggestion.description}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-warm-500">
                     <span>{getCategoryLabel(suggestion.category)}</span>
                     <span>·</span>
                     <span>{new Date(suggestion.createdAt).toLocaleDateString()}</span>
@@ -200,17 +200,17 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 rounded-lg text-sm"
+            className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
           >
             ←
           </button>
-          <span className="px-3 py-1.5 text-sm text-gray-400">
+          <span className="px-3 py-1.5 text-sm text-warm-400">
             {page} / {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 rounded-lg text-sm"
+            className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
           >
             →
           </button>

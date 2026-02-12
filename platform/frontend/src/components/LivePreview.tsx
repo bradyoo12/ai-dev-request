@@ -31,11 +31,11 @@ export default function LivePreview({ previewUrl }: LivePreviewProps) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden mb-6">
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700">
+    <div className="bg-warm-900 border border-warm-700 rounded-xl overflow-hidden mb-6">
+      <div className="flex items-center justify-between px-4 py-3 bg-warm-800 border-b border-warm-700">
         <h4 className="font-bold text-emerald-400">{t('preview.title')}</h4>
         <div className="flex items-center gap-2">
-          <div className="flex bg-gray-900 rounded-lg p-0.5">
+          <div className="flex bg-warm-900 rounded-lg p-0.5">
             {(['desktop', 'tablet', 'mobile'] as DeviceMode[]).map((d) => (
               <button
                 key={d}
@@ -43,7 +43,7 @@ export default function LivePreview({ previewUrl }: LivePreviewProps) {
                 className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   device === d
                     ? 'bg-emerald-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-warm-400 hover:text-white'
                 }`}
               >
                 {t(`preview.${d}`)}
@@ -52,7 +52,7 @@ export default function LivePreview({ previewUrl }: LivePreviewProps) {
           </div>
           <button
             onClick={handleCopyUrl}
-            className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs text-gray-300 transition-colors"
+            className="px-3 py-1 bg-warm-700 hover:bg-warm-600 rounded-lg text-xs text-warm-300 transition-colors"
           >
             {copied ? t('preview.copied') : t('preview.copyUrl')}
           </button>
@@ -60,14 +60,14 @@ export default function LivePreview({ previewUrl }: LivePreviewProps) {
             href={fullUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs text-gray-300 transition-colors"
+            className="px-3 py-1 bg-warm-700 hover:bg-warm-600 rounded-lg text-xs text-warm-300 transition-colors"
           >
             {t('preview.openNew')}
           </a>
         </div>
       </div>
 
-      <div className="flex justify-center bg-gray-950 p-4" style={{ minHeight: '500px' }}>
+      <div className="flex justify-center bg-warm-950 p-4" style={{ minHeight: '500px' }}>
         <div
           className="bg-white rounded-lg overflow-hidden shadow-2xl transition-all duration-300"
           style={{
@@ -85,7 +85,7 @@ export default function LivePreview({ previewUrl }: LivePreviewProps) {
         </div>
       </div>
 
-      <div className="px-4 py-2 bg-gray-800 border-t border-gray-700 flex items-center justify-between text-xs text-gray-500">
+      <div className="px-4 py-2 bg-warm-800 border-t border-warm-700 flex items-center justify-between text-xs text-warm-500">
         <span>{deviceSizes[device].label}</span>
         <span className="font-mono truncate max-w-[300px]">{fullUrl}</span>
       </div>

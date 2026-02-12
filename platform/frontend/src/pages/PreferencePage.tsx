@@ -92,7 +92,7 @@ export default function PreferencePage() {
   }
 
   if (loading && preferences.length === 0) {
-    return <div className="text-center py-8 text-gray-400">{t('preference.loading')}</div>
+    return <div className="text-center py-8 text-warm-400">{t('preference.loading')}</div>
   }
 
   const grouped = preferences.reduce<Record<string, PreferenceRecord[]>>((acc, p) => {
@@ -106,7 +106,7 @@ export default function PreferencePage() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold">{t('preference.title')}</h3>
-          <p className="text-sm text-gray-400 mt-1">{t('preference.description')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('preference.description')}</p>
         </div>
         <div className="flex gap-2">
           {preferences.length > 0 && (
@@ -144,7 +144,7 @@ export default function PreferencePage() {
               {t('preference.regenerate')}
             </button>
           </div>
-          <p className="text-sm text-gray-300">{summary.summaryText}</p>
+          <p className="text-sm text-warm-300">{summary.summaryText}</p>
         </div>
       )}
 
@@ -152,7 +152,7 @@ export default function PreferencePage() {
         <button
           onClick={() => setFilterCategory('')}
           className={`px-3 py-1 text-xs rounded-full transition-colors ${
-            filterCategory === '' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+            filterCategory === '' ? 'bg-purple-600 text-white' : 'bg-warm-700 text-warm-300 hover:bg-warm-600'
           }`}
         >
           {t('preference.filterAll')}
@@ -162,7 +162,7 @@ export default function PreferencePage() {
             key={cat}
             onClick={() => setFilterCategory(cat)}
             className={`px-3 py-1 text-xs rounded-full transition-colors ${
-              filterCategory === cat ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              filterCategory === cat ? 'bg-purple-600 text-white' : 'bg-warm-700 text-warm-300 hover:bg-warm-600'
             }`}
           >
             {t(`preference.cat.${cat}`)}
@@ -171,8 +171,8 @@ export default function PreferencePage() {
       </div>
 
       {preferences.length === 0 ? (
-        <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-          <p className="text-gray-400">{t('preference.empty')}</p>
+        <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+          <p className="text-warm-400">{t('preference.empty')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -182,15 +182,15 @@ export default function PreferencePage() {
                 {t(`preference.cat.${category}`)}
               </h4>
               {prefs.map((p) => (
-                <div key={p.id} className="bg-gray-800 rounded-lg p-3 flex items-center justify-between gap-4">
+                <div key={p.id} className="bg-warm-800 rounded-lg p-3 flex items-center justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-white">{p.key}</span>
-                      <span className="text-sm text-gray-400">=</span>
+                      <span className="text-sm text-warm-400">=</span>
                       <span className="text-sm text-purple-300">{p.value}</span>
                     </div>
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-warm-500">
                         {t('preference.confidence')}: {Math.round(p.confidence * 100)}%
                       </span>
                       <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs ${
@@ -202,7 +202,7 @@ export default function PreferencePage() {
                   </div>
                   <button
                     onClick={() => handleDelete(p.id)}
-                    className="text-gray-500 hover:text-red-400 transition-colors text-sm shrink-0"
+                    className="text-warm-500 hover:text-red-400 transition-colors text-sm shrink-0"
                   >
                     {t('memory.delete')}
                   </button>
@@ -215,15 +215,15 @@ export default function PreferencePage() {
 
       {showAddDialog && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowAddDialog(false)}>
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-warm-800 rounded-xl p-6 w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-4">{t('preference.addTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('preference.categoryLabel')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('preference.categoryLabel')}</label>
                 <select
                   value={newCategory}
                   onChange={e => setNewCategory(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                  className="w-full bg-warm-700 border border-warm-600 rounded-lg p-2 text-white text-sm"
                 >
                   {CATEGORIES.map(c => (
                     <option key={c} value={c}>{t(`preference.cat.${c}`)}</option>
@@ -231,27 +231,27 @@ export default function PreferencePage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('preference.keyLabel')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('preference.keyLabel')}</label>
                 <input
                   value={newKey}
                   onChange={e => setNewKey(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                  className="w-full bg-warm-700 border border-warm-600 rounded-lg p-2 text-white text-sm"
                   placeholder={t('preference.keyPlaceholder')}
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('preference.valueLabel')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('preference.valueLabel')}</label>
                 <input
                   value={newValue}
                   onChange={e => setNewValue(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                  className="w-full bg-warm-700 border border-warm-600 rounded-lg p-2 text-white text-sm"
                   placeholder={t('preference.valuePlaceholder')}
                 />
               </div>
               <div className="flex gap-2 justify-end">
                 <button
                   onClick={() => setShowAddDialog(false)}
-                  className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-2 text-sm text-warm-400 hover:text-white transition-colors"
                 >
                   {t('tokens.confirm.cancel')}
                 </button>
@@ -270,13 +270,13 @@ export default function PreferencePage() {
 
       {deleteAllConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setDeleteAllConfirm(false)}>
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-warm-800 rounded-xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-2">{t('preference.deleteAllTitle')}</h3>
-            <p className="text-sm text-gray-400 mb-4">{t('preference.deleteAllConfirm')}</p>
+            <p className="text-sm text-warm-400 mb-4">{t('preference.deleteAllConfirm')}</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setDeleteAllConfirm(false)}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm text-warm-400 hover:text-white transition-colors"
               >
                 {t('tokens.confirm.cancel')}
               </button>

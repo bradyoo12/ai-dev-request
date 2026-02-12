@@ -141,17 +141,17 @@ export default function SettingsLayout() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/')}
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-warm-400 hover:text-white transition-colors"
         >
           &larr;
         </button>
         <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
       </div>
-      <div className="flex gap-1 mb-6 bg-gray-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
+      <div className="flex gap-1 mb-6 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
         <button
           onClick={() => setSettingsTab('tokens')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'tokens' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'tokens' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.tokens')}
@@ -159,7 +159,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('usage')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'usage' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'usage' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.usage')}
@@ -167,7 +167,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('billing')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'billing' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'billing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -178,7 +178,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('payments')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'payments' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'payments' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.payments')}
@@ -186,7 +186,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('memories')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'memories' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'memories' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.memories')}
@@ -194,7 +194,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('preferences')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'preferences' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'preferences' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.preferences')}
@@ -202,7 +202,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('infrastructure')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'infrastructure' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'infrastructure' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.infrastructure', 'Infrastructure')}
@@ -210,7 +210,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('secrets')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'secrets' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'secrets' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.secrets', 'Secrets')}
@@ -218,7 +218,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('preview')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'preview' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'preview' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.preview', 'Preview')}
@@ -226,7 +226,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('generation')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'generation' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'generation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.generation', 'Generation')}
@@ -234,7 +234,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('oauth')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'oauth' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'oauth' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.oauth', 'OAuth')}
@@ -242,7 +242,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('compiler')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'compiler' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'compiler' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.compiler', 'Compiler')}
@@ -250,7 +250,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('observability')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'observability' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'observability' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.observability', 'Observability')}
@@ -258,7 +258,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('workflows')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'workflows' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'workflows' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.workflows', 'Workflows')}
@@ -266,7 +266,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('specifications')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'specifications' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'specifications' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.specifications', 'Specifications')}
@@ -274,7 +274,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('github-sync')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'github-sync' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'github-sync' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.githubSync', 'GitHub Sync')}
@@ -282,7 +282,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('code-review')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'code-review' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'code-review' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('settings.tabs.codeReview', 'Code Review')}
@@ -290,7 +290,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('streaming-generation')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'streaming-generation' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'streaming-generation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -301,7 +301,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('mcp-integration')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mcp-integration' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'mcp-integration' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -312,7 +312,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('analytics')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'analytics' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'analytics' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -323,7 +323,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('marketplace')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'marketplace' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'marketplace' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -334,7 +334,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('containerization')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'containerization' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'containerization' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -345,7 +345,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('test-generation')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'test-generation' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'test-generation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -356,7 +356,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('collaborative-editing')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'collaborative-editing' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'collaborative-editing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -367,7 +367,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('onboarding')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'onboarding' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'onboarding' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -378,7 +378,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('version-history')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'version-history' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'version-history' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -389,7 +389,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('component-preview')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'component-preview' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'component-preview' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -400,7 +400,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('variant-comparison')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'variant-comparison' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'variant-comparison' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -411,7 +411,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('performance')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'performance' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'performance' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -422,7 +422,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('schema-designer')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'schema-designer' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'schema-designer' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -433,7 +433,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('api-cli')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'api-cli' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'api-cli' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -444,7 +444,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('pipeline-builder')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'pipeline-builder' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'pipeline-builder' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -455,7 +455,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('api-docs')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'api-docs' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'api-docs' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -466,7 +466,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('code-merge')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'code-merge' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'code-merge' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -477,7 +477,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('voice-input')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'voice-input' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'voice-input' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -488,7 +488,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('model-routing')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'model-routing' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'model-routing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -499,7 +499,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('context-index')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'context-index' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'context-index' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -510,7 +510,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('deployment-health')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'deployment-health' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'deployment-health' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -521,7 +521,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('generative-ui')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'generative-ui' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'generative-ui' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -532,7 +532,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('mobile-app')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mobile-app' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'mobile-app' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -543,7 +543,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('background-agents')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'background-agents' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'background-agents' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -554,7 +554,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('platform-upgrade')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'platform-upgrade' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'platform-upgrade' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -565,7 +565,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('visual-prompt')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'visual-prompt' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'visual-prompt' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -576,7 +576,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('multi-framework')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'multi-framework' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'multi-framework' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -587,7 +587,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('view-transitions')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'view-transitions' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'view-transitions' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -598,7 +598,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('nl-schema')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'nl-schema' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'nl-schema' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -609,7 +609,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('query-config')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'query-config' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'query-config' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -620,7 +620,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('agentic-planning')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agentic-planning' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'agentic-planning' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -631,7 +631,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('visual-regression')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'visual-regression' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'visual-regression' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -642,7 +642,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('mcp-gateway')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mcp-gateway' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'mcp-gateway' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -653,7 +653,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('codebase-memory')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'codebase-memory' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'codebase-memory' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -664,7 +664,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('figma-import')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'figma-import' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'figma-import' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -675,7 +675,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('arena')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'arena' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'arena' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -686,7 +686,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('visual-overlay')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'visual-overlay' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'visual-overlay' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -697,7 +697,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('semantic-search')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'semantic-search' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'semantic-search' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -708,7 +708,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('planning-mode')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'planning-mode' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'planning-mode' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -719,7 +719,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('project-docs')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'project-docs' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'project-docs' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -730,7 +730,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('ai-elements')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'ai-elements' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'ai-elements' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -741,7 +741,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('review-pipeline')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'review-pipeline' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'review-pipeline' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -752,7 +752,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('oauth-connectors')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'oauth-connectors' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'oauth-connectors' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -763,7 +763,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('mcp-tools')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mcp-tools' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'mcp-tools' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -774,7 +774,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('ai-model')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'ai-model' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'ai-model' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">
@@ -785,7 +785,7 @@ export default function SettingsLayout() {
         <button
           onClick={() => setSettingsTab('bidir-sync')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'bidir-sync' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            settingsTab === 'bidir-sync' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           <span className="flex items-center gap-1 justify-center">

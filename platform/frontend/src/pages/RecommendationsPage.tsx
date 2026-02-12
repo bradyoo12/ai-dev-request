@@ -102,7 +102,7 @@ export default function RecommendationsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center py-16">
           <h2 className="text-2xl font-bold mb-2">{t('recommend.title')}</h2>
-          <p className="text-gray-400">{t('recommend.loginRequired')}</p>
+          <p className="text-warm-400">{t('recommend.loginRequired')}</p>
         </div>
       </div>
     )
@@ -111,7 +111,7 @@ export default function RecommendationsPage() {
   if (loading && recommendations.length === 0) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="text-center py-8 text-gray-400">{t('recommend.loading')}</div>
+        <div className="text-center py-8 text-warm-400">{t('recommend.loading')}</div>
       </div>
     )
   }
@@ -121,7 +121,7 @@ export default function RecommendationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">{t('recommend.title')}</h2>
-          <p className="text-sm text-gray-400 mt-1">{t('recommend.description')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('recommend.description')}</p>
         </div>
         <button
           onClick={handleRefresh}
@@ -140,9 +140,9 @@ export default function RecommendationsPage() {
       )}
 
       {/* Interests Section */}
-      <div className="bg-gray-800/50 rounded-lg p-4">
+      <div className="bg-warm-800/50 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-gray-300">{t('recommend.yourInterests')}</h3>
+          <h3 className="text-sm font-medium text-warm-300">{t('recommend.yourInterests')}</h3>
           <button
             onClick={() => setShowInterestDialog(true)}
             className="text-xs text-purple-400 hover:text-purple-200 transition-colors"
@@ -151,7 +151,7 @@ export default function RecommendationsPage() {
           </button>
         </div>
         {interests.length === 0 ? (
-          <p className="text-xs text-gray-500">{t('recommend.noInterests')}</p>
+          <p className="text-xs text-warm-500">{t('recommend.noInterests')}</p>
         ) : (
           <div className="flex gap-2 flex-wrap">
             {interests.map((interest) => (
@@ -174,14 +174,14 @@ export default function RecommendationsPage() {
 
       {/* Recommendations Grid */}
       {recommendations.length === 0 ? (
-        <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-          <p className="text-gray-400">{t('recommend.empty')}</p>
-          <p className="text-sm text-gray-500 mt-1">{t('recommend.emptyHint')}</p>
+        <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+          <p className="text-warm-400">{t('recommend.empty')}</p>
+          <p className="text-sm text-warm-500 mt-1">{t('recommend.emptyHint')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {recommendations.map((rec) => (
-            <div key={rec.id} className="bg-gray-800 rounded-xl p-5 flex flex-col">
+            <div key={rec.id} className="bg-warm-800 rounded-xl p-5 flex flex-col">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-900/50 text-purple-300">
@@ -193,15 +193,15 @@ export default function RecommendationsPage() {
                 </div>
                 <button
                   onClick={() => handleDismiss(rec.id)}
-                  className="text-gray-500 hover:text-red-400 transition-colors text-sm"
+                  className="text-warm-500 hover:text-red-400 transition-colors text-sm"
                   title={t('recommend.dismiss')}
                 >
                   &times;
                 </button>
               </div>
               <h4 className="text-white font-semibold mb-2">{rec.title}</h4>
-              <p className="text-sm text-gray-400 mb-2 flex-1">{rec.description}</p>
-              <p className="text-xs text-gray-500 mb-4">{rec.reason}</p>
+              <p className="text-sm text-warm-400 mb-2 flex-1">{rec.description}</p>
+              <p className="text-xs text-warm-500 mb-4">{rec.reason}</p>
               <button
                 onClick={() => handleUseTemplate(rec.promptTemplate)}
                 className="w-full py-2 text-sm bg-purple-600/20 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-colors"
@@ -216,15 +216,15 @@ export default function RecommendationsPage() {
       {/* Add Interest Dialog */}
       {showInterestDialog && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowInterestDialog(false)}>
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
+          <div className="bg-warm-800 rounded-xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-semibold mb-4">{t('recommend.addInterestTitle')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-1">{t('recommend.interestLabel')}</label>
+                <label className="block text-sm text-warm-400 mb-1">{t('recommend.interestLabel')}</label>
                 <select
                   value={newInterestCategory}
                   onChange={e => setNewInterestCategory(e.target.value)}
-                  className="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                  className="w-full bg-warm-700 border border-warm-600 rounded-lg p-2 text-white text-sm"
                 >
                   {INTEREST_CATEGORIES.map(c => (
                     <option key={c} value={c}>{t(`recommend.interest.${c}`)}</option>
@@ -234,7 +234,7 @@ export default function RecommendationsPage() {
               <div className="flex gap-2 justify-end">
                 <button
                   onClick={() => setShowInterestDialog(false)}
-                  className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-2 text-sm text-warm-400 hover:text-white transition-colors"
                 >
                   {t('tokens.confirm.cancel')}
                 </button>

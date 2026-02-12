@@ -61,7 +61,7 @@ export default function VisualRegressionPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('visualRegression.title', 'Visual Regression Testing')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('visualRegression.subtitle', 'Capture screenshots and detect visual differences across project iterations')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('visualRegression.subtitle', 'Capture screenshots and detect visual differences across project iterations')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['capture', 'results', 'stats'] as Tab[]).map((t2) => (
@@ -69,7 +69,7 @@ export default function VisualRegressionPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`visualRegression.tabs.${t2}`, t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -87,7 +87,7 @@ export default function VisualRegressionPage() {
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   placeholder="My Web App"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -96,7 +96,7 @@ export default function VisualRegressionPage() {
                   value={pageUrl}
                   onChange={(e) => setPageUrl(e.target.value)}
                   placeholder="/"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function VisualRegressionPage() {
                 <select
                   value={viewport}
                   onChange={(e) => setViewport(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
                 >
                   {viewports.map((vp) => (
                     <option key={vp.id} value={`${vp.width}x${vp.height}`}>{vp.name} ({vp.width}x{vp.height})</option>
@@ -128,7 +128,7 @@ export default function VisualRegressionPage() {
                   onChange={(e) => setThreshold(Number(e.target.value))}
                   className="w-full accent-blue-500"
                 />
-                <p className="text-xs text-gray-500 mt-1">{t('visualRegression.thresholdDesc', 'Maximum allowed mismatch percentage')}</p>
+                <p className="text-xs text-warm-500 mt-1">{t('visualRegression.thresholdDesc', 'Maximum allowed mismatch percentage')}</p>
               </div>
               <div className="flex gap-2">
                 <button
@@ -150,13 +150,13 @@ export default function VisualRegressionPage() {
           </div>
 
           {result && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 space-y-4">
+            <div className="bg-warm-900 border border-warm-700 rounded-lg p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h4 className="font-medium">{result.projectName}</h4>
                   <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(result.passed, result.status)}`}>{statusLabel(result.passed, result.status)}</span>
                 </div>
-                <span className="text-xs text-gray-500">{result.viewportSize}</span>
+                <span className="text-xs text-warm-500">{result.viewportSize}</span>
               </div>
 
               {result.status === 'completed' && (
@@ -165,12 +165,12 @@ export default function VisualRegressionPage() {
                     <div className={`text-3xl font-bold ${result.passed ? 'text-green-400' : 'text-red-400'}`}>
                       {result.mismatchPercentage}%
                     </div>
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-warm-400">
                       <div>{t('visualRegression.mismatch', 'Mismatch')}</div>
                       <div className="text-xs">{result.pixelsDifferent.toLocaleString()} / {result.totalPixels.toLocaleString()} {t('visualRegression.pixels', 'pixels')}</div>
                     </div>
                   </div>
-                  <div className="w-full h-2 bg-gray-700 rounded-full">
+                  <div className="w-full h-2 bg-warm-700 rounded-full">
                     <div
                       className={`h-2 rounded-full transition-all ${result.passed ? 'bg-green-500' : 'bg-red-500'}`}
                       style={{ width: `${Math.min(result.mismatchPercentage * 10, 100)}%` }}
@@ -180,21 +180,21 @@ export default function VisualRegressionPage() {
               )}
 
               <div className="grid grid-cols-4 gap-3">
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{result.captureTimeMs}ms</div>
-                  <div className="text-xs text-gray-400">{t('visualRegression.captureTime', 'Capture')}</div>
+                  <div className="text-xs text-warm-400">{t('visualRegression.captureTime', 'Capture')}</div>
                 </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{result.compareTimeMs}ms</div>
-                  <div className="text-xs text-gray-400">{t('visualRegression.compareTime', 'Compare')}</div>
+                  <div className="text-xs text-warm-400">{t('visualRegression.compareTime', 'Compare')}</div>
                 </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{result.threshold}%</div>
-                  <div className="text-xs text-gray-400">{t('visualRegression.thresholdLabel', 'Threshold')}</div>
+                  <div className="text-xs text-warm-400">{t('visualRegression.thresholdLabel', 'Threshold')}</div>
                 </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{result.viewportSize}</div>
-                  <div className="text-xs text-gray-400">{t('visualRegression.viewportLabel', 'Viewport')}</div>
+                  <div className="text-xs text-warm-400">{t('visualRegression.viewportLabel', 'Viewport')}</div>
                 </div>
               </div>
             </div>
@@ -205,13 +205,13 @@ export default function VisualRegressionPage() {
       {tab === 'results' && (
         <div className="space-y-3">
           {results.length === 0 && (
-            <div className="text-center py-12 text-gray-500 text-sm">{t('visualRegression.noResults', 'No test results yet. Capture a baseline to get started!')}</div>
+            <div className="text-center py-12 text-warm-500 text-sm">{t('visualRegression.noResults', 'No test results yet. Capture a baseline to get started!')}</div>
           )}
           {results.map((r) => (
-            <div key={r.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center justify-between">
+            <div key={r.id} className="bg-warm-800 border border-warm-700 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <div className="font-medium text-sm">{r.projectName}</div>
-                <div className="text-xs text-gray-400 mt-1">{r.pageUrl} — {r.viewportSize}</div>
+                <div className="text-xs text-warm-400 mt-1">{r.pageUrl} — {r.viewportSize}</div>
               </div>
               <div className="flex items-center gap-3">
                 {r.status === 'completed' && (
@@ -220,7 +220,7 @@ export default function VisualRegressionPage() {
                   </span>
                 )}
                 <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(r.passed, r.status)}`}>{statusLabel(r.passed, r.status)}</span>
-                <span className="text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</span>
+                <span className="text-xs text-warm-500">{new Date(r.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
@@ -230,29 +230,29 @@ export default function VisualRegressionPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalTests}</div>
-              <div className="text-sm text-gray-400">{t('visualRegression.stats.total', 'Total Tests')}</div>
+              <div className="text-sm text-warm-400">{t('visualRegression.stats.total', 'Total Tests')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.passedTests}</div>
-              <div className="text-sm text-gray-400">{t('visualRegression.stats.passed', 'Passed')}</div>
+              <div className="text-sm text-warm-400">{t('visualRegression.stats.passed', 'Passed')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-red-400">{stats.failedTests}</div>
-              <div className="text-sm text-gray-400">{t('visualRegression.stats.failed', 'Failed')}</div>
+              <div className="text-sm text-warm-400">{t('visualRegression.stats.failed', 'Failed')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.passRate}%</div>
-              <div className="text-sm text-gray-400">{t('visualRegression.stats.passRate', 'Pass Rate')}</div>
+              <div className="text-sm text-warm-400">{t('visualRegression.stats.passRate', 'Pass Rate')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.avgMismatch}%</div>
-              <div className="text-sm text-gray-400">{t('visualRegression.stats.avgMismatch', 'Avg Mismatch')}</div>
+              <div className="text-sm text-warm-400">{t('visualRegression.stats.avgMismatch', 'Avg Mismatch')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalPixelsAnalyzed.toLocaleString()}</div>
-              <div className="text-sm text-gray-400">{t('visualRegression.stats.pixels', 'Pixels Analyzed')}</div>
+              <div className="text-sm text-warm-400">{t('visualRegression.stats.pixels', 'Pixels Analyzed')}</div>
             </div>
           </div>
           {stats.recentResults.length > 0 && (
@@ -260,15 +260,15 @@ export default function VisualRegressionPage() {
               <h4 className="font-medium mb-3">{t('visualRegression.stats.recent', 'Recent Results')}</h4>
               <div className="space-y-2">
                 {stats.recentResults.map((r, i) => (
-                  <div key={i} className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+                  <div key={i} className="bg-warm-800 border border-warm-700 rounded-lg p-3 flex items-center justify-between">
                     <div>
                       <span className="font-medium text-sm">{r.projectName}</span>
-                      <span className="text-xs text-gray-400 ml-2">{r.pageUrl}</span>
+                      <span className="text-xs text-warm-400 ml-2">{r.pageUrl}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-sm font-bold ${r.passed ? 'text-green-400' : 'text-red-400'}`}>{r.mismatchPercentage}%</span>
                       <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(r.passed, r.status)}`}>{statusLabel(r.passed, r.status)}</span>
-                      <span className="text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString()}</span>
+                      <span className="text-xs text-warm-500">{new Date(r.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 ))}

@@ -105,7 +105,7 @@ export default function CompilerValidationPage() {
       case 'fixing':
         return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-900/40 text-yellow-400">Auto-fixing...</span>
       default:
-        return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-400">Not run</span>
+        return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-warm-700 text-warm-400">Not run</span>
     }
   }
 
@@ -113,7 +113,7 @@ export default function CompilerValidationPage() {
     return (
       <div className="text-center py-16">
         <h3 className="text-lg font-bold mb-2">{t('compiler.title', 'Compiler Validation')}</h3>
-        <p className="text-gray-400">{t('compiler.noProject', 'No project selected. Build a project first, then return here to validate.')}</p>
+        <p className="text-warm-400">{t('compiler.noProject', 'No project selected. Build a project first, then return here to validate.')}</p>
       </div>
     )
   }
@@ -124,7 +124,7 @@ export default function CompilerValidationPage() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-bold">{t('compiler.title', 'Compiler Validation')}</h3>
-          <p className="text-sm text-gray-400 mt-1">{t('compiler.description', 'Compile generated code to verify it builds successfully')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('compiler.description', 'Compile generated code to verify it builds successfully')}</p>
         </div>
         {statusBadge()}
       </div>
@@ -137,14 +137,14 @@ export default function CompilerValidationPage() {
       )}
 
       {/* Controls */}
-      <div className="bg-gray-800 rounded-xl p-4">
+      <div className="bg-warm-800 rounded-xl p-4">
         <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">{t('compiler.language', 'Language / Framework')}</label>
+            <label className="block text-xs text-warm-400 mb-1">{t('compiler.language', 'Language / Framework')}</label>
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
             >
               {languages.map((lang) => (
                 <option key={lang.id} value={lang.id}>{lang.name}</option>
@@ -180,34 +180,34 @@ export default function CompilerValidationPage() {
       {/* Summary */}
       {status !== 'idle' && !loading && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className={`text-2xl font-bold ${errors.length === 0 ? 'text-green-400' : 'text-red-400'}`}>
               {errors.length}
             </div>
-            <div className="text-xs text-gray-400 mt-1">{t('compiler.errors', 'Errors')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('compiler.errors', 'Errors')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-yellow-400">{warnings.length}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('compiler.warnings', 'Warnings')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('compiler.warnings', 'Warnings')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-white">{retryCount}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('compiler.retries', 'Retries')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('compiler.retries', 'Retries')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-white">{selectedLanguage}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('compiler.lang', 'Language')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('compiler.lang', 'Language')}</div>
           </div>
         </div>
       )}
 
       {loading && (
-        <div className="text-center py-8 text-gray-400">{t('compiler.loading', 'Loading...')}</div>
+        <div className="text-center py-8 text-warm-400">{t('compiler.loading', 'Loading...')}</div>
       )}
 
       {/* Error List */}
       {!loading && errors.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-4">
+        <div className="bg-warm-800 rounded-xl p-4">
           <h4 className="text-sm font-bold text-red-400 mb-3">{t('compiler.errorList', 'Compilation Errors')}</h4>
           <div className="space-y-2 max-h-80 overflow-y-auto">
             {errors.map((err, i) => (
@@ -216,7 +216,7 @@ export default function CompilerValidationPage() {
                   <span className="text-red-400 shrink-0 font-mono text-xs mt-0.5">E{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     {err.file && (
-                      <span className="text-gray-400 font-mono text-xs">
+                      <span className="text-warm-400 font-mono text-xs">
                         {err.file}{err.line ? `:${err.line}` : ''}
                       </span>
                     )}
@@ -231,7 +231,7 @@ export default function CompilerValidationPage() {
 
       {/* Warning List */}
       {!loading && warnings.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-4">
+        <div className="bg-warm-800 rounded-xl p-4">
           <h4 className="text-sm font-bold text-yellow-400 mb-3">{t('compiler.warningList', 'Warnings')}</h4>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {warnings.map((warn, i) => (
@@ -240,7 +240,7 @@ export default function CompilerValidationPage() {
                   <span className="text-yellow-400 shrink-0 font-mono text-xs mt-0.5">W{i + 1}</span>
                   <div className="min-w-0 flex-1">
                     {warn.file && (
-                      <span className="text-gray-400 font-mono text-xs">
+                      <span className="text-warm-400 font-mono text-xs">
                         {warn.file}{warn.line ? `:${warn.line}` : ''}
                       </span>
                     )}
@@ -255,9 +255,9 @@ export default function CompilerValidationPage() {
 
       {/* History */}
       {lastResult && (
-        <div className="bg-gray-800 rounded-xl p-4">
-          <h4 className="text-sm font-bold text-gray-300 mb-2">{t('compiler.lastResult', 'Last Compilation')}</h4>
-          <div className="text-sm text-gray-400 space-y-1">
+        <div className="bg-warm-800 rounded-xl p-4">
+          <h4 className="text-sm font-bold text-warm-300 mb-2">{t('compiler.lastResult', 'Last Compilation')}</h4>
+          <div className="text-sm text-warm-400 space-y-1">
             <p>{t('compiler.language', 'Language')}: <span className="text-white">{lastResult.language}</span></p>
             <p>{t('compiler.status', 'Status')}: <span className={lastResult.success ? 'text-green-400' : 'text-red-400'}>{lastResult.success ? 'Passed' : 'Failed'}</span></p>
             <p>{t('compiler.retries', 'Retries')}: <span className="text-white">{lastResult.retryCount}</span></p>

@@ -59,7 +59,7 @@ function getStepColor(type: string): string {
     case 'green': return 'border-green-500 bg-green-900/20'
     case 'orange': return 'border-orange-500 bg-orange-900/20'
     case 'cyan': return 'border-cyan-500 bg-cyan-900/20'
-    default: return 'border-gray-500 bg-gray-900/20'
+    default: return 'border-warm-500 bg-warm-900/20'
   }
 }
 
@@ -221,7 +221,7 @@ export default function PipelineBuilderPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('pipeline.loading', 'Loading pipelines...')}</p>
+        <p className="text-warm-400">{t('pipeline.loading', 'Loading pipelines...')}</p>
       </div>
     )
   }
@@ -231,13 +231,13 @@ export default function PipelineBuilderPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-white text-sm">
+          <button onClick={() => setEditing(null)} className="text-warm-400 hover:text-white text-sm">
             &larr; {t('pipeline.backToList', 'Back to pipelines')}
           </button>
           <div className="flex gap-2">
             <button
               onClick={() => setEditing(null)}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+              className="px-4 py-2 bg-warm-700 hover:bg-warm-600 text-white rounded-lg text-sm transition-colors"
             >
               {t('pipeline.cancel', 'Cancel')}
             </button>
@@ -259,13 +259,13 @@ export default function PipelineBuilderPage() {
         )}
 
         {/* Pipeline name and description */}
-        <div className="bg-gray-800 rounded-xl p-5 space-y-3">
+        <div className="bg-warm-800 rounded-xl p-5 space-y-3">
           <input
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             placeholder={t('pipeline.namePlaceholder', 'Pipeline name')}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white text-lg font-bold placeholder-gray-500"
+            className="w-full bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-white text-lg font-bold placeholder-warm-500"
             maxLength={200}
           />
           <input
@@ -273,13 +273,13 @@ export default function PipelineBuilderPage() {
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
             placeholder={t('pipeline.descPlaceholder', 'Description (optional)')}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 placeholder-gray-500"
+            className="w-full bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-sm text-warm-300 placeholder-warm-500"
             maxLength={500}
           />
         </div>
 
         {/* Steps editor with drag and drop */}
-        <div className="bg-gray-800 rounded-xl p-5">
+        <div className="bg-warm-800 rounded-xl p-5">
           <h3 className="text-sm font-bold mb-4">{t('pipeline.steps', 'Pipeline Steps')}</h3>
           <div className="space-y-2">
             {editSteps.map((step, index) => (
@@ -293,10 +293,10 @@ export default function PipelineBuilderPage() {
                 className={`border-l-4 rounded-lg p-3 flex items-center gap-3 cursor-grab active:cursor-grabbing transition-all ${getStepColor(step.type)} ${!step.enabled ? 'opacity-40' : ''}`}
               >
                 {/* Drag handle */}
-                <span className="text-gray-500 select-none">⠿</span>
+                <span className="text-warm-500 select-none">⠿</span>
 
                 {/* Step number */}
-                <span className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300">
+                <span className="w-6 h-6 rounded-full bg-warm-700 flex items-center justify-center text-xs font-bold text-warm-300">
                   {index + 1}
                 </span>
 
@@ -313,14 +313,14 @@ export default function PipelineBuilderPage() {
                 />
 
                 {/* Type badge */}
-                <span className="px-2 py-0.5 rounded text-xs bg-gray-700 text-gray-400 uppercase">
+                <span className="px-2 py-0.5 rounded text-xs bg-warm-700 text-warm-400 uppercase">
                   {step.type}
                 </span>
 
                 {/* Toggle enable */}
                 <button
                   onClick={() => toggleStep(index)}
-                  className={`w-8 h-5 rounded-full transition-colors ${step.enabled ? 'bg-green-600' : 'bg-gray-600'}`}
+                  className={`w-8 h-5 rounded-full transition-colors ${step.enabled ? 'bg-green-600' : 'bg-warm-600'}`}
                 >
                   <span className={`block w-3 h-3 bg-white rounded-full transition-transform mx-0.5 ${step.enabled ? 'translate-x-3' : ''}`} />
                 </button>
@@ -339,7 +339,7 @@ export default function PipelineBuilderPage() {
           {/* Arrow connector */}
           {editSteps.length > 0 && (
             <div className="flex justify-center my-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-gray-600">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-warm-600">
                 <path d="M12 5v14M19 12l-7 7-7-7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
@@ -351,7 +351,7 @@ export default function PipelineBuilderPage() {
               <button
                 key={st.type}
                 onClick={() => addStep(st.type)}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 text-warm-300 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
               >
                 <span>{st.icon}</span>
                 <span>{st.type.charAt(0).toUpperCase() + st.type.slice(1)}</span>
@@ -372,14 +372,14 @@ export default function PipelineBuilderPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold">{t('pipeline.title', 'Pipeline Builder')}</h2>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-warm-400 mt-1">
             {t('pipeline.subtitle', 'Create custom dev request pipelines with drag-and-drop steps')}
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setShowTemplates(!showTemplates)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-warm-700 hover:bg-warm-600 text-white rounded-lg text-sm transition-colors"
           >
             {t('pipeline.templates', 'Templates')}
           </button>
@@ -402,7 +402,7 @@ export default function PipelineBuilderPage() {
 
       {/* Template picker */}
       {showTemplates && (
-        <div className="bg-gray-800 rounded-xl p-5">
+        <div className="bg-warm-800 rounded-xl p-5">
           <h3 className="text-sm font-bold mb-3">{t('pipeline.pickTemplate', 'Start from a template')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {TEMPLATES.map((tmpl) => (
@@ -410,10 +410,10 @@ export default function PipelineBuilderPage() {
                 key={tmpl.name}
                 onClick={() => handleCreateFromTemplate(tmpl)}
                 disabled={saving}
-                className="bg-gray-900 hover:bg-gray-700 border border-gray-700 rounded-lg p-4 text-left transition-colors disabled:opacity-50"
+                className="bg-warm-900 hover:bg-warm-700 border border-warm-700 rounded-lg p-4 text-left transition-colors disabled:opacity-50"
               >
                 <p className="text-sm font-bold text-white">{tmpl.name}</p>
-                <p className="text-xs text-gray-400 mt-1">{tmpl.description}</p>
+                <p className="text-xs text-warm-400 mt-1">{tmpl.description}</p>
                 <div className="flex gap-1 mt-2">
                   {tmpl.steps.map((s) => (
                     <span key={s.id} className="text-sm" title={s.name}>{getStepIcon(s.type)}</span>
@@ -426,12 +426,12 @@ export default function PipelineBuilderPage() {
       )}
 
       {/* Pipelines list */}
-      <div className="bg-gray-800 rounded-xl p-5">
+      <div className="bg-warm-800 rounded-xl p-5">
         <h3 className="text-sm font-bold mb-3">
           {t('pipeline.myPipelines', 'My Pipelines')} ({userPipelines.length})
         </h3>
         {userPipelines.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-6">
+          <p className="text-sm text-warm-500 text-center py-6">
             {t('pipeline.noPipelines', 'No pipelines yet. Create one or start from a template.')}
           </p>
         ) : (
@@ -439,19 +439,19 @@ export default function PipelineBuilderPage() {
             {userPipelines.map((pipeline) => (
               <div
                 key={pipeline.id}
-                className="bg-gray-900 rounded-lg p-4 flex items-center justify-between hover:bg-gray-850 transition-colors"
+                className="bg-warm-900 rounded-lg p-4 flex items-center justify-between hover:bg-warm-850 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-white truncate">{pipeline.name}</p>
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                      pipeline.status === 'Active' ? 'bg-green-900/50 text-green-400' : 'bg-gray-700 text-gray-400'
+                      pipeline.status === 'Active' ? 'bg-green-900/50 text-green-400' : 'bg-warm-700 text-warm-400'
                     }`}>
                       {pipeline.status}
                     </span>
                   </div>
                   {pipeline.description && (
-                    <p className="text-xs text-gray-500 mt-0.5 truncate">{pipeline.description}</p>
+                    <p className="text-xs text-warm-500 mt-0.5 truncate">{pipeline.description}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex gap-0.5">
@@ -459,8 +459,8 @@ export default function PipelineBuilderPage() {
                         <span key={s.id} className="text-xs" title={s.name}>{getStepIcon(s.type)}</span>
                       ))}
                     </div>
-                    <span className="text-xs text-gray-600">·</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-warm-600">·</span>
+                    <span className="text-xs text-warm-500">
                       {pipeline.steps.length} {t('pipeline.stepsCount', 'steps')}
                     </span>
                   </div>
@@ -468,7 +468,7 @@ export default function PipelineBuilderPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => startEditing(pipeline)}
-                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded text-xs font-medium transition-colors"
+                    className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 text-white rounded text-xs font-medium transition-colors"
                   >
                     {t('pipeline.edit', 'Edit')}
                   </button>

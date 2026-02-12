@@ -96,7 +96,7 @@ export default function GenerationManifestPage() {
       case 'passed': return 'text-green-400 bg-green-900/40'
       case 'resolved': return 'text-blue-400 bg-blue-900/40'
       case 'failed': return 'text-red-400 bg-red-900/40'
-      default: return 'text-gray-400 bg-gray-700'
+      default: return 'text-warm-400 bg-warm-700'
     }
   }
 
@@ -105,7 +105,7 @@ export default function GenerationManifestPage() {
       case 'error': return 'text-red-400 bg-red-900/40'
       case 'warning': return 'text-yellow-400 bg-yellow-900/40'
       case 'resolved': return 'text-green-400 bg-green-900/40'
-      default: return 'text-gray-400 bg-gray-700'
+      default: return 'text-warm-400 bg-warm-700'
     }
   }
 
@@ -117,7 +117,7 @@ export default function GenerationManifestPage() {
       case 'Python': return 'text-green-400 bg-green-900/40'
       case 'CSS': return 'text-pink-400 bg-pink-900/40'
       case 'HTML': return 'text-orange-400 bg-orange-900/40'
-      default: return 'text-gray-400 bg-gray-700'
+      default: return 'text-warm-400 bg-warm-700'
     }
   }
 
@@ -133,7 +133,7 @@ export default function GenerationManifestPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('generation.title', 'Generation Manifest')}</h2>
-        <p className="text-gray-400">{t('generation.loginRequired', 'Please log in to view generation data.')}</p>
+        <p className="text-warm-400">{t('generation.loginRequired', 'Please log in to view generation data.')}</p>
       </div>
     )
   }
@@ -142,7 +142,7 @@ export default function GenerationManifestPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('generation.title', 'Generation Manifest')}</h2>
-        <p className="text-gray-400">{t('generation.noProject', 'No project selected. Go to your project to view its generation manifest.')}</p>
+        <p className="text-warm-400">{t('generation.noProject', 'No project selected. Go to your project to view its generation manifest.')}</p>
         <button
           onClick={() => navigate('/')}
           className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm transition-colors"
@@ -157,12 +157,12 @@ export default function GenerationManifestPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">
           &larr;
         </button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{t('generation.title', 'Generation Manifest')}</h2>
-          <p className="text-sm text-gray-400 mt-1">{t('generation.description', 'Multi-file generation with cross-file consistency validation')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('generation.description', 'Multi-file generation with cross-file consistency validation')}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -194,37 +194,37 @@ export default function GenerationManifestPage() {
       {/* Summary Cards */}
       {manifest && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-white">{manifest.fileCount}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('generation.files', 'Files')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('generation.files', 'Files')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-blue-400">{manifest.crossReferenceCount}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('generation.crossRefs', 'Cross-References')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('generation.crossRefs', 'Cross-References')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className={`text-2xl font-bold ${manifest.issueCount > 0 ? 'text-red-400' : 'text-green-400'}`}>
               {manifest.issueCount}
             </div>
-            <div className="text-xs text-gray-400 mt-1">{t('generation.issues', 'Issues')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('generation.issues', 'Issues')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <span className={`inline-flex items-center px-2 py-1 rounded text-sm font-medium ${statusColor(manifest.validationStatus)}`}>
               {manifest.validationStatus.toUpperCase()}
             </span>
-            <div className="text-xs text-gray-400 mt-1">{t('generation.status', 'Status')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('generation.status', 'Status')}</div>
           </div>
         </div>
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+      <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
         {(['files', 'dependencies', 'validation'] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              activeTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
             }`}
           >
             {tab === 'files' && `${t('generation.tab.files', 'Files')} (${files.length})`}
@@ -235,7 +235,7 @@ export default function GenerationManifestPage() {
       </div>
 
       {loading && (
-        <div className="text-center py-8 text-gray-400">{t('generation.loading', 'Loading...')}</div>
+        <div className="text-center py-8 text-warm-400">{t('generation.loading', 'Loading...')}</div>
       )}
 
       {/* Files Tab */}
@@ -246,16 +246,16 @@ export default function GenerationManifestPage() {
             placeholder={t('generation.searchPlaceholder', 'Search files...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+            className="w-full bg-warm-800 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white placeholder-warm-500 focus:outline-none focus:border-purple-500"
           />
 
           {filteredFileInfos.length === 0 && filteredFiles.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">{t('generation.noFiles', 'No files in manifest. Create a manifest first.')}</p>
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">{t('generation.noFiles', 'No files in manifest. Create a manifest first.')}</p>
             </div>
           ) : (
             <div className="space-y-1">
-              <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs text-gray-500 font-medium">
+              <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs text-warm-500 font-medium">
                 <div className="col-span-5">{t('generation.filePath', 'File Path')}</div>
                 <div className="col-span-2">{t('generation.language', 'Language')}</div>
                 <div className="col-span-1 text-center">{t('generation.size', 'Size')}</div>
@@ -268,20 +268,20 @@ export default function GenerationManifestPage() {
                 const info = 'exportCount' in file ? file as GeneratedFileInfo : null
                 const mf = !info ? file as ManifestFile : null
                 return (
-                  <div key={i} className="grid grid-cols-12 gap-2 bg-gray-800 rounded-lg px-3 py-2 text-sm">
+                  <div key={i} className="grid grid-cols-12 gap-2 bg-warm-800 rounded-lg px-3 py-2 text-sm">
                     <div className="col-span-5 text-white truncate font-mono text-xs" title={file.path}>{file.path}</div>
                     <div className="col-span-2">
                       <span className={`px-1.5 py-0.5 rounded text-xs ${languageColor(file.language)}`}>{file.language}</span>
                     </div>
-                    <div className="col-span-1 text-center text-gray-400 text-xs">{file.size > 1024 ? `${(file.size / 1024).toFixed(1)}K` : `${file.size}B`}</div>
-                    <div className="col-span-1 text-center text-gray-400 text-xs">{info ? info.exportCount : mf?.exports.length ?? 0}</div>
-                    <div className="col-span-1 text-center text-gray-400 text-xs">{info ? info.importCount : mf?.imports.length ?? 0}</div>
-                    <div className="col-span-1 text-center text-gray-400 text-xs">{info ? info.dependencyCount : '-'}</div>
-                    <div className="col-span-1 text-center text-gray-400 text-xs">{info ? info.dependentCount : '-'}</div>
+                    <div className="col-span-1 text-center text-warm-400 text-xs">{file.size > 1024 ? `${(file.size / 1024).toFixed(1)}K` : `${file.size}B`}</div>
+                    <div className="col-span-1 text-center text-warm-400 text-xs">{info ? info.exportCount : mf?.exports.length ?? 0}</div>
+                    <div className="col-span-1 text-center text-warm-400 text-xs">{info ? info.importCount : mf?.imports.length ?? 0}</div>
+                    <div className="col-span-1 text-center text-warm-400 text-xs">{info ? info.dependencyCount : '-'}</div>
+                    <div className="col-span-1 text-center text-warm-400 text-xs">{info ? info.dependentCount : '-'}</div>
                   </div>
                 )
               })}
-              <div className="text-xs text-gray-500 text-right pt-2">
+              <div className="text-xs text-warm-500 text-right pt-2">
                 {(filteredFileInfos.length > 0 ? filteredFileInfos.length : filteredFiles.length)} / {files.length} {t('generation.filesLabel', 'files')}
               </div>
             </div>
@@ -293,33 +293,33 @@ export default function GenerationManifestPage() {
       {!loading && activeTab === 'dependencies' && (
         <div className="space-y-3">
           {crossRefs.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">{t('generation.noDeps', 'No cross-file dependencies detected.')}</p>
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">{t('generation.noDeps', 'No cross-file dependencies detected.')}</p>
             </div>
           ) : (
             <>
               {/* Dependency graph as list */}
               <div className="space-y-1">
-                <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs text-gray-500 font-medium">
+                <div className="grid grid-cols-12 gap-2 px-3 py-2 text-xs text-warm-500 font-medium">
                   <div className="col-span-4">{t('generation.source', 'Source File')}</div>
                   <div className="col-span-1 text-center">-&gt;</div>
                   <div className="col-span-4">{t('generation.target', 'Target File')}</div>
                   <div className="col-span-3">{t('generation.symbol', 'Symbol')}</div>
                 </div>
                 {crossRefs.map((ref, i) => (
-                  <div key={i} className="grid grid-cols-12 gap-2 bg-gray-800 rounded-lg px-3 py-2 text-sm">
+                  <div key={i} className="grid grid-cols-12 gap-2 bg-warm-800 rounded-lg px-3 py-2 text-sm">
                     <div className="col-span-4 text-white truncate font-mono text-xs" title={ref.sourceFile}>{ref.sourceFile}</div>
-                    <div className="col-span-1 text-center text-gray-500">
-                      <span className="px-1.5 py-0.5 rounded text-xs bg-gray-700 text-gray-300">{ref.referenceType}</span>
+                    <div className="col-span-1 text-center text-warm-500">
+                      <span className="px-1.5 py-0.5 rounded text-xs bg-warm-700 text-warm-300">{ref.referenceType}</span>
                     </div>
                     <div className="col-span-4 text-blue-400 truncate font-mono text-xs" title={ref.targetFile}>{ref.targetFile}</div>
-                    <div className="col-span-3 text-gray-400 truncate text-xs" title={ref.symbol}>{ref.symbol}</div>
+                    <div className="col-span-3 text-warm-400 truncate text-xs" title={ref.symbol}>{ref.symbol}</div>
                   </div>
                 ))}
               </div>
 
               {/* File dependency summary */}
-              <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="bg-warm-800/50 rounded-lg p-4">
                 <h3 className="text-sm font-medium text-white mb-3">{t('generation.depSummary', 'Dependency Summary')}</h3>
                 <div className="space-y-2">
                   {Array.from(new Set(crossRefs.map(r => r.sourceFile))).map(src => {
@@ -327,10 +327,10 @@ export default function GenerationManifestPage() {
                     return (
                       <div key={src} className="flex items-center gap-2">
                         <span className="text-xs font-mono text-white truncate flex-shrink-0 max-w-[200px]" title={src}>{src.split('/').pop()}</span>
-                        <span className="text-xs text-gray-500">depends on</span>
+                        <span className="text-xs text-warm-500">depends on</span>
                         <div className="flex gap-1 flex-wrap">
                           {deps.map((d, j) => (
-                            <span key={j} className="px-1.5 py-0.5 rounded text-xs bg-gray-700 text-blue-300 font-mono">{d.targetFile.split('/').pop()}</span>
+                            <span key={j} className="px-1.5 py-0.5 rounded text-xs bg-warm-700 text-blue-300 font-mono">{d.targetFile.split('/').pop()}</span>
                           ))}
                         </div>
                       </div>
@@ -347,8 +347,8 @@ export default function GenerationManifestPage() {
       {!loading && activeTab === 'validation' && (
         <div className="space-y-3">
           {issues.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">
                 {manifest?.validationStatus === 'passed'
                   ? t('generation.noIssues', 'All checks passed. Cross-file consistency is valid.')
                   : t('generation.noValidation', 'No validation results. Click Validate to check consistency.')}
@@ -356,14 +356,14 @@ export default function GenerationManifestPage() {
             </div>
           ) : (
             issues.map((issue, i) => (
-              <div key={i} className="bg-gray-800 rounded-lg p-4">
+              <div key={i} className="bg-warm-800 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${issueStatusColor(issue.status)}`}>
                         {issue.status.toUpperCase()}
                       </span>
-                      <span className="text-xs text-gray-500 font-mono">{issue.rule}</span>
+                      <span className="text-xs text-warm-500 font-mono">{issue.rule}</span>
                     </div>
                     <p className="text-sm text-white">{issue.message}</p>
                     {issue.suggestion && (
@@ -374,7 +374,7 @@ export default function GenerationManifestPage() {
                     {issue.affectedFiles.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {issue.affectedFiles.map((f, j) => (
-                          <span key={j} className="px-1.5 py-0.5 rounded text-xs bg-gray-700 text-gray-300 font-mono">{f}</span>
+                          <span key={j} className="px-1.5 py-0.5 rounded text-xs bg-warm-700 text-warm-300 font-mono">{f}</span>
                         ))}
                       </div>
                     )}

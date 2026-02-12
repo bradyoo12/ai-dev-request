@@ -39,7 +39,7 @@ export default function WhiteLabelPage() {
 
   useEffect(() => { if (authUser) loadTenants(); }, [authUser, loadTenants]);
 
-  if (!authUser) return <p className="text-center py-12 text-gray-400">{t('wl.loginRequired')}</p>;
+  if (!authUser) return <p className="text-center py-12 text-warm-400">{t('wl.loginRequired')}</p>;
 
   const openDetail = async (id: number) => {
     try {
@@ -101,7 +101,7 @@ export default function WhiteLabelPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold">{selectedTenant.name}</h2>
-            <p className="text-gray-400 text-sm">{selectedTenant.slug}{selectedTenant.customDomain ? ` / ${selectedTenant.customDomain}` : ''}</p>
+            <p className="text-warm-400 text-sm">{selectedTenant.slug}{selectedTenant.customDomain ? ` / ${selectedTenant.customDomain}` : ''}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className={`px-2 py-1 rounded text-xs ${selectedTenant.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>
@@ -112,10 +112,10 @@ export default function WhiteLabelPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 border-b border-gray-700 pb-2">
+        <div className="flex gap-4 border-b border-warm-700 pb-2">
           {(['branding', 'partners', 'usage'] as const).map(t2 => (
             <button key={t2} onClick={() => setTab(t2)}
-              className={`px-3 py-1 rounded-t text-sm ${tab === t2 ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'}`}>
+              className={`px-3 py-1 rounded-t text-sm ${tab === t2 ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'}`}>
               {t(`wl.tab.${t2}`)}
             </button>
           ))}
@@ -125,23 +125,23 @@ export default function WhiteLabelPage() {
         {tab === 'branding' && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-800 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-300 mb-3">{t('wl.brandPreview')}</h3>
-                <div className="bg-gray-900 rounded-lg p-4 space-y-2">
+              <div className="bg-warm-800 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-warm-300 mb-3">{t('wl.brandPreview')}</h3>
+                <div className="bg-warm-900 rounded-lg p-4 space-y-2">
                   {selectedTenant.logoUrl && <img src={selectedTenant.logoUrl} alt="Logo" className="h-8" />}
                   <div className="flex gap-2">
                     <div className="w-8 h-8 rounded" style={{ backgroundColor: selectedTenant.primaryColor || '#3b82f6' }} />
                     <div className="w-8 h-8 rounded" style={{ backgroundColor: selectedTenant.secondaryColor || '#6b7280' }} />
                   </div>
-                  {selectedTenant.welcomeMessage && <p className="text-xs text-gray-400">{selectedTenant.welcomeMessage}</p>}
+                  {selectedTenant.welcomeMessage && <p className="text-xs text-warm-400">{selectedTenant.welcomeMessage}</p>}
                 </div>
               </div>
-              <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-                <h3 className="text-sm font-medium text-gray-300 mb-3">{t('wl.details')}</h3>
-                <p className="text-xs text-gray-400">{t('wl.domain')}: {selectedTenant.customDomain || '-'}</p>
-                <p className="text-xs text-gray-400">{t('wl.primaryColor')}: {selectedTenant.primaryColor || '#3b82f6'}</p>
-                <p className="text-xs text-gray-400">{t('wl.secondaryColor')}: {selectedTenant.secondaryColor || '#6b7280'}</p>
-                <p className="text-xs text-gray-400">{t('wl.aiPrompt')}: {selectedTenant.aiPromptGuidelines ? t('wl.configured') : t('wl.notConfigured')}</p>
+              <div className="bg-warm-800 rounded-lg p-4 space-y-2">
+                <h3 className="text-sm font-medium text-warm-300 mb-3">{t('wl.details')}</h3>
+                <p className="text-xs text-warm-400">{t('wl.domain')}: {selectedTenant.customDomain || '-'}</p>
+                <p className="text-xs text-warm-400">{t('wl.primaryColor')}: {selectedTenant.primaryColor || '#3b82f6'}</p>
+                <p className="text-xs text-warm-400">{t('wl.secondaryColor')}: {selectedTenant.secondaryColor || '#6b7280'}</p>
+                <p className="text-xs text-warm-400">{t('wl.aiPrompt')}: {selectedTenant.aiPromptGuidelines ? t('wl.configured') : t('wl.notConfigured')}</p>
               </div>
             </div>
           </div>
@@ -151,18 +151,18 @@ export default function WhiteLabelPage() {
         {tab === 'partners' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="text-sm font-medium text-gray-300">{t('wl.partners')}</h3>
+              <h3 className="text-sm font-medium text-warm-300">{t('wl.partners')}</h3>
               <button onClick={() => setShowAddPartner(true)} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm">{t('wl.addPartner')}</button>
             </div>
             {partners.length === 0 ? (
-              <p className="text-gray-500 text-sm">{t('wl.noPartners')}</p>
+              <p className="text-warm-500 text-sm">{t('wl.noPartners')}</p>
             ) : (
               <div className="space-y-2">
                 {partners.map(p => (
-                  <div key={p.id} className="bg-gray-800 rounded-lg p-3 flex items-center justify-between">
+                  <div key={p.id} className="bg-warm-800 rounded-lg p-3 flex items-center justify-between">
                     <div>
                       <p className="font-medium text-sm">{p.companyName}</p>
-                      <p className="text-xs text-gray-400">{p.contactEmail || '-'} &middot; {t('wl.margin')}: {p.marginPercent}%</p>
+                      <p className="text-xs text-warm-400">{p.contactEmail || '-'} &middot; {t('wl.margin')}: {p.marginPercent}%</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-0.5 rounded text-xs ${p.status === 'active' ? 'bg-green-900 text-green-300' : 'bg-yellow-900 text-yellow-300'}`}>{p.status}</span>
@@ -175,17 +175,17 @@ export default function WhiteLabelPage() {
 
             {/* Add Partner Dialog */}
             {showAddPartner && (
-              <div className="bg-gray-800 rounded-lg p-4 space-y-3 border border-gray-600">
+              <div className="bg-warm-800 rounded-lg p-4 space-y-3 border border-warm-600">
                 <h4 className="text-sm font-medium">{t('wl.addPartnerTitle')}</h4>
                 <input value={partnerName} onChange={e => setPartnerName(e.target.value)} placeholder={t('wl.companyPlaceholder')}
-                  className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm" />
+                  className="w-full bg-warm-900 border border-warm-600 rounded px-3 py-2 text-sm" />
                 <input value={partnerEmail} onChange={e => setPartnerEmail(e.target.value)} placeholder={t('wl.emailPlaceholder')}
-                  className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm" />
+                  className="w-full bg-warm-900 border border-warm-600 rounded px-3 py-2 text-sm" />
                 <input value={partnerMargin} onChange={e => setPartnerMargin(e.target.value)} placeholder={t('wl.marginPlaceholder')} type="number" min="0" max="100"
-                  className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm" />
+                  className="w-full bg-warm-900 border border-warm-600 rounded px-3 py-2 text-sm" />
                 <div className="flex gap-2">
                   <button onClick={handleAddPartner} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm">{t('wl.add')}</button>
-                  <button onClick={() => setShowAddPartner(false)} className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-sm">{t('wl.cancel')}</button>
+                  <button onClick={() => setShowAddPartner(false)} className="px-3 py-1 bg-warm-600 hover:bg-warm-500 rounded text-sm">{t('wl.cancel')}</button>
                 </div>
               </div>
             )}
@@ -196,22 +196,22 @@ export default function WhiteLabelPage() {
         {tab === 'usage' && usage && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-800 rounded-lg p-4 text-center">
+              <div className="bg-warm-800 rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-blue-400">{usage.totalTokens.toLocaleString()}</p>
-                <p className="text-xs text-gray-400">{t('wl.totalTokens')}</p>
+                <p className="text-xs text-warm-400">{t('wl.totalTokens')}</p>
               </div>
-              <div className="bg-gray-800 rounded-lg p-4 text-center">
+              <div className="bg-warm-800 rounded-lg p-4 text-center">
                 <p className="text-2xl font-bold text-green-400">{usage.totalActions}</p>
-                <p className="text-xs text-gray-400">{t('wl.totalActions')}</p>
+                <p className="text-xs text-warm-400">{t('wl.totalActions')}</p>
               </div>
             </div>
             {usage.actionBreakdown.length > 0 && (
-              <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-                <h3 className="text-sm font-medium text-gray-300 mb-2">{t('wl.breakdown')}</h3>
+              <div className="bg-warm-800 rounded-lg p-4 space-y-2">
+                <h3 className="text-sm font-medium text-warm-300 mb-2">{t('wl.breakdown')}</h3>
                 {usage.actionBreakdown.map(b => (
                   <div key={b.action} className="flex justify-between text-sm">
-                    <span className="text-gray-300">{b.action}</span>
-                    <span className="text-gray-400">{b.tokens.toLocaleString()} tokens ({b.count}x)</span>
+                    <span className="text-warm-300">{b.action}</span>
+                    <span className="text-warm-400">{b.tokens.toLocaleString()} tokens ({b.count}x)</span>
                   </div>
                 ))}
               </div>
@@ -230,7 +230,7 @@ export default function WhiteLabelPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">{t('wl.title')}</h1>
-          <p className="text-gray-400 text-sm mt-1">{t('wl.description')}</p>
+          <p className="text-warm-400 text-sm mt-1">{t('wl.description')}</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium">{t('wl.create')}</button>
       </div>
@@ -239,25 +239,25 @@ export default function WhiteLabelPage() {
 
       {/* Create Dialog */}
       {showCreate && (
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3 border border-gray-600">
+        <div className="bg-warm-800 rounded-lg p-4 space-y-3 border border-warm-600">
           <h3 className="text-lg font-medium">{t('wl.createTitle')}</h3>
           <input value={newName} onChange={e => setNewName(e.target.value)} placeholder={t('wl.namePlaceholder')}
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm" />
+            className="w-full bg-warm-900 border border-warm-600 rounded px-3 py-2 text-sm" />
           <input value={newSlug} onChange={e => setNewSlug(e.target.value)} placeholder={t('wl.slugPlaceholder')}
-            className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-sm" />
+            className="w-full bg-warm-900 border border-warm-600 rounded px-3 py-2 text-sm" />
           <div className="flex gap-2">
             <button onClick={handleCreate} disabled={creating} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm disabled:opacity-50">
               {creating ? t('wl.creating') : t('wl.create')}
             </button>
-            <button onClick={() => setShowCreate(false)} className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-sm">{t('wl.cancel')}</button>
+            <button onClick={() => setShowCreate(false)} className="px-3 py-1 bg-warm-600 hover:bg-warm-500 rounded text-sm">{t('wl.cancel')}</button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <p className="text-gray-400 text-center py-8">{t('wl.loading')}</p>
+        <p className="text-warm-400 text-center py-8">{t('wl.loading')}</p>
       ) : tenants.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-warm-500">
           <p className="text-lg">{t('wl.empty')}</p>
           <p className="text-sm mt-1">{t('wl.emptyHint')}</p>
         </div>
@@ -265,13 +265,13 @@ export default function WhiteLabelPage() {
         <div className="grid gap-4">
           {tenants.map(tenant => (
             <div key={tenant.id} onClick={() => openDetail(tenant.id)}
-              className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-750 transition-colors">
+              className="bg-warm-800 rounded-lg p-4 cursor-pointer hover:bg-warm-750 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   {tenant.primaryColor && <div className="w-4 h-4 rounded" style={{ backgroundColor: tenant.primaryColor }} />}
                   <div>
                     <h3 className="font-medium">{tenant.name}</h3>
-                    <p className="text-xs text-gray-400">{tenant.slug}{tenant.customDomain ? ` / ${tenant.customDomain}` : ''}</p>
+                    <p className="text-xs text-warm-400">{tenant.slug}{tenant.customDomain ? ` / ${tenant.customDomain}` : ''}</p>
                   </div>
                 </div>
                 <span className={`px-2 py-0.5 rounded text-xs ${tenant.isActive ? 'bg-green-900 text-green-300' : 'bg-red-900 text-red-300'}`}>

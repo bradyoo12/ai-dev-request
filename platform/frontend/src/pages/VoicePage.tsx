@@ -132,7 +132,7 @@ export default function VoicePage() {
   }
 
   if (loading) {
-    return <div className="text-center py-12 text-gray-400">{t('voice.loading')}</div>
+    return <div className="text-center py-12 text-warm-400">{t('voice.loading')}</div>
   }
 
   return (
@@ -140,7 +140,7 @@ export default function VoicePage() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-white">{t('voice.title')}</h3>
-          <p className="text-sm text-gray-400 mt-1">{t('voice.description')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('voice.description')}</p>
         </div>
       </div>
 
@@ -161,29 +161,29 @@ export default function VoicePage() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-blue-400">{stats.sessionCount}</div>
-            <div className="text-sm text-gray-400">{t('voice.stats.sessions')}</div>
+            <div className="text-sm text-warm-400">{t('voice.stats.sessions')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-green-400">{formatDuration(stats.totalDurationSeconds)}</div>
-            <div className="text-sm text-gray-400">{t('voice.stats.totalDuration')}</div>
+            <div className="text-sm text-warm-400">{t('voice.stats.totalDuration')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <div className="text-2xl font-bold text-purple-400">{formatDuration(stats.averageDurationSeconds)}</div>
-            <div className="text-sm text-gray-400">{t('voice.stats.avgDuration')}</div>
+            <div className="text-sm text-warm-400">{t('voice.stats.avgDuration')}</div>
           </div>
         </div>
       )}
 
       {/* Voice Input Area */}
       {supported && (
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className="bg-warm-800 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-medium text-white">{t('voice.inputTitle')}</h4>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-warm-400">
               {config && (
-                <span className="bg-gray-700 px-2 py-1 rounded text-xs">
+                <span className="bg-warm-700 px-2 py-1 rounded text-xs">
                   {languages.find(l => l.code === config.language)?.name || config.language}
                 </span>
               )}
@@ -208,36 +208,36 @@ export default function VoicePage() {
                 )}
               </svg>
             </button>
-            <span className={`text-sm ${isListening ? 'text-red-400' : 'text-gray-400'}`}>
+            <span className={`text-sm ${isListening ? 'text-red-400' : 'text-warm-400'}`}>
               {isListening ? t('voice.listening') : t('voice.clickToStart')}
             </span>
           </div>
 
           {/* Transcript Display */}
           <div className="mt-4">
-            <div className="bg-gray-900 rounded-lg p-4 min-h-[120px] max-h-[300px] overflow-y-auto">
+            <div className="bg-warm-900 rounded-lg p-4 min-h-[120px] max-h-[300px] overflow-y-auto">
               {transcript || interimTranscript ? (
-                <p className="text-gray-200 whitespace-pre-wrap">
+                <p className="text-warm-200 whitespace-pre-wrap">
                   {transcript}
                   {interimTranscript && (
-                    <span className="text-gray-500 italic">{interimTranscript}</span>
+                    <span className="text-warm-500 italic">{interimTranscript}</span>
                   )}
                 </p>
               ) : (
-                <p className="text-gray-600 italic">{t('voice.transcriptPlaceholder')}</p>
+                <p className="text-warm-600 italic">{t('voice.transcriptPlaceholder')}</p>
               )}
             </div>
             {transcript && (
               <div className="flex gap-2 mt-2 justify-end">
                 <button
                   onClick={copyTranscript}
-                  className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+                  className="px-3 py-1 text-sm bg-warm-700 hover:bg-warm-600 text-warm-300 rounded transition-colors"
                 >
                   {t('voice.copy')}
                 </button>
                 <button
                   onClick={clearTranscript}
-                  className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition-colors"
+                  className="px-3 py-1 text-sm bg-warm-700 hover:bg-warm-600 text-warm-300 rounded transition-colors"
                 >
                   {t('voice.clear')}
                 </button>
@@ -249,16 +249,16 @@ export default function VoicePage() {
 
       {/* Settings */}
       {config && (
-        <div className="bg-gray-800 rounded-lg p-6">
+        <div className="bg-warm-800 rounded-lg p-6">
           <h4 className="font-medium text-white mb-4">{t('voice.settings')}</h4>
           <div className="space-y-4">
             {/* Language */}
             <div className="flex items-center justify-between">
-              <label className="text-sm text-gray-300">{t('voice.language')}</label>
+              <label className="text-sm text-warm-300">{t('voice.language')}</label>
               <select
                 value={config.language}
                 onChange={(e) => handleConfigChange({ language: e.target.value })}
-                className="bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-sm text-white"
+                className="bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white"
               >
                 {languages.map(lang => (
                   <option key={lang.code} value={lang.code}>{lang.name}</option>
@@ -269,13 +269,13 @@ export default function VoicePage() {
             {/* Continuous Mode */}
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm text-gray-300">{t('voice.continuousMode')}</label>
-                <p className="text-xs text-gray-500">{t('voice.continuousModeDesc')}</p>
+                <label className="text-sm text-warm-300">{t('voice.continuousMode')}</label>
+                <p className="text-xs text-warm-500">{t('voice.continuousModeDesc')}</p>
               </div>
               <button
                 onClick={() => handleConfigChange({ continuousMode: !config.continuousMode })}
                 className={`w-11 h-6 rounded-full transition-colors relative ${
-                  config.continuousMode ? 'bg-blue-600' : 'bg-gray-600'
+                  config.continuousMode ? 'bg-blue-600' : 'bg-warm-600'
                 }`}
               >
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -287,13 +287,13 @@ export default function VoicePage() {
             {/* Auto-Punctuate */}
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm text-gray-300">{t('voice.autoPunctuate')}</label>
-                <p className="text-xs text-gray-500">{t('voice.autoPunctuateDesc')}</p>
+                <label className="text-sm text-warm-300">{t('voice.autoPunctuate')}</label>
+                <p className="text-xs text-warm-500">{t('voice.autoPunctuateDesc')}</p>
               </div>
               <button
                 onClick={() => handleConfigChange({ autoPunctuate: !config.autoPunctuate })}
                 className={`w-11 h-6 rounded-full transition-colors relative ${
-                  config.autoPunctuate ? 'bg-blue-600' : 'bg-gray-600'
+                  config.autoPunctuate ? 'bg-blue-600' : 'bg-warm-600'
                 }`}
               >
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -305,13 +305,13 @@ export default function VoicePage() {
             {/* TTS */}
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm text-gray-300">{t('voice.ttsEnabled')}</label>
-                <p className="text-xs text-gray-500">{t('voice.ttsEnabledDesc')}</p>
+                <label className="text-sm text-warm-300">{t('voice.ttsEnabled')}</label>
+                <p className="text-xs text-warm-500">{t('voice.ttsEnabledDesc')}</p>
               </div>
               <button
                 onClick={() => handleConfigChange({ ttsEnabled: !config.ttsEnabled })}
                 className={`w-11 h-6 rounded-full transition-colors relative ${
-                  config.ttsEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                  config.ttsEnabled ? 'bg-blue-600' : 'bg-warm-600'
                 }`}
               >
                 <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
@@ -323,7 +323,7 @@ export default function VoicePage() {
             {/* TTS Rate */}
             {config.ttsEnabled && (
               <div className="flex items-center justify-between">
-                <label className="text-sm text-gray-300">{t('voice.ttsRate')}</label>
+                <label className="text-sm text-warm-300">{t('voice.ttsRate')}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="range"
@@ -334,7 +334,7 @@ export default function VoicePage() {
                     onChange={(e) => handleConfigChange({ ttsRate: parseFloat(e.target.value) })}
                     className="w-24"
                   />
-                  <span className="text-sm text-gray-400 w-10 text-right">{config.ttsRate.toFixed(1)}x</span>
+                  <span className="text-sm text-warm-400 w-10 text-right">{config.ttsRate.toFixed(1)}x</span>
                 </div>
               </div>
             )}

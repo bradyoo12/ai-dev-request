@@ -185,15 +185,15 @@ export default function ContainerizationPage() {
       </div>
 
       {/* Project ID Input */}
-      <div className="bg-gray-900 rounded-xl p-6">
-        <label className="block text-sm text-gray-400 mb-2">{t('containerization.projectIdLabel', 'Project ID')}</label>
+      <div className="bg-warm-900 rounded-xl p-6">
+        <label className="block text-sm text-warm-400 mb-2">{t('containerization.projectIdLabel', 'Project ID')}</label>
         <div className="flex gap-3">
           <input
             type="number"
             value={projectId}
             onChange={e => setProjectId(e.target.value)}
             placeholder="Enter project ID..."
-            className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+            className="flex-1 bg-warm-800 text-white rounded-lg px-4 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
             data-testid="project-id-input"
           />
           <button
@@ -207,7 +207,7 @@ export default function ContainerizationPage() {
           <button
             onClick={handleLoadConfig}
             disabled={loading}
-            className="bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="bg-warm-700 hover:bg-warm-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             data-testid="load-config-btn"
           >
             {t('containerization.loadConfig', 'Load Config')}
@@ -217,17 +217,17 @@ export default function ContainerizationPage() {
 
       {/* Detected Stack */}
       {config && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-sm text-gray-400 mb-1">{t('containerization.detectedStack', 'Detected Stack')}</div>
+              <div className="text-sm text-warm-400 mb-1">{t('containerization.detectedStack', 'Detected Stack')}</div>
               <span className="bg-blue-600/20 text-blue-400 text-sm px-3 py-1 rounded-full font-medium" data-testid="detected-stack">
                 {STACK_LABELS[config.detectedStack] || config.detectedStack}
               </span>
             </div>
             <div>
-              <div className="text-sm text-gray-400 mb-1">{t('containerization.buildStatusLabel', 'Build Status')}</div>
-              <span className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_COLORS[currentStatus] || 'bg-gray-600/20 text-gray-400'}`} data-testid="build-status">
+              <div className="text-sm text-warm-400 mb-1">{t('containerization.buildStatusLabel', 'Build Status')}</div>
+              <span className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_COLORS[currentStatus] || 'bg-warm-600/20 text-warm-400'}`} data-testid="build-status">
                 {currentStatus}
               </span>
             </div>
@@ -236,24 +236,24 @@ export default function ContainerizationPage() {
           {/* Image Info */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-400">{t('containerization.imageName', 'Image')}:</span>
+              <span className="text-warm-400">{t('containerization.imageName', 'Image')}:</span>
               <span className="ml-2 text-white font-mono">{config.imageName}:{config.imageTag}</span>
             </div>
             {config.builtAt && (
               <div>
-                <span className="text-gray-400">{t('containerization.builtAt', 'Built')}:</span>
+                <span className="text-warm-400">{t('containerization.builtAt', 'Built')}:</span>
                 <span className="ml-2 text-white">{new Date(config.builtAt).toLocaleString()}</span>
               </div>
             )}
             {config.deployedAt && (
               <div>
-                <span className="text-gray-400">{t('containerization.deployedAt', 'Deployed')}:</span>
+                <span className="text-warm-400">{t('containerization.deployedAt', 'Deployed')}:</span>
                 <span className="ml-2 text-white">{new Date(config.deployedAt).toLocaleString()}</span>
               </div>
             )}
             {config.buildDurationMs > 0 && (
               <div>
-                <span className="text-gray-400">{t('containerization.duration', 'Duration')}:</span>
+                <span className="text-warm-400">{t('containerization.duration', 'Duration')}:</span>
                 <span className="ml-2 text-white">{(config.buildDurationMs / 1000).toFixed(1)}s</span>
               </div>
             )}
@@ -263,7 +263,7 @@ export default function ContainerizationPage() {
 
       {/* Dockerfile Preview */}
       {config?.dockerfile && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <h4 className="text-md font-bold mb-3">{t('containerization.dockerfilePreview', 'Dockerfile')}</h4>
           <pre className="bg-black rounded-lg p-4 text-sm text-green-400 font-mono overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto" data-testid="dockerfile-preview">
             {config.dockerfile}
@@ -273,7 +273,7 @@ export default function ContainerizationPage() {
 
       {/* Docker Compose Preview */}
       {config?.composeFile && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <button
             onClick={() => setShowCompose(!showCompose)}
             className="flex items-center gap-2 text-md font-bold mb-3 hover:text-blue-400 transition-colors"
@@ -292,7 +292,7 @@ export default function ContainerizationPage() {
 
       {/* K8s Manifest */}
       {config && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-md font-bold">{t('containerization.k8sTitle', 'Kubernetes Manifest')}</h4>
             <button
@@ -322,28 +322,28 @@ export default function ContainerizationPage() {
 
       {/* Registry Configuration */}
       {config && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <h4 className="text-md font-bold mb-3">{t('containerization.registryConfig', 'Registry Configuration')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('containerization.registryUrl', 'Registry URL')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('containerization.registryUrl', 'Registry URL')}</label>
               <input
                 type="text"
                 value={registryUrl}
                 onChange={e => setRegistryUrl(e.target.value)}
                 placeholder="e.g., ghcr.io/username"
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
                 data-testid="registry-url-input"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('containerization.imageTagLabel', 'Image Tag')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('containerization.imageTagLabel', 'Image Tag')}</label>
               <input
                 type="text"
                 value={imageTag}
                 onChange={e => setImageTag(e.target.value)}
                 placeholder="latest"
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
                 data-testid="image-tag-input"
               />
             </div>
@@ -353,7 +353,7 @@ export default function ContainerizationPage() {
 
       {/* Build & Deploy Actions */}
       {config && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <h4 className="text-md font-bold mb-3">{t('containerization.actions', 'Actions')}</h4>
           <div className="flex flex-wrap gap-3">
             <button
@@ -374,14 +374,14 @@ export default function ContainerizationPage() {
             </button>
             <button
               onClick={handleRefreshStatus}
-              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="bg-warm-700 hover:bg-warm-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               data-testid="refresh-status-btn"
             >
               {t('containerization.refreshStatus', 'Refresh Status')}
             </button>
             <button
               onClick={handleLoadLogs}
-              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="bg-warm-700 hover:bg-warm-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               data-testid="load-logs-btn"
             >
               {t('containerization.loadLogs', 'Load Logs')}
@@ -392,22 +392,22 @@ export default function ContainerizationPage() {
 
       {/* Build Status Details */}
       {buildStatus && (
-        <div className="bg-gray-900 rounded-xl p-6" data-testid="build-status-panel">
+        <div className="bg-warm-900 rounded-xl p-6" data-testid="build-status-panel">
           <h4 className="text-md font-bold mb-3">{t('containerization.buildStatusTitle', 'Build Status')}</h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-400">{t('containerization.status', 'Status')}:</span>
+              <span className="text-warm-400">{t('containerization.status', 'Status')}:</span>
               <span className={`ml-2 px-2 py-0.5 rounded text-xs ${STATUS_COLORS[buildStatus.status] || ''}`}>
                 {buildStatus.status}
               </span>
             </div>
             <div>
-              <span className="text-gray-400">{t('containerization.image', 'Image')}:</span>
+              <span className="text-warm-400">{t('containerization.image', 'Image')}:</span>
               <span className="ml-2 text-white font-mono">{buildStatus.imageName}:{buildStatus.imageTag}</span>
             </div>
             {buildStatus.buildDurationMs > 0 && (
               <div>
-                <span className="text-gray-400">{t('containerization.duration', 'Duration')}:</span>
+                <span className="text-warm-400">{t('containerization.duration', 'Duration')}:</span>
                 <span className="ml-2 text-white">{(buildStatus.buildDurationMs / 1000).toFixed(1)}s</span>
               </div>
             )}
@@ -422,17 +422,17 @@ export default function ContainerizationPage() {
 
       {/* Build Logs */}
       {buildLogs && (
-        <div className="bg-gray-900 rounded-xl p-6" data-testid="build-logs-panel">
+        <div className="bg-warm-900 rounded-xl p-6" data-testid="build-logs-panel">
           <h4 className="text-md font-bold mb-3">{t('containerization.buildLogsTitle', 'Build Logs')}</h4>
           <div className="bg-black rounded-lg p-4 max-h-64 overflow-y-auto font-mono text-xs" data-testid="build-logs-output">
             {parseLogs(buildLogs.logs).map((entry, i) => (
-              <div key={i} className="text-gray-300">
-                <span className="text-gray-500">[{new Date(entry.timestamp).toLocaleTimeString()}]</span>{' '}
+              <div key={i} className="text-warm-300">
+                <span className="text-warm-500">[{new Date(entry.timestamp).toLocaleTimeString()}]</span>{' '}
                 {entry.message}
               </div>
             ))}
             {parseLogs(buildLogs.logs).length === 0 && (
-              <div className="text-gray-500">{t('containerization.noLogs', 'No build logs available')}</div>
+              <div className="text-warm-500">{t('containerization.noLogs', 'No build logs available')}</div>
             )}
           </div>
         </div>

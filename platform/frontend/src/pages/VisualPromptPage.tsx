@@ -64,7 +64,7 @@ export default function VisualPromptPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('visualPrompt.title', 'Visual Prompt-to-UI')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('visualPrompt.subtitle', 'Describe a UI component and see it generated instantly with live preview')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('visualPrompt.subtitle', 'Describe a UI component and see it generated instantly with live preview')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['generate', 'gallery', 'components', 'stats'] as Tab[]).map((t2) => (
@@ -72,7 +72,7 @@ export default function VisualPromptPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`visualPrompt.tabs.${t2}`, t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -89,7 +89,7 @@ export default function VisualPromptPage() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={t('visualPrompt.promptPlaceholder', 'e.g., A pricing table with 3 tiers and a monthly/yearly toggle...')}
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white text-sm h-32 resize-none"
+                className="w-full bg-warm-800 border border-warm-600 rounded-lg p-3 text-white text-sm h-32 resize-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -99,7 +99,7 @@ export default function VisualPromptPage() {
                   value={componentName}
                   onChange={(e) => setComponentName(e.target.value)}
                   placeholder="PricingTable"
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                  className="w-full bg-warm-800 border border-warm-600 rounded-lg p-2 text-white text-sm"
                 />
               </div>
               <div>
@@ -107,7 +107,7 @@ export default function VisualPromptPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                  className="w-full bg-warm-800 border border-warm-600 rounded-lg p-2 text-white text-sm"
                 >
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
@@ -128,7 +128,7 @@ export default function VisualPromptPage() {
                 <h4 className="font-medium">{t('visualPrompt.conversation', 'Conversation')}</h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {activeComponent.conversation.map((msg, i) => (
-                    <div key={i} className={`p-2 rounded-lg text-sm ${msg.role === 'user' ? 'bg-blue-900/30 text-blue-200' : 'bg-gray-800 text-gray-300'}`}>
+                    <div key={i} className={`p-2 rounded-lg text-sm ${msg.role === 'user' ? 'bg-blue-900/30 text-blue-200' : 'bg-warm-800 text-warm-300'}`}>
                       <span className="font-medium">{msg.role === 'user' ? 'You' : 'AI'}:</span> {msg.content}
                     </div>
                   ))}
@@ -138,7 +138,7 @@ export default function VisualPromptPage() {
                     value={refinePrompt}
                     onChange={(e) => setRefinePrompt(e.target.value)}
                     placeholder={t('visualPrompt.refinePlaceholder', 'Describe changes...')}
-                    className="flex-1 bg-gray-800 border border-gray-600 rounded-lg p-2 text-white text-sm"
+                    className="flex-1 bg-warm-800 border border-warm-600 rounded-lg p-2 text-white text-sm"
                     onKeyDown={(e) => e.key === 'Enter' && handleRefine()}
                   />
                   <button
@@ -158,7 +158,7 @@ export default function VisualPromptPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-medium">{activeComponent.componentName}</h4>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <div className="flex items-center gap-2 text-xs text-warm-400">
                     <span>{t('visualPrompt.iterations', 'Iterations')}: {activeComponent.iterationCount}</span>
                     <span>·</span>
                     <span>{activeComponent.generationTimeMs}ms</span>
@@ -179,14 +179,14 @@ export default function VisualPromptPage() {
                       {t('visualPrompt.copyCode', 'Copy Code')}
                     </button>
                   </div>
-                  <pre className="bg-gray-900 border border-gray-700 rounded-lg p-3 text-xs text-green-400 overflow-x-auto max-h-64 overflow-y-auto">
+                  <pre className="bg-warm-900 border border-warm-700 rounded-lg p-3 text-xs text-green-400 overflow-x-auto max-h-64 overflow-y-auto">
                     {activeComponent.generatedCode}
                   </pre>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-64 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
-                <div className="text-center text-gray-500">
+              <div className="flex items-center justify-center h-64 bg-warm-800/50 rounded-lg border border-dashed border-warm-600">
+                <div className="text-center text-warm-500">
                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
                   <p className="text-sm">{t('visualPrompt.previewPlaceholder', 'Your generated component will appear here')}</p>
                 </div>
@@ -201,7 +201,7 @@ export default function VisualPromptPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setFilterCategory('all')}
-              className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+              className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400'}`}
             >
               {t('visualPrompt.allCategories', 'All')}
             </button>
@@ -209,14 +209,14 @@ export default function VisualPromptPage() {
               <button
                 key={c.id}
                 onClick={() => setFilterCategory(c.id)}
-                className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === c.id ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === c.id ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400'}`}
               >
                 {c.name}
               </button>
             ))}
           </div>
           {gallery.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-warm-500">
               <p>{t('visualPrompt.emptyGallery', 'No components in gallery yet. Generate some components to see them here.')}</p>
             </div>
           ) : (
@@ -225,14 +225,14 @@ export default function VisualPromptPage() {
                 <div
                   key={comp.id}
                   onClick={() => handleViewComponent(comp.id)}
-                  className="bg-gray-800 border border-gray-700 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors"
+                  className="bg-warm-800 border border-warm-700 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-sm">{comp.componentName}</span>
-                    <span className="text-xs bg-gray-700 px-2 py-0.5 rounded">{comp.category}</span>
+                    <span className="text-xs bg-warm-700 px-2 py-0.5 rounded">{comp.category}</span>
                   </div>
-                  <p className="text-xs text-gray-400 line-clamp-2 mb-3">{comp.promptText}</p>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <p className="text-xs text-warm-400 line-clamp-2 mb-3">{comp.promptText}</p>
+                  <div className="flex items-center gap-3 text-xs text-warm-500">
                     <span>{comp.viewCount} {t('visualPrompt.views', 'views')}</span>
                     <span>{comp.forkCount} {t('visualPrompt.forks', 'forks')}</span>
                     <span>{comp.likeCount} {t('visualPrompt.likes', 'likes')}</span>
@@ -249,7 +249,7 @@ export default function VisualPromptPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setFilterCategory('all')}
-              className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+              className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400'}`}
             >
               {t('visualPrompt.allCategories', 'All')}
             </button>
@@ -257,14 +257,14 @@ export default function VisualPromptPage() {
               <button
                 key={c.id}
                 onClick={() => setFilterCategory(c.id)}
-                className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === c.id ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400'}`}
+                className={`px-3 py-1 rounded-full text-xs font-medium ${filterCategory === c.id ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400'}`}
               >
                 {c.name}
               </button>
             ))}
           </div>
           {components.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-warm-500">
               <p>{t('visualPrompt.noComponents', 'No components yet. Start by generating one!')}</p>
             </div>
           ) : (
@@ -273,17 +273,17 @@ export default function VisualPromptPage() {
                 <div
                   key={comp.id}
                   onClick={() => handleViewComponent(comp.id)}
-                  className="bg-gray-800 border border-gray-700 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors flex items-center justify-between"
+                  className="bg-warm-800 border border-warm-700 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors flex items-center justify-between"
                 >
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium">{comp.componentName}</span>
-                      <span className={`text-xs px-2 py-0.5 rounded ${comp.status === 'generated' ? 'bg-green-900/30 text-green-400' : 'bg-gray-700 text-gray-400'}`}>{comp.status}</span>
-                      <span className="text-xs bg-gray-700 px-2 py-0.5 rounded">{comp.category}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${comp.status === 'generated' ? 'bg-green-900/30 text-green-400' : 'bg-warm-700 text-warm-400'}`}>{comp.status}</span>
+                      <span className="text-xs bg-warm-700 px-2 py-0.5 rounded">{comp.category}</span>
                     </div>
-                    <p className="text-xs text-gray-400 line-clamp-1">{comp.promptText}</p>
+                    <p className="text-xs text-warm-400 line-clamp-1">{comp.promptText}</p>
                   </div>
-                  <div className="text-xs text-gray-500 text-right">
+                  <div className="text-xs text-warm-500 text-right">
                     <div>{comp.iterationCount} {t('visualPrompt.iterations', 'iterations')}</div>
                     <div>{new Date(comp.updatedAt).toLocaleDateString()}</div>
                   </div>
@@ -297,37 +297,37 @@ export default function VisualPromptPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalComponents}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.totalComponents', 'Total Components')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.totalComponents', 'Total Components')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalIterations}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.totalIterations', 'Total Iterations')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.totalIterations', 'Total Iterations')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalTokensUsed.toLocaleString()}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.tokensUsed', 'Tokens Used')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.tokensUsed', 'Tokens Used')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">${stats.totalCost.toFixed(4)}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.totalCost', 'Total Cost')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.totalCost', 'Total Cost')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.avgGenerationTimeMs}ms</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.avgGenTime', 'Avg Generation Time')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.avgGenTime', 'Avg Generation Time')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.categoriesUsed}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.categoriesUsed', 'Categories Used')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.categoriesUsed', 'Categories Used')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.exportedCount}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.exported', 'Exported')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.exported', 'Exported')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.publicCount}</div>
-              <div className="text-sm text-gray-400">{t('visualPrompt.stats.public', 'Public')}</div>
+              <div className="text-sm text-warm-400">{t('visualPrompt.stats.public', 'Public')}</div>
             </div>
           </div>
         </div>

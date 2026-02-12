@@ -51,9 +51,9 @@ export default function PaymentHistoryPage() {
       case 'Refunded':
         return 'bg-blue-900/50 text-blue-400'
       case 'Cancelled':
-        return 'bg-gray-700 text-gray-400'
+        return 'bg-warm-700 text-warm-400'
       default:
-        return 'bg-gray-700 text-gray-400'
+        return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -73,7 +73,7 @@ export default function PaymentHistoryPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('payments.loading')}</p>
+        <p className="text-warm-400">{t('payments.loading')}</p>
       </div>
     )
   }
@@ -86,22 +86,22 @@ export default function PaymentHistoryPage() {
         </div>
       )}
 
-      <div className="bg-gray-800 rounded-xl p-6">
+      <div className="bg-warm-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">{t('payments.history')}</h3>
-          <span className="text-gray-400 text-sm">
+          <span className="text-warm-400 text-sm">
             {t('payments.totalPayments', { count: totalCount })}
           </span>
         </div>
 
         {payments.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">{t('payments.noHistory')}</p>
+          <p className="text-warm-500 text-center py-8">{t('payments.noHistory')}</p>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-700">
+                  <tr className="text-warm-400 border-b border-warm-700">
                     <th className="text-left py-2 px-2">{t('payments.date')}</th>
                     <th className="text-left py-2 px-2">{t('payments.typeLabel')}</th>
                     <th className="text-center py-2 px-2">{t('payments.providerLabel')}</th>
@@ -113,8 +113,8 @@ export default function PaymentHistoryPage() {
                 </thead>
                 <tbody>
                   {payments.map((payment) => (
-                    <tr key={payment.id} className="border-b border-gray-700/50">
-                      <td className="py-2 px-2 text-gray-400 whitespace-nowrap">
+                    <tr key={payment.id} className="border-b border-warm-700/50">
+                      <td className="py-2 px-2 text-warm-400 whitespace-nowrap">
                         {formatDate(payment.createdAt)}
                       </td>
                       <td className="py-2 px-2">{getTypeLabel(payment.type)}</td>
@@ -127,12 +127,12 @@ export default function PaymentHistoryPage() {
                           {payment.provider === 'CoinbaseCommerce' ? t('payments.providerCrypto') : t('payments.providerStripe')}
                         </span>
                       </td>
-                      <td className="py-2 px-2 text-gray-400">
+                      <td className="py-2 px-2 text-warm-400">
                         {payment.description || '-'}
                       </td>
                       <td className="py-2 px-2 text-right font-medium">
                         ${payment.amountUsd.toFixed(2)}
-                        <span className="text-gray-500 text-xs ml-1">
+                        <span className="text-warm-500 text-xs ml-1">
                           {payment.currency.toUpperCase()}
                         </span>
                       </td>
@@ -163,17 +163,17 @@ export default function PaymentHistoryPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-600 rounded-lg text-sm transition-colors"
+                  className="px-3 py-1 bg-warm-700 hover:bg-warm-600 disabled:bg-warm-800 disabled:text-warm-600 rounded-lg text-sm transition-colors"
                 >
                   {t('payments.prev')}
                 </button>
-                <span className="text-gray-400 text-sm">
+                <span className="text-warm-400 text-sm">
                   {page} / {Math.ceil(totalCount / pageSize)}
                 </span>
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(totalCount / pageSize)}
-                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-600 rounded-lg text-sm transition-colors"
+                  className="px-3 py-1 bg-warm-700 hover:bg-warm-600 disabled:bg-warm-800 disabled:text-warm-600 rounded-lg text-sm transition-colors"
                 >
                   {t('payments.next')}
                 </button>

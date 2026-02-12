@@ -89,7 +89,7 @@ export default function SchemaDesignerPage() {
     <div className="space-y-6">
       <div>
         <h3 className="text-xl font-semibold mb-1">{t('schemaDesigner.title')}</h3>
-        <p className="text-gray-400 text-sm">{t('schemaDesigner.subtitle')}</p>
+        <p className="text-warm-400 text-sm">{t('schemaDesigner.subtitle')}</p>
       </div>
 
       {error && (
@@ -97,34 +97,34 @@ export default function SchemaDesignerPage() {
       )}
 
       {/* Input Section */}
-      <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+      <div className="bg-warm-800 rounded-lg p-4 space-y-3">
         <div>
-          <label className="block text-sm text-gray-300 mb-1">{t('schemaDesigner.requestIdLabel')}</label>
+          <label className="block text-sm text-warm-300 mb-1">{t('schemaDesigner.requestIdLabel')}</label>
           <div className="flex gap-2">
             <input
               type="text"
               value={requestId}
               onChange={(e) => setRequestId(e.target.value)}
               placeholder={t('schemaDesigner.requestIdPlaceholder')}
-              className="flex-1 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500"
+              className="flex-1 bg-warm-900 border border-warm-700 rounded px-3 py-2 text-sm text-white placeholder-warm-500"
             />
             <button
               onClick={handleLoad}
               disabled={loading || !requestId.trim()}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 rounded text-sm"
+              className="px-4 py-2 bg-warm-700 hover:bg-warm-600 disabled:opacity-50 rounded text-sm"
             >
               {t('schemaDesigner.loadExisting')}
             </button>
           </div>
         </div>
         <div>
-          <label className="block text-sm text-gray-300 mb-1">{t('schemaDesigner.promptLabel')}</label>
+          <label className="block text-sm text-warm-300 mb-1">{t('schemaDesigner.promptLabel')}</label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={t('schemaDesigner.promptPlaceholder')}
             rows={3}
-            className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500 resize-none"
+            className="w-full bg-warm-900 border border-warm-700 rounded px-3 py-2 text-sm text-white placeholder-warm-500 resize-none"
           />
         </div>
         <button
@@ -141,19 +141,19 @@ export default function SchemaDesignerPage() {
         <div className="space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
+            <div className="bg-warm-800 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold text-blue-400">{schema.entityCount}</div>
-              <div className="text-xs text-gray-400">{t('schemaDesigner.entities')}</div>
+              <div className="text-xs text-warm-400">{t('schemaDesigner.entities')}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
+            <div className="bg-warm-800 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold text-green-400">{schema.relationshipCount}</div>
-              <div className="text-xs text-gray-400">{t('schemaDesigner.relationships')}</div>
+              <div className="text-xs text-warm-400">{t('schemaDesigner.relationships')}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
+            <div className="bg-warm-800 rounded-lg p-3 text-center">
               <div className="text-2xl font-bold text-yellow-400">{validations.length}</div>
-              <div className="text-xs text-gray-400">{t('schemaDesigner.validationIssues')}</div>
+              <div className="text-xs text-warm-400">{t('schemaDesigner.validationIssues')}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-3 text-center">
+            <div className="bg-warm-800 rounded-lg p-3 text-center">
               <div className={`text-sm font-medium px-2 py-1 rounded ${
                 schema.status === 'validated' ? 'bg-green-500/20 text-green-400'
                 : schema.status === 'generated' ? 'bg-blue-500/20 text-blue-400'
@@ -161,25 +161,25 @@ export default function SchemaDesignerPage() {
               }`}>
                 {schema.status}
               </div>
-              <div className="text-xs text-gray-400 mt-1">{t('schemaDesigner.status')}</div>
+              <div className="text-xs text-warm-400 mt-1">{t('schemaDesigner.status')}</div>
             </div>
           </div>
 
           {/* Entity List */}
           {entities.length > 0 && (
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-300 mb-3">{t('schemaDesigner.entityList')}</h4>
+            <div className="bg-warm-800 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-warm-300 mb-3">{t('schemaDesigner.entityList')}</h4>
               <div className="space-y-3">
                 {entities.map((entity, idx) => (
-                  <div key={idx} className="bg-gray-900 rounded p-3">
+                  <div key={idx} className="bg-warm-900 rounded p-3">
                     <div className="font-medium text-blue-300 mb-2">{entity.name}</div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                       {entity.columns.map((col, cidx) => (
                         <div key={cidx} className="text-xs flex items-center gap-2">
                           {col.isPrimaryKey && <span className="text-yellow-400">PK</span>}
-                          <span className="text-gray-300">{col.name}</span>
-                          <span className="text-gray-500">{col.type}</span>
-                          {col.nullable && <span className="text-gray-600">nullable</span>}
+                          <span className="text-warm-300">{col.name}</span>
+                          <span className="text-warm-500">{col.type}</span>
+                          {col.nullable && <span className="text-warm-600">nullable</span>}
                         </div>
                       ))}
                     </div>
@@ -191,15 +191,15 @@ export default function SchemaDesignerPage() {
 
           {/* Relationships */}
           {relationships.length > 0 && (
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-300 mb-3">{t('schemaDesigner.relationshipList')}</h4>
+            <div className="bg-warm-800 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-warm-300 mb-3">{t('schemaDesigner.relationshipList')}</h4>
               <div className="space-y-2">
                 {relationships.map((rel, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-sm">
                     <span className="text-blue-300">{rel.fromEntity}</span>
-                    <span className="text-gray-500">{rel.type}</span>
+                    <span className="text-warm-500">{rel.type}</span>
                     <span className="text-green-300">{rel.toEntity}</span>
-                    <span className="text-gray-600 text-xs">({rel.foreignKey})</span>
+                    <span className="text-warm-600 text-xs">({rel.foreignKey})</span>
                   </div>
                 ))}
               </div>
@@ -208,8 +208,8 @@ export default function SchemaDesignerPage() {
 
           {/* Validation Issues */}
           {validations.length > 0 && (
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-300 mb-3">{t('schemaDesigner.validationResults')}</h4>
+            <div className="bg-warm-800 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-warm-300 mb-3">{t('schemaDesigner.validationResults')}</h4>
               <div className="space-y-2">
                 {validations.map((v, idx) => (
                   <div key={idx} className={`text-sm p-2 rounded ${
@@ -244,22 +244,22 @@ export default function SchemaDesignerPage() {
 
           {/* Generated Code */}
           {(codeContent.sql || codeContent.entities || codeContent.controllers || codeContent.frontend) && (
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-300 mb-3">{t('schemaDesigner.generatedCode')}</h4>
-              <div className="flex gap-1 mb-3 bg-gray-900 rounded p-1">
+            <div className="bg-warm-800 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-warm-300 mb-3">{t('schemaDesigner.generatedCode')}</h4>
+              <div className="flex gap-1 mb-3 bg-warm-900 rounded p-1">
                 {(['sql', 'entities', 'controllers', 'frontend'] as const).map(tab => (
                   <button
                     key={tab}
                     onClick={() => setActiveCodeTab(tab)}
                     className={`px-3 py-1 rounded text-xs font-medium ${
-                      activeCodeTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                      activeCodeTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
                     }`}
                   >
                     {t(`schemaDesigner.codeTab.${tab}`)}
                   </button>
                 ))}
               </div>
-              <pre className="bg-gray-900 rounded p-3 text-xs text-gray-300 overflow-x-auto max-h-96">
+              <pre className="bg-warm-900 rounded p-3 text-xs text-warm-300 overflow-x-auto max-h-96">
                 {codeContent[activeCodeTab] || t('schemaDesigner.noCodeYet')}
               </pre>
             </div>
@@ -269,7 +269,7 @@ export default function SchemaDesignerPage() {
 
       {/* Empty State */}
       {!schema && !loading && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-warm-500">
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 opacity-50"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
           <p className="text-sm">{t('schemaDesigner.emptyState')}</p>
         </div>

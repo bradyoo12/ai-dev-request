@@ -135,8 +135,8 @@ export default function TeamPage() {
     switch (role) {
       case 'owner': return 'text-yellow-400 bg-yellow-900/40'
       case 'editor': return 'text-blue-400 bg-blue-900/40'
-      case 'viewer': return 'text-gray-400 bg-gray-700'
-      default: return 'text-gray-400 bg-gray-700'
+      case 'viewer': return 'text-warm-400 bg-warm-700'
+      default: return 'text-warm-400 bg-warm-700'
     }
   }
 
@@ -155,24 +155,24 @@ export default function TeamPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('team.title')}</h2>
-        <p className="text-gray-400">{t('team.loginRequired')}</p>
+        <p className="text-warm-400">{t('team.loginRequired')}</p>
       </div>
     )
   }
 
   if (loading) {
-    return <div className="max-w-4xl mx-auto text-center py-8 text-gray-400">{t('team.loading')}</div>
+    return <div className="max-w-4xl mx-auto text-center py-8 text-warm-400">{t('team.loading')}</div>
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">
           &larr;
         </button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{t('team.title')}</h2>
-          <p className="text-sm text-gray-400 mt-1">{t('team.description')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('team.description')}</p>
         </div>
         {!selectedTeam && (
           <button
@@ -193,33 +193,33 @@ export default function TeamPage() {
 
       {/* Create Team Dialog */}
       {showCreate && (
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+        <div className="bg-warm-800 rounded-lg p-4 space-y-3">
           <h3 className="font-semibold text-white">{t('team.createTitle')}</h3>
           <input
             type="text"
             value={newTeamName}
             onChange={(e) => setNewTeamName(e.target.value)}
             placeholder={t('team.namePlaceholder')}
-            className="w-full px-3 py-2 bg-gray-700 rounded-lg text-sm text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-warm-700 rounded-lg text-sm text-white placeholder-warm-500"
           />
           <input
             type="text"
             value={newTeamDesc}
             onChange={(e) => setNewTeamDesc(e.target.value)}
             placeholder={t('team.descPlaceholder')}
-            className="w-full px-3 py-2 bg-gray-700 rounded-lg text-sm text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-warm-700 rounded-lg text-sm text-white placeholder-warm-500"
           />
           <div className="flex gap-2">
             <button
               onClick={handleCreateTeam}
               disabled={creating || !newTeamName.trim()}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 rounded-lg text-sm font-medium transition-colors"
             >
               {creating ? t('team.creating') : t('team.create')}
             </button>
             <button
               onClick={() => setShowCreate(false)}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+              className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
             >
               {t('team.cancel')}
             </button>
@@ -231,23 +231,23 @@ export default function TeamPage() {
       {!selectedTeam && (
         <div className="space-y-3">
           {teams.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">{t('team.empty')}</p>
-              <p className="text-sm text-gray-500 mt-1">{t('team.emptyHint')}</p>
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">{t('team.empty')}</p>
+              <p className="text-sm text-warm-500 mt-1">{t('team.emptyHint')}</p>
             </div>
           ) : (
             teams.map((team) => (
               <button
                 key={team.id}
                 onClick={() => handleSelectTeam(team)}
-                className="w-full bg-gray-800 rounded-lg p-4 flex items-center justify-between hover:bg-gray-750 transition-colors text-left"
+                className="w-full bg-warm-800 rounded-lg p-4 flex items-center justify-between hover:bg-warm-750 transition-colors text-left"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white">{team.name}</p>
                   {team.description && (
-                    <p className="text-xs text-gray-500 mt-1 truncate">{team.description}</p>
+                    <p className="text-xs text-warm-500 mt-1 truncate">{team.description}</p>
                   )}
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="text-xs text-warm-600 mt-1">
                     {t('team.created')}: {new Date(team.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -272,27 +272,27 @@ export default function TeamPage() {
         <div className="space-y-4">
           <button
             onClick={() => { setSelectedTeam(null); setMembers([]); setActivities([]) }}
-            className="text-sm text-gray-400 hover:text-white transition-colors"
+            className="text-sm text-warm-400 hover:text-white transition-colors"
           >
             &larr; {t('team.backToList')}
           </button>
 
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <h3 className="font-semibold text-white text-lg">{selectedTeam.name}</h3>
             {selectedTeam.description && (
-              <p className="text-sm text-gray-400 mt-1">{selectedTeam.description}</p>
+              <p className="text-sm text-warm-400 mt-1">{selectedTeam.description}</p>
             )}
-            <p className="text-xs text-gray-600 mt-2">
+            <p className="text-xs text-warm-600 mt-2">
               {t('team.created')}: {new Date(selectedTeam.createdAt).toLocaleDateString()}
             </p>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+          <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
             <button
               onClick={() => setActiveTab('members')}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'members' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                activeTab === 'members' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
               }`}
             >
               {t('team.tab.members')} ({members.length})
@@ -300,7 +300,7 @@ export default function TeamPage() {
             <button
               onClick={() => setActiveTab('activity')}
               className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                activeTab === 'activity' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                activeTab === 'activity' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
               }`}
             >
               {t('team.tab.activity')}
@@ -320,19 +320,19 @@ export default function TeamPage() {
               </div>
 
               {showAddMember && (
-                <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+                <div className="bg-warm-800 rounded-lg p-4 space-y-3">
                   <h4 className="font-medium text-white text-sm">{t('team.addMemberTitle')}</h4>
                   <input
                     type="email"
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
                     placeholder={t('team.emailPlaceholder')}
-                    className="w-full px-3 py-2 bg-gray-700 rounded-lg text-sm text-white placeholder-gray-500"
+                    className="w-full px-3 py-2 bg-warm-700 rounded-lg text-sm text-white placeholder-warm-500"
                   />
                   <select
                     value={newMemberRole}
                     onChange={(e) => setNewMemberRole(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-700 rounded-lg text-sm text-white"
+                    className="w-full px-3 py-2 bg-warm-700 rounded-lg text-sm text-white"
                   >
                     {ROLES.map(r => (
                       <option key={r} value={r}>{t(`team.role.${r}`)}</option>
@@ -342,13 +342,13 @@ export default function TeamPage() {
                     <button
                       onClick={handleAddMember}
                       disabled={adding || !newMemberEmail.trim()}
-                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg text-xs font-medium transition-colors"
+                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 rounded-lg text-xs font-medium transition-colors"
                     >
                       {adding ? t('team.adding') : t('team.add')}
                     </button>
                     <button
                       onClick={() => setShowAddMember(false)}
-                      className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs transition-colors"
+                      className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded-lg text-xs transition-colors"
                     >
                       {t('team.cancel')}
                     </button>
@@ -357,18 +357,18 @@ export default function TeamPage() {
               )}
 
               {members.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">{t('team.noMembers')}</div>
+                <div className="text-center py-8 text-warm-400">{t('team.noMembers')}</div>
               ) : (
                 <div className="space-y-2">
                   {members.map((member) => (
-                    <div key={member.id} className="bg-gray-800 rounded-lg p-3 flex items-center justify-between">
+                    <div key={member.id} className="bg-warm-800 rounded-lg p-3 flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-sm text-gray-300">
+                        <div className="w-8 h-8 bg-warm-700 rounded-full flex items-center justify-center text-sm text-warm-300">
                           {member.userId.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <p className="text-sm text-white">{member.userId}</p>
-                          <p className="text-xs text-gray-500">{t('team.joined')}: {new Date(member.joinedAt).toLocaleDateString()}</p>
+                          <p className="text-xs text-warm-500">{t('team.joined')}: {new Date(member.joinedAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ export default function TeamPage() {
                             <select
                               value={member.role}
                               onChange={(e) => handleRoleChange(member.id, e.target.value)}
-                              className="px-2 py-1 bg-gray-700 rounded text-xs text-white"
+                              className="px-2 py-1 bg-warm-700 rounded text-xs text-white"
                             >
                               {ROLES.map(r => (
                                 <option key={r} value={r}>{t(`team.role.${r}`)}</option>
@@ -406,19 +406,19 @@ export default function TeamPage() {
           {activeTab === 'activity' && (
             <div className="space-y-2">
               {activities.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">{t('team.noActivities')}</div>
+                <div className="text-center py-8 text-warm-400">{t('team.noActivities')}</div>
               ) : (
                 activities.map((activity) => (
-                  <div key={activity.id} className="bg-gray-800 rounded-lg p-3 flex items-start gap-3">
+                  <div key={activity.id} className="bg-warm-800 rounded-lg p-3 flex items-start gap-3">
                     <span className="text-lg">{actionIcon(activity.action)}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white">
                         {t(`team.action.${activity.action}`)}
                       </p>
                       {activity.detail && (
-                        <p className="text-xs text-gray-400 mt-0.5">{activity.detail}</p>
+                        <p className="text-xs text-warm-400 mt-0.5">{activity.detail}</p>
                       )}
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-warm-600 mt-1">
                         {new Date(activity.createdAt).toLocaleString()}
                       </p>
                     </div>

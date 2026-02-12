@@ -153,7 +153,7 @@ export default function BillingPage() {
       case 'trialing': return 'bg-blue-900/50 text-blue-400'
       case 'past_due': return 'bg-yellow-900/50 text-yellow-400'
       case 'cancelled': return 'bg-red-900/50 text-red-400'
-      default: return 'bg-gray-700 text-gray-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -162,13 +162,13 @@ export default function BillingPage() {
       case 'paid': return 'bg-green-900/50 text-green-400'
       case 'pending': return 'bg-yellow-900/50 text-yellow-400'
       case 'cancelled': return 'bg-red-900/50 text-red-400'
-      default: return 'bg-gray-700 text-gray-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
   if (loading) {
     return (
-      <div className="text-center py-12 text-gray-400">
+      <div className="text-center py-12 text-warm-400">
         {t('billing.loading')}
       </div>
     )
@@ -201,7 +201,7 @@ export default function BillingPage() {
 
       {/* Current Plan Card */}
       {account && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold">{t('billing.currentPlan', 'Current Plan')}</h3>
             <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(account.status)}`}>
@@ -209,16 +209,16 @@ export default function BillingPage() {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400 mb-1">{t('billing.planName', 'Plan')}</div>
+            <div className="bg-warm-800 rounded-lg p-4">
+              <div className="text-sm text-warm-400 mb-1">{t('billing.planName', 'Plan')}</div>
               <div className="text-xl font-bold capitalize">{account.plan}</div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400 mb-1">{t('billing.monthlyRate', 'Monthly Rate')}</div>
-              <div className="text-xl font-bold">${account.monthlyRate.toFixed(2)}<span className="text-sm text-gray-400 font-normal">/mo</span></div>
+            <div className="bg-warm-800 rounded-lg p-4">
+              <div className="text-sm text-warm-400 mb-1">{t('billing.monthlyRate', 'Monthly Rate')}</div>
+              <div className="text-xl font-bold">${account.monthlyRate.toFixed(2)}<span className="text-sm text-warm-400 font-normal">/mo</span></div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-sm text-gray-400 mb-1">{t('billing.period', 'Billing Period')}</div>
+            <div className="bg-warm-800 rounded-lg p-4">
+              <div className="text-sm text-warm-400 mb-1">{t('billing.period', 'Billing Period')}</div>
               <div className="text-sm">
                 {new Date(account.periodStart).toLocaleDateString()} - {new Date(account.periodEnd).toLocaleDateString()}
               </div>
@@ -228,7 +228,7 @@ export default function BillingPage() {
             <div className="mt-4 flex gap-3">
               <button
                 onClick={handleManageSubscription}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2 bg-warm-700 hover:bg-warm-600 text-white rounded-lg text-sm font-medium transition-colors"
               >
                 {t('billing.manageSubscription', 'Manage Subscription')}
               </button>
@@ -246,18 +246,18 @@ export default function BillingPage() {
 
       {/* Usage Meters */}
       {usage && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <h3 className="text-lg font-bold mb-4">{t('billing.usageThisPeriod', 'Usage This Period')}</h3>
           <div className="space-y-4">
             {/* Requests progress bar */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-400">{t('billing.requests', 'Requests')}</span>
+                <span className="text-sm text-warm-400">{t('billing.requests', 'Requests')}</span>
                 <span className="text-sm font-mono">
                   {usage.requestsUsed} / {usage.requestsLimit}
                 </span>
               </div>
-              <div className="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
+              <div className="w-full h-3 bg-warm-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-300 ${
                     requestsPercent >= 100 ? 'bg-red-500' :
@@ -271,7 +271,7 @@ export default function BillingPage() {
 
             {/* Tokens consumed */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400">{t('billing.tokensConsumed', 'Tokens Consumed')}</span>
+              <span className="text-sm text-warm-400">{t('billing.tokensConsumed', 'Tokens Consumed')}</span>
               <span className="text-sm font-mono">{usage.tokensUsed.toLocaleString()}</span>
             </div>
 
@@ -284,13 +284,13 @@ export default function BillingPage() {
             )}
 
             {/* Estimated total */}
-            <div className="flex items-center justify-between border-t border-gray-700 pt-3">
+            <div className="flex items-center justify-between border-t border-warm-700 pt-3">
               <span className="text-sm font-medium">{t('billing.estimatedTotal', 'Estimated Total')}</span>
               <span className="text-lg font-bold">${usage.totalEstimated.toFixed(2)}</span>
             </div>
 
             {/* Days remaining */}
-            <div className="text-xs text-gray-500 text-right">
+            <div className="text-xs text-warm-500 text-right">
               {usage.daysRemaining} {t('billing.daysRemaining', 'days remaining in period')}
             </div>
           </div>
@@ -307,20 +307,20 @@ export default function BillingPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`bg-gray-900 rounded-xl p-6 border-2 transition-colors ${
-                    isCurrent ? 'border-blue-500' : 'border-transparent hover:border-gray-700'
+                  className={`bg-warm-900 rounded-xl p-6 border-2 transition-colors ${
+                    isCurrent ? 'border-blue-500' : 'border-transparent hover:border-warm-700'
                   }`}
                 >
                   <div className="mb-4">
                     <h4 className="text-lg font-bold">{plan.name}</h4>
                     <div className="mt-2">
                       <span className="text-3xl font-bold">${plan.monthlyRate}</span>
-                      <span className="text-gray-400 text-sm">/mo</span>
+                      <span className="text-warm-400 text-sm">/mo</span>
                     </div>
                   </div>
                   <ul className="space-y-2 mb-6">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
+                      <li key={idx} className="flex items-start gap-2 text-sm text-warm-300">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400 mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
                         {feature}
                       </li>
@@ -352,12 +352,12 @@ export default function BillingPage() {
 
       {/* Invoice History */}
       {invoices.length > 0 && (
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <h3 className="text-lg font-bold mb-4">{t('billing.invoiceHistory', 'Invoice History')}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-gray-400 border-b border-gray-700">
+                <tr className="text-warm-400 border-b border-warm-700">
                   <th className="text-left py-2 pr-4">{t('billing.date', 'Date')}</th>
                   <th className="text-left py-2 pr-4">{t('billing.description', 'Description')}</th>
                   <th className="text-right py-2 pr-4">{t('billing.amount', 'Amount')}</th>
@@ -366,9 +366,9 @@ export default function BillingPage() {
               </thead>
               <tbody>
                 {invoices.map((invoice) => (
-                  <tr key={invoice.id} className="border-b border-gray-800">
-                    <td className="py-3 pr-4 text-gray-300">{new Date(invoice.date).toLocaleDateString()}</td>
-                    <td className="py-3 pr-4 text-gray-300">{invoice.description}</td>
+                  <tr key={invoice.id} className="border-b border-warm-800">
+                    <td className="py-3 pr-4 text-warm-300">{new Date(invoice.date).toLocaleDateString()}</td>
+                    <td className="py-3 pr-4 text-warm-300">{invoice.description}</td>
                     <td className="py-3 pr-4 text-right font-mono">${invoice.amount.toFixed(2)}</td>
                     <td className="py-3 text-center">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${getInvoiceStatusColor(invoice.status)}`}>
@@ -394,16 +394,16 @@ export default function BillingPage() {
           </div>
 
           {billing.paymentMethods.length === 0 ? (
-            <div className="bg-gray-900 rounded-xl p-6 text-center text-gray-400">
+            <div className="bg-warm-900 rounded-xl p-6 text-center text-warm-400">
               <p>{t('billing.noPaymentMethods')}</p>
               <p className="text-sm mt-2">{t('billing.addCardPrompt')}</p>
             </div>
           ) : (
             billing.paymentMethods.map(pm => (
-              <div key={pm.id} className="bg-gray-900 rounded-xl p-5 mb-3">
+              <div key={pm.id} className="bg-warm-900 rounded-xl p-5 mb-3">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-warm-400"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
                     <div>
                       <div className="font-medium">
                         {pm.brand} **** {pm.last4}
@@ -413,14 +413,14 @@ export default function BillingPage() {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-warm-400">
                         {t('billing.expires')} {pm.expMonth}/{pm.expYear}
                       </div>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     {!pm.isDefault && (
-                      <button className="text-sm text-gray-400 hover:text-white">
+                      <button className="text-sm text-warm-400 hover:text-white">
                         {t('billing.setDefault')}
                       </button>
                     )}
@@ -432,7 +432,7 @@ export default function BillingPage() {
 
                 {/* Auto Top-Up section within default card */}
                 {pm.isDefault && billing && (
-                  <div className="bg-gray-800 rounded-lg p-4">
+                  <div className="bg-warm-800 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -442,7 +442,7 @@ export default function BillingPage() {
                         onClick={handleToggleAutoTopUp}
                         disabled={saving}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          billing.autoTopUp.isEnabled ? 'bg-green-600' : 'bg-gray-600'
+                          billing.autoTopUp.isEnabled ? 'bg-green-600' : 'bg-warm-600'
                         }`}
                       >
                         <span
@@ -465,11 +465,11 @@ export default function BillingPage() {
 
                         {/* Threshold */}
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">{t('billing.autoTopUp.threshold')}</span>
+                          <span className="text-sm text-warm-400">{t('billing.autoTopUp.threshold')}</span>
                           <select
                             value={billing.autoTopUp.threshold}
                             onChange={e => handleUpdateConfig({ threshold: Number(e.target.value) })}
-                            className="bg-gray-700 text-white text-sm rounded-lg px-3 py-1.5 border border-gray-600"
+                            className="bg-warm-700 text-white text-sm rounded-lg px-3 py-1.5 border border-warm-600"
                           >
                             {thresholdOptions.map(v => (
                               <option key={v} value={v}>{v} {t('settings.tokens.tokensUnit')}</option>
@@ -479,11 +479,11 @@ export default function BillingPage() {
 
                         {/* Package */}
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">{t('billing.autoTopUp.package')}</span>
+                          <span className="text-sm text-warm-400">{t('billing.autoTopUp.package')}</span>
                           <select
                             value={billing.autoTopUp.tokenPackageId}
                             onChange={e => handleUpdateConfig({ tokenPackageId: Number(e.target.value) })}
-                            className="bg-gray-700 text-white text-sm rounded-lg px-3 py-1.5 border border-gray-600"
+                            className="bg-warm-700 text-white text-sm rounded-lg px-3 py-1.5 border border-warm-600"
                           >
                             {packages.map(pkg => (
                               <option key={pkg.id} value={pkg.id}>
@@ -495,13 +495,13 @@ export default function BillingPage() {
 
                         {/* Monthly limit */}
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-400">{t('billing.autoTopUp.monthlyLimit')}</span>
+                          <span className="text-sm text-warm-400">{t('billing.autoTopUp.monthlyLimit')}</span>
                           <select
                             value={billing.autoTopUp.monthlyLimitUsd ?? ''}
                             onChange={e => handleUpdateConfig({
                               monthlyLimitUsd: e.target.value ? Number(e.target.value) : null
                             })}
-                            className="bg-gray-700 text-white text-sm rounded-lg px-3 py-1.5 border border-gray-600"
+                            className="bg-warm-700 text-white text-sm rounded-lg px-3 py-1.5 border border-warm-600"
                           >
                             {monthlyLimitOptions.map((opt, i) => (
                               <option key={i} value={opt.value ?? ''}>
@@ -512,7 +512,7 @@ export default function BillingPage() {
                         </div>
 
                         {/* Summary */}
-                        <div className="bg-gray-900/50 rounded-lg p-3 text-sm text-gray-400">
+                        <div className="bg-warm-900/50 rounded-lg p-3 text-sm text-warm-400">
                           {t('billing.autoTopUp.summary', {
                             amount: selectedPackage ? `$${selectedPackage.priceUsd.toFixed(2)}` : '',
                             tokens: selectedPackage?.tokenAmount ?? 0,
@@ -522,7 +522,7 @@ export default function BillingPage() {
 
                         {/* Monthly spent */}
                         {billing.autoTopUp.monthlySpentUsd > 0 && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-warm-500">
                             {t('billing.autoTopUp.monthlySpent', {
                               amount: `$${billing.autoTopUp.monthlySpentUsd.toFixed(2)}`,
                             })}
@@ -530,7 +530,7 @@ export default function BillingPage() {
                         )}
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-warm-400">
                         <p>{t('billing.autoTopUp.disabledDescription')}</p>
                       </div>
                     )}

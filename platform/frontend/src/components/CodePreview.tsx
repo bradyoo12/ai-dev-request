@@ -42,9 +42,9 @@ export default function CodePreview({ files, projectName }: CodePreviewProps) {
   const fileNames = Object.keys(files)
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
+    <div className="bg-warm-900 border border-warm-700 rounded-xl overflow-hidden">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700">
+      <div className="flex items-center justify-between px-4 py-3 bg-warm-800 border-b border-warm-700">
         <div className="flex items-center gap-3">
           <h4 className="font-bold text-blue-400">
             {projectName || t('codePreview.title')}
@@ -52,7 +52,7 @@ export default function CodePreview({ files, projectName }: CodePreviewProps) {
         </div>
         <div className="flex items-center gap-2">
           {/* Viewport Switcher */}
-          <div className="flex bg-gray-900 rounded-lg p-0.5">
+          <div className="flex bg-warm-900 rounded-lg p-0.5">
             {(['desktop', 'tablet', 'mobile'] as ViewportMode[]).map((mode) => (
               <button
                 key={mode}
@@ -60,7 +60,7 @@ export default function CodePreview({ files, projectName }: CodePreviewProps) {
                 className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
                   viewport === mode
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-warm-400 hover:text-white'
                 }`}
               >
                 {t(`codePreview.viewport.${mode}`)}
@@ -70,15 +70,15 @@ export default function CodePreview({ files, projectName }: CodePreviewProps) {
 
           {/* Copy Code Dropdown */}
           <div className="relative group">
-            <button className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs text-gray-300 transition-colors">
+            <button className="px-3 py-1 bg-warm-700 hover:bg-warm-600 rounded-lg text-xs text-warm-300 transition-colors">
               {t('codePreview.copyCode')}
             </button>
-            <div className="absolute right-0 top-full mt-1 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 hidden group-hover:block">
+            <div className="absolute right-0 top-full mt-1 w-56 bg-warm-800 border border-warm-700 rounded-lg shadow-xl z-10 hidden group-hover:block">
               {fileNames.map((filename) => (
                 <button
                   key={filename}
                   onClick={() => handleCopyCode(filename)}
-                  className="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-gray-700 transition-colors first:rounded-t-lg last:rounded-b-lg font-mono"
+                  className="w-full text-left px-3 py-2 text-xs text-warm-300 hover:bg-warm-700 transition-colors first:rounded-t-lg last:rounded-b-lg font-mono"
                 >
                   {copiedFile === filename
                     ? t('codePreview.copied')
@@ -144,7 +144,7 @@ export default function CodePreview({ files, projectName }: CodePreviewProps) {
       </SandpackProvider>
 
       {/* Footer info */}
-      <div className="px-4 py-2 bg-gray-800 border-t border-gray-700 flex items-center justify-between text-xs text-gray-500">
+      <div className="px-4 py-2 bg-warm-800 border-t border-warm-700 flex items-center justify-between text-xs text-warm-500">
         <span>
           {t('codePreview.files')}: {fileNames.length}
         </span>

@@ -961,3 +961,14 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `McpToolIntegration` with Id (Guid), UserId, McpEnabled, AutoAttachTools, ContextDepthLevel, per-tool enable flags, TotalExecutions, SuccessfulExecutions, FailedExecutions, AvgLatencyMs, TokensSaved, ExecutionHistoryJson, CustomServersJson, CreatedAt, UpdatedAt
 - **Frontend**: `McpToolIntegrationPage` in Settings with "MCP Tools" tab — 3 sub-tabs (Tools with 8 tool cards + toggles + execute, History with execution log, Stats with metric cards)
 - **Flow**: Open MCP Tools tab → enable/disable individual tools → set context depth → execute tools → view results → browse history → monitor stats
+
+### #333 — AI Model Configuration with Claude Opus 4.6 (PR #341)
+- **Backend**: `AiModelController` with endpoints for model config, available models, and stats
+- **Endpoints**:
+  - `GET /api/ai-model/config` — get or create user AI model config
+  - `PUT /api/ai-model/config` — update config (selected model, extended thinking, thinking budget)
+  - `GET /api/ai-model/models` — list available models (Claude Opus 4.6, Sonnet 4.5, Haiku 4.5)
+  - `GET /api/ai-model/stats` — usage stats per model (requests, tokens, avg latency)
+- **Entity**: `AiModelConfig` with Id (Guid), UserId, SelectedModel, ExtendedThinkingEnabled, ThinkingBudgetTokens, MaxOutputTokens, Temperature, StreamingEnabled, TotalRequests, TotalInputTokens, TotalOutputTokens, TotalThinkingTokens, AvgLatencyMs, ModelUsageJson, CreatedAt, UpdatedAt
+- **Frontend**: `AiModelPage` in Settings with "AI Model" tab — 3 sub-tabs (Models with model selector cards showing capabilities/pricing, Configure with extended thinking toggle + budget slider + streaming toggle, Stats with usage metrics)
+- **Flow**: Open AI Model tab → select model (Opus 4.6 for complex tasks, Sonnet 4.5 for speed) → enable extended thinking with budget → configure streaming → view per-model usage stats

@@ -85,7 +85,7 @@ public class McpGatewayController : ControllerBase
 
     // POST /api/mcp-gateway/servers/{id}/execute
     [HttpPost("servers/{id}/execute")]
-    public async Task<IActionResult> ExecuteTool(Guid id, [FromBody] ExecuteToolRequest req)
+    public async Task<IActionResult> ExecuteTool(Guid id, [FromBody] McpGatewayExecuteToolRequest req)
     {
         var userId = GetUserId();
         var server = await _db.McpGatewayServers.FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
@@ -179,4 +179,4 @@ public class McpGatewayController : ControllerBase
 }
 
 public record AddServerRequest(string ServerName, string ServerUrl, string? TransportType, string? Description, string? Category, string? IconUrl);
-public record ExecuteToolRequest(string ToolName, string? InputJson);
+public record McpGatewayExecuteToolRequest(string ToolName, string? InputJson);

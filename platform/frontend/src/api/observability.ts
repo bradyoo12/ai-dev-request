@@ -12,12 +12,23 @@ function authHeaders(): Record<string, string> {
 export interface TraceRecord {
   id: number
   traceId: string
+  spanId?: string
+  parentSpanId?: string
+  operationName?: string
   devRequestId?: string
   totalTokens: number
+  inputTokens: number
+  outputTokens: number
   totalCost: number
+  estimatedCost: number
   latencyMs: number
+  durationMs: number
   model?: string
+  modelTier?: string
   status: string
+  errorMessage?: string
+  attributesJson?: string
+  startedAt: string
   createdAt: string
   completedAt?: string
 }
@@ -25,6 +36,7 @@ export interface TraceRecord {
 export interface SpanRecord {
   id: number
   spanName: string
+  parentSpanId?: string
   model?: string
   inputTokens: number
   outputTokens: number
@@ -32,6 +44,8 @@ export interface SpanRecord {
   cost: number
   latencyMs: number
   status: string
+  errorMessage?: string
+  attributesJson?: string
   startedAt: string
   completedAt?: string
 }
@@ -45,6 +59,27 @@ export interface TraceListResult {
 
 export interface TraceDetailResult extends TraceRecord {
   spans: SpanRecord[]
+}
+
+export interface ObservabilityStatsResult {
+  totalTraces: number
+  totalTokens: number
+  totalCost: number
+  avgDurationMs: number
+  errorRate: number
+  tracesByOperation: Record<string, number>
+}
+
+export interface RecordTracePayload {
+  operationName: string
+  parentSpanId?: string
+  inputTokens: number
+  outputTokens: number
+  durationMs: number
+  model?: string
+  modelTier?: string
+  error?: string
+  attributesJson?: string
 }
 
 export interface CostBucket {
@@ -106,11 +141,13 @@ export async function getTraces(
   page = 1,
   pageSize = 20,
   status?: string,
-  model?: string
+  model?: string,
+  operation?: string
 ): Promise<TraceListResult> {
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) })
   if (status) params.set('status', status)
   if (model) params.set('model', model)
+  if (operation) params.set('operation', operation)
 
   const response = await fetch(
     `${API_BASE_URL}/api/observability/traces?${params}`,
@@ -129,6 +166,43 @@ export async function getTrace(traceId: string): Promise<TraceDetailResult> {
   )
   if (!response.ok) {
     throw new Error(t('api.error.traceDetailFailed'))
+  }
+  return response.json()
+}
+
+export async function recordTrace(payload: RecordTracePayload): Promise<TraceRecord> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/observability/traces`,
+    {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }
+  )
+  if (!response.ok) {
+    throw new Error(t('api.error.recordTraceFailed'))
+  }
+  return response.json()
+}
+
+export async function getObservabilityStats(): Promise<ObservabilityStatsResult> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/observability/stats`,
+    { headers: authHeaders() }
+  )
+  if (!response.ok) {
+    throw new Error(t('api.error.observabilityStatsFailed'))
+  }
+  return response.json()
+}
+
+export async function getOperations(): Promise<string[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/observability/operations`,
+    { headers: authHeaders() }
+  )
+  if (!response.ok) {
+    throw new Error(t('api.error.operationsFailed'))
   }
   return response.json()
 }

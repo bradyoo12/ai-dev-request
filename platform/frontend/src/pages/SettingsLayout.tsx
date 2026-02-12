@@ -126,7 +126,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/oauth-connectors' ? 'oauth-connectors' as SettingsTab
     : location.pathname === '/settings/mcp-tools' ? 'mcp-tools' as SettingsTab
     : location.pathname === '/settings/ai-model' ? 'ai-model' as SettingsTab
-    : location.pathname === '/settings/bidir-sync' ? 'bidir-sync' as SettingsTab : null
+    : location.pathname === '/settings/bidir-sync' ? 'bidir-sync' as SettingsTab
+    : location.pathname === '/settings/observability' ? 'observability' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 

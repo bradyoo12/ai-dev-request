@@ -1058,9 +1058,16 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.TraceId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.SpanId).HasMaxLength(100);
+            entity.Property(e => e.ParentSpanId).HasMaxLength(100);
+            entity.Property(e => e.OperationName).HasMaxLength(50);
             entity.Property(e => e.TotalCost).HasColumnType("decimal(18,8)");
+            entity.Property(e => e.EstimatedCost).HasColumnType("decimal(18,8)");
             entity.Property(e => e.Model).HasMaxLength(50);
+            entity.Property(e => e.ModelTier).HasMaxLength(20);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.Property(e => e.AttributesJson).HasColumnType("jsonb");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.SetNull);
             entity.HasIndex(e => e.UserId);
@@ -1068,6 +1075,8 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+            entity.HasIndex(e => e.OperationName);
+            entity.HasIndex(e => e.StartedAt);
         });
 
         modelBuilder.Entity<ObservabilitySpan>(entity =>
@@ -1075,9 +1084,12 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("observability_spans");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.SpanName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ParentSpanId).HasMaxLength(100);
             entity.Property(e => e.Model).HasMaxLength(50);
             entity.Property(e => e.Cost).HasColumnType("decimal(18,8)");
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.Property(e => e.AttributesJson).HasColumnType("jsonb");
             entity.HasOne<ObservabilityTrace>().WithMany().HasForeignKey(e => e.TraceId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.TraceId);
             entity.HasIndex(e => e.StartedAt);

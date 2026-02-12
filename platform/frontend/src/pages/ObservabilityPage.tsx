@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next'
 import {
   getTraces,
   getTrace,
+  getObservabilityStats,
+  getOperations,
   getCostAnalytics,
   getPerformanceMetrics,
   getUsageAnalytics,
   type TraceRecord,
   type TraceDetailResult,
+  type ObservabilityStatsResult,
   type CostAnalyticsResult,
   type PerformanceMetricsResult,
   type UsageAnalyticsResult,
@@ -21,12 +24,17 @@ export default function ObservabilityPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Stats state
+  const [stats, setStats] = useState<ObservabilityStatsResult | null>(null)
+  const [operations, setOperations] = useState<string[]>([])
+
   // Traces state
   const [traces, setTraces] = useState<TraceRecord[]>([])
   const [traceTotalCount, setTraceTotalCount] = useState(0)
   const [tracePage, setTracePage] = useState(1)
   const [statusFilter, setStatusFilter] = useState('')
   const [modelFilter, setModelFilter] = useState('')
+  const [operationFilter, setOperationFilter] = useState('')
   const [selectedTrace, setSelectedTrace] = useState<TraceDetailResult | null>(null)
 
   // Analytics state
@@ -37,6 +45,19 @@ export default function ObservabilityPage() {
 
   const pageSize = 20
 
+  async function loadStats() {
+    try {
+      const [statsResult, opsResult] = await Promise.all([
+        getObservabilityStats(),
+        getOperations(),
+      ])
+      setStats(statsResult)
+      setOperations(opsResult)
+    } catch {
+      // Stats loading is non-blocking
+    }
+  }
+
   async function loadTraces() {
     try {
       setLoading(true)
@@ -45,7 +66,8 @@ export default function ObservabilityPage() {
         tracePage,
         pageSize,
         statusFilter || undefined,
-        modelFilter || undefined
+        modelFilter || undefined,
+        operationFilter || undefined
       )
       setTraces(result.traces)
       setTraceTotalCount(result.totalCount)
@@ -105,11 +127,15 @@ export default function ObservabilityPage() {
   }
 
   useEffect(() => {
+    loadStats()
+  }, [])
+
+  useEffect(() => {
     if (view === 'traces') loadTraces()
     else if (view === 'cost') loadCostAnalytics()
     else if (view === 'performance') loadPerformance()
     else if (view === 'usage') loadUsageAnalytics()
-  }, [view, tracePage, statusFilter, modelFilter, granularity])
+  }, [view, tracePage, statusFilter, modelFilter, operationFilter, granularity])
 
   const totalPages = Math.ceil(traceTotalCount / pageSize)
 
@@ -123,11 +149,24 @@ export default function ObservabilityPage() {
 
   const statusColor = (s: string) => {
     switch (s) {
-      case 'completed': return 'text-green-400 bg-green-900/30'
+      case 'completed':
+      case 'ok':
+        return 'text-green-400 bg-green-900/30'
       case 'running': return 'text-blue-400 bg-blue-900/30'
       case 'error': return 'text-red-400 bg-red-900/30'
       default: return 'text-warm-400 bg-warm-700'
     }
+  }
+
+  const operationLabel = (op: string) => {
+    const labels: Record<string, string> = {
+      analysis: t('observability.op.analysis', 'Analysis'),
+      proposal: t('observability.op.proposal', 'Proposal'),
+      generation: t('observability.op.generation', 'Generation'),
+      review: t('observability.op.review', 'Review'),
+      deployment: t('observability.op.deployment', 'Deployment'),
+    }
+    return labels[op] || op
   }
 
   return (
@@ -138,6 +177,71 @@ export default function ObservabilityPage() {
           {t('observability.description', 'Trace AI pipeline executions, analyze costs, and monitor performance.')}
         </p>
       </div>
+
+      {/* Stats cards */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-warm-800 rounded-xl p-5">
+            <div className="text-sm text-warm-400">{t('observability.totalTraces', 'Total Traces')}</div>
+            <div className="text-2xl font-bold mt-1">{stats.totalTraces.toLocaleString()}</div>
+          </div>
+          <div className="bg-warm-800 rounded-xl p-5">
+            <div className="text-sm text-warm-400">{t('observability.totalTokens', 'Total Tokens')}</div>
+            <div className="text-2xl font-bold mt-1 text-blue-400">{stats.totalTokens.toLocaleString()}</div>
+          </div>
+          <div className="bg-gradient-to-r from-yellow-900/50 to-orange-900/50 rounded-xl p-5">
+            <div className="text-sm text-warm-300">{t('observability.totalCost', 'Total Cost')}</div>
+            <div className="text-2xl font-bold mt-1 text-yellow-400">{formatCost(stats.totalCost)}</div>
+          </div>
+          <div className="bg-warm-800 rounded-xl p-5">
+            <div className="text-sm text-warm-400">{t('observability.avgDuration', 'Avg Duration')}</div>
+            <div className="text-2xl font-bold mt-1">{formatLatency(stats.avgDurationMs)}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Error rate indicator */}
+      {stats && stats.errorRate > 0 && (
+        <div className={`rounded-lg p-3 text-sm flex items-center gap-2 ${
+          stats.errorRate > 10 ? 'bg-red-900/30 border border-red-700 text-red-300' :
+          stats.errorRate > 5 ? 'bg-yellow-900/30 border border-yellow-700 text-yellow-300' :
+          'bg-green-900/30 border border-green-700 text-green-300'
+        }`}>
+          <span className="font-medium">{t('observability.errorRateLabel', 'Error Rate')}:</span>
+          <span className="font-bold">{stats.errorRate.toFixed(1)}%</span>
+          <span className="text-xs ml-1">
+            ({Math.round(stats.totalTraces * stats.errorRate / 100)} {t('observability.errorsOf', 'errors of')} {stats.totalTraces} {t('observability.tracesLabel', 'traces')})
+          </span>
+        </div>
+      )}
+
+      {/* Operation filter tabs */}
+      {operations.length > 0 && view === 'traces' && (
+        <div className="flex gap-1 flex-wrap">
+          <button
+            onClick={() => { setOperationFilter(''); setTracePage(1) }}
+            className={`py-1.5 px-3 rounded-md text-xs font-medium transition-colors ${
+              operationFilter === '' ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
+            }`}
+          >
+            {t('observability.allOperations', 'All')}
+          </button>
+          {operations.map((op) => (
+            <button
+              key={op}
+              onClick={() => { setOperationFilter(op); setTracePage(1) }}
+              className={`py-1.5 px-3 rounded-md text-xs font-medium transition-colors ${
+                operationFilter === op ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
+              }`}
+            >
+              {operationLabel(op)}
+              {stats?.tracesByOperation[op] !== undefined && (
+                <span className="ml-1 text-xs opacity-70">({stats.tracesByOperation[op]})</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Sub-navigation */}
       <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
@@ -179,6 +283,7 @@ export default function ObservabilityPage() {
             >
               <option value="">{t('observability.allStatuses', 'All statuses')}</option>
               <option value="completed">{t('observability.completed', 'Completed')}</option>
+              <option value="ok">{t('observability.ok', 'OK')}</option>
               <option value="running">{t('observability.running', 'Running')}</option>
               <option value="error">{t('observability.error', 'Error')}</option>
             </select>
@@ -204,11 +309,12 @@ export default function ObservabilityPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-warm-400 border-b border-warm-700">
+                      <th className="text-left py-2 px-2">{t('observability.operation', 'Operation')}</th>
                       <th className="text-left py-2 px-2">{t('observability.traceId', 'Trace ID')}</th>
                       <th className="text-left py-2 px-2">{t('observability.model', 'Model')}</th>
                       <th className="text-right py-2 px-2">{t('observability.tokens', 'Tokens')}</th>
                       <th className="text-right py-2 px-2">{t('observability.cost', 'Cost')}</th>
-                      <th className="text-right py-2 px-2">{t('observability.latency', 'Latency')}</th>
+                      <th className="text-right py-2 px-2">{t('observability.duration', 'Duration')}</th>
                       <th className="text-center py-2 px-2">{t('observability.status', 'Status')}</th>
                       <th className="text-left py-2 px-2">{t('observability.date', 'Date')}</th>
                     </tr>
@@ -220,13 +326,26 @@ export default function ObservabilityPage() {
                         onClick={() => handleTraceClick(tr.traceId)}
                         className="border-b border-warm-700/50 hover:bg-warm-800/50 cursor-pointer transition-colors"
                       >
+                        <td className="py-2 px-2">
+                          {tr.operationName ? (
+                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-warm-700 text-warm-200">
+                              {operationLabel(tr.operationName)}
+                            </span>
+                          ) : (
+                            <span className="text-warm-500">-</span>
+                          )}
+                        </td>
                         <td className="py-2 px-2 font-mono text-xs text-blue-400">
                           {tr.traceId.slice(0, 12)}...
                         </td>
-                        <td className="py-2 px-2 text-warm-300">{tr.model || '-'}</td>
+                        <td className="py-2 px-2 text-warm-300">
+                          {tr.modelTier || tr.model || '-'}
+                        </td>
                         <td className="py-2 px-2 text-right">{tr.totalTokens.toLocaleString()}</td>
                         <td className="py-2 px-2 text-right text-yellow-400">{formatCost(tr.totalCost)}</td>
-                        <td className="py-2 px-2 text-right">{formatLatency(tr.latencyMs)}</td>
+                        <td className="py-2 px-2 text-right">
+                          {formatLatency(tr.durationMs > 0 ? tr.durationMs : tr.latencyMs)}
+                        </td>
                         <td className="py-2 px-2 text-center">
                           <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusColor(tr.status)}`}>
                             {tr.status}
@@ -275,11 +394,26 @@ export default function ObservabilityPage() {
 
           <div className="bg-warm-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold">{t('observability.traceDetail', 'Trace Detail')}</h4>
+              <div className="flex items-center gap-3">
+                <h4 className="font-semibold">{t('observability.traceDetail', 'Trace Detail')}</h4>
+                {selectedTrace.operationName && (
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-900/40 text-blue-300">
+                    {operationLabel(selectedTrace.operationName)}
+                  </span>
+                )}
+              </div>
               <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusColor(selectedTrace.status)}`}>
                 {selectedTrace.status}
               </span>
             </div>
+
+            {/* Error message */}
+            {selectedTrace.errorMessage && (
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-3 mb-4 text-sm text-red-300">
+                <span className="font-medium">{t('observability.errorLabel', 'Error')}:</span> {selectedTrace.errorMessage}
+              </div>
+            )}
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div>
                 <div className="text-xs text-warm-400">{t('observability.traceId', 'Trace ID')}</div>
@@ -288,16 +422,60 @@ export default function ObservabilityPage() {
               <div>
                 <div className="text-xs text-warm-400">{t('observability.tokens', 'Tokens')}</div>
                 <div className="text-lg font-bold">{selectedTrace.totalTokens.toLocaleString()}</div>
+                <div className="text-xs text-warm-500">
+                  {t('observability.input', 'In')}: {selectedTrace.inputTokens.toLocaleString()} / {t('observability.output', 'Out')}: {selectedTrace.outputTokens.toLocaleString()}
+                </div>
               </div>
               <div>
                 <div className="text-xs text-warm-400">{t('observability.cost', 'Cost')}</div>
                 <div className="text-lg font-bold text-yellow-400">{formatCost(selectedTrace.totalCost)}</div>
               </div>
               <div>
-                <div className="text-xs text-warm-400">{t('observability.latency', 'Latency')}</div>
-                <div className="text-lg font-bold">{formatLatency(selectedTrace.latencyMs)}</div>
+                <div className="text-xs text-warm-400">{t('observability.duration', 'Duration')}</div>
+                <div className="text-lg font-bold">
+                  {formatLatency(selectedTrace.durationMs > 0 ? selectedTrace.durationMs : selectedTrace.latencyMs)}
+                </div>
               </div>
             </div>
+
+            {/* Extra attributes */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
+              {selectedTrace.modelTier && (
+                <div>
+                  <div className="text-xs text-warm-400">{t('observability.modelTier', 'Model Tier')}</div>
+                  <div className="text-warm-200">{selectedTrace.modelTier}</div>
+                </div>
+              )}
+              {selectedTrace.spanId && (
+                <div>
+                  <div className="text-xs text-warm-400">{t('observability.spanId', 'Span ID')}</div>
+                  <div className="font-mono text-xs text-warm-300">{selectedTrace.spanId}</div>
+                </div>
+              )}
+              {selectedTrace.parentSpanId && (
+                <div>
+                  <div className="text-xs text-warm-400">{t('observability.parentSpanId', 'Parent Span')}</div>
+                  <div className="font-mono text-xs text-warm-300">{selectedTrace.parentSpanId}</div>
+                </div>
+              )}
+              <div>
+                <div className="text-xs text-warm-400">{t('observability.startedAt', 'Started At')}</div>
+                <div className="text-warm-300 text-xs">{formatDate(selectedTrace.startedAt)}</div>
+              </div>
+            </div>
+
+            {/* Custom attributes JSON */}
+            {selectedTrace.attributesJson && (
+              <div className="mb-6">
+                <div className="text-xs text-warm-400 mb-1">{t('observability.attributes', 'Custom Attributes')}</div>
+                <pre className="bg-warm-900 rounded-lg p-3 text-xs text-warm-300 overflow-x-auto">
+                  {(() => {
+                    try { return JSON.stringify(JSON.parse(selectedTrace.attributesJson), null, 2) }
+                    catch { return selectedTrace.attributesJson }
+                  })()}
+                </pre>
+              </div>
+            )}
 
             {/* Span waterfall */}
             <h5 className="text-sm font-medium text-warm-300 mb-3">
@@ -341,6 +519,11 @@ export default function ObservabilityPage() {
                         <span>{t('observability.input', 'In')}: {span.inputTokens.toLocaleString()}</span>
                         <span>{t('observability.output', 'Out')}: {span.outputTokens.toLocaleString()}</span>
                       </div>
+                      {span.errorMessage && (
+                        <div className="mt-2 text-xs text-red-400">
+                          {span.errorMessage}
+                        </div>
+                      )}
                     </div>
                   )
                 })}

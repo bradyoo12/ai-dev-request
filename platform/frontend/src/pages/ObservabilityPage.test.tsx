@@ -9,6 +9,8 @@ vi.mock('react-i18next', () => {
 vi.mock('../api/observability', () => ({
   getTraces: vi.fn(() => Promise.resolve({ traces: [], totalCount: 0, page: 1, pageSize: 20 })),
   getTrace: vi.fn(),
+  getObservabilityStats: vi.fn(() => Promise.resolve({ totalTraces: 0, totalTokens: 0, totalCost: 0, avgDurationMs: 0, errorRate: 0, tracesByOperation: {} })),
+  getOperations: vi.fn(() => Promise.resolve(['analysis', 'proposal', 'generation', 'review', 'deployment'])),
   getCostAnalytics: vi.fn(() => Promise.resolve({ totalCost: 0, totalTraces: 0, buckets: [], costByModel: [] })),
   getPerformanceMetrics: vi.fn(() => Promise.resolve({ totalTraces: 0, successRate: 0, avgLatencyMs: 0, p50LatencyMs: 0, p95LatencyMs: 0, p99LatencyMs: 0, avgTokensPerTrace: 0, errorCount: 0 })),
   getUsageAnalytics: vi.fn(() => Promise.resolve({ totalInputTokens: 0, totalOutputTokens: 0, totalTokens: 0, buckets: [], usageByModel: [] })),

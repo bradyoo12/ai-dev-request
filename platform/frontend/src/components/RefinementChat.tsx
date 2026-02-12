@@ -11,6 +11,11 @@ interface SuggestionDetected {
   summary: string
 }
 
+interface FollowUpAction {
+  label: string
+  message: string
+}
+
 interface RefinementChatProps {
   requestId: string
   onTokensUsed?: (tokensUsed: number, newBalance: number) => void
@@ -44,6 +49,25 @@ function parseSuggestionFromContent(content: string): { cleanContent: string; su
   return { cleanContent: content, suggestion: null }
 }
 
+function parseFollowUpActions(content: string): { cleanContent: string; actions: FollowUpAction[] } {
+  const regex = /```follow_up_actions\n([\s\S]*?)\n```/
+  const match = content.match(regex)
+
+  if (!match) return { cleanContent: content, actions: [] }
+
+  try {
+    const actions = JSON.parse(match[1]) as FollowUpAction[]
+    if (Array.isArray(actions) && actions.every(a => a.label && a.message)) {
+      const cleanContent = content.replace(regex, '').trim()
+      return { cleanContent, actions }
+    }
+  } catch {
+    // Parse failed, not valid follow-up actions
+  }
+
+  return { cleanContent: content, actions: [] }
+}
+
 export default function RefinementChat({ requestId, onTokensUsed }: RefinementChatProps) {
   const { t } = useTranslation()
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -55,6 +79,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
   const [streamingContent, setStreamingContent] = useState('')
   const [appliedMessages, setAppliedMessages] = useState<Set<number>>(new Set())
   const [applyingId, setApplyingId] = useState<number | null>(null)
+  const [followUpActions, setFollowUpActions] = useState<FollowUpAction[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const loadHistory = useCallback(async () => {
@@ -83,6 +108,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     setSending(true)
     setPendingSuggestion(null)
     setStreamingContent('')
+    setFollowUpActions([])
 
     // Optimistic add user message
     const tempMsg: ChatMessage = {
@@ -106,7 +132,8 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
         },
         (tokensUsed, newBalance) => {
           // Stream complete — finalize message
-          const { cleanContent, suggestion } = parseSuggestionFromContent(streamed)
+          const { cleanContent: contentWithoutSuggestion, suggestion } = parseSuggestionFromContent(streamed)
+          const { cleanContent, actions } = parseFollowUpActions(contentWithoutSuggestion)
           const assistantMsg: ChatMessage = {
             id: Date.now() + 1,
             role: 'assistant',
@@ -117,6 +144,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
           setMessages(prev => [...prev, assistantMsg])
           setStreamingContent('')
           setSending(false)
+          setFollowUpActions(actions)
 
           if (suggestion) {
             setPendingSuggestion({ suggestion, messageId: assistantMsg.id })
@@ -147,7 +175,8 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
           return
         }
 
-        const { cleanContent, suggestion } = parseSuggestionFromContent(response.message.content)
+        const { cleanContent: contentWithoutSuggestion, suggestion } = parseSuggestionFromContent(response.message.content)
+        const { cleanContent, actions } = parseFollowUpActions(contentWithoutSuggestion)
         const cleanMessage = { ...response.message, content: cleanContent }
 
         setMessages(prev => [
@@ -155,6 +184,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
           { ...tempMsg, id: response.message.id - 1 },
           cleanMessage,
         ])
+        setFollowUpActions(actions)
 
         if (suggestion) {
           setPendingSuggestion({ suggestion, messageId: response.message.id })
@@ -231,6 +261,16 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
     } finally {
       setApplyingId(null)
     }
+  }
+
+  const handleFollowUpClick = (action: FollowUpAction) => {
+    setInput(action.message)
+    setFollowUpActions([])
+    // Auto-send after a brief delay so user can see what's being sent
+    setTimeout(() => {
+      const sendBtn = document.querySelector('[data-send-btn]') as HTMLButtonElement
+      sendBtn?.click()
+    }, 100)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -349,6 +389,21 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
           </div>
         )}
 
+        {/* Follow-Up Action Chips */}
+        {followUpActions.length > 0 && !sending && (
+          <div className="flex flex-wrap gap-2 px-1">
+            {followUpActions.map((action, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleFollowUpClick(action)}
+                className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 border border-warm-600 rounded-full text-sm text-warm-200 transition-colors"
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {sending && (
           <div className="flex justify-start">
             <div className="max-w-[80%] bg-warm-800 rounded-2xl px-4 py-3">
@@ -393,6 +448,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
             className="flex-1 bg-warm-800 border border-warm-700 rounded-xl px-4 py-2.5 text-white placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
           />
           <button
+            data-send-btn
             onClick={handleSend}
             disabled={!input.trim() || sending}
             className="self-end px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-700 disabled:cursor-not-allowed rounded-xl text-sm font-medium transition-colors"

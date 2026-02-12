@@ -301,6 +301,21 @@ public class RefinementService : IRefinementService
 - If the change is small, show only the relevant portion
 - If the change requires a new file, show the complete file content
 
+## Follow-Up Actions
+At the END of every response, include 2-3 contextual follow-up suggestions the user might want to do next.
+Format as a JSON block:
+
+```follow_up_actions
+[{{""label"":""Short button text"",""message"":""Full message to send""}}]
+```
+
+Examples:
+- After explaining code: [{{""label"":""Show me the tests"",""message"":""Show me the test files for this component""}},{{""label"":""Modify this"",""message"":""I'd like to change this implementation""}}]
+- After applying changes: [{{""label"":""Run tests"",""message"":""Can you check if the tests still pass?""}},{{""label"":""Another change"",""message"":""I have another change to make""}}]
+- After answering a question: [{{""label"":""Tell me more"",""message"":""Can you explain this in more detail?""}},{{""label"":""Show the code"",""message"":""Show me the relevant code for this""}}]
+
+Always include the follow_up_actions block. Make suggestions context-aware based on what you just discussed.
+
 ## Suggestion Detection
 When the user's message contains a valuable suggestion, feature request, improvement idea, or inquiry about the platform:
 1. Acknowledge the idea positively

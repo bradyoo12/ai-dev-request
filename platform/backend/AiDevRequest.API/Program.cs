@@ -19,6 +19,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddMemoryCache();
 
 // Add model routing & cost tracking (singleton: stateless or in-memory state)
 builder.Services.AddSingleton<IModelRouterService, ModelRouterService>();
@@ -29,6 +30,7 @@ builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();
 builder.Services.AddSingleton<IProductionService, ProductionService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
 builder.Services.AddSingleton<IDeploymentService, AzureDeploymentService>();
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddScoped<ICryptoPaymentService, CoinbaseCryptoPaymentService>();

@@ -118,6 +118,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<McpToolIntegration> McpToolIntegrations => Set<McpToolIntegration>();
     public DbSet<AiModelConfig> AiModelConfigs => Set<AiModelConfig>();
     public DbSet<BidirectionalGitSync> BidirectionalGitSyncs => Set<BidirectionalGitSync>();
+    public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
+    public DbSet<CreditPackagePrice> CreditPackagePrices => Set<CreditPackagePrice>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1790,6 +1792,53 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.PreviewHistoryJson).HasColumnType("text");
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId).IsUnique();
+        });
+
+        modelBuilder.Entity<ExchangeRate>(entity =>
+        {
+            entity.ToTable("exchange_rates");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CurrencyCode).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.RateToUsd).HasColumnType("decimal(18,6)");
+            entity.HasIndex(e => e.CurrencyCode);
+            entity.HasIndex(e => e.FetchedAt);
+            entity.HasData(
+                new ExchangeRate { Id = 1, CurrencyCode = "KRW", RateToUsd = 1400m, FetchedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new ExchangeRate { Id = 2, CurrencyCode = "JPY", RateToUsd = 155m, FetchedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+                new ExchangeRate { Id = 3, CurrencyCode = "EUR", RateToUsd = 0.92m, FetchedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+            );
+        });
+
+        modelBuilder.Entity<CreditPackagePrice>(entity =>
+        {
+            entity.ToTable("credit_package_prices");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CurrencyCode).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
+            entity.HasOne<TokenPackage>().WithMany().HasForeignKey(e => e.TokenPackageId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => new { e.TokenPackageId, e.CurrencyCode }).IsUnique();
+            entity.HasData(
+                // USD prices (matching existing TokenPackage.PriceUsd)
+                new CreditPackagePrice { Id = 1, TokenPackageId = 1, CurrencyCode = "USD", Price = 5.00m },
+                new CreditPackagePrice { Id = 2, TokenPackageId = 2, CurrencyCode = "USD", Price = 10.00m },
+                new CreditPackagePrice { Id = 3, TokenPackageId = 3, CurrencyCode = "USD", Price = 25.00m },
+                new CreditPackagePrice { Id = 4, TokenPackageId = 4, CurrencyCode = "USD", Price = 70.00m },
+                // KRW prices
+                new CreditPackagePrice { Id = 5, TokenPackageId = 1, CurrencyCode = "KRW", Price = 6900m },
+                new CreditPackagePrice { Id = 6, TokenPackageId = 2, CurrencyCode = "KRW", Price = 13900m },
+                new CreditPackagePrice { Id = 7, TokenPackageId = 3, CurrencyCode = "KRW", Price = 34900m },
+                new CreditPackagePrice { Id = 8, TokenPackageId = 4, CurrencyCode = "KRW", Price = 97900m },
+                // JPY prices
+                new CreditPackagePrice { Id = 9, TokenPackageId = 1, CurrencyCode = "JPY", Price = 780m },
+                new CreditPackagePrice { Id = 10, TokenPackageId = 2, CurrencyCode = "JPY", Price = 1550m },
+                new CreditPackagePrice { Id = 11, TokenPackageId = 3, CurrencyCode = "JPY", Price = 3900m },
+                new CreditPackagePrice { Id = 12, TokenPackageId = 4, CurrencyCode = "JPY", Price = 10900m },
+                // EUR prices
+                new CreditPackagePrice { Id = 13, TokenPackageId = 1, CurrencyCode = "EUR", Price = 4.59m },
+                new CreditPackagePrice { Id = 14, TokenPackageId = 2, CurrencyCode = "EUR", Price = 9.19m },
+                new CreditPackagePrice { Id = 15, TokenPackageId = 3, CurrencyCode = "EUR", Price = 22.99m },
+                new CreditPackagePrice { Id = 16, TokenPackageId = 4, CurrencyCode = "EUR", Price = 64.49m }
+            );
         });
     }
 }

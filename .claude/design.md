@@ -99,6 +99,8 @@ User Request (natural language)
 | PerformanceProfile | Multi-dimensional performance profiling result with scores, suggestions, and optimization history |
 | DataSchema | NL-designed database schema with entities, relationships, validation, and multi-target code generation |
 | SupportPost | Customer support post with public read, auth write, admin reward credits |
+| SelfHealingTestResult | Self-healing test automation result with healed/failed test details and confidence scores |
+| DatabaseBranch | Git-like database branch for preview environments with schema versioning and merge/discard |
 
 ## Spec-Driven Development Pipeline
 

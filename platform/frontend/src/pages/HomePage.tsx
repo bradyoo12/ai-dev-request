@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError } from '../api/requests'
@@ -8,6 +8,7 @@ import type { DevRequestResponse, AnalysisResponse, ProposalResponse, Production
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
+import { detectCurrency, formatCurrency as formatCurrencyUtil } from '../utils/currency'
 import PlanSelectionDialog from '../components/PlanSelectionDialog'
 import RefinementChat from '../components/RefinementChat'
 import HeroSection from '../components/HeroSection'
@@ -380,10 +381,10 @@ export default function HomePage() {
     }
   }
 
+  const detectedCurrency = useMemo(() => detectCurrency(i18n.language), [i18n.language])
+
   const formatCurrency = (amount: number) => {
-    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US'
-    const currency = i18n.language === 'ko' ? 'KRW' : 'USD'
-    return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount)
+    return formatCurrencyUtil(amount, detectedCurrency)
   }
 
   const exampleRequests = [

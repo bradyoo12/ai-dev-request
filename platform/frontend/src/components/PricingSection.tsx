@@ -1,10 +1,17 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import type { PricingPlanData } from '../api/settings'
 import FadeIn from './motion/FadeIn'
 import StaggerChildren, { staggerItemVariants } from './motion/StaggerChildren'
+import {
+  detectCurrency,
+  getPlanPrice,
+  formatPlanPrice,
+  convertCurrency,
+  type Currency,
+} from '../utils/currency'
 
 interface PricingSectionProps {
   plans: PricingPlanData[]
@@ -22,6 +29,8 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
   const { t, i18n } = useTranslation()
   const [annual, setAnnual] = useState(false)
 
+  const currency = useMemo(() => detectCurrency(i18n.language), [i18n.language])
+
   const displayPlans = plans.length > 0 ? plans : fallbackPlans
 
   const featureKeys = [
@@ -38,12 +47,23 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
   }
 
   const formatPrice = (plan: PricingPlanData) => {
-    const price = annual ? plan.priceYearly : plan.priceMonthly
-    if (price === 0) return t('pricing.free')
-    if (price < 0) return t('pricing.contact')
-    const symbol = plan.currency === 'KRW' ? '₩' : '$'
-    const displayPrice = annual ? Math.round(price / 12) : price
-    return `${symbol}${displayPrice.toLocaleString()}`
+    const period = annual ? 'yearly' : 'monthly'
+
+    // For fallback plans, use the currency utility which converts from KRW base prices
+    if (plans.length === 0) {
+      const price = getPlanPrice(plan.id, period, currency)
+      const displayPrice = annual && price > 0 ? Math.round(price / 12) : price
+      return formatPlanPrice(displayPrice, currency, t)
+    }
+
+    // For API-provided plans, convert from their declared currency
+    const rawPrice = annual ? plan.priceYearly : plan.priceMonthly
+    if (rawPrice === 0) return t('pricing.free')
+    if (rawPrice < 0) return t('pricing.contact')
+    const planCurrency = (plan.currency || 'KRW') as Currency
+    const converted = convertCurrency(rawPrice, planCurrency, currency)
+    const displayPrice = annual ? Math.round(converted / 12) : converted
+    return formatPlanPrice(displayPrice, currency, t)
   }
 
   const getName = (plan: PricingPlanData) => {

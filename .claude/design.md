@@ -935,3 +935,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `ReviewPipelineConfig` with Id (Guid), UserId, AutoReviewEnabled, SecurityCheckEnabled, PerformanceCheckEnabled, AccessibilityCheckEnabled, ArchitectureCheckEnabled, MaintainabilityCheckEnabled, AutoFixEnabled, TestGenerationEnabled, QualityThreshold, TotalReviews, TotalAutoFixes, TotalTestsGenerated, AvgQualityScore, ReviewHistoryJson, CreatedAt, UpdatedAt
 - **Frontend**: `ReviewPipelinePage` in Settings with "Review Pipeline" tab — 3 sub-tabs (Review with project input + dimension score bars + findings list, Configure with dimension toggles + threshold slider, Stats with metric cards)
 - **Flow**: Open Review Pipeline tab → enter project name → run review → see dimension scores with color coding → review findings with severity → configure per-dimension toggles and quality threshold → view aggregate stats
+
+### #317 — Managed OAuth Connectors (PR #339)
+- **Backend**: `OAuthConnectorController` with 6 endpoints for connector management, provider catalog, and stats
+- **Endpoints**:
+  - `GET /api/oauth-connectors` — list user's connected OAuth providers
+  - `POST /api/oauth-connectors/connect` — connect a provider (simulated OAuth flow)
+  - `DELETE /api/oauth-connectors/{id}` — disconnect a provider
+  - `GET /api/oauth-connectors/providers` — list 6 available providers (Stripe, Google, Notion, Slack, GitHub, Supabase) with metadata
+  - `POST /api/oauth-connectors/{id}/refresh` — refresh token (simulated)
+  - `GET /api/oauth-connectors/stats` — aggregate stats (connected, by category, API calls)
+- **Entity**: `OAuthConnector` with Id (Guid), UserId, Provider, DisplayName, Status (connected/disconnected/expired), Scopes, AccessTokenHash, RefreshTokenHash, TokenExpiresAt, ConnectedAt, LastUsedAt, TotalApiCalls, FailedApiCalls, IconUrl, Category (payments/productivity/communication/development/database), CreatedAt, UpdatedAt
+- **Frontend**: `OAuthConnectorsPage` in Settings with "OAuth Connectors" tab — 3 sub-tabs (Connectors with 6 provider cards + connect/disconnect, Connected with active connections list, Stats with metric cards)
+- **Flow**: Open OAuth Connectors tab → browse 6 providers by category → click Connect → provider added to Connected tab → manage connections → view usage stats

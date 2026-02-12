@@ -1052,6 +1052,22 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Services updated**: AnalysisService, ProposalService, ProductionService, TestGenerationService, SelfHealingService, CompilerValidationService, CodeQualityReviewService, CodeReviewService, AccessibilityService, BuildVerificationService
 - **Impact**: Removed ~123 lines of duplicated JSON parsing code, replaced with one-liner helper calls
 
+### #349 — Cache Headers for Content-Hashed Static Assets
+- **Config**: `staticwebapp.config.json` updated with route rule for `/assets/*` setting `Cache-Control: public, max-age=31536000, immutable`
+- **Impact**: Vite content-hashed bundles (JS, CSS) get 1-year cache with immutable flag; index.html retains default short cache
+
+### #350 — Conversational Tone in Refinement Chat
+- **Backend**: `RefinementService.cs` system prompt extended with `## Conversational Style` section
+- **Behavior**: LLM now expresses genuine agreement and compliments when warranted, matches user language (en/ko), avoids over-complimenting
+
+### #363 — OpenTelemetry Observability Instrumentation (PR #375)
+- **Backend Entity**: `ObservabilityTrace` extended with SpanId, ParentSpanId, OperationName, InputTokens, OutputTokens, EstimatedCost, DurationMs, ModelTier, ErrorMessage, AttributesJson
+- **Backend Service**: `ObservabilityService` extended with StartSpanAsync, CompleteSpanAsync, GetStatsAsync, GetOperationsAsync, GetCostAnalyticsAsync, GetPerformanceMetricsAsync, GetUsageAnalyticsAsync
+- **Backend Controller**: `ObservabilityController` extended with stats, operations, cost-analytics, performance-metrics, usage-analytics endpoints
+- **Frontend**: Enhanced `ObservabilityPage` with stats cards (Total Traces, Tokens, Cost, Avg Duration), operation filters, Cost/Performance/Usage analytics tabs
+- **Route**: `/settings/observability` path mapping added in SettingsLayout
+- **i18n**: 80+ new keys in en.json and ko.json under `observability.*` namespace
+
 ### #374 — ErrorBoundary for White Screen Crash Prevention (PR #376)
 - **Component**: `ErrorBoundary` class component wrapping the entire `<App>` — catches rendering errors and displays a recovery UI
 - **Features**: "Try Again" button (resets error state), "Go Home" button (navigates to `/`), dev-only error message display

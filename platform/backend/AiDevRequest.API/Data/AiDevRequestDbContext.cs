@@ -122,6 +122,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
     public DbSet<CreditPackagePrice> CreditPackagePrices => Set<CreditPackagePrice>();
     public DbSet<SupportPost> SupportPosts => Set<SupportPost>();
+    public DbSet<TestHealingRecord> TestHealingRecords => Set<TestHealingRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1871,6 +1872,24 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<TestHealingRecord>(entity =>
+        {
+            entity.ToTable("test_healing_records");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.TestFilePath).HasMaxLength(500);
+            entity.Property(e => e.OriginalSelector).HasMaxLength(2000);
+            entity.Property(e => e.HealedSelector).HasMaxLength(2000);
+            entity.Property(e => e.FailureReason).HasMaxLength(5000);
+            entity.Property(e => e.HealingSummary).HasMaxLength(5000);
+            entity.Property(e => e.LocatorStrategy).HasMaxLength(50);
+            entity.Property(e => e.DiffJson).HasColumnType("jsonb");
+            entity.Property(e => e.SuggestedFixJson).HasColumnType("jsonb");
+            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
         });
     }
 }

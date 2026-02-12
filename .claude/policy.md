@@ -127,6 +127,16 @@ These items can be decided autonomously without adding `on hold`:
 
 ## Automated Testing
 
+### Unit Tests
+- **Backend**: xUnit + Moq + FluentAssertions in `platform/backend/AiDevRequest.Tests/`
+  - Run: `dotnet test` from `platform/backend/`
+  - Uses `TestDbContextFactory` with EF Core InMemory provider
+  - Some entities with int FK → Guid PK mismatch are excluded via `RemoveEntityType`
+- **Frontend**: Vitest + React Testing Library in `platform/frontend/src/`
+  - Run: `npx vitest run` from `platform/frontend/`
+  - Config in `vitest.config.ts` (separate from `vite.config.ts`)
+
+### E2E Tests
 - Use Playwright for E2E testing
 - AI-assisted testing should simulate human behavior
 - If tests cannot be run automatically, add `on hold` for manual testing

@@ -987,6 +987,24 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Frontend**: `AiModelPage` in Settings with "AI Model" tab — 3 sub-tabs (Models with model selector cards showing capabilities/pricing, Configure with extended thinking toggle + budget slider + streaming toggle, Stats with usage metrics)
 - **Flow**: Open AI Model tab → select model (Opus 4.6 for complex tasks, Sonnet 4.5 for speed) → enable extended thinking with budget → configure streaming → view per-model usage stats
 
+### #173 — Platform Growth Metrics Dashboard (PR #180)
+- **Backend**: `GrowthService` manages growth metrics tracking, funnel analysis, and snapshot generation; `AdminGrowthController` with admin-only endpoints
+- **Endpoints**:
+  - `GET /api/admin/growth/overview` — KPI summary (TotalVisitors, TotalRegistered, TotalTrialUsers, TotalPaidUsers, MonthlyGrowthRate, ConversionRate, ChurnRate)
+  - `GET /api/admin/growth/trends?months=12` — monthly growth trends with 12-month history
+  - `GET /api/admin/growth/funnel` — conversion funnel stages (Visitors → Registered → Trial Users → Paid Users)
+  - `POST /api/admin/growth/events` — record platform events (visit, register, trial_start, paid_conversion, churn)
+  - `GET /api/admin/growth/export` — CSV export of growth metrics
+- **Entities**: `PlatformEvent` (EventType, UserId, SessionId, Metadata), `GrowthSnapshot` (SnapshotDate, Period, TotalVisitors, TotalRegistered, TotalTrialUsers, TotalPaidUsers, NewRegistrations, ConversionRate, ChurnRate)
+- **Frontend**: `AdminGrowthPage` with KPI cards (Visitors, Trial Users, Paid Members, Growth Rate), monthly growth trend line chart, conversion funnel visualization, CSV export
+- **Flow**: Platform events recorded → daily/monthly snapshots generated → admin views KPI dashboard → analyzes funnel conversion rates → exports data as CSV
+
+### #174 — Unit Test Infrastructure (PR #360)
+- **Backend Tests**: xUnit + Moq + FluentAssertions + EF Core InMemory — 468 tests across 57 test files (25 controller tests + 30 service tests + 2 helpers) in `platform/backend/AiDevRequest.Tests/`
+- **Frontend Tests**: Vitest + React Testing Library + jsdom — 875 tests across 106 test files (38 API tests + 16 component tests + 31+ page tests) in `platform/frontend/src/`
+- **Test Infrastructure**: `TestDbContextFactory` with `TestAiDevRequestDbContext` subclass using `RemoveEntityType` pattern for EF Core InMemory FK type mismatch workarounds (int FK → Guid PK entities excluded)
+- **Config**: Separate `vitest.config.ts` for frontend tests (keeps `vite.config.ts` clean for production builds)
+
 ### #334 — Bidirectional GitHub Sync for Generated Projects (PR #343)
 - **Backend**: `BidirectionalGitSyncController` with 7 endpoints for sync config, push/pull operations, status, history, and stats
 - **Endpoints**:

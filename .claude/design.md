@@ -972,3 +972,17 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `AiModelConfig` with Id (Guid), UserId, SelectedModel, ExtendedThinkingEnabled, ThinkingBudgetTokens, MaxOutputTokens, Temperature, StreamingEnabled, TotalRequests, TotalInputTokens, TotalOutputTokens, TotalThinkingTokens, AvgLatencyMs, ModelUsageJson, CreatedAt, UpdatedAt
 - **Frontend**: `AiModelPage` in Settings with "AI Model" tab — 3 sub-tabs (Models with model selector cards showing capabilities/pricing, Configure with extended thinking toggle + budget slider + streaming toggle, Stats with usage metrics)
 - **Flow**: Open AI Model tab → select model (Opus 4.6 for complex tasks, Sonnet 4.5 for speed) → enable extended thinking with budget → configure streaming → view per-model usage stats
+
+### #334 — Bidirectional GitHub Sync for Generated Projects (PR #343)
+- **Backend**: `BidirectionalGitSyncController` with 7 endpoints for sync config, push/pull operations, status, history, and stats
+- **Endpoints**:
+  - `GET /api/bidir-sync/config/{projectId}` — get or create sync config
+  - `PUT /api/bidir-sync/config/{projectId}` — update sync settings
+  - `POST /api/bidir-sync/push` — push project to GitHub (simulated)
+  - `POST /api/bidir-sync/pull` — pull changes from GitHub (simulated)
+  - `GET /api/bidir-sync/status/{projectId}` — sync status (synced/ahead/behind/diverged)
+  - `GET /api/bidir-sync/history/{projectId}` — sync operation history
+  - `GET /api/bidir-sync/stats` — aggregate stats
+- **Entity**: `BidirectionalGitSync` with Id (Guid), UserId, DevRequestId, ProjectName, RepoOwner, RepoName, DefaultBranch, AiBranch, SyncEnabled, AutoPushEnabled, AutoPullEnabled, WebhookEnabled, Status, TotalPushes, TotalPulls, TotalConflicts, ConflictsResolved, SyncHistoryJson, ConflictFilesJson, CreatedAt, UpdatedAt
+- **Frontend**: `BidirectionalGitSyncPage` in Settings with "Bidir Sync" tab — 3 sub-tabs (Sync with repo connection + push/pull + status, History with operation log, Stats with metric cards)
+- **Flow**: Connect repo → push generated code → pull user changes → resolve conflicts → monitor sync status and history

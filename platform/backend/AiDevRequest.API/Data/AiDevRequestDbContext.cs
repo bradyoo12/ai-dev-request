@@ -125,6 +125,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CreditPackagePrice> CreditPackagePrices => Set<CreditPackagePrice>();
     public DbSet<SupportPost> SupportPosts => Set<SupportPost>();
     public DbSet<UsageMeter> UsageMeters => Set<UsageMeter>();
+    public DbSet<AgentTask> AgentTasks => Set<AgentTask>();
+    public DbSet<AgentAutomationConfig> AgentAutomationConfigs => Set<AgentAutomationConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

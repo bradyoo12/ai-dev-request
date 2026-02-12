@@ -31,7 +31,11 @@ test.describe('Homepage', () => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    // Wait for the root element to be visible instead of networkidle
+    // (networkidle doesn't work when backend API calls are failing)
+    await expect(page.locator('#root')).toBeVisible();
+    // Give a moment for any console errors to be logged
+    await page.waitForTimeout(1000);
     // Filter out expected errors (no backend running)
     const unexpectedErrors = errors.filter(
       (e) =>

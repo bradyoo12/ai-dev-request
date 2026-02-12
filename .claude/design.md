@@ -1094,3 +1094,17 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Endpoints**: `POST /api/agent-automation/webhook`, `GET /api/agent-automation/config`, `GET /api/agent-automation/triggers`, `GET /api/agent-automation/triggers/{id}`, `POST /api/agent-automation/triggers/{id}/retry`, `POST /api/agent-automation/triggers/{id}/cancel`, `GET /api/agent-automation/stats`
 - **Frontend**: `AgentTriggerPage` at `/settings/agent-triggers` with trigger list, status tracking, and automation stats
 - **i18n**: `agentTrigger.*` keys in en.json and ko.json
+
+### #381 — Currency Localization Based on User Preference and Geolocation (PR #402)
+- **Frontend Utility**: `currency.ts` with currency detection, conversion, and formatting functions
+- **Currency Detection Logic**: localStorage preference → navigator.language region subtag → i18n language fallback (en → USD, ko → KRW)
+- **Supported Currencies**: USD, KRW, JPY, EUR with static exchange rates for conversion
+- **Base Prices**: All prices stored in KRW and converted on-demand to user's detected currency
+- **Updated Components**: `PricingSection` and `HomePage` now display prices in user's detected currency
+- **Test Coverage**: 26 unit tests for currency detection, conversion, and formatting (included in 946 total tests)
+
+### #404 — Fix E2E Test Networkidle Timeout (PR #407)
+- **Problem**: Two E2E tests (`homepage.spec.ts` console errors test, `i18n.spec.ts` raw keys test) failed with 30s timeout waiting for `networkidle` state that never arrived due to failed API requests
+- **Root Cause**: Without backend running in E2E tests, `getPricingPlans()` and `getTemplates()` API calls fail/timeout, keeping network busy indefinitely
+- **Solution**: Replaced `page.waitForLoadState('networkidle')` with `page.locator('#root').toBeVisible()` wait strategy that confirms React app render without depending on network activity
+- **Impact**: All 21 E2E tests now pass in ~7s (previously 2 tests timed out at 30s)

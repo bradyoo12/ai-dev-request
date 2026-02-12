@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
@@ -269,26 +270,49 @@ public class CreditController : ControllerBase
 
 public record CreditPackagesResponseDto
 {
+    [JsonPropertyName("currency")]
     public string Currency { get; init; } = "USD";
+
+    [JsonPropertyName("exchangeRate")]
     public decimal ExchangeRate { get; init; } = 1.0m;
+
+    [JsonPropertyName("rateUpdatedAt")]
     public DateTime RateUpdatedAt { get; init; }
+
+    [JsonPropertyName("packages")]
     public List<CreditPackageItemDto> Packages { get; init; } = [];
 }
 
 public record CreditPackageItemDto
 {
+    [JsonPropertyName("id")]
     public int Id { get; init; }
+
+    [JsonPropertyName("name")]
     public string Name { get; init; } = "";
+
+    [JsonPropertyName("price")]
     public decimal Price { get; init; }
+
+    [JsonPropertyName("credits")]
     public int Credits { get; init; }
+
+    [JsonPropertyName("isPopular")]
     public bool IsPopular { get; init; }
 }
 
 public record CreditBalanceDto
 {
+    [JsonPropertyName("balance")]
     public int Credits { get; init; }
+
+    [JsonPropertyName("totalEarned")]
     public int TotalEarned { get; init; }
+
+    [JsonPropertyName("totalSpent")]
     public int TotalSpent { get; init; }
+
+    [JsonPropertyName("valueUsd")]
     public decimal ValueUsd { get; init; }
 }
 
@@ -328,6 +352,9 @@ public record CreditCheckoutRequestDto
 
 public record CreditCheckoutResponseDto
 {
+    [JsonPropertyName("checkoutUrl")]
     public string CheckoutUrl { get; init; } = "";
+
+    [JsonPropertyName("isSimulation")]
     public bool IsSimulation { get; init; }
 }

@@ -3,7 +3,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Internationalization', () => {
   test('app renders without showing raw i18n keys', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    // Wait for the root element to be visible instead of networkidle
+    // (networkidle doesn't work when backend API calls are failing)
+    await expect(page.locator('#root')).toBeVisible();
     const body = await page.locator('body').textContent();
     // Raw keys like "hero.title" should never appear even in loading state
     expect(body).not.toContain('hero.title');

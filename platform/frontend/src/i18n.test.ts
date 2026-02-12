@@ -12,10 +12,6 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: vi.fn() },
 }))
 
-vi.mock('i18next-http-backend', () => ({
-  default: { type: 'backend', init: vi.fn() },
-}))
-
 vi.mock('i18next-browser-languagedetector', () => ({
   default: { type: 'languageDetector', init: vi.fn() },
 }))
@@ -26,7 +22,7 @@ vi.mock('./locales/en.json', () => ({ default: { key: 'value-en' } }))
 describe('i18n', () => {
   it('initializes i18next', async () => {
     const i18n = (await import('./i18n')).default
-    expect(i18n.use).toHaveBeenCalledTimes(3)
+    expect(i18n.use).toHaveBeenCalledTimes(2)
     expect(i18n.init).toHaveBeenCalledTimes(1)
   })
 

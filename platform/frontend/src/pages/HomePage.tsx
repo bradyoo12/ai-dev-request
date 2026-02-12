@@ -21,6 +21,8 @@ import ValidationProgress from '../components/ValidationProgress'
 import FixHistoryDisplay from '../components/FixHistoryDisplay'
 import CostSavingsDisplay from '../components/CostSavingsDisplay'
 import QualityConfidenceBadge from '../components/QualityConfidenceBadge'
+import PowerLevelSelector from '../components/PowerLevelSelector'
+import type { PowerLevel } from '../components/PowerLevelSelector'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -35,6 +37,7 @@ export default function HomePage() {
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [framework, setFramework] = useState('')
+  const [powerLevel, setPowerLevel] = useState<PowerLevel>('standard')
   const [viewState, setViewState] = useState<ViewState>('form')
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
@@ -212,6 +215,7 @@ export default function HomePage() {
     setEmail('')
     setScreenshotFile(null)
     setScreenshotPreview(null)
+    setPowerLevel('standard')
     setViewState('form')
     setSubmittedRequest(null)
     setAnalysisResult(null)
@@ -249,6 +253,7 @@ export default function HomePage() {
         screenshotBase64,
         screenshotMediaType,
         framework: framework || undefined,
+        powerLevel: powerLevel || undefined,
       })
       setSubmittedRequest(result)
 
@@ -542,6 +547,7 @@ export default function HomePage() {
               </div>
               <p className="mt-2 text-xs text-warm-500">{t('framework.hint')}</p>
             </div>
+            <PowerLevelSelector value={powerLevel} onChange={setPowerLevel} />
             <button type="submit" disabled={!request.trim()}
               className="mt-6 w-full py-4 bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue disabled:from-warm-700 disabled:to-warm-700 disabled:cursor-not-allowed rounded-2xl font-semibold text-lg transition-all btn-premium">
               {t('form.submit')}

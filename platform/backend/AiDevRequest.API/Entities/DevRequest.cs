@@ -25,6 +25,9 @@ public class DevRequest
     // Preferred framework (e.g. react, vue, svelte, nextjs, nuxt, angular)
     public string? Framework { get; set; }
 
+    // AI power level for dynamic intelligence
+    public PowerLevel PowerLevel { get; set; } = PowerLevel.Standard;
+
     // Request classification
     public RequestCategory Category { get; set; } = RequestCategory.Unknown;
 
@@ -113,4 +116,11 @@ public enum RequestStatus
     Staging,        // 스테이징 배포됨
     Completed,      // 완료
     Cancelled       // 취소됨
+}
+
+public enum PowerLevel
+{
+    Standard = 0,   // 표준 - 빠른 분석
+    Extended = 1,   // 확장 사고 - 단계별 추론
+    HighPower = 2   // 고성능 - 최고 성능 모델
 }

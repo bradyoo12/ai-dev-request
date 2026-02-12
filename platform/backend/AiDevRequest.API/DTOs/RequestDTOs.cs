@@ -24,6 +24,11 @@ public record CreateDevRequestDto
     /// Preferred framework: react, vue, svelte, nextjs, nuxt, angular (default: auto-detect)
     /// </summary>
     public string? Framework { get; init; }
+
+    /// <summary>
+    /// AI power level: standard, extended, high_power (default: standard)
+    /// </summary>
+    public string? PowerLevel { get; init; }
 }
 
 public record DevRequestResponseDto
@@ -88,6 +93,13 @@ public static class DevRequestMappings
 
     public static DevRequest ToEntity(this CreateDevRequestDto dto, string userId)
     {
+        var powerLevel = dto.PowerLevel?.ToLowerInvariant() switch
+        {
+            "extended" => Entities.PowerLevel.Extended,
+            "high_power" => Entities.PowerLevel.HighPower,
+            _ => Entities.PowerLevel.Standard
+        };
+
         return new DevRequest
         {
             UserId = userId,
@@ -96,7 +108,8 @@ public static class DevRequestMappings
             ContactPhone = dto.ContactPhone,
             ScreenshotBase64 = dto.ScreenshotBase64,
             ScreenshotMediaType = dto.ScreenshotMediaType,
-            Framework = dto.Framework
+            Framework = dto.Framework,
+            PowerLevel = powerLevel
         };
     }
 }

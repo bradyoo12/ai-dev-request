@@ -1072,3 +1072,8 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Component**: `ErrorBoundary` class component wrapping the entire `<App>` — catches rendering errors and displays a recovery UI
 - **Features**: "Try Again" button (resets error state), "Go Home" button (navigates to `/`), dev-only error message display
 - **i18n**: `errorBoundary.title`, `errorBoundary.description`, `errorBoundary.retry`, `errorBoundary.goHome` in en/ko
+
+### #364 — Automated AI Code Review Agent with Auto-Fix (PR #378)
+- **Backend**: Enhanced `RequestsController` generation pipeline to auto-apply critical fixes after code quality review, then re-run review for updated scores
+- **New Endpoint**: `GET /api/projects/{projectId}/review/summary` — concise review status with overall score, pass/fail, finding counts by severity, fixes applied
+- **Auto-Fix Flow**: After `TriggerReviewAsync`, if critical findings exist → `ApplyAllFixesAsync("critical")` → re-trigger review → update `QualityConfidenceScore` with post-fix score

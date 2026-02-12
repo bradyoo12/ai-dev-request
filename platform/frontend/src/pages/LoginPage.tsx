@@ -24,7 +24,7 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [socialLoading, setSocialLoading] = useState<SocialProvider | null>(null)
-  const [providers, setProviders] = useState<SocialProvider[]>(['google', 'apple', 'kakao', 'line'])
+  const [providers, setProviders] = useState<SocialProvider[]>([])
 
   useEffect(() => {
     getProviders().then(setProviders)

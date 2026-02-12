@@ -17,6 +17,9 @@ export interface AiModelConfig {
   totalOutputTokens: number
   estimatedCost: number
   modelHistoryJson?: string
+  // Gemini-specific settings
+  geminiSafetyLevel?: string // "BLOCK_NONE" | "BLOCK_LOW_AND_ABOVE" | "BLOCK_MEDIUM_AND_ABOVE" | "BLOCK_HIGH"
+  geminiTemperature?: number // 0.0 - 2.0
   createdAt: string
   updatedAt: string
 }
@@ -51,6 +54,31 @@ export interface AiModelStats {
   totalRequestsSonnet: number
   totalThinkingTokens: number
   totalOutputTokens: number
+  estimatedCost: number
+  perProviderStats?: ProviderStats[]
+}
+
+export interface Provider {
+  id: string // "claude" | "gemini"
+  name: string
+  description: string
+  available: boolean
+}
+
+export interface Model {
+  id: string // "sonnet-4-5" | "pro-1.5"
+  name: string
+  provider: string
+  tier: string // "fast" | "balanced" | "advanced"
+  costPerToken: number
+  description?: string
+  capabilities?: string[]
+}
+
+export interface ProviderStats {
+  provider: string
+  totalRequests: number
+  totalTokens: number
   estimatedCost: number
 }
 
@@ -108,6 +136,24 @@ export async function getAiModelStats(): Promise<AiModelStats> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
     throw new Error(error.error || t('api.error.aiModelStatsLoad'))
+  }
+  return response.json()
+}
+
+export async function getAvailableProviders(): Promise<Provider[]> {
+  const response = await authFetch(`${API_BASE_URL}/api/ai-model/providers`)
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.aiModelProvidersLoad'))
+  }
+  return response.json()
+}
+
+export async function getModelsForProvider(provider: string): Promise<Model[]> {
+  const response = await authFetch(`${API_BASE_URL}/api/ai-model/models?provider=${provider}`)
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.aiModelModelsLoad'))
   }
   return response.json()
 }

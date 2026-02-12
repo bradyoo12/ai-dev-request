@@ -129,18 +129,7 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
-            // Extract JSON from response
-            var jsonStart = content.IndexOf('{');
-            var jsonEnd = content.LastIndexOf('}');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var result = JsonSerializer.Deserialize<ProposalResult>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var result = StructuredOutputHelper.DeserializeResponse<ProposalResult>(content);
 
             return result ?? new ProposalResult { Title = "제안서 생성 실패" };
         }

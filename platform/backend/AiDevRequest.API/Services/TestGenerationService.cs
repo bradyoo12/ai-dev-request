@@ -249,17 +249,7 @@ Generate realistic, runnable test files. JSON only.";
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
-            var jsonStart = content.IndexOf('{');
-            var jsonEnd = content.LastIndexOf('}');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var generated = JsonSerializer.Deserialize<GeneratedTestSuite>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var generated = StructuredOutputHelper.DeserializeResponse<GeneratedTestSuite>(content);
 
             if (generated != null)
             {

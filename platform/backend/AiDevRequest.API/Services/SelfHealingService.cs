@@ -207,17 +207,7 @@ Only include files that need changes. Provide the complete file content, not pat
         var response = await _client.Messages.GetClaudeMessageAsync(parameters);
         var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
-        var jsonStart = content.IndexOf('{');
-        var jsonEnd = content.LastIndexOf('}');
-        if (jsonStart >= 0 && jsonEnd > jsonStart)
-        {
-            content = content[jsonStart..(jsonEnd + 1)];
-        }
-
-        var fixResult = JsonSerializer.Deserialize<SelfHealingFixResponse>(content, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var fixResult = StructuredOutputHelper.DeserializeResponse<SelfHealingFixResponse>(content);
 
         var result = new Dictionary<string, string>();
         if (fixResult?.Fixes != null)

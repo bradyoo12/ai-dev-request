@@ -436,18 +436,7 @@ JSON array only. No other text.";
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "[]";
 
-            // Extract JSON array from response
-            var jsonStart = content.IndexOf('[');
-            var jsonEnd = content.LastIndexOf(']');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var findings = JsonSerializer.Deserialize<List<ReviewFinding>>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var findings = StructuredOutputHelper.DeserializeListResponse<ReviewFinding>(content);
 
             if (findings != null)
             {

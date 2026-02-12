@@ -1051,3 +1051,8 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Methods**: `DeserializeResponse<T>`, `DeserializeListResponse<T>`, `ExtractJson` (handles markdown code fences, raw JSON, whitespace)
 - **Services updated**: AnalysisService, ProposalService, ProductionService, TestGenerationService, SelfHealingService, CompilerValidationService, CodeQualityReviewService, CodeReviewService, AccessibilityService, BuildVerificationService
 - **Impact**: Removed ~123 lines of duplicated JSON parsing code, replaced with one-liner helper calls
+
+### #374 — ErrorBoundary for White Screen Crash Prevention (PR #376)
+- **Component**: `ErrorBoundary` class component wrapping the entire `<App>` — catches rendering errors and displays a recovery UI
+- **Features**: "Try Again" button (resets error state), "Go Home" button (navigates to `/`), dev-only error message display
+- **i18n**: `errorBoundary.title`, `errorBoundary.description`, `errorBoundary.retry`, `errorBoundary.goHome` in en/ko

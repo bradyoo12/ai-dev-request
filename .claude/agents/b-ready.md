@@ -120,8 +120,14 @@ After claiming, re-fetch the project board and verify the ticket is now "In Prog
 1. Make all necessary code changes
 2. Follow existing project patterns
 3. Write clean, well-documented code
+4. **Create or update unit tests** for new logic (utilities, services, hooks, validators)
+5. **Create or update Playwright E2E tests** for new user-facing features:
+   - New pages/routes → test navigation and rendering
+   - New forms → test submission and validation
+   - New workflows → test end-to-end user journey
+   - Place E2E tests in `platform/frontend/e2e/` following existing patterns
 
-**In team mode:** If you are a specialized agent (frontend-dev or backend-dev), only implement your assigned scope. Use SendMessage to report completion to the planner/team lead.
+**In team mode:** If you are a specialized agent (frontend-dev or backend-dev), only implement your assigned scope. Use SendMessage to report completion to the planner/team lead. The unit-test-analyst and e2e-test-analyst agents will create tests after you complete.
 
 ### Step 6: Run Local Tests (Full Regression Gate)
 

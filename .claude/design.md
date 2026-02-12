@@ -264,6 +264,20 @@ User behavior tracking and pipeline funnel analytics:
   - `GET /api/analytics/trends` — time-series trends by metric
 - **Frontend**: `AnalyticsDashboardPage` in Settings with metrics cards, funnel visualization, usage breakdown, period-filtered trends
 
+## Platform Growth Metrics Dashboard
+
+Admin-only growth analytics tracking visitor, trial, and paid user metrics:
+- **Backend**: `AdminGrowthController` with `GrowthService` for event recording, trend analysis, conversion funnels, and CSV export
+- **Endpoints**:
+  - `GET /api/admin/growth/overview` — KPI summary (visitors, registered, trial, paid, growth rate, conversion, churn)
+  - `GET /api/admin/growth/trends?months=N` — monthly growth trends
+  - `GET /api/admin/growth/funnel` — conversion funnel (visitor → registered → trial → paid)
+  - `POST /api/admin/growth/events` — record platform events
+  - `GET /api/admin/growth/export` — CSV export
+- **Entities**: `PlatformEvent` (event tracking), `GrowthSnapshot` (pre-computed aggregations)
+- **Frontend**: `GrowthDashboardPage` at `/admin/growth` with KPI cards, stacked bar chart trends, conversion funnel visualization, CSV export
+- **Flow**: Events recorded → daily/monthly snapshots aggregated → admin views dashboard → exports CSV
+
 ## Template Marketplace
 
 Community-driven project scaffolding templates:

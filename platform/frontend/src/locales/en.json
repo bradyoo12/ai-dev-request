@@ -2232,5 +2232,9 @@
   "support.form.submit": "Submit",
   "support.form.submitting": "Submitting...",
   "support.pagination.prev": "Previous",
-  "support.pagination.next": "Next"
+  "support.pagination.next": "Next",
+  "errorBoundary.title": "Something went wrong",
+  "errorBoundary.description": "An unexpected error occurred. You can try again or return to the home page.",
+  "errorBoundary.retry": "Try Again",
+  "errorBoundary.goHome": "Go Home"
 }

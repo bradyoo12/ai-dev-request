@@ -2232,5 +2232,9 @@
   "support.form.submit": "등록",
   "support.form.submitting": "등록 중...",
   "support.pagination.prev": "이전",
-  "support.pagination.next": "다음"
+  "support.pagination.next": "다음",
+  "errorBoundary.title": "오류가 발생했습니다",
+  "errorBoundary.description": "예상치 못한 오류가 발생했습니다. 다시 시도하거나 홈 페이지로 돌아갈 수 있습니다.",
+  "errorBoundary.retry": "다시 시도",
+  "errorBoundary.goHome": "홈으로"
 }

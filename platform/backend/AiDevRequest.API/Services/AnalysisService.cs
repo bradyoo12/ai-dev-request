@@ -110,18 +110,7 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
-            // Extract JSON from response (in case there's extra text)
-            var jsonStart = content.IndexOf('{');
-            var jsonEnd = content.LastIndexOf('}');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var result = JsonSerializer.Deserialize<AnalysisResult>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var result = StructuredOutputHelper.DeserializeResponse<AnalysisResult>(content);
 
             return result ?? new AnalysisResult { Summary = "분석 실패" };
         }

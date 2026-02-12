@@ -276,17 +276,7 @@ Only report real, actionable issues. Do not nitpick style preferences. If the co
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
-            var jsonStart = content.IndexOf('{');
-            var jsonEnd = content.LastIndexOf('}');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var result = JsonSerializer.Deserialize<AiReviewResult>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var result = StructuredOutputHelper.DeserializeResponse<AiReviewResult>(content);
 
             if (result != null)
             {
@@ -360,17 +350,7 @@ Only include files that need changes. Provide the complete file content, not pat
             var response = await _client.Messages.GetClaudeMessageAsync(parameters);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
-            var jsonStart = content.IndexOf('{');
-            var jsonEnd = content.LastIndexOf('}');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var result = JsonSerializer.Deserialize<AiFixResult>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var result = StructuredOutputHelper.DeserializeResponse<AiFixResult>(content);
 
             return result ?? new AiFixResult();
         }

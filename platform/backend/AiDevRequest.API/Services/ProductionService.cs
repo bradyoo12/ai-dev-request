@@ -199,18 +199,7 @@ JSON만 응답하세요.";
                 .Where(c => c is TextContent)
                 .Select(c => c.ToString())) ?? "{}";
 
-            // Extract JSON
-            var jsonStart = content.IndexOf('{');
-            var jsonEnd = content.LastIndexOf('}');
-            if (jsonStart >= 0 && jsonEnd > jsonStart)
-            {
-                content = content[jsonStart..(jsonEnd + 1)];
-            }
-
-            var generatedProject = JsonSerializer.Deserialize<GeneratedProject>(content, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var generatedProject = StructuredOutputHelper.DeserializeResponse<GeneratedProject>(content);
 
             if (generatedProject == null)
             {

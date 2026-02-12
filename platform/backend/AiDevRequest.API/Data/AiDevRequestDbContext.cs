@@ -114,6 +114,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ProjectDocumentation> ProjectDocumentations => Set<ProjectDocumentation>();
     public DbSet<AiElementsConfig> AiElementsConfigs => Set<AiElementsConfig>();
     public DbSet<ReviewPipelineConfig> ReviewPipelineConfigs => Set<ReviewPipelineConfig>();
+    public DbSet<OAuthConnector> OAuthConnectors => Set<OAuthConnector>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

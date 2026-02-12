@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
@@ -25,6 +26,12 @@ const InfrastructurePage = lazy(() => import('./pages/InfrastructurePage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {
+  const { i18n } = useTranslation()
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language
+  }, [i18n.language])
+
   return (
     <BrowserRouter>
       <AuthProvider>

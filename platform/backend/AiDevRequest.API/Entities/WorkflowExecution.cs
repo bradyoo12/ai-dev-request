@@ -3,7 +3,7 @@ namespace AiDevRequest.API.Entities;
 public class WorkflowExecution
 {
     public int Id { get; set; }
-    public int DevRequestId { get; set; }
+    public Guid DevRequestId { get; set; }
     public required string WorkflowType { get; set; }
     public WorkflowStatus Status { get; set; } = WorkflowStatus.Pending;
     public required string StepsJson { get; set; }

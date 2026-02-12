@@ -69,7 +69,7 @@ public class WorkflowController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListWorkflows([FromQuery] int? requestId = null)
+    public async Task<IActionResult> ListWorkflows([FromQuery] Guid? requestId = null)
     {
         var workflows = await _workflowService.ListWorkflowsAsync(requestId);
         return Ok(workflows.Select(MapDto).ToList());
@@ -99,14 +99,14 @@ public class WorkflowController : ControllerBase
 
 public record StartWorkflowDto
 {
-    public int RequestId { get; init; }
+    public Guid RequestId { get; init; }
     public string WorkflowType { get; init; } = "full";
 }
 
 public record WorkflowExecutionDto
 {
     public int Id { get; init; }
-    public int DevRequestId { get; init; }
+    public Guid DevRequestId { get; init; }
     public string WorkflowType { get; init; } = "";
     public string Status { get; init; } = "";
     public string StepsJson { get; init; } = "";

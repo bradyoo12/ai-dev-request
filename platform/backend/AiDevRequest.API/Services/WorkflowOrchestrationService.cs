@@ -7,11 +7,11 @@ namespace AiDevRequest.API.Services;
 
 public interface IWorkflowOrchestrationService
 {
-    Task<WorkflowExecution> StartWorkflowAsync(int requestId, string workflowType);
+    Task<WorkflowExecution> StartWorkflowAsync(Guid requestId, string workflowType);
     Task<WorkflowExecution?> GetWorkflowStatusAsync(int executionId);
     Task<WorkflowExecution> RetryStepAsync(int executionId, string stepName);
     Task<WorkflowExecution> CancelWorkflowAsync(int executionId);
-    Task<List<WorkflowExecution>> ListWorkflowsAsync(int? requestId = null);
+    Task<List<WorkflowExecution>> ListWorkflowsAsync(Guid? requestId = null);
     Task<WorkflowMetrics> GetWorkflowMetricsAsync();
 }
 
@@ -56,7 +56,7 @@ public class WorkflowOrchestrationService : IWorkflowOrchestrationService
         _logger = logger;
     }
 
-    public async Task<WorkflowExecution> StartWorkflowAsync(int requestId, string workflowType)
+    public async Task<WorkflowExecution> StartWorkflowAsync(Guid requestId, string workflowType)
     {
         var steps = DefaultPipelineSteps.Select(name => new WorkflowStep { Name = name }).ToList();
 
@@ -146,7 +146,7 @@ public class WorkflowOrchestrationService : IWorkflowOrchestrationService
         return execution;
     }
 
-    public async Task<List<WorkflowExecution>> ListWorkflowsAsync(int? requestId = null)
+    public async Task<List<WorkflowExecution>> ListWorkflowsAsync(Guid? requestId = null)
     {
         var query = _context.WorkflowExecutions.AsQueryable();
 

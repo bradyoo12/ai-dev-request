@@ -13,9 +13,14 @@ public class ProposalService : IProposalService
 {
     private readonly AnthropicClient _client;
     private readonly IModelRouterService _modelRouter;
+    private readonly IEnumerable<IModelProviderService> _providers;
     private readonly ILogger<ProposalService> _logger;
 
-    public ProposalService(IConfiguration configuration, IModelRouterService modelRouter, ILogger<ProposalService> logger)
+    public ProposalService(
+        IConfiguration configuration,
+        IModelRouterService modelRouter,
+        IEnumerable<IModelProviderService> providers,
+        ILogger<ProposalService> logger)
     {
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
@@ -23,6 +28,7 @@ public class ProposalService : IProposalService
 
         _client = new AnthropicClient(apiKey);
         _modelRouter = modelRouter;
+        _providers = providers;
         _logger = logger;
     }
 
@@ -105,29 +111,20 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
 
         try
         {
-            var messages = new List<Message>
-            {
-                new Message(RoleType.User, prompt)
-            };
-
             // Model routing: Proposal generation is standard generation → Sonnet tier recommended.
-            // Currently using a single configured model; the ModelRouterService provides the
-            // recommended tier for future multi-model support.
             var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.StandardGeneration);
-            var recommendedModelId = _modelRouter.GetModelId(recommendedTier);
-            _logger.LogInformation("Proposal task: recommended tier={Tier}, model={Model}", recommendedTier, recommendedModelId);
+            var qualifiedModelId = _modelRouter.GetModelId(recommendedTier);
+            _logger.LogInformation("Proposal task: tier={Tier}, model={Model}", recommendedTier, qualifiedModelId);
 
-            var parameters = new MessageParameters
-            {
-                Messages = messages,
-                // TODO: Switch to recommendedModelId once multi-model client support is available
-                Model = "claude-sonnet-4-20250514",
-                MaxTokens = 4000,
-                Temperature = 0.4m
-            };
+            // Parse provider:model format and route to appropriate provider
+            var (providerName, modelId) = ParseModelId(qualifiedModelId);
+            var provider = _providers.FirstOrDefault(p => p.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase))
+                           ?? _providers.FirstOrDefault(p => p.ProviderName == "claude");
 
-            var response = await _client.Messages.GetClaudeMessageAsync(parameters);
-            var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
+            if (provider == null)
+                throw new InvalidOperationException("No AI provider available");
+
+            var content = await provider.GenerateAsync(prompt, modelId);
 
             var result = StructuredOutputHelper.DeserializeResponse<ProposalResult>(content);
 
@@ -142,6 +139,12 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
                 Summary = $"오류: {ex.Message}"
             };
         }
+    }
+
+    private static (string provider, string model) ParseModelId(string qualifiedModelId)
+    {
+        var parts = qualifiedModelId.Split(':', 2);
+        return parts.Length == 2 ? (parts[0], parts[1]) : ("claude", qualifiedModelId);
     }
 }
 

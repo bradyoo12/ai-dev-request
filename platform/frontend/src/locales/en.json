@@ -2506,5 +2506,12 @@
   "usageDashboard.empty": "No usage data yet. Usage will appear here as you use AI compute, build minutes, test runs, and preview deploys.",
   "usageDashboard.error.loadFailed": "Failed to load usage data",
   "usageDashboard.error.projectFailed": "Failed to load project costs",
-  "api.error.usageSummaryFailed": "Failed to load usage summary"
+  "api.error.usageSummaryFailed": "Failed to load usage summary",
+  "aiModel.selectProvider": "AI Provider",
+  "aiModel.providers.claude": "Claude",
+  "aiModel.providers.gemini": "Gemini",
+  "aiModel.gemini.safetySettings": "Safety Settings",
+  "aiModel.gemini.temperature": "Temperature",
+  "aiModel.configure.geminiSettings": "Gemini Settings",
+  "api.error.aiModelProvidersLoad": "Failed to load AI providers"
 }

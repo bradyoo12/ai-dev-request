@@ -14,9 +14,14 @@ public class AnalysisService : IAnalysisService
 {
     private readonly AnthropicClient _client;
     private readonly IModelRouterService _modelRouter;
+    private readonly IEnumerable<IModelProviderService> _providers;
     private readonly ILogger<AnalysisService> _logger;
 
-    public AnalysisService(IConfiguration configuration, IModelRouterService modelRouter, ILogger<AnalysisService> logger)
+    public AnalysisService(
+        IConfiguration configuration,
+        IModelRouterService modelRouter,
+        IEnumerable<IModelProviderService> providers,
+        ILogger<AnalysisService> logger)
     {
         var apiKey = configuration["Anthropic:ApiKey"]
             ?? Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
@@ -24,6 +29,7 @@ public class AnalysisService : IAnalysisService
 
         _client = new AnthropicClient(apiKey);
         _modelRouter = modelRouter;
+        _providers = providers;
         _logger = logger;
     }
 
@@ -68,8 +74,9 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
 
         try
         {
-            List<Message> messages;
+            string content;
 
+            // Image analysis: Use Claude client directly (not yet in provider abstraction)
             if (!string.IsNullOrEmpty(screenshotBase64))
             {
                 var contentBlocks = new List<ContentBase>
@@ -84,31 +91,36 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
                     },
                     new TextContent { Text = prompt }
                 };
-                messages = new List<Message> { new Message { Role = RoleType.User, Content = contentBlocks } };
+                var messages = new List<Message> { new Message { Role = RoleType.User, Content = contentBlocks } };
+
+                var parameters = new MessageParameters
+                {
+                    Messages = messages,
+                    Model = "claude-sonnet-4-20250514",
+                    MaxTokens = 2000,
+                    Temperature = 0.3m
+                };
+
+                var response = await _client.Messages.GetClaudeMessageAsync(parameters);
+                content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
             }
+            // Text-only analysis: Use provider abstraction with tier-based routing
             else
             {
-                messages = new List<Message> { new Message(RoleType.User, prompt) };
+                var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.Analysis);
+                var qualifiedModelId = _modelRouter.GetModelId(recommendedTier);
+                _logger.LogInformation("Analysis task: tier={Tier}, model={Model}", recommendedTier, qualifiedModelId);
+
+                // Parse provider:model format
+                var (providerName, modelId) = ParseModelId(qualifiedModelId);
+                var provider = _providers.FirstOrDefault(p => p.ProviderName.Equals(providerName, StringComparison.OrdinalIgnoreCase))
+                               ?? _providers.FirstOrDefault(p => p.ProviderName == "claude");
+
+                if (provider == null)
+                    throw new InvalidOperationException("No AI provider available");
+
+                content = await provider.GenerateAsync(prompt, modelId);
             }
-
-            // Model routing: Analysis is a lightweight task → Haiku tier recommended.
-            // Currently using a single configured model; the ModelRouterService provides the
-            // recommended tier for future multi-model support.
-            var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.Analysis);
-            var recommendedModelId = _modelRouter.GetModelId(recommendedTier);
-            _logger.LogInformation("Analysis task: recommended tier={Tier}, model={Model}", recommendedTier, recommendedModelId);
-
-            var parameters = new MessageParameters
-            {
-                Messages = messages,
-                // TODO: Switch to recommendedModelId once multi-model client support is available
-                Model = "claude-sonnet-4-20250514",
-                MaxTokens = 2000,
-                Temperature = 0.3m
-            };
-
-            var response = await _client.Messages.GetClaudeMessageAsync(parameters);
-            var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
 
             var result = StructuredOutputHelper.DeserializeResponse<AnalysisResult>(content);
 
@@ -125,6 +137,12 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
                 Feasibility = new FeasibilityInfo { Score = 0, Risks = new[] { ex.Message } }
             };
         }
+    }
+
+    private static (string provider, string model) ParseModelId(string qualifiedModelId)
+    {
+        var parts = qualifiedModelId.Split(':', 2);
+        return parts.Length == 2 ? (parts[0], parts[1]) : ("claude", qualifiedModelId);
     }
 }
 

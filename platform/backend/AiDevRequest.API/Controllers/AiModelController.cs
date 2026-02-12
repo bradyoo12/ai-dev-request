@@ -1,5 +1,6 @@
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,14 +14,63 @@ namespace AiDevRequest.API.Controllers;
 public class AiModelController : ControllerBase
 {
     private readonly AiDevRequestDbContext _db;
+    private readonly IModelRouterService _modelRouter;
 
-    public AiModelController(AiDevRequestDbContext db)
+    public AiModelController(AiDevRequestDbContext db, IModelRouterService modelRouter)
     {
         _db = db;
+        _modelRouter = modelRouter;
     }
 
     private string GetUserId() =>
         User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub") ?? "";
+
+    /// <summary>
+    /// Get list of available AI providers
+    /// </summary>
+    [HttpGet("providers")]
+    public ActionResult<IEnumerable<ProviderDto>> GetProviders()
+    {
+        var providers = _modelRouter.GetAllProviders()
+            .Select(p => new ProviderDto
+            {
+                Name = p.ProviderName,
+                ModelCount = p.GetAvailableModels().Count()
+            });
+
+        return Ok(providers);
+    }
+
+    /// <summary>
+    /// Get list of available models for a specific provider
+    /// </summary>
+    [HttpGet("models")]
+    public ActionResult<IEnumerable<ProviderModelDto>> GetModels([FromQuery] string? provider = null)
+    {
+        IEnumerable<IModelProviderService> providers;
+
+        if (string.IsNullOrWhiteSpace(provider))
+        {
+            // Return models from all providers
+            providers = _modelRouter.GetAllProviders();
+        }
+        else
+        {
+            // Return models from specific provider
+            providers = _modelRouter.GetAllProviders()
+                .Where(p => p.ProviderName.Equals(provider, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var models = providers.SelectMany(p => p.GetAvailableModels().Select(modelId => new ProviderModelDto
+        {
+            Provider = p.ProviderName,
+            ModelId = modelId,
+            QualifiedModelId = $"{p.ProviderName}:{modelId}",
+            CostPerToken = p.GetCostPerToken(modelId)
+        }));
+
+        return Ok(models);
+    }
 
     /// <summary>
     /// Get or create the user's AI model configuration
@@ -59,6 +109,7 @@ public class AiModelController : ControllerBase
         }
 
         if (dto.SelectedModel != null) config.SelectedModel = dto.SelectedModel;
+        if (dto.PreferredProvider != null) config.PreferredProvider = dto.PreferredProvider;
         if (dto.ExtendedThinkingEnabled.HasValue) config.ExtendedThinkingEnabled = dto.ExtendedThinkingEnabled.Value;
         if (dto.ThinkingBudgetTokens.HasValue) config.ThinkingBudgetTokens = Math.Clamp(dto.ThinkingBudgetTokens.Value, 1000, 50000);
         if (dto.StreamThinkingEnabled.HasValue) config.StreamThinkingEnabled = dto.StreamThinkingEnabled.Value;
@@ -68,48 +119,6 @@ public class AiModelController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok(ToDto(config));
-    }
-
-    /// <summary>
-    /// List available AI models with pricing and capabilities
-    /// </summary>
-    [HttpGet("models")]
-    public ActionResult<IEnumerable<AvailableModelDto>> GetModels()
-    {
-        var models = new[]
-        {
-            new AvailableModelDto
-            {
-                Id = "claude-opus-4-6",
-                Name = "Claude Opus 4.6",
-                ModelId = "claude-opus-4-6",
-                Description = "Most capable model with extended thinking for complex reasoning",
-                InputCostPer1k = 0.015m,
-                OutputCostPer1k = 0.075m,
-                SupportsExtendedThinking = true,
-                MaxOutputTokens = 32000,
-                AvgLatencyMs = 5000,
-                Tier = "powerful",
-                Badge = "Most Capable",
-                Capabilities = new[] { "Extended thinking", "Complex reasoning", "Architecture design", "Security analysis", "System design", "Advanced debugging" },
-            },
-            new AvailableModelDto
-            {
-                Id = "claude-sonnet-4-5",
-                Name = "Claude Sonnet 4.5",
-                ModelId = "claude-sonnet-4-5-20250929",
-                Description = "Fast and efficient model for everyday development tasks",
-                InputCostPer1k = 0.003m,
-                OutputCostPer1k = 0.015m,
-                SupportsExtendedThinking = false,
-                MaxOutputTokens = 16000,
-                AvgLatencyMs = 1500,
-                Tier = "fast",
-                Badge = "Fastest",
-                Capabilities = new[] { "Code generation", "Bug fixing", "Testing", "Documentation", "Refactoring", "Quick iterations" },
-            },
-        };
-        return Ok(models);
     }
 
     /// <summary>
@@ -166,6 +175,7 @@ public class AiModelController : ControllerBase
     {
         Id = config.Id,
         SelectedModel = config.SelectedModel,
+        PreferredProvider = config.PreferredProvider,
         ExtendedThinkingEnabled = config.ExtendedThinkingEnabled,
         ThinkingBudgetTokens = config.ThinkingBudgetTokens,
         StreamThinkingEnabled = config.StreamThinkingEnabled,
@@ -181,10 +191,25 @@ public class AiModelController : ControllerBase
     };
 }
 
+public class ProviderDto
+{
+    public string Name { get; set; } = "";
+    public int ModelCount { get; set; }
+}
+
+public class ProviderModelDto
+{
+    public string Provider { get; set; } = "";
+    public string ModelId { get; set; } = "";
+    public string QualifiedModelId { get; set; } = "";
+    public decimal CostPerToken { get; set; }
+}
+
 public class AiModelConfigDto
 {
     public Guid Id { get; set; }
     public string SelectedModel { get; set; } = "";
+    public string? PreferredProvider { get; set; }
     public bool ExtendedThinkingEnabled { get; set; }
     public int ThinkingBudgetTokens { get; set; }
     public bool StreamThinkingEnabled { get; set; }
@@ -202,26 +227,11 @@ public class AiModelConfigDto
 public class UpdateAiModelConfigDto
 {
     public string? SelectedModel { get; set; }
+    public string? PreferredProvider { get; set; }
     public bool? ExtendedThinkingEnabled { get; set; }
     public int? ThinkingBudgetTokens { get; set; }
     public bool? StreamThinkingEnabled { get; set; }
     public bool? AutoModelSelection { get; set; }
-}
-
-public class AvailableModelDto
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string ModelId { get; set; } = "";
-    public string Description { get; set; } = "";
-    public decimal InputCostPer1k { get; set; }
-    public decimal OutputCostPer1k { get; set; }
-    public bool SupportsExtendedThinking { get; set; }
-    public int MaxOutputTokens { get; set; }
-    public int AvgLatencyMs { get; set; }
-    public string Tier { get; set; } = "";
-    public string Badge { get; set; } = "";
-    public string[] Capabilities { get; set; } = [];
 }
 
 public class CostEstimateRequestDto

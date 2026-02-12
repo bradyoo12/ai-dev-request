@@ -188,6 +188,7 @@ Implement and locally test ONE Ready ticket using an Agent Team.
 4. **IMMEDIATELY move the ticket to "In Progress"** — this is the FIRST action, before reading the ticket, classifying it, or doing anything else:
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
 5. **Verify the claim succeeded** — re-fetch the project item and confirm it is now "In Progress":
    ```bash
@@ -323,6 +324,7 @@ Merge PRs to main. This is a simple operation — no team needed.
 5. Move ticket to "In Review":
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
+   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
 6. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
 7. Cleanup (worktree-safe — never checks out `main` branch):
@@ -427,6 +429,7 @@ For each failed run:
    ```bash
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url <issue_url> --format json --jq '.id')
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+   gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
    ```
 
 9. Process this fix through b-progress (Step 4) to merge immediately — CI fixes are high priority.
@@ -483,6 +486,7 @@ Verify changes on staging using parallel agents.
 - Move to "Done":
   ```bash
   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 98236657
+  gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
   ```
 - Close the issue (REST):
   ```bash
@@ -581,6 +585,7 @@ Before researching new technologies, use Playwright to test all links and button
      ```bash
      ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
      gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
+     gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
      ```
 
 4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
@@ -625,6 +630,7 @@ After collecting findings from both scouts:
    ```bash
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
+   gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
    ```
 
 #### Step 6e: Cleanup
@@ -695,6 +701,7 @@ After collecting findings from both agents:
    ```bash
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
+   gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
    ```
 
 #### Step 7d: Cleanup
@@ -759,6 +766,11 @@ Log the current status of the project board:
 
 ## Important Notes
 
+- **Move to top on status change** — After every `gh project item-edit` that changes a ticket's status, immediately move the item to the top of the column so it's visible on the board:
+  ```bash
+  gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
+  ```
+  Omitting `afterId` places the item at the top of the list.
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
 - **NEVER ask the user for permission to continue** - always proceed to the next cycle automatically. Do NOT say "Would you like me to continue?" or any variation. The loop is autonomous.
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects

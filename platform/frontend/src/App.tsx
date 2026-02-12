@@ -36,6 +36,7 @@ function App() {
   }, [i18n.language])
 
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <ErrorBoundary>
         <AuthProvider>
@@ -88,6 +89,7 @@ function App() {
         </AuthProvider>
       </ErrorBoundary>
     </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 

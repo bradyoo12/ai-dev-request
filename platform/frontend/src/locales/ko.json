@@ -2232,5 +2232,10 @@
   "support.form.submit": "등록",
   "support.form.submitting": "등록 중...",
   "support.pagination.prev": "이전",
-  "support.pagination.next": "다음"
+  "support.pagination.next": "다음",
+  "errorBoundary.title": "문제가 발생했습니다",
+  "errorBoundary.message": "예상치 못한 오류가 발생했습니다. 페이지를 새로고침하거나 홈으로 이동해 주세요.",
+  "errorBoundary.goHome": "홈으로",
+  "errorBoundary.retry": "다시 시도",
+  "errorBoundary.details": "오류 상세 정보"
 }

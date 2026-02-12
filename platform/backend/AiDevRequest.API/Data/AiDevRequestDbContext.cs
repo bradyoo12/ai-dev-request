@@ -117,6 +117,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<OAuthConnector> OAuthConnectors => Set<OAuthConnector>();
     public DbSet<McpToolIntegration> McpToolIntegrations => Set<McpToolIntegration>();
     public DbSet<AiModelConfig> AiModelConfigs => Set<AiModelConfig>();
+    public DbSet<GitHubSyncConfig> GitHubSyncConfigs => Set<GitHubSyncConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

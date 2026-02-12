@@ -1080,3 +1080,17 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Backend**: Enhanced `RequestsController` generation pipeline to auto-apply critical fixes after code quality review, then re-run review for updated scores
 - **New Endpoint**: `GET /api/projects/{projectId}/review/summary` — concise review status with overall score, pass/fail, finding counts by severity, fixes applied
 - **Auto-Fix Flow**: After `TriggerReviewAsync`, if critical findings exist → `ApplyAllFixesAsync("critical")` → re-trigger review → update `QualityConfidenceScore` with post-fix score
+
+### #393 — Effort-Based Pricing with Usage Metering and Outcome Billing (PR #397)
+- **Backend Entity**: `UsageMeter` with Id, UserId, DevRequestId, EffortTier (base/standard/complex/enterprise), Outcome (success/partial/failed), BasePrice, EffortMultiplier, OutcomeMultiplier, FinalPrice, TokensUsed, DurationMs, CreatedAt
+- **Backend Service**: `UsageMeteringService` with RecordUsage, GetReport, GetBillingEstimate, GetPricingTiers — implements effort-based pricing multipliers (base: 1.0x, standard: 2.0x, complex: 3.5x, enterprise: 5.0x) and outcome-based billing (success: 1.0x, partial: 0.5x, failed: 0x)
+- **Backend Controller**: `UsageMeteringController` with 4 endpoints: `POST /api/usage-metering/record`, `GET /api/usage-metering/report`, `GET /api/usage-metering/billing-estimate`, `GET /api/usage-metering/pricing-tiers`
+- **Frontend**: `UsageDashboardPage` at `/settings/usage-dashboard` with usage stats, billing breakdown, and pricing tier reference
+- **i18n**: `usageMeeting.*` keys in en.json and ko.json
+
+### #394 — Agent-Triggered Automation from GitHub Issue Assignment (PR #398)
+- **Backend Entity**: `AgentAutomation` with Id, IssueNumber, IssueTitle, IssueBody, AssignedTo, Status (Pending/Analyzing/Implementing/Testing/PrCreated/Completed/Failed), BranchName, PrNumber, PrUrl, StartedAt, CompletedAt, ErrorMessage, ContextSummary, CreatedAt, UpdatedAt
+- **Backend Controller**: `AgentAutomationController` with webhook endpoint, config, task management, stats, and cancel APIs
+- **Endpoints**: `POST /api/agent-automation/webhook`, `GET /api/agent-automation/config`, `GET /api/agent-automation/triggers`, `GET /api/agent-automation/triggers/{id}`, `POST /api/agent-automation/triggers/{id}/retry`, `POST /api/agent-automation/triggers/{id}/cancel`, `GET /api/agent-automation/stats`
+- **Frontend**: `AgentTriggerPage` at `/settings/agent-triggers` with trigger list, status tracking, and automation stats
+- **i18n**: `agentTrigger.*` keys in en.json and ko.json

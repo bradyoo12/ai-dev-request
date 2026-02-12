@@ -116,7 +116,7 @@ public class AiModelController : ControllerBase
     /// Estimate cost for a task given input text
     /// </summary>
     [HttpPost("estimate")]
-    public ActionResult<CostEstimateDto> EstimateCost([FromBody] CostEstimateRequestDto request)
+    public ActionResult<AiModelCostEstimateDto> EstimateCost([FromBody] CostEstimateRequestDto request)
     {
         // Rough token estimation: ~4 chars per token for English text
         var estimatedInputTokens = (int)Math.Ceiling((request.InputText?.Length ?? 0) / 4.0);
@@ -129,7 +129,7 @@ public class AiModelController : ControllerBase
         var sonnetInputCost = estimatedInputTokens / 1000.0m * 0.003m;
         var sonnetOutputCost = estimatedOutputTokens / 1000.0m * 0.015m;
 
-        return Ok(new CostEstimateDto
+        return Ok(new AiModelCostEstimateDto
         {
             EstimatedInputTokens = estimatedInputTokens,
             EstimatedOutputTokens = estimatedOutputTokens,
@@ -232,7 +232,7 @@ public class CostEstimateRequestDto
     public int ThinkingBudget { get; set; } = 10000;
 }
 
-public class CostEstimateDto
+public class AiModelCostEstimateDto
 {
     public int EstimatedInputTokens { get; set; }
     public int EstimatedOutputTokens { get; set; }

@@ -86,7 +86,7 @@ public class McpToolIntegrationController : ControllerBase
 
     // POST /api/mcp-tools/execute
     [HttpPost("execute")]
-    public async Task<IActionResult> ExecuteTool([FromBody] ExecuteToolRequest request)
+    public async Task<IActionResult> ExecuteTool([FromBody] McpToolExecuteRequest request)
     {
         var userId = GetUserId();
         var config = await _db.McpToolIntegrations.FirstOrDefaultAsync(c => c.UserId == userId);
@@ -263,7 +263,7 @@ public class UpdateMcpToolConfigRequest
     public string? CustomServersJson { get; set; }
 }
 
-public class ExecuteToolRequest
+public class McpToolExecuteRequest
 {
     public string ToolName { get; set; } = string.Empty;
     public string? Input { get; set; }

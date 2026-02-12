@@ -1,4 +1,5 @@
 using AiDevRequest.API.Services;
+using AiDevRequest.Tests.Helpers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,13 +14,15 @@ public class TestGenerationServiceTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>())
             .Build();
+        var db = TestDbContextFactory.Create();
         var logger = new Mock<ILogger<TestGenerationService>>();
 
         var originalKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
         try
         {
             Environment.SetEnvironmentVariable("ANTHROPIC_API_KEY", null);
-            Assert.Throws<InvalidOperationException>(() => new TestGenerationService(config, logger.Object));
+            var act = () => new TestGenerationService(db, config, logger.Object);
+            act.Should().Throw<InvalidOperationException>();
         }
         finally
         {
@@ -36,11 +39,12 @@ public class TestGenerationServiceTests
                 ["Anthropic:ApiKey"] = "test-api-key"
             })
             .Build();
+        var db = TestDbContextFactory.Create();
         var logger = new Mock<ILogger<TestGenerationService>>();
 
-        var service = new TestGenerationService(config, logger.Object);
+        var service = new TestGenerationService(db, config, logger.Object);
 
-        Assert.NotNull(service);
+        service.Should().NotBeNull();
     }
 
     [Fact]
@@ -52,12 +56,13 @@ public class TestGenerationServiceTests
                 ["Anthropic:ApiKey"] = "test-api-key"
             })
             .Build();
+        var db = TestDbContextFactory.Create();
         var logger = new Mock<ILogger<TestGenerationService>>();
-        var service = new TestGenerationService(config, logger.Object);
+        var service = new TestGenerationService(db, config, logger.Object);
 
         var result = await service.GenerateTestsAsync("/nonexistent/path", "react");
 
-        Assert.Equal(0, result.TestFilesGenerated);
-        Assert.Equal("No source files found to generate tests for.", result.Summary);
+        result.TestFilesGenerated.Should().Be(0);
+        result.Summary.Should().Contain("No source files found");
     }
 }

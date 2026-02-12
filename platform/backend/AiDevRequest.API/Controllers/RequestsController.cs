@@ -608,12 +608,42 @@ public class RequestsController : ControllerBase
                 result.CodeReviewSummary = reviewResult.Summary;
                 result.CodeReviewIssueCount = reviewResult.Issues.Count;
 
-                // 5-dimension quality review
+                // 5-dimension quality review with auto-fix for critical findings
                 try
                 {
                     var qualityReview = await _codeQualityReviewService.TriggerReviewAsync(
                         0, result.ProjectPath, result.ProjectType);
                     result.QualityConfidenceScore = (int)Math.Round(qualityReview.OverallScore * 20); // Convert 1-5 to 0-100
+
+                    // Auto-apply critical fixes if any were found
+                    if (qualityReview.CriticalCount > 0)
+                    {
+                        _logger.LogInformation(
+                            "Auto-applying {Count} critical fixes for request {RequestId}",
+                            qualityReview.CriticalCount, id);
+
+                        try
+                        {
+                            await _codeQualityReviewService.ApplyAllFixesAsync(0, "critical");
+
+                            // Re-run review after fixes to get updated scores
+                            var updatedReview = await _codeQualityReviewService.TriggerReviewAsync(
+                                0, result.ProjectPath, result.ProjectType);
+                            result.QualityConfidenceScore = (int)Math.Round(updatedReview.OverallScore * 20);
+
+                            _logger.LogInformation(
+                                "Post-fix review completed for {RequestId}: score {Before} -> {After}, critical {CritBefore} -> {CritAfter}",
+                                id,
+                                (int)Math.Round(qualityReview.OverallScore * 20),
+                                result.QualityConfidenceScore,
+                                qualityReview.CriticalCount,
+                                updatedReview.CriticalCount);
+                        }
+                        catch (Exception fixEx)
+                        {
+                            _logger.LogWarning(fixEx, "Auto-fix for critical findings failed for {RequestId}, keeping original review scores", id);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

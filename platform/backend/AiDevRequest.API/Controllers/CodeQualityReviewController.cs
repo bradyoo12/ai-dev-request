@@ -75,6 +75,32 @@ public class CodeQualityReviewController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get a concise review summary with overall score, pass/fail, and finding counts
+    /// </summary>
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetReviewSummary(int projectId)
+    {
+        var result = await _reviewService.GetReviewResultAsync(projectId);
+        if (result == null) return NotFound(new { error = "No review found for this project." });
+
+        const double passingThreshold = 3.0; // 3 out of 5
+
+        return Ok(new ReviewSummaryDto
+        {
+            ProjectId = projectId,
+            OverallScore = result.OverallScore,
+            Passed = result.OverallScore >= passingThreshold,
+            Status = result.Status,
+            CriticalCount = result.CriticalCount,
+            WarningCount = result.WarningCount,
+            InfoCount = result.InfoCount,
+            FixesApplied = result.FixesApplied,
+            ReviewVersion = result.ReviewVersion,
+            CompletedAt = result.CompletedAt,
+        });
+    }
+
     private static CodeQualityReviewDto MapDto(Entities.CodeQualityReview r) => new()
     {
         Id = r.Id,
@@ -124,5 +150,19 @@ public record CodeQualityReviewDto
     public int FixesApplied { get; init; }
     public int ReviewVersion { get; init; }
     public DateTime CreatedAt { get; init; }
+    public DateTime? CompletedAt { get; init; }
+}
+
+public record ReviewSummaryDto
+{
+    public int ProjectId { get; init; }
+    public double OverallScore { get; init; }
+    public bool Passed { get; init; }
+    public string Status { get; init; } = "";
+    public int CriticalCount { get; init; }
+    public int WarningCount { get; init; }
+    public int InfoCount { get; init; }
+    public int FixesApplied { get; init; }
+    public int ReviewVersion { get; init; }
     public DateTime? CompletedAt { get; init; }
 }

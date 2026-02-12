@@ -105,7 +105,10 @@ export async function createCreditCheckout(
 ): Promise<{ checkoutUrl: string; isSimulation: boolean }> {
   const response = await fetch(`${API_BASE_URL}/api/credits/checkout`, {
     method: 'POST',
-    headers: authHeaders(),
+    headers: {
+      ...authHeaders(),
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ packageId, currency }),
   })
 

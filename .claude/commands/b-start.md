@@ -42,6 +42,7 @@ This command orchestrates the entire development workflow using Agent Teams for 
 │  2. Audit all tickets for alignment                              │
 │  3. b-ready team → plan, implement, unit tests, E2E test, PR      │
 │  4. b-progress → merge PR to main, move to In Review             │
+│  4b. GitHub Actions health check → find & fix CI failures        │
 │  5. b-review team → parallel test + verify on staging            │
 │  6. b-modernize team → parallel research + create suggestions    │
 │  7. Site audit → visit live site, find errors, create tickets    │
@@ -57,6 +58,7 @@ Teams are used within a single ticket to parallelize independent work:
 |------|-----------|--------|-------------|
 | b-ready | `ready-<ticket#>` | planner + frontend-dev + backend-dev + unit-test-analyst + tester | Frontend & backend can be implemented simultaneously; unit tests created before E2E |
 | b-progress | No team | Single operation | Simple merge, no parallelism needed |
+| Actions check | No team | Single operation | Diagnose & fix CI failures sequentially |
 | b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
 | b-modernize | `modernize` | tech-scout + competitor-scout | Independent web searches |
 | site-audit | `site-audit` | error-checker + ux-reviewer | Error checking and UX review run independently |
@@ -334,6 +336,109 @@ Merge PRs to main. This is a simple operation — no team needed.
    # Delete merged remote branches (never delete main/master)
    git branch -r --merged origin/main | grep -vE 'main|master' | sed 's/origin\///' | xargs -r -I {} git push origin --delete {}
    ```
+
+### Step 4b: GitHub Actions Health Check
+
+After merging PRs, check GitHub Actions for failed workflow runs on `main` and fix any errors found.
+
+#### Step 4b-1: Check Recent Workflow Runs
+
+1. Fetch recent workflow runs on the `main` branch:
+   ```bash
+   gh run list --repo bradyoo12/ai-dev-request --branch main --limit 10 --json databaseId,status,conclusion,name,headBranch,event,createdAt
+   ```
+
+2. Also check for failed runs on any branch (catches PR check failures):
+   ```bash
+   gh run list --repo bradyoo12/ai-dev-request --status failure --limit 5 --json databaseId,status,conclusion,name,headBranch,event,createdAt
+   ```
+
+3. If no failures found, log "GitHub Actions: all green" and skip to Step 5.
+
+#### Step 4b-2: Diagnose Each Failure
+
+For each failed run:
+
+1. Get the failure details and logs:
+   ```bash
+   gh run view <run_id> --repo bradyoo12/ai-dev-request --log-failed
+   ```
+
+2. If logs are too large, get job-level details first:
+   ```bash
+   gh run view <run_id> --repo bradyoo12/ai-dev-request --json jobs --jq '.jobs[] | select(.conclusion=="failure") | {name, conclusion, steps: [.steps[] | select(.conclusion=="failure") | {name, conclusion}]}'
+   ```
+
+3. Classify the failure:
+
+   **Transient failure** (network timeout, rate limit, flaky test, GitHub infrastructure issue):
+   - Re-run the failed jobs:
+     ```bash
+     gh run rerun <run_id> --repo bradyoo12/ai-dev-request --failed
+     ```
+   - Log: "Re-ran transient failure in run #<run_id>"
+   - Move to the next failed run
+
+   **Code/config failure** (build error, test failure, lint error, deployment config issue):
+   - Proceed to Step 4b-3
+
+#### Step 4b-3: Fix Code/Config Failures
+
+1. Create a fix branch (worktree-safe):
+   ```bash
+   git fetch origin
+   git checkout -b fix/ci-<run_id> origin/main
+   ```
+
+2. Analyze the error logs and identify the root cause:
+   - Build failures: missing dependencies, type errors, compilation errors
+   - Test failures: broken tests, missing test fixtures, environment issues
+   - Lint/format failures: code style violations
+   - Deployment failures: misconfigured workflows, wrong secrets references
+
+3. Fix the issue in the worktree
+
+4. Run the relevant checks locally to verify the fix:
+   - Build: `cd platform/frontend && npm run build`
+   - Tests: `cd platform/frontend && npm test`
+   - Backend: `cd platform/backend/AiDevRequest.API && dotnet build`
+
+5. Commit and push:
+   ```bash
+   git add -A
+   git commit -m "fix: resolve CI failure from Actions run #<run_id>"
+   git push origin fix/ci-<run_id>
+   ```
+
+6. Create a PR:
+   ```bash
+   gh pr create --repo bradyoo12/ai-dev-request --title "[CI Fix] <short description of failure>" --body "Fixes CI failure from GitHub Actions run #<run_id>.\n\n**Root cause:** <description>\n**Fix:** <what was changed>"
+   ```
+
+7. Create a tracking ticket (REST):
+   ```bash
+   gh api --method POST "repos/bradyoo12/ai-dev-request/issues" \
+     -f title="[CI Fix] <short description>" \
+     -f body="GitHub Actions run #<run_id> failed on \`main\` branch.\n\n**Error:** <error summary>\n**Root cause:** <description>\n**Fix PR:** #<pr_number>" \
+     -f "labels[]=bug"
+   ```
+
+8. Add the ticket to the project and set to **In Progress**:
+   ```bash
+   ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url <issue_url> --format json --jq '.id')
+   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+   ```
+
+9. Process this fix through b-progress (Step 4) to merge immediately — CI fixes are high priority.
+
+10. After the fix PR is merged, verify the Actions run passes:
+    ```bash
+    # Wait briefly for the new run to start
+    sleep 30
+    gh run list --repo bradyoo12/ai-dev-request --branch main --limit 3 --json databaseId,status,conclusion,name
+    ```
+    - If still failing, retry the fix (up to 3 attempts total)
+    - If still failing after 3 attempts, add `on hold` label to the ticket and proceed to Step 5
 
 ### Step 5: b-review — Verify with Agent Team
 

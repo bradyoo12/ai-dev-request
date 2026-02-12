@@ -30,6 +30,7 @@ export interface CreateDevRequestDto {
   screenshotBase64?: string;
   screenshotMediaType?: string;
   framework?: string;
+  powerLevel?: string;
 }
 
 export interface DevRequestResponse {

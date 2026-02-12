@@ -116,6 +116,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ReviewPipelineConfig> ReviewPipelineConfigs => Set<ReviewPipelineConfig>();
     public DbSet<OAuthConnector> OAuthConnectors => Set<OAuthConnector>();
     public DbSet<McpToolIntegration> McpToolIntegrations => Set<McpToolIntegration>();
+    public DbSet<AiModelConfig> AiModelConfigs => Set<AiModelConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

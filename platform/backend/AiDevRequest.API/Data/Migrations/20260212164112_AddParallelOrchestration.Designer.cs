@@ -3,6 +3,7 @@ using System;
 using AiDevRequest.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiDevRequest.API.Data.Migrations
 {
     [DbContext(typeof(AiDevRequestDbContext))]
-    partial class AiDevRequestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212164112_AddParallelOrchestration")]
+    partial class AddParallelOrchestration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

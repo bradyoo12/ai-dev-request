@@ -77,6 +77,9 @@ builder.Services.AddScoped<ICodeQualityReviewService, CodeQualityReviewService>(
 builder.Services.AddScoped<IStreamingGenerationService, StreamingGenerationService>();
 builder.Services.AddScoped<IUsageBillingService, UsageBillingService>();
 builder.Services.AddScoped<IMcpIntegrationService, McpIntegrationService>();
+builder.Services.AddScoped<ITaskDecompositionService, TaskDecompositionService>();
+builder.Services.AddScoped<ISubagentOrchestrationService, SubagentOrchestrationService>();
+builder.Services.AddScoped<IResultAggregationService, ResultAggregationService>();
 builder.Services.AddScoped<IAnalyticsDashboardService, AnalyticsDashboardService>();
 builder.Services.AddScoped<ITemplateMarketplaceService, TemplateMarketplaceService>();
 builder.Services.AddScoped<IContainerizationService, ContainerizationService>();

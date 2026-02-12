@@ -66,3 +66,31 @@ export async function retryAgentTask(taskId: string): Promise<AgentTask> {
   }
   return response.json()
 }
+
+export interface AgentAutomationStats {
+  totalRuns: number
+  completed: number
+  failed: number
+  inProgress: number
+  avgDurationSeconds: number
+}
+
+export async function getAgentStats(): Promise<AgentAutomationStats> {
+  const response = await authFetch(`${API_BASE_URL}/api/agent-automation/stats`)
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.agentAutomationStatsLoad'))
+  }
+  return response.json()
+}
+
+export async function cancelAgentTask(taskId: string): Promise<AgentTask> {
+  const response = await authFetch(`${API_BASE_URL}/api/agent-automation/tasks/${taskId}/cancel`, {
+    method: 'POST',
+  })
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.agentAutomationCancel'))
+  }
+  return response.json()
+}

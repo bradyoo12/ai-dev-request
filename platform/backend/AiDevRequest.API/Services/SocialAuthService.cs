@@ -155,18 +155,23 @@ public class SocialAuthService : ISocialAuthService
     private async Task<SocialUserInfo> ExchangeKakaoCodeAsync(string code, string redirectUri)
     {
         var clientId = _configuration["OAuth:Kakao:ClientId"] ?? throw new InvalidOperationException("Kakao ClientId not configured");
+        var clientSecret = _configuration["OAuth:Kakao:ClientSecret"];
 
         var client = _httpClientFactory.CreateClient();
 
         // Exchange code for tokens
+        var tokenParams = new Dictionary<string, string>
+        {
+            ["code"] = code,
+            ["client_id"] = clientId,
+            ["redirect_uri"] = redirectUri,
+            ["grant_type"] = "authorization_code"
+        };
+        if (!string.IsNullOrEmpty(clientSecret))
+            tokenParams["client_secret"] = clientSecret;
+
         var tokenResponse = await client.PostAsync("https://kauth.kakao.com/oauth/token",
-            new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["code"] = code,
-                ["client_id"] = clientId,
-                ["redirect_uri"] = redirectUri,
-                ["grant_type"] = "authorization_code"
-            }));
+            new FormUrlEncodedContent(tokenParams));
 
         var tokenJson = await tokenResponse.Content.ReadAsStringAsync();
         if (!tokenResponse.IsSuccessStatusCode)

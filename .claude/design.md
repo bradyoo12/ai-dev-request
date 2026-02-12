@@ -101,6 +101,7 @@ User Request (natural language)
 | SupportPost | Customer support post with public read, auth write, admin reward credits |
 | SelfHealingTestResult | Self-healing test automation result with healed/failed test details and confidence scores |
 | DatabaseBranch | Git-like database branch for preview environments with schema versioning and merge/discard |
+| SandboxExecution | Sandboxed code execution record with isolation level, resource usage, and security violation tracking |
 
 ## Spec-Driven Development Pipeline
 

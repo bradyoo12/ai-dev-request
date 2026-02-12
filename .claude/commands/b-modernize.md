@@ -204,6 +204,8 @@ For each discovered technology, evaluate:
 
 Create tickets for both external research findings (Step 3–4) and internal code audit findings (Step 2).
 
+**Maximum 10 tickets per run.** If you have more than 10 findings, prioritize by impact score and only create the top 10.
+
 ### For external research findings (suggestions)
 
 ```bash
@@ -245,5 +247,6 @@ Log a summary of findings and tickets created.
 - **Focus on the most impactful findings** — prioritize by impact score
 - **Set status to Ready** on the project board when adding tickets
 - **Label suggestion tickets with `suggestion`**, code audit improvements with `enhancement`, code audit defects with `bug`
+- **Maximum 10 tickets per run** — prioritize by impact score if more findings exist
 - If 4+ suggestion tickets already exist in Backlog, skip b-modernize entirely
 - In team mode, report findings — do NOT create tickets directly

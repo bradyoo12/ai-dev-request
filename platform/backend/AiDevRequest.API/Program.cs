@@ -88,6 +88,7 @@ builder.Services.AddScoped<IPerformanceProfileService, PerformanceProfileService
 builder.Services.AddScoped<ISchemaDesignerService, SchemaDesignerService>();
 builder.Services.AddScoped<ISelfHealingTestService, SelfHealingTestService>();
 builder.Services.AddScoped<IDatabaseBranchService, DatabaseBranchService>();
+builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

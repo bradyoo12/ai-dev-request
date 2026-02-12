@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getAiModelConfig, updateAiModelConfig, getAvailableModels, getAiModelStats } from '../api/aiModel'
-import type { AiModelConfig, AvailableModel, AiModelStats } from '../api/aiModel'
+import { getAiModelConfig, updateAiModelConfig, getAvailableModels, getAiModelStats, getAvailableProviders } from '../api/aiModel'
+import type { AiModelConfig, AvailableModel, AiModelStats, Provider } from '../api/aiModel'
 
 type SubTab = 'models' | 'configure' | 'stats'
 
@@ -10,6 +10,8 @@ export default function AiModelPage() {
   const [config, setConfig] = useState<AiModelConfig | null>(null)
   const [models, setModels] = useState<AvailableModel[]>([])
   const [stats, setStats] = useState<AiModelStats | null>(null)
+  const [providers, setProviders] = useState<Provider[]>([])
+  const [selectedProvider, setSelectedProvider] = useState<string>('claude')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [subTab, setSubTab] = useState<SubTab>('models')
@@ -21,14 +23,16 @@ export default function AiModelPage() {
   async function loadData() {
     try {
       setLoading(true)
-      const [configRes, modelsRes, statsRes] = await Promise.all([
+      const [configRes, modelsRes, statsRes, providersRes] = await Promise.all([
         getAiModelConfig(),
         getAvailableModels(),
         getAiModelStats(),
+        getAvailableProviders().catch(() => []), // Fallback for backward compatibility
       ])
       setConfig(configRes)
       setModels(modelsRes)
       setStats(statsRes)
+      setProviders(providersRes)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('aiModel.errorLoading', 'Failed to load AI model settings'))
     } finally {
@@ -66,6 +70,27 @@ export default function AiModelPage() {
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
           {error}
           <button onClick={() => setError('')} className="ml-2 text-red-300 hover:text-white">&times;</button>
+        </div>
+      )}
+
+      {/* Provider Selector */}
+      {providers.length > 0 && (
+        <div className="bg-warm-800 rounded-lg p-4">
+          <label className="text-sm text-warm-300 block mb-2">{t('aiModel.selectProvider', 'AI Provider')}</label>
+          <select
+            value={selectedProvider}
+            onChange={(e) => setSelectedProvider(e.target.value)}
+            className="w-full bg-warm-700 border border-warm-600 rounded-lg px-4 py-2 text-white"
+          >
+            {providers.map(provider => (
+              <option key={provider.id} value={provider.id} disabled={!provider.available}>
+                {provider.name} {!provider.available && '(Coming Soon)'}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-warm-500 mt-2">
+            {providers.find(p => p.id === selectedProvider)?.description || ''}
+          </p>
         </div>
       )}
 
@@ -296,6 +321,57 @@ export default function AiModelPage() {
             </div>
           </div>
 
+          {/* Gemini-Specific Settings */}
+          {selectedProvider === 'gemini' && (
+            <div className="bg-warm-800 rounded-lg p-6">
+              <h4 className="font-medium text-white mb-4">{t('aiModel.configure.geminiSettings', 'Gemini Settings')}</h4>
+              <div className="space-y-4">
+                {/* Safety Settings */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <label className="text-sm text-warm-300">{t('aiModel.gemini.safetySettings', 'Safety Settings')}</label>
+                      <p className="text-xs text-warm-500">Configure content safety filtering level</p>
+                    </div>
+                    <select
+                      value={config?.geminiSafetyLevel || 'BLOCK_MEDIUM_AND_ABOVE'}
+                      onChange={(e) => handleConfigChange({ geminiSafetyLevel: e.target.value })}
+                      className="bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white"
+                    >
+                      <option value="BLOCK_NONE">No Blocking</option>
+                      <option value="BLOCK_LOW_AND_ABOVE">Block Low & Above</option>
+                      <option value="BLOCK_MEDIUM_AND_ABOVE">Block Medium & Above</option>
+                      <option value="BLOCK_HIGH">Block Only High Risk</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Temperature Slider */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-sm text-warm-300">{t('aiModel.gemini.temperature', 'Temperature')}</label>
+                    <span className="text-sm text-blue-400 font-mono">{(config?.geminiTemperature || 1.0).toFixed(1)}</span>
+                  </div>
+                  <p className="text-xs text-warm-500 mb-3">Controls randomness in responses (0.0 - 2.0)</p>
+                  <input
+                    type="range"
+                    min={0.0}
+                    max={2.0}
+                    step={0.1}
+                    value={config?.geminiTemperature || 1.0}
+                    onChange={(e) => handleConfigChange({ geminiTemperature: parseFloat(e.target.value) })}
+                    className="w-full h-2 bg-warm-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  />
+                  <div className="flex justify-between text-xs text-warm-600 mt-1">
+                    <span>0.0 (Deterministic)</span>
+                    <span>1.0 (Balanced)</span>
+                    <span>2.0 (Creative)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Cost Preview */}
           <div className="bg-warm-800 rounded-lg p-6">
             <h4 className="font-medium text-white mb-4">Cost Preview</h4>
@@ -377,6 +453,33 @@ export default function AiModelPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Per-Provider Stats */}
+          {stats.perProviderStats && stats.perProviderStats.length > 0 && (
+            <div className="bg-warm-800 rounded-lg p-6">
+              <h4 className="font-medium text-white mb-4">Provider Breakdown</h4>
+              <div className="space-y-4">
+                {stats.perProviderStats.map(providerStat => (
+                  <div key={providerStat.provider} className="border-b border-warm-700 last:border-0 pb-4 last:pb-0">
+                    <div className="flex justify-between items-center mb-2">
+                      <h5 className="text-sm font-semibold text-white capitalize">{providerStat.provider}</h5>
+                      <span className="text-xs text-warm-500">{providerStat.totalRequests} requests</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <div className="text-xs text-warm-500">Total Tokens</div>
+                        <div className="text-base font-medium text-warm-300">{formatTokens(providerStat.totalTokens)}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-warm-500">Estimated Cost</div>
+                        <div className="text-base font-medium text-green-400">${providerStat.estimatedCost.toFixed(4)}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

@@ -142,12 +142,13 @@ export default function SettingsLayout() {
         <button
           onClick={() => navigate('/')}
           className="text-warm-400 hover:text-white transition-colors"
+          aria-label={t('settings.backToHome', 'Back to home')}
         >
-          &larr;
+          <span aria-hidden="true">&larr;</span>
         </button>
         <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
       </div>
-      <div className="flex gap-1 mb-6 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
+      <div className="flex gap-1 mb-6 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap" role="tablist" aria-label={t('settings.title')}>
         <button
           onClick={() => setSettingsTab('tokens')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${

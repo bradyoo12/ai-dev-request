@@ -307,13 +307,14 @@ export default function MySitesPage() {
 
       {/* Site Details Modal */}
       {selectedSite && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="site-detail-dialog-title">
           <div className="bg-warm-800 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">{t('sites.detailTitle')}: {selectedSite.siteName}</h3>
+              <h3 id="site-detail-dialog-title" className="text-xl font-bold">{t('sites.detailTitle')}: {selectedSite.siteName}</h3>
               <button
                 onClick={() => { setSelectedSite(null); setSiteDomain(null) }}
                 className="text-warm-400 hover:text-white text-2xl"
+                aria-label={t('common.close', 'Close')}
               >
                 &times;
               </button>
@@ -596,9 +597,9 @@ export default function MySitesPage() {
 
       {/* Domain Purchase Confirmation */}
       {purchaseConfirm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4" role="dialog" aria-modal="true" aria-labelledby="purchase-dialog-title">
           <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold mb-4">{t('domain.purchaseTitle')}</h3>
+            <h3 id="purchase-dialog-title" className="text-xl font-bold mb-4">{t('domain.purchaseTitle')}</h3>
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-sm">
                 <span className="text-warm-400">{t('domain.columnDomain')}</span>
@@ -640,9 +641,9 @@ export default function MySitesPage() {
 
       {/* Delete Confirmation Dialog */}
       {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-dialog-title">
           <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold mb-4 text-red-400">{t('sites.deleteConfirm.title')}</h3>
+            <h3 id="delete-confirm-dialog-title" className="text-xl font-bold mb-4 text-red-400">{t('sites.deleteConfirm.title')}</h3>
             <p className="text-warm-400 mb-6">{t('sites.deleteConfirm.description')}</p>
             <div className="flex gap-3">
               <button

@@ -32,15 +32,15 @@ export default function ValidationProgress({ iterations, maxIterations, currentP
   }
 
   return (
-    <div className="bg-warm-900 rounded-xl p-4 mb-4" data-testid="validation-progress">
+    <div className="bg-warm-900 rounded-xl p-4 mb-4" data-testid="validation-progress" aria-live="polite">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {passed ? (
-            <span className="text-green-400 text-xl" data-testid="check-icon">&#10003;</span>
+            <span className="text-green-400 text-xl" data-testid="check-icon" aria-hidden="true">&#10003;</span>
           ) : currentPhase === 'maxRetries' ? (
-            <span className="text-yellow-400 text-xl" data-testid="warning-icon">&#9888;</span>
+            <span className="text-yellow-400 text-xl" data-testid="warning-icon" aria-hidden="true">&#9888;</span>
           ) : (
-            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" data-testid="spinner-icon" />
+            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" data-testid="spinner-icon" role="status" aria-label={t('validation.validating')} />
           )}
           <span className={`font-medium ${getPhaseColor()}`}>{getPhaseLabel()}</span>
         </div>
@@ -49,7 +49,7 @@ export default function ValidationProgress({ iterations, maxIterations, currentP
         </span>
       </div>
 
-      <div className="w-full bg-warm-700 rounded-full h-2">
+      <div className="w-full bg-warm-700 rounded-full h-2" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100} aria-label={t('validation.validating')}>
         <div
           className={`h-2 rounded-full transition-all duration-500 ${getBarColor()}`}
           style={{ width: `${progressPercent}%` }}
@@ -71,6 +71,7 @@ export default function ValidationProgress({ iterations, maxIterations, currentP
                     : 'border-warm-600'
               }`}
               data-testid={`step-dot-${i}`}
+              aria-hidden="true"
             />
             <span className="text-[10px] text-warm-500 mt-1">{i + 1}</span>
           </div>

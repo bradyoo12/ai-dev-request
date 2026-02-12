@@ -32,7 +32,7 @@ export default function CostSavingsDisplay({ requestId }: CostSavingsDisplayProp
     return (
       <div className="bg-warm-900 rounded-xl p-4 mb-4" data-testid="cost-savings-loading">
         <div className="flex items-center gap-2 text-warm-400">
-          <div className="animate-spin w-4 h-4 border-2 border-warm-400 border-t-transparent rounded-full" />
+          <div className="animate-spin w-4 h-4 border-2 border-warm-400 border-t-transparent rounded-full" role="status" aria-label={t('cost.loading')} />
           <span className="text-sm">{t('cost.loading')}</span>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function CostSavingsDisplay({ requestId }: CostSavingsDisplayProp
             <span className="text-warm-400">{t('cost.savings')}</span>
             <span className="text-green-400 font-bold">{savingsPercentage}%</span>
           </div>
-          <div className="w-full bg-warm-700 rounded-full h-2.5">
+          <div className="w-full bg-warm-700 rounded-full h-2.5" role="progressbar" aria-valuenow={savingsPercentage} aria-valuemin={0} aria-valuemax={100} aria-label={`${t('cost.savings')}: ${savingsPercentage}%`}>
             <div
               className="bg-green-500 h-2.5 rounded-full transition-all duration-500"
               style={{ width: `${Math.min(savingsPercentage, 100)}%` }}

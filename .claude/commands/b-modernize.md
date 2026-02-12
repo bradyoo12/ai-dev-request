@@ -1,5 +1,5 @@
 ---
-description: Search tech news sites (Medium, dev.to, Hacker News, TechCrunch) for latest trends, recent technologies, and competitor features, then create suggestion tickets. Supports team mode for parallel research.
+description: Audit current implementation for improvements, search tech news sites (Medium, dev.to, Hacker News, TechCrunch) for latest trends, recent technologies, and competitor features, then create tickets. Supports team mode for parallel research.
 allowed-prompts:
   - tool: Bash
     prompt: run gh commands for GitHub operations
@@ -9,12 +9,11 @@ allowed-prompts:
 
 ## Mission
 
-Search the web for:
-1. **Latest trends** from tech news sites and developer blogs (Medium, dev.to, Hacker News, etc.)
-2. **Recent technologies** and frameworks that could benefit the AI Dev Request platform
-3. **Competitor features** from AI app builders and development automation platforms
-
-Then create suggestion tickets for promising discoveries.
+1. **Audit the current implementation** for code quality, performance, security, accessibility, and design alignment issues
+2. **Latest trends** from tech news sites and developer blogs (Medium, dev.to, Hacker News, etc.)
+3. **Recent technologies** and frameworks that could benefit the AI Dev Request platform
+4. **Competitor features** from AI app builders and development automation platforms
+5. **Create tickets** for both internal improvement opportunities and external suggestions
 
 ## Context
 
@@ -74,7 +73,76 @@ Note all existing titles to avoid creating duplicate suggestions.
 
 **In team mode:** The team lead handles this check before spawning you. Your existing ticket list will be provided in the task prompt.
 
-## Step 2: Web Search for Trends and Technologies
+## Step 2: Audit Current Implementation
+
+Before looking externally, review the current codebase for improvement opportunities. Read `design.md` and `policy.md` for context, then inspect the implementation.
+
+### What to Audit
+
+1. **Code quality**:
+   - Read key source files (components, controllers, services, hooks, stores)
+   - Look for duplicated logic, overly complex functions, dead code, or inconsistent patterns
+   - Check for missing error handling at system boundaries (API calls, user input)
+
+2. **Design.md alignment**:
+   - Read `.claude/design.md` and compare against what's actually implemented
+   - Identify features described in design.md that are missing, incomplete, or diverged from the spec
+   - Flag any implemented behavior that contradicts the design
+
+3. **Dependency health**:
+   - Frontend: check `platform/frontend/package.json` for outdated or deprecated packages
+   - Backend: check `.csproj` files for outdated NuGet packages
+   - Look for security advisories on current dependencies
+
+4. **Performance**:
+   - Large bundle imports that could be tree-shaken or lazy-loaded
+   - Components that re-render unnecessarily (missing memoization on expensive renders)
+   - API calls that could be batched, cached, or deduplicated
+   - Missing loading/skeleton states causing layout shift
+
+5. **Accessibility & UX**:
+   - Missing aria labels, alt text, or keyboard navigation support
+   - Color contrast issues in Tailwind classes
+   - Missing responsive breakpoints for mobile views
+
+6. **Security**:
+   - Unsanitized user input, missing CSRF protection, exposed secrets in code
+   - Overly permissive CORS settings
+   - Missing rate limiting on public endpoints
+
+7. **Test coverage gaps**:
+   - Key business logic files with no corresponding test files
+   - Untested error paths or edge cases in existing tests
+
+### How to Audit
+
+1. Read `.claude/design.md` and `.claude/policy.md`
+2. Use Glob to discover key source files:
+   ```
+   platform/frontend/src/**/*.{ts,tsx}
+   platform/backend/AiDevRequest.API/**/*.cs
+   ```
+3. Read and review files systematically — prioritize:
+   - Entry points (App.tsx, routes, controllers)
+   - State management (stores, contexts)
+   - API integration (services, hooks)
+   - Shared components and utilities
+4. For each finding, record:
+   - **File & location**: Which file and roughly what area
+   - **Issue**: What's wrong or could be better
+   - **Suggestion**: Specific improvement
+   - **Impact** (1-5): How much it matters
+   - **Effort** (1-5): How hard to fix (1 = trivial, 5 = major)
+
+### Filtering
+
+Only keep findings where:
+- Impact >= 3
+- Effort <= 4
+
+**In team mode (tech-scout or competitor-scout):** Include relevant code audit findings in your report alongside external research findings. The tech-scout should focus on code quality, performance, and dependency health. The competitor-scout should focus on design alignment and missing features vs competitors.
+
+## Step 3: Web Search for Trends and Technologies
 
 **In team mode, only search your assigned scope (tech-scout or competitor-scout).**
 
@@ -115,7 +183,7 @@ For each discovered feature:
 3. **Feasibility**: Can we build it with current stack? (1-5)
 4. **Competitive Edge**: Would this help stand out? (1-5)
 
-## Step 3: Evaluate Relevance
+## Step 4: Evaluate Relevance
 
 For each discovered technology, evaluate:
 
@@ -130,15 +198,27 @@ For each discovered technology, evaluate:
 
 **In team mode:** Report all qualifying findings via SendMessage. The team lead will handle deduplication and ticket creation.
 
-## Step 4: Create Suggestion Tickets (Standalone Mode Only)
+## Step 5: Create Tickets (Standalone Mode Only)
 
 **In team mode, skip this step — the team lead creates tickets after collecting findings from all scouts.**
 
-For each qualifying technology, create a GitHub issue:
+Create tickets for both external research findings (Step 3–4) and internal code audit findings (Step 2).
+
+### For external research findings (suggestions)
 
 ```bash
 # REST — avoids GraphQL rate limit. Read body from draft file:
 BODY=$(cat {draft-file}) && gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="$BODY" -f "labels[]=suggestion"
+```
+
+### For code audit findings (improvements/bugs)
+
+```bash
+# Use "enhancement" label for improvements, "bug" for defects
+gh api --method POST "repos/bradyoo12/ai-dev-request/issues" \
+  -f title="[Code Audit] {short description}" \
+  -f body="**Found in:** \`{file_path}\`\n\n**Issue:** {description}\n\n**Suggestion:** {specific improvement}\n\n**Impact:** {score}/5 | **Effort:** {score}/5\n\n_Discovered during automated code audit._" \
+  -f "labels[]=enhancement"
 ```
 
 ### Add to project and set status to Ready
@@ -153,7 +233,7 @@ ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format js
 gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
 ```
 
-## Step 5: Report Summary
+## Step 6: Report Summary
 
 Log a summary of findings and tickets created.
 
@@ -162,8 +242,8 @@ Log a summary of findings and tickets created.
 ## Important Notes
 
 - **Do NOT create duplicate tickets** — always check existing issues first
-- **Maximum 3 tickets per run** — focus on the most impactful suggestions
+- **Focus on the most impactful findings** — prioritize by impact score
 - **Set status to Ready** on the project board when adding tickets
-- **Label all tickets with `suggestion`**
+- **Label suggestion tickets with `suggestion`**, code audit improvements with `enhancement`, code audit defects with `bug`
 - If 4+ suggestion tickets already exist in Backlog, skip b-modernize entirely
 - In team mode, report findings — do NOT create tickets directly

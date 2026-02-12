@@ -617,7 +617,7 @@ Before researching new technologies, use Playwright to test all links and button
 After collecting findings from both scouts:
 1. Filter for qualifying technologies (relevance >= 3, impact >= 3, effort <= 4)
 2. Deduplicate against existing tickets
-3. Create max 3 suggestion tickets (REST):
+3. Create suggestion tickets for qualifying findings (REST):
    ```bash
    gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="{body}" -f "labels[]=suggestion"
    ```

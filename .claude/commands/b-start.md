@@ -56,7 +56,7 @@ Teams are used within a single ticket to parallelize independent work:
 
 | Step | Team Name | Agents | Why Parallel |
 |------|-----------|--------|-------------|
-| b-ready | `ready-<ticket#>` | planner + frontend-dev + backend-dev + unit-test-analyst + tester | Frontend & backend can be implemented simultaneously; unit tests created before E2E |
+| b-ready | `ready-<ticket#>` | planner + frontend-dev + backend-dev + unit-test-analyst + e2e-test-analyst + tester | Frontend & backend can be implemented simultaneously; unit tests created first, then E2E tests, then full test suite |
 | b-progress | No team | Single operation | Simple merge, no parallelism needed |
 | Actions check | No team | Single operation | Diagnose & fix CI failures sequentially |
 | b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
@@ -266,18 +266,38 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - If new tests fail, fixes them (up to 3 attempts)
    - Reports results to planner: how many tests added, coverage summary
 
-7. After unit-test-analyst completes, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
+7. After unit-test-analyst completes, spawn **e2e-test-analyst** agent (general-purpose, team_name: ready-<ticket_number>):
+   - Identifies new user-facing features added by the current ticket:
+     - New pages and routes
+     - New forms with submission workflows
+     - Navigation changes
+     - Critical user workflows (multi-step processes)
+     - API integrations visible to users
+   - For each new feature, checks if Playwright E2E tests exist in `platform/frontend/e2e/`
+   - Analyzes what should be covered by E2E tests (focus on critical user paths, not every component):
+     - New pages → test navigation and rendering
+     - Forms → test submission, validation, and success/error states
+     - User workflows → test end-to-end journey
+     - API integration → test user action → network request → UI update
+     - Accessibility features → test keyboard navigation, ARIA labels
+     - i18n/localization → test new UI strings in both en and ko
+   - Creates or updates Playwright tests following existing patterns in `platform/frontend/e2e/`
+   - Runs E2E tests to verify they pass: `npm test` in platform/frontend
+   - If new tests fail, fixes them (up to 3 attempts)
+   - Reports results to planner: how many tests added/updated
+
+8. After e2e-test-analyst completes, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
    - Runs `npm run build` in platform/frontend
    - Runs full Playwright E2E suite: `npm test` in platform/frontend
    - Reports results to planner
    - If tests fail: attempt fixes (up to 3 attempts), then report
 
-8. Planner handles final steps:
-   - Commits all changes (including new unit tests) with "Refs #<ticket_number>"
+9. Planner handles final steps:
+   - Commits all changes (including new unit tests and E2E tests) with "Refs #<ticket_number>"
    - Pushes branch and creates PR
    - Reports success/failure
 
-9. Shut down all agents and delete the team:
+10. Shut down all agents and delete the team:
    ```
    SendMessage: shutdown_request to each agent
    TeamDelete

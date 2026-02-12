@@ -118,6 +118,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<McpToolIntegration> McpToolIntegrations => Set<McpToolIntegration>();
     public DbSet<AiModelConfig> AiModelConfigs => Set<AiModelConfig>();
     public DbSet<BidirectionalGitSync> BidirectionalGitSyncs => Set<BidirectionalGitSync>();
+    public DbSet<SelfHealingTestResult> SelfHealingTestResults => Set<SelfHealingTestResult>();
     public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
     public DbSet<CreditPackagePrice> CreditPackagePrices => Set<CreditPackagePrice>();
     public DbSet<SupportPost> SupportPosts => Set<SupportPost>();

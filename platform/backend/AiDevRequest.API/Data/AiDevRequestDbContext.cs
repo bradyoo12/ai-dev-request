@@ -124,6 +124,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
     public DbSet<CreditPackagePrice> CreditPackagePrices => Set<CreditPackagePrice>();
     public DbSet<SupportPost> SupportPosts => Set<SupportPost>();
+    public DbSet<UsageMeter> UsageMeters => Set<UsageMeter>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

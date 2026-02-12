@@ -30,7 +30,7 @@ function countFileChanges(content: string): number {
   return matches ? matches.length : 0
 }
 
-function parseSuggestionFromContent(content: string): { cleanContent: string; suggestion: SuggestionDetected | null } {
+export function parseSuggestionFromContent(content: string): { cleanContent: string; suggestion: SuggestionDetected | null } {
   const regex = /```suggestion_detected\n([\s\S]*?)\n```/
   const match = content.match(regex)
 
@@ -49,7 +49,7 @@ function parseSuggestionFromContent(content: string): { cleanContent: string; su
   return { cleanContent: content, suggestion: null }
 }
 
-function parseFollowUpActions(content: string): { cleanContent: string; actions: FollowUpAction[] } {
+export function parseFollowUpActions(content: string): { cleanContent: string; actions: FollowUpAction[] } {
   const regex = /```follow_up_actions\n([\s\S]*?)\n```/
   const match = content.match(regex)
 

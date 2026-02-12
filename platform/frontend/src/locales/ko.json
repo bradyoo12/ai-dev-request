@@ -2506,5 +2506,12 @@
   "usageDashboard.empty": "아직 사용 데이터가 없습니다. AI 컴퓨팅, 빌드 시간, 테스트 실행, 프리뷰 배포를 사용하면 여기에 표시됩니다.",
   "usageDashboard.error.loadFailed": "사용량 데이터를 불러오지 못했습니다",
   "usageDashboard.error.projectFailed": "프로젝트 비용을 불러오지 못했습니다",
-  "api.error.usageSummaryFailed": "사용량 요약을 불러오지 못했습니다"
+  "api.error.usageSummaryFailed": "사용량 요약을 불러오지 못했습니다",
+  "aiModel.selectProvider": "AI 제공자",
+  "aiModel.providers.claude": "Claude",
+  "aiModel.providers.gemini": "Gemini",
+  "aiModel.gemini.safetySettings": "안전 설정",
+  "aiModel.gemini.temperature": "온도",
+  "aiModel.configure.geminiSettings": "Gemini 설정",
+  "api.error.aiModelProvidersLoad": "AI 제공자를 불러오지 못했습니다"
 }

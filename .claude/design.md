@@ -98,6 +98,7 @@ User Request (natural language)
 | GenerationVariant | A/B variant of generated code with approach, metrics, rating, and selection status |
 | PerformanceProfile | Multi-dimensional performance profiling result with scores, suggestions, and optimization history |
 | DataSchema | NL-designed database schema with entities, relationships, validation, and multi-target code generation |
+| SupportPost | Customer support post with public read, auth write, admin reward credits |
 
 ## Spec-Driven Development Pipeline
 
@@ -1032,3 +1033,21 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Entity**: `BidirectionalGitSync` with Id (Guid), UserId, DevRequestId, ProjectName, RepoOwner, RepoName, DefaultBranch, AiBranch, SyncEnabled, AutoPushEnabled, AutoPullEnabled, WebhookEnabled, Status, TotalPushes, TotalPulls, TotalConflicts, ConflictsResolved, SyncHistoryJson, ConflictFilesJson, CreatedAt, UpdatedAt
 - **Frontend**: `BidirectionalGitSyncPage` in Settings with "Bidir Sync" tab — 3 sub-tabs (Sync with repo connection + push/pull + status, History with operation log, Stats with metric cards)
 - **Flow**: Connect repo → push generated code → pull user changes → resolve conflicts → monitor sync status and history
+
+### #358 — Support Board: Public Read + Auth Write + Admin Credits (PR #373)
+- **Backend**: `SupportController` with 5 endpoints for CRUD and admin reward/status management
+- **Endpoints**:
+  - `GET /api/support` — paginated list (public, supports category filter and sort)
+  - `GET /api/support/{id}` — single post detail (public)
+  - `POST /api/support` — create post (authenticated)
+  - `PATCH /api/support/{id}/reward` — set/modify reward credit (admin only)
+  - `PATCH /api/support/{id}/status` — update post status (admin only)
+- **Entity**: `SupportPost` with Id, UserId, Title, Content, Category (complaint/request/inquiry/other), Status (open/in_review/resolved/closed), RewardCredit, RewardedByUserId, RewardedAt, CreatedAt, UpdatedAt
+- **Frontend**: `SupportBoardPage` at `/support` — list with category filter, pagination, detail view with admin credit controls, write form for authenticated users
+- **Navigation**: Support link added to both public and authenticated nav in Layout header
+
+### #362 — Structured Output Helper for AI Responses (PR #371)
+- **Backend**: `StructuredOutputHelper` utility class centralizing JSON extraction and deserialization across 10 AI service files
+- **Methods**: `DeserializeResponse<T>`, `DeserializeListResponse<T>`, `ExtractJson` (handles markdown code fences, raw JSON, whitespace)
+- **Services updated**: AnalysisService, ProposalService, ProductionService, TestGenerationService, SelfHealingService, CompilerValidationService, CodeQualityReviewService, CodeReviewService, AccessibilityService, BuildVerificationService
+- **Impact**: Removed ~123 lines of duplicated JSON parsing code, replaced with one-liner helper calls

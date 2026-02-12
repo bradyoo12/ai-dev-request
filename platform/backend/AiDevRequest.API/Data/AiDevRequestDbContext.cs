@@ -120,6 +120,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<BidirectionalGitSync> BidirectionalGitSyncs => Set<BidirectionalGitSync>();
     public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
     public DbSet<CreditPackagePrice> CreditPackagePrices => Set<CreditPackagePrice>();
+    public DbSet<SupportPost> SupportPosts => Set<SupportPost>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1839,6 +1840,24 @@ public class AiDevRequestDbContext : DbContext
                 new CreditPackagePrice { Id = 15, TokenPackageId = 3, CurrencyCode = "EUR", Price = 22.99m },
                 new CreditPackagePrice { Id = 16, TokenPackageId = 4, CurrencyCode = "EUR", Price = 64.49m }
             );
+        });
+
+        modelBuilder.Entity<SupportPost>(entity =>
+        {
+            entity.ToTable("support_posts");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(10000);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.RewardCredit).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.RewardedByUserId).HasMaxLength(100);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

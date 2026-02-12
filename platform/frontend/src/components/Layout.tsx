@@ -50,6 +50,7 @@ export default function Layout() {
     <>
       <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
       <Link to="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.howItWorks')}</Link>
+      <Link to="/support" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.support')}</Link>
       <a href="mailto:support@aidevrequest.com" className={navLinkClass}>{t('header.contact')}</a>
     </>
   )
@@ -58,6 +59,7 @@ export default function Layout() {
     <>
       <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
       <Link to="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.howItWorks')}</Link>
+      <Link to="/support" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.support')}</Link>
       <a href="mailto:support@aidevrequest.com" className={navLinkClass}>{t('header.contact')}</a>
     </>
   )
@@ -79,6 +81,7 @@ export default function Layout() {
       <button onClick={() => navigateProtected('/project-health')} className={navLinkAccentClass} aria-current={currentPath === '/project-health' ? 'page' : undefined}>{t('header.projectHealth')}</button>
       <button onClick={() => navigateProtected('/teams')} className={navLinkAccentClass} aria-current={currentPath === '/teams' ? 'page' : undefined}>{t('header.teams')}</button>
       <button onClick={() => navigateProtected('/whitelabel')} className={navLinkAccentClass} aria-current={currentPath === '/whitelabel' ? 'page' : undefined}>{t('header.whitelabel')}</button>
+      <Link to="/support" onClick={() => { setMobileMenuOpen(false); setMoreMenuOpen(false) }} className={navLinkAccentClass} aria-current={currentPath === '/support' ? 'page' : undefined}>{t('header.support')}</Link>
       {authUser?.isAdmin && (
         <button onClick={() => navigateProtected('/admin/churn')} className={navLinkAccentClass} aria-current={currentPath === '/admin/churn' ? 'page' : undefined}>{t('header.adminChurn')}</button>
       )}

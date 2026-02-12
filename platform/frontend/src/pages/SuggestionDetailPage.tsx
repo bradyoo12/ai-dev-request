@@ -77,8 +77,8 @@ export default function SuggestionDetailPage() {
       case 'implemented': return 'bg-green-600'
       case 'resolved': return 'bg-green-600'
       case 'on_hold': return 'bg-orange-600'
-      case 'closed': return 'bg-gray-600'
-      default: return 'bg-gray-600'
+      case 'closed': return 'bg-warm-600'
+      default: return 'bg-warm-600'
     }
   }
 
@@ -97,7 +97,7 @@ export default function SuggestionDetailPage() {
       <section>
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-gray-400">{t('suggestions.loading')}</p>
+          <p className="text-warm-400">{t('suggestions.loading')}</p>
         </div>
       </section>
     )
@@ -106,7 +106,7 @@ export default function SuggestionDetailPage() {
   if (!suggestion) {
     return (
       <section>
-        <p className="text-gray-400 text-center py-12">{t('api.error.notFound')}</p>
+        <p className="text-warm-400 text-center py-12">{t('api.error.notFound')}</p>
       </section>
     )
   }
@@ -116,7 +116,7 @@ export default function SuggestionDetailPage() {
   return (
     <section>
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/suggestions')} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate('/suggestions')} className="text-warm-400 hover:text-white transition-colors">
           &larr;
         </button>
         <h2 className="text-2xl font-bold">
@@ -128,22 +128,22 @@ export default function SuggestionDetailPage() {
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Description */}
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(suggestion.status)}`}>
                 {getStatusLabel(suggestion.status)}
               </span>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-warm-500">
                 #{suggestion.id} &middot; {new Date(suggestion.createdAt).toLocaleDateString()}
               </span>
             </div>
-            <p className="text-gray-300 whitespace-pre-wrap">{suggestion.description}</p>
+            <p className="text-warm-300 whitespace-pre-wrap">{suggestion.description}</p>
 
-            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-700">
+            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-warm-700">
               <button
                 onClick={handleVote}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
-                  suggestion.userVoted ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                  suggestion.userVoted ? 'bg-blue-600 text-white' : 'bg-warm-700 hover:bg-warm-600 text-warm-300'
                 }`}
               >
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3L3 13h14L10 3z" /></svg>
@@ -156,21 +156,21 @@ export default function SuggestionDetailPage() {
           </div>
 
           {/* Comments */}
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <h3 className="font-bold mb-4">{t('feedback.comments')} ({comments.length})</h3>
             {comments.length === 0 ? (
-              <p className="text-gray-500 text-sm">{t('feedback.noComments')}</p>
+              <p className="text-warm-500 text-sm">{t('feedback.noComments')}</p>
             ) : (
               <div className="space-y-4">
                 {comments.map(c => (
-                  <div key={c.id} className={`rounded-lg p-4 ${c.isAdminReply ? 'bg-blue-900/30 border border-blue-800' : 'bg-gray-900'}`}>
+                  <div key={c.id} className={`rounded-lg p-4 ${c.isAdminReply ? 'bg-blue-900/30 border border-blue-800' : 'bg-warm-900'}`}>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-sm font-medium ${c.isAdminReply ? 'text-blue-400' : 'text-gray-400'}`}>
+                      <span className={`text-sm font-medium ${c.isAdminReply ? 'text-blue-400' : 'text-warm-400'}`}>
                         {c.isAdminReply ? t('feedback.admin') : t('feedback.user')}
                       </span>
-                      <span className="text-xs text-gray-600">{new Date(c.createdAt).toLocaleString()}</span>
+                      <span className="text-xs text-warm-600">{new Date(c.createdAt).toLocaleString()}</span>
                     </div>
-                    <p className="text-gray-300 text-sm whitespace-pre-wrap">{c.content}</p>
+                    <p className="text-warm-300 text-sm whitespace-pre-wrap">{c.content}</p>
                   </div>
                 ))}
               </div>
@@ -183,12 +183,12 @@ export default function SuggestionDetailPage() {
                 onChange={e => setNewComment(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSendComment()}
                 placeholder={t('feedback.commentPlaceholder')}
-                className="flex-1 p-2.5 bg-gray-900 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 p-2.5 bg-warm-900 border border-warm-700 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button
                 onClick={handleSendComment}
                 disabled={!newComment.trim() || sending}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 rounded-lg text-sm font-medium transition-colors"
               >
                 {t('feedback.send')}
               </button>
@@ -198,7 +198,7 @@ export default function SuggestionDetailPage() {
 
         {/* Sidebar - Status Timeline */}
         <div className="space-y-6">
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <h3 className="font-bold mb-4">{t('feedback.timeline')}</h3>
             <div className="space-y-4">
               {statusFlow.map((status, i) => {
@@ -209,26 +209,26 @@ export default function SuggestionDetailPage() {
                   <div key={status} className="flex gap-3">
                     <div className="flex flex-col items-center">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                        isCompleted ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-500'
+                        isCompleted ? 'bg-green-600 text-white' : 'bg-warm-700 text-warm-500'
                       } ${isCurrent ? 'ring-2 ring-green-400' : ''}`}>
                         {isCompleted ? '✓' : i + 1}
                       </div>
                       {i < statusFlow.length - 1 && (
-                        <div className={`w-0.5 h-8 ${isCompleted ? 'bg-green-600' : 'bg-gray-700'}`} />
+                        <div className={`w-0.5 h-8 ${isCompleted ? 'bg-green-600' : 'bg-warm-700'}`} />
                       )}
                     </div>
                     <div>
-                      <div className={`text-sm font-medium ${isCompleted ? 'text-white' : 'text-gray-500'}`}>
+                      <div className={`text-sm font-medium ${isCompleted ? 'text-white' : 'text-warm-500'}`}>
                         {getStatusLabel(status)}
                       </div>
                       {historyEntry && (
-                        <div className="text-xs text-gray-500 mt-0.5">
+                        <div className="text-xs text-warm-500 mt-0.5">
                           {new Date(historyEntry.createdAt).toLocaleString()}
-                          {historyEntry.note && <span className="block text-gray-600 mt-0.5">{historyEntry.note}</span>}
+                          {historyEntry.note && <span className="block text-warm-600 mt-0.5">{historyEntry.note}</span>}
                         </div>
                       )}
                       {status === 'pending' && !historyEntry && (
-                        <div className="text-xs text-gray-500 mt-0.5">
+                        <div className="text-xs text-warm-500 mt-0.5">
                           {new Date(suggestion.createdAt).toLocaleString()}
                         </div>
                       )}
@@ -240,19 +240,19 @@ export default function SuggestionDetailPage() {
           </div>
 
           {/* Info card */}
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <h3 className="font-bold mb-3">{t('feedback.info')}</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">{t('feedback.category')}</span>
+                <span className="text-warm-400">{t('feedback.category')}</span>
                 <span>{getCategoryIcon(suggestion.category)} {t(`suggestions.category.${suggestion.category === 'feature_request' ? 'featureRequest' : suggestion.category === 'bug_report' ? 'bugReport' : suggestion.category}`)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">{t('feedback.submitted')}</span>
+                <span className="text-warm-400">{t('feedback.submitted')}</span>
                 <span>{new Date(suggestion.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">{t('feedback.lastUpdated')}</span>
+                <span className="text-warm-400">{t('feedback.lastUpdated')}</span>
                 <span>{new Date(suggestion.updatedAt).toLocaleDateString()}</span>
               </div>
             </div>

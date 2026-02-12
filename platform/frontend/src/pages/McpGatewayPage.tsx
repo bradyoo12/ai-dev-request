@@ -65,7 +65,7 @@ export default function McpGatewayPage() {
   const statusColor = (status: string) => {
     if (status === 'connected') return 'bg-green-900/30 text-green-400'
     if (status === 'error') return 'bg-red-900/30 text-red-400'
-    return 'bg-gray-900/30 text-gray-400'
+    return 'bg-warm-900/30 text-warm-400'
   }
 
   const categoryColor = (cat: string) => {
@@ -75,7 +75,7 @@ export default function McpGatewayPage() {
       design: 'bg-pink-900/30 text-pink-400',
       devops: 'bg-yellow-900/30 text-yellow-400',
       ai: 'bg-cyan-900/30 text-cyan-400',
-      custom: 'bg-gray-900/30 text-gray-400',
+      custom: 'bg-warm-900/30 text-warm-400',
     }
     return map[cat] || map.custom
   }
@@ -83,7 +83,7 @@ export default function McpGatewayPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('mcpGateway.title', 'MCP Gateway')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('mcpGateway.subtitle', 'Orchestrate multiple MCP servers for rich AI-powered code generation')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('mcpGateway.subtitle', 'Orchestrate multiple MCP servers for rich AI-powered code generation')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['servers', 'catalog', 'stats'] as Tab[]).map((t2) => (
@@ -91,7 +91,7 @@ export default function McpGatewayPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`mcpGateway.tabs.${t2}`, t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -101,7 +101,7 @@ export default function McpGatewayPage() {
 
       {tab === 'servers' && (
         <div className="space-y-6">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 space-y-4">
+          <div className="bg-warm-900 border border-warm-700 rounded-lg p-4 space-y-4">
             <h4 className="font-medium">{t('mcpGateway.addServer', 'Add MCP Server')}</h4>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
@@ -110,7 +110,7 @@ export default function McpGatewayPage() {
                   value={serverName}
                   onChange={(e) => setServerName(e.target.value)}
                   placeholder="My MCP Server"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -119,7 +119,7 @@ export default function McpGatewayPage() {
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
                   placeholder="npx @modelcontextprotocol/server-github"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -127,7 +127,7 @@ export default function McpGatewayPage() {
                 <select
                   value={transport}
                   onChange={(e) => setTransport(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
                 >
                   <option value="stdio">stdio</option>
                   <option value="sse">SSE (Server-Sent Events)</option>
@@ -139,7 +139,7 @@ export default function McpGatewayPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
                 >
                   <option value="custom">Custom</option>
                   <option value="database">Database</option>
@@ -156,7 +156,7 @@ export default function McpGatewayPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional description"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
               />
             </div>
             <button
@@ -169,11 +169,11 @@ export default function McpGatewayPage() {
           </div>
 
           {servers.length === 0 && (
-            <div className="text-center py-12 text-gray-500 text-sm">{t('mcpGateway.noServers', 'No MCP servers configured. Add one above or browse the catalog!')}</div>
+            <div className="text-center py-12 text-warm-500 text-sm">{t('mcpGateway.noServers', 'No MCP servers configured. Add one above or browse the catalog!')}</div>
           )}
 
           {servers.map((s) => (
-            <div key={s.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-3">
+            <div key={s.id} className="bg-warm-800 border border-warm-700 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h4 className="font-medium">{s.serverName}</h4>
@@ -183,30 +183,30 @@ export default function McpGatewayPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleHealthCheck(s.id)}
-                    className="text-xs px-3 py-1 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition-colors"
+                    className="text-xs px-3 py-1 bg-warm-700 text-warm-300 rounded hover:bg-warm-600 transition-colors"
                   >
                     {t('mcpGateway.healthCheck', 'Health Check')}
                   </button>
                 </div>
               </div>
-              {s.description && <p className="text-xs text-gray-400">{s.description}</p>}
-              <div className="text-xs text-gray-500">{s.serverUrl}</div>
+              {s.description && <p className="text-xs text-warm-400">{s.description}</p>}
+              <div className="text-xs text-warm-500">{s.serverUrl}</div>
               <div className="grid grid-cols-4 gap-3">
-                <div className="bg-gray-900 border border-gray-700 rounded p-2 text-center">
+                <div className="bg-warm-900 border border-warm-700 rounded p-2 text-center">
                   <div className="text-sm font-bold">{s.toolCount}</div>
-                  <div className="text-xs text-gray-400">{t('mcpGateway.tools', 'Tools')}</div>
+                  <div className="text-xs text-warm-400">{t('mcpGateway.tools', 'Tools')}</div>
                 </div>
-                <div className="bg-gray-900 border border-gray-700 rounded p-2 text-center">
+                <div className="bg-warm-900 border border-warm-700 rounded p-2 text-center">
                   <div className="text-sm font-bold">{s.totalExecutions}</div>
-                  <div className="text-xs text-gray-400">{t('mcpGateway.executions', 'Executions')}</div>
+                  <div className="text-xs text-warm-400">{t('mcpGateway.executions', 'Executions')}</div>
                 </div>
-                <div className="bg-gray-900 border border-gray-700 rounded p-2 text-center">
+                <div className="bg-warm-900 border border-warm-700 rounded p-2 text-center">
                   <div className="text-sm font-bold">{s.avgLatencyMs}ms</div>
-                  <div className="text-xs text-gray-400">{t('mcpGateway.latency', 'Latency')}</div>
+                  <div className="text-xs text-warm-400">{t('mcpGateway.latency', 'Latency')}</div>
                 </div>
-                <div className="bg-gray-900 border border-gray-700 rounded p-2 text-center">
+                <div className="bg-warm-900 border border-warm-700 rounded p-2 text-center">
                   <div className="text-sm font-bold text-green-400">{s.successfulExecutions}</div>
-                  <div className="text-xs text-gray-400">{t('mcpGateway.success', 'Success')}</div>
+                  <div className="text-xs text-warm-400">{t('mcpGateway.success', 'Success')}</div>
                 </div>
               </div>
               {s.toolCount > 0 && (
@@ -215,7 +215,7 @@ export default function McpGatewayPage() {
                     <button
                       key={i}
                       onClick={() => handleExecute(s.id, tool.name)}
-                      className="text-xs px-2 py-1 bg-gray-700 text-gray-300 rounded hover:bg-blue-600 hover:text-white transition-colors"
+                      className="text-xs px-2 py-1 bg-warm-700 text-warm-300 rounded hover:bg-blue-600 hover:text-white transition-colors"
                       title={tool.desc}
                     >
                       {tool.name}
@@ -234,8 +234,8 @@ export default function McpGatewayPage() {
                   {execResult.success ? t('mcpGateway.execSuccess', 'Success') : t('mcpGateway.execFailed', 'Failed')}
                 </span>
               </div>
-              <div className="text-sm text-gray-300">{execResult.result}</div>
-              <div className="text-xs text-gray-500 mt-1">{execResult.latencyMs}ms</div>
+              <div className="text-sm text-warm-300">{execResult.result}</div>
+              <div className="text-xs text-warm-500 mt-1">{execResult.latencyMs}ms</div>
             </div>
           )}
         </div>
@@ -244,16 +244,16 @@ export default function McpGatewayPage() {
       {tab === 'catalog' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {catalog.map((entry) => (
-            <div key={entry.name} className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-3">
+            <div key={entry.name} className="bg-warm-800 border border-warm-700 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h4 className="font-medium">{entry.name}</h4>
                   <span className={`text-xs px-2 py-0.5 rounded ${categoryColor(entry.category)}`}>{entry.category}</span>
                 </div>
-                <span className="text-xs text-gray-500">{entry.toolCount} {t('mcpGateway.tools', 'tools')}</span>
+                <span className="text-xs text-warm-500">{entry.toolCount} {t('mcpGateway.tools', 'tools')}</span>
               </div>
-              <p className="text-sm text-gray-400">{entry.description}</p>
-              <div className="text-xs text-gray-500 font-mono">{entry.serverUrl}</div>
+              <p className="text-sm text-warm-400">{entry.description}</p>
+              <div className="text-xs text-warm-500 font-mono">{entry.serverUrl}</div>
               <button
                 onClick={() => handleInstallCatalog(entry)}
                 disabled={adding}
@@ -269,29 +269,29 @@ export default function McpGatewayPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalServers}</div>
-              <div className="text-sm text-gray-400">{t('mcpGateway.stats.servers', 'Total Servers')}</div>
+              <div className="text-sm text-warm-400">{t('mcpGateway.stats.servers', 'Total Servers')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.connectedServers}</div>
-              <div className="text-sm text-gray-400">{t('mcpGateway.stats.connected', 'Connected')}</div>
+              <div className="text-sm text-warm-400">{t('mcpGateway.stats.connected', 'Connected')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalTools}</div>
-              <div className="text-sm text-gray-400">{t('mcpGateway.stats.tools', 'Total Tools')}</div>
+              <div className="text-sm text-warm-400">{t('mcpGateway.stats.tools', 'Total Tools')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalExecutions}</div>
-              <div className="text-sm text-gray-400">{t('mcpGateway.stats.executions', 'Executions')}</div>
+              <div className="text-sm text-warm-400">{t('mcpGateway.stats.executions', 'Executions')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.successRate}%</div>
-              <div className="text-sm text-gray-400">{t('mcpGateway.stats.successRate', 'Success Rate')}</div>
+              <div className="text-sm text-warm-400">{t('mcpGateway.stats.successRate', 'Success Rate')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.avgLatency}ms</div>
-              <div className="text-sm text-gray-400">{t('mcpGateway.stats.avgLatency', 'Avg Latency')}</div>
+              <div className="text-sm text-warm-400">{t('mcpGateway.stats.avgLatency', 'Avg Latency')}</div>
             </div>
           </div>
           {stats.recentServers.length > 0 && (
@@ -299,14 +299,14 @@ export default function McpGatewayPage() {
               <h4 className="font-medium mb-3">{t('mcpGateway.stats.recent', 'Recent Servers')}</h4>
               <div className="space-y-2">
                 {stats.recentServers.map((s, i) => (
-                  <div key={i} className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+                  <div key={i} className="bg-warm-800 border border-warm-700 rounded-lg p-3 flex items-center justify-between">
                     <div>
                       <span className="font-medium text-sm">{s.serverName}</span>
-                      <span className="text-xs text-gray-400 ml-2">{s.toolCount} tools</span>
+                      <span className="text-xs text-warm-400 ml-2">{s.toolCount} tools</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400">{s.totalExecutions} exec</span>
-                      <span className="text-xs text-gray-400">{s.avgLatencyMs}ms</span>
+                      <span className="text-xs text-warm-400">{s.totalExecutions} exec</span>
+                      <span className="text-xs text-warm-400">{s.avgLatencyMs}ms</span>
                       <span className={`text-xs px-2 py-0.5 rounded ${statusColor(s.status)}`}>{s.status}</span>
                     </div>
                   </div>

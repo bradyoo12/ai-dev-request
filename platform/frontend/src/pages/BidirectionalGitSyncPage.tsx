@@ -19,7 +19,7 @@ const STATUS_COLORS: Record<string, string> = {
   ahead: 'bg-blue-900 text-blue-300 border-blue-700',
   behind: 'bg-yellow-900 text-yellow-300 border-yellow-700',
   diverged: 'bg-red-900 text-red-300 border-red-700',
-  disconnected: 'bg-gray-700 text-gray-400 border-gray-600',
+  disconnected: 'bg-warm-700 text-warm-400 border-warm-600',
 }
 
 const OP_COLORS: Record<string, string> = {
@@ -157,14 +157,14 @@ export default function BidirectionalGitSyncPage() {
   }
 
   if (loading && !config) {
-    return <div className="text-center py-12 text-gray-400">{t('bidirSync.loading', 'Loading sync settings...')}</div>
+    return <div className="text-center py-12 text-warm-400">{t('bidirSync.loading', 'Loading sync settings...')}</div>
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-white">{t('bidirSync.title', 'Bidirectional Git Sync')}</h3>
-        <p className="text-sm text-gray-400 mt-1">{t('bidirSync.description', 'Two-way synchronization between generated projects and GitHub repositories')}</p>
+        <p className="text-sm text-warm-400 mt-1">{t('bidirSync.description', 'Two-way synchronization between generated projects and GitHub repositories')}</p>
       </div>
 
       {error && (
@@ -175,11 +175,11 @@ export default function BidirectionalGitSyncPage() {
       )}
 
       {/* Sub-tabs */}
-      <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+      <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
         <button
           onClick={() => setSubTab('sync')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            subTab === 'sync' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            subTab === 'sync' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('bidirSync.tabs.sync', 'Sync')}
@@ -187,7 +187,7 @@ export default function BidirectionalGitSyncPage() {
         <button
           onClick={() => setSubTab('history')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            subTab === 'history' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            subTab === 'history' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('bidirSync.tabs.history', 'History')}
@@ -195,7 +195,7 @@ export default function BidirectionalGitSyncPage() {
         <button
           onClick={() => setSubTab('stats')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            subTab === 'stats' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+            subTab === 'stats' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
           }`}
         >
           {t('bidirSync.tabs.stats', 'Stats')}
@@ -206,20 +206,20 @@ export default function BidirectionalGitSyncPage() {
       {subTab === 'sync' && (
         <div className="space-y-6">
           {/* Project ID Input */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="bg-warm-800 rounded-lg p-6">
             <h4 className="font-medium text-white mb-4">{t('bidirSync.projectSelection', 'Project Selection')}</h4>
             <div className="flex items-center gap-3">
-              <label className="text-sm text-gray-300">{t('bidirSync.projectId', 'Project ID')}</label>
+              <label className="text-sm text-warm-300">{t('bidirSync.projectId', 'Project ID')}</label>
               <input
                 type="number"
                 min={1}
                 value={projectId}
                 onChange={(e) => setProjectId(parseInt(e.target.value) || 1)}
-                className="bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-sm text-white w-24"
+                className="bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white w-24"
               />
               <button
                 onClick={loadConfig}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-sm text-white transition-colors"
+                className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded text-sm text-white transition-colors"
               >
                 {t('bidirSync.load', 'Load')}
               </button>
@@ -227,28 +227,28 @@ export default function BidirectionalGitSyncPage() {
           </div>
 
           {/* Repository Connection */}
-          <div className="bg-gray-800 rounded-lg p-6">
+          <div className="bg-warm-800 rounded-lg p-6">
             <h4 className="font-medium text-white mb-4">{t('bidirSync.repoConnection', 'Repository Connection')}</h4>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-300 mb-1">{t('bidirSync.repoOwner', 'Repository Owner')}</label>
+                  <label className="block text-sm text-warm-300 mb-1">{t('bidirSync.repoOwner', 'Repository Owner')}</label>
                   <input
                     type="text"
                     value={repoOwner}
                     onChange={(e) => setRepoOwner(e.target.value)}
                     placeholder="owner"
-                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500"
+                    className="w-full bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white placeholder-warm-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-300 mb-1">{t('bidirSync.repoName', 'Repository Name')}</label>
+                  <label className="block text-sm text-warm-300 mb-1">{t('bidirSync.repoName', 'Repository Name')}</label>
                   <input
                     type="text"
                     value={repoName}
                     onChange={(e) => setRepoName(e.target.value)}
                     placeholder="repo-name"
-                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500"
+                    className="w-full bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white placeholder-warm-500"
                   />
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function BidirectionalGitSyncPage() {
 
           {/* Status Badge + Ahead/Behind */}
           {config && config.status !== 'disconnected' && (
-            <div className="bg-gray-800 rounded-lg p-6">
+            <div className="bg-warm-800 rounded-lg p-6">
               <h4 className="font-medium text-white mb-4">{t('bidirSync.syncStatus', 'Sync Status')}</h4>
               <div className="flex items-center gap-4 mb-4">
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${STATUS_COLORS[config.status] || STATUS_COLORS.disconnected}`}>
@@ -282,7 +282,7 @@ export default function BidirectionalGitSyncPage() {
                   </span>
                 )}
                 {config.lastSyncAt && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-warm-500">
                     Last sync: {new Date(config.lastSyncAt).toLocaleString()}
                   </span>
                 )}
@@ -339,7 +339,7 @@ export default function BidirectionalGitSyncPage() {
 
           {/* Toggle settings */}
           {config && config.status !== 'disconnected' && (
-            <div className="bg-gray-800 rounded-lg p-6">
+            <div className="bg-warm-800 rounded-lg p-6">
               <h4 className="font-medium text-white mb-4">{t('bidirSync.settings', 'Sync Settings')}</h4>
               <div className="space-y-4">
                 {([
@@ -350,13 +350,13 @@ export default function BidirectionalGitSyncPage() {
                 ]).map(({ field, label, desc }) => (
                   <div key={field} className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm text-gray-300">{label}</label>
-                      <p className="text-xs text-gray-500">{desc}</p>
+                      <label className="text-sm text-warm-300">{label}</label>
+                      <p className="text-xs text-warm-500">{desc}</p>
                     </div>
                     <button
                       onClick={() => handleToggle(field)}
                       className={`relative w-11 h-6 rounded-full transition-colors ${
-                        config[field] ? 'bg-green-500' : 'bg-gray-600'
+                        config[field] ? 'bg-green-500' : 'bg-warm-600'
                       }`}
                     >
                       <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
@@ -374,27 +374,27 @@ export default function BidirectionalGitSyncPage() {
       {/* History Tab */}
       {subTab === 'history' && (
         <div className="space-y-4">
-          <p className="text-sm text-gray-400">{t('bidirSync.historyDescription', 'Sync operation history for the selected project')}</p>
+          <p className="text-sm text-warm-400">{t('bidirSync.historyDescription', 'Sync operation history for the selected project')}</p>
           {loading ? (
-            <div className="text-center py-8 text-gray-400">{t('bidirSync.loadingHistory', 'Loading history...')}</div>
+            <div className="text-center py-8 text-warm-400">{t('bidirSync.loadingHistory', 'Loading history...')}</div>
           ) : history.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t('bidirSync.noHistory', 'No sync operations yet')}</div>
+            <div className="text-center py-8 text-warm-500">{t('bidirSync.noHistory', 'No sync operations yet')}</div>
           ) : (
             <div className="space-y-2">
               {history.map((entry, i) => (
-                <div key={i} className="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
+                <div key={i} className="bg-warm-800 rounded-lg p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${OP_COLORS[entry.operation] || 'bg-gray-700 text-gray-300'}`}>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${OP_COLORS[entry.operation] || 'bg-warm-700 text-warm-300'}`}>
                       {entry.operation.toUpperCase()}
                     </span>
-                    <span className="text-sm text-gray-300 font-mono">{entry.commitSha}</span>
-                    <span className="text-sm text-gray-400">{entry.files} file(s)</span>
+                    <span className="text-sm text-warm-300 font-mono">{entry.commitSha}</span>
+                    <span className="text-sm text-warm-400">{entry.files} file(s)</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-sm font-medium ${HISTORY_STATUS_COLORS[entry.status] || 'text-gray-400'}`}>
+                    <span className={`text-sm font-medium ${HISTORY_STATUS_COLORS[entry.status] || 'text-warm-400'}`}>
                       {entry.status}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-warm-500">
                       {new Date(entry.timestamp).toLocaleString()}
                     </span>
                   </div>
@@ -409,53 +409,53 @@ export default function BidirectionalGitSyncPage() {
       {subTab === 'stats' && (
         <div className="space-y-6">
           {loading ? (
-            <div className="text-center py-8 text-gray-400">{t('bidirSync.loadingStats', 'Loading stats...')}</div>
+            <div className="text-center py-8 text-warm-400">{t('bidirSync.loadingStats', 'Loading stats...')}</div>
           ) : stats ? (
             <>
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-800 rounded-lg p-4">
+                <div className="bg-warm-800 rounded-lg p-4">
                   <div className="text-2xl font-bold text-white">{stats.totalSyncs}</div>
-                  <div className="text-sm text-gray-400">{t('bidirSync.stats.totalSyncs', 'Total Syncs')}</div>
+                  <div className="text-sm text-warm-400">{t('bidirSync.stats.totalSyncs', 'Total Syncs')}</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
+                <div className="bg-warm-800 rounded-lg p-4">
                   <div className="text-2xl font-bold text-blue-400">{stats.totalPushes}</div>
-                  <div className="text-sm text-gray-400">{t('bidirSync.stats.totalPushes', 'Total Pushes')}</div>
+                  <div className="text-sm text-warm-400">{t('bidirSync.stats.totalPushes', 'Total Pushes')}</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
+                <div className="bg-warm-800 rounded-lg p-4">
                   <div className="text-2xl font-bold text-purple-400">{stats.totalPulls}</div>
-                  <div className="text-sm text-gray-400">{t('bidirSync.stats.totalPulls', 'Total Pulls')}</div>
+                  <div className="text-sm text-warm-400">{t('bidirSync.stats.totalPulls', 'Total Pulls')}</div>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-800 rounded-lg p-4">
+                <div className="bg-warm-800 rounded-lg p-4">
                   <div className="text-2xl font-bold text-red-400">{stats.totalConflicts}</div>
-                  <div className="text-sm text-gray-400">{t('bidirSync.stats.totalConflicts', 'Conflicts')}</div>
+                  <div className="text-sm text-warm-400">{t('bidirSync.stats.totalConflicts', 'Conflicts')}</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
+                <div className="bg-warm-800 rounded-lg p-4">
                   <div className="text-2xl font-bold text-green-400">{stats.conflictsResolved}</div>
-                  <div className="text-sm text-gray-400">{t('bidirSync.stats.conflictsResolved', 'Resolved')}</div>
+                  <div className="text-sm text-warm-400">{t('bidirSync.stats.conflictsResolved', 'Resolved')}</div>
                 </div>
-                <div className="bg-gray-800 rounded-lg p-4">
+                <div className="bg-warm-800 rounded-lg p-4">
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${STATUS_COLORS[stats.status] || STATUS_COLORS.disconnected}`}>
                       {stats.status.toUpperCase()}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-400 mt-2">{t('bidirSync.stats.overallStatus', 'Overall Status')}</div>
+                  <div className="text-sm text-warm-400 mt-2">{t('bidirSync.stats.overallStatus', 'Overall Status')}</div>
                 </div>
               </div>
 
               {/* Sync Distribution */}
               {stats.totalSyncs > 0 && (
-                <div className="bg-gray-800 rounded-lg p-6">
+                <div className="bg-warm-800 rounded-lg p-6">
                   <h4 className="font-medium text-white mb-4">{t('bidirSync.stats.distribution', 'Sync Distribution')}</h4>
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="text-blue-400">Pushes</span>
-                        <span className="text-gray-400">{stats.totalSyncs > 0 ? Math.round((stats.totalPushes / stats.totalSyncs) * 100) : 0}%</span>
+                        <span className="text-warm-400">{stats.totalSyncs > 0 ? Math.round((stats.totalPushes / stats.totalSyncs) * 100) : 0}%</span>
                       </div>
-                      <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-2 bg-warm-700 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-blue-500 rounded-full transition-all"
                           style={{ width: `${stats.totalSyncs > 0 ? (stats.totalPushes / stats.totalSyncs) * 100 : 0}%` }}
@@ -465,9 +465,9 @@ export default function BidirectionalGitSyncPage() {
                     <div>
                       <div className="flex justify-between text-sm mb-1">
                         <span className="text-purple-400">Pulls</span>
-                        <span className="text-gray-400">{stats.totalSyncs > 0 ? Math.round((stats.totalPulls / stats.totalSyncs) * 100) : 0}%</span>
+                        <span className="text-warm-400">{stats.totalSyncs > 0 ? Math.round((stats.totalPulls / stats.totalSyncs) * 100) : 0}%</span>
                       </div>
-                      <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div className="h-2 bg-warm-700 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-purple-500 rounded-full transition-all"
                           style={{ width: `${stats.totalSyncs > 0 ? (stats.totalPulls / stats.totalSyncs) * 100 : 0}%` }}
@@ -479,7 +479,7 @@ export default function BidirectionalGitSyncPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-8 text-gray-500">{t('bidirSync.noStats', 'No stats available')}</div>
+            <div className="text-center py-8 text-warm-500">{t('bidirSync.noStats', 'No stats available')}</div>
           )}
         </div>
       )}

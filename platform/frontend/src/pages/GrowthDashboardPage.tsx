@@ -39,7 +39,7 @@ export default function GrowthDashboardPage() {
   }, [loadData])
 
   const getGrowthIndicator = (value: number) => {
-    if (value === 0) return <span className="text-gray-400 text-sm">-</span>
+    if (value === 0) return <span className="text-warm-400 text-sm">-</span>
     const isPositive = value > 0
     return (
       <span className={`text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
@@ -56,12 +56,12 @@ export default function GrowthDashboardPage() {
     return (
       <section>
         <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">&larr;</button>
+          <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">&larr;</button>
           <h2 className="text-2xl font-bold">{t('growth.title')}</h2>
         </div>
         <div className="text-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-400">{t('growth.loading', 'Loading...')}</p>
+          <p className="text-warm-400">{t('growth.loading', 'Loading...')}</p>
         </div>
       </section>
     )
@@ -71,17 +71,17 @@ export default function GrowthDashboardPage() {
     <section>
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">&larr;</button>
+        <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">&larr;</button>
         <h2 className="text-2xl font-bold">{t('growth.title')}</h2>
       </div>
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-gray-400 text-sm">{t('growth.description', 'Track visitor, trial, and paid user growth metrics.')}</p>
+          <p className="text-warm-400 text-sm">{t('growth.description', 'Track visitor, trial, and paid user growth metrics.')}</p>
         </div>
         <button
           onClick={() => exportGrowthCsv()}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+          className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
         >
           {t('growth.export')}
         </button>
@@ -96,20 +96,20 @@ export default function GrowthDashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.visitors')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.visitors')}</div>
           <div className="text-2xl font-bold">{overview?.totalVisitors.toLocaleString() ?? 0}</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.trialUsers')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.trialUsers')}</div>
           <div className="text-2xl font-bold">{overview?.totalTrialUsers.toLocaleString() ?? 0}</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.paidUsers')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.paidUsers')}</div>
           <div className="text-2xl font-bold">{overview?.totalPaidUsers.toLocaleString() ?? 0}</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.growthRate')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.growthRate')}</div>
           <div className="text-2xl font-bold">{overview?.monthlyGrowthRate ?? 0}%</div>
           {overview && getGrowthIndicator(overview.monthlyGrowthRate)}
         </div>
@@ -117,28 +117,28 @@ export default function GrowthDashboardPage() {
 
       {/* Secondary KPI Row */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.registered')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.registered')}</div>
           <div className="text-xl font-bold">{overview?.totalRegistered.toLocaleString() ?? 0}</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.conversionRate')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.conversionRate')}</div>
           <div className="text-xl font-bold">{overview?.conversionRate ?? 0}%</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('growth.churnRate')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('growth.churnRate')}</div>
           <div className="text-xl font-bold">{overview?.churnRate ?? 0}%</div>
         </div>
       </div>
 
       {/* Monthly Trends (Bar Chart) */}
       {trends.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6 mb-6">
+        <div className="bg-warm-800 rounded-xl p-6 mb-6">
           <h4 className="font-bold mb-4">{t('growth.trends')}</h4>
           <div className="space-y-3">
             {trends.map((trend) => (
               <div key={trend.month}>
-                <div className="flex items-center justify-between text-sm text-gray-400 mb-1">
+                <div className="flex items-center justify-between text-sm text-warm-400 mb-1">
                   <span>{trend.month}</span>
                   <span>
                     {t('growth.visitors')}: {trend.visitors.toLocaleString()} |{' '}
@@ -183,7 +183,7 @@ export default function GrowthDashboardPage() {
             ))}
           </div>
           {/* Legend */}
-          <div className="flex gap-4 mt-4 text-xs text-gray-400">
+          <div className="flex gap-4 mt-4 text-xs text-warm-400">
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 bg-blue-500 rounded-sm" />
               {t('growth.visitors')}
@@ -206,7 +206,7 @@ export default function GrowthDashboardPage() {
 
       {/* Conversion Funnel */}
       {funnel.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6">
+        <div className="bg-warm-800 rounded-xl p-6">
           <h4 className="font-bold mb-4">{t('growth.funnel')}</h4>
           <div className="space-y-4">
             {funnel.map((step, index) => {
@@ -216,11 +216,11 @@ export default function GrowthDashboardPage() {
                 <div key={step.stage}>
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="font-medium">{step.stage}</span>
-                    <span className="text-gray-400">
+                    <span className="text-warm-400">
                       {step.count.toLocaleString()} ({step.percentage}%)
                     </span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
+                  <div className="w-full bg-warm-700 rounded-full h-6 overflow-hidden">
                     <div
                       className={`${color} h-full rounded-full transition-all flex items-center justify-end pr-2`}
                       style={{ width: `${Math.max(step.percentage, 2)}%` }}
@@ -237,8 +237,8 @@ export default function GrowthDashboardPage() {
 
           {/* Conversion rates between stages */}
           {funnel.length >= 2 && (
-            <div className="mt-4 pt-4 border-t border-gray-700">
-              <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+            <div className="mt-4 pt-4 border-t border-warm-700">
+              <div className="flex flex-wrap gap-4 text-sm text-warm-400">
                 {funnel.slice(1).map((step, i) => {
                   const prevCount = funnel[i].count
                   const rate = prevCount > 0 ? ((step.count / prevCount) * 100).toFixed(1) : '0.0'
@@ -256,7 +256,7 @@ export default function GrowthDashboardPage() {
 
       {/* Empty state */}
       {!overview && trends.length === 0 && funnel.length === 0 && (
-        <div className="text-center py-12 text-gray-400">{t('growth.noData')}</div>
+        <div className="text-center py-12 text-warm-400">{t('growth.noData')}</div>
       )}
     </section>
   )

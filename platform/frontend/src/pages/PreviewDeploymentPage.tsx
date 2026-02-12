@@ -58,9 +58,9 @@ function getStatusColor(status: string): string {
     case 'Deployed': return 'text-green-400'
     case 'Deploying': return 'text-yellow-400'
     case 'Pending': return 'text-blue-400'
-    case 'Expired': return 'text-gray-400'
+    case 'Expired': return 'text-warm-400'
     case 'Failed': return 'text-red-400'
-    default: return 'text-gray-400'
+    default: return 'text-warm-400'
   }
 }
 
@@ -69,9 +69,9 @@ function getStatusBadge(status: string): string {
     case 'Deployed': return 'bg-green-900/40 border-green-700 text-green-300'
     case 'Deploying': return 'bg-yellow-900/40 border-yellow-700 text-yellow-300'
     case 'Pending': return 'bg-blue-900/40 border-blue-700 text-blue-300'
-    case 'Expired': return 'bg-gray-900/40 border-gray-700 text-gray-400'
+    case 'Expired': return 'bg-warm-900/40 border-warm-700 text-warm-400'
     case 'Failed': return 'bg-red-900/40 border-red-700 text-red-300'
-    default: return 'bg-gray-900/40 border-gray-700 text-gray-400'
+    default: return 'bg-warm-900/40 border-warm-700 text-warm-400'
   }
 }
 
@@ -177,7 +177,7 @@ export default function PreviewDeploymentPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('preview.title', 'Preview Deployments')}</h2>
-        <p className="text-gray-400">{t('preview.loginRequired', 'Please log in to deploy previews.')}</p>
+        <p className="text-warm-400">{t('preview.loginRequired', 'Please log in to deploy previews.')}</p>
       </div>
     )
   }
@@ -186,7 +186,7 @@ export default function PreviewDeploymentPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('preview.title', 'Preview Deployments')}</h2>
-        <p className="text-gray-400">{t('preview.noProject', 'No project selected. Go to your project to deploy a preview.')}</p>
+        <p className="text-warm-400">{t('preview.noProject', 'No project selected. Go to your project to deploy a preview.')}</p>
         <button
           onClick={() => navigate('/')}
           className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm transition-colors"
@@ -201,12 +201,12 @@ export default function PreviewDeploymentPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">
           &larr;
         </button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{t('preview.title', 'Preview Deployments')}</h2>
-          <p className="text-sm text-gray-400 mt-1">{t('preview.description', 'Deploy instant edge previews with sub-5-second URLs')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('preview.description', 'Deploy instant edge previews with sub-5-second URLs')}</p>
         </div>
       </div>
 
@@ -218,14 +218,14 @@ export default function PreviewDeploymentPage() {
       )}
 
       {loading && (
-        <div className="text-center py-8 text-gray-400">{t('preview.loading', 'Loading...')}</div>
+        <div className="text-center py-8 text-warm-400">{t('preview.loading', 'Loading...')}</div>
       )}
 
       {/* Deploy Button */}
       {(!currentPreview || currentPreview.status === 'Expired' || currentPreview.status === 'Failed') && (
-        <div className="bg-gray-800 rounded-xl p-6 text-center">
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
           <h3 className="text-lg font-bold mb-2">{t('preview.deployNew', 'Deploy Preview')}</h3>
-          <p className="text-sm text-gray-400 mb-4">
+          <p className="text-sm text-warm-400 mb-4">
             {t('preview.deployDescription', 'Generate an instant preview URL for your project. Preview expires after 24 hours.')}
           </p>
           <button
@@ -242,7 +242,7 @@ export default function PreviewDeploymentPage() {
 
       {/* Active Preview */}
       {currentPreview && currentPreview.status === 'Deployed' && (
-        <div className="bg-gray-800 rounded-xl p-6 space-y-4">
+        <div className="bg-warm-800 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold">{t('preview.activePreview', 'Active Preview')}</h3>
             <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusBadge(currentPreview.status)}`}>
@@ -251,8 +251,8 @@ export default function PreviewDeploymentPage() {
           </div>
 
           {/* Preview URL */}
-          <div className="bg-gray-900 rounded-lg p-4">
-            <label className="text-xs text-gray-500 block mb-1">{t('preview.urlLabel', 'Preview URL')}</label>
+          <div className="bg-warm-900 rounded-lg p-4">
+            <label className="text-xs text-warm-500 block mb-1">{t('preview.urlLabel', 'Preview URL')}</label>
             <div className="flex items-center gap-2">
               <a
                 href={currentPreview.previewUrl!}
@@ -264,7 +264,7 @@ export default function PreviewDeploymentPage() {
               </a>
               <button
                 onClick={handleCopyUrl}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs font-medium transition-colors whitespace-nowrap"
+                className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded text-xs font-medium transition-colors whitespace-nowrap"
               >
                 {copied ? t('preview.copied', 'Copied!') : t('preview.copy', 'Copy')}
               </button>
@@ -274,9 +274,9 @@ export default function PreviewDeploymentPage() {
           {/* QR Code */}
           {currentPreview.previewUrl && (
             <div className="flex flex-col items-center gap-2">
-              <label className="text-xs text-gray-500">{t('preview.qrLabel', 'Scan for mobile preview')}</label>
+              <label className="text-xs text-warm-500">{t('preview.qrLabel', 'Scan for mobile preview')}</label>
               <div
-                className="bg-gray-900 rounded-lg p-4"
+                className="bg-warm-900 rounded-lg p-4"
                 dangerouslySetInnerHTML={{ __html: generateQrCodeSvg(currentPreview.previewUrl) }}
               />
             </div>
@@ -284,16 +284,16 @@ export default function PreviewDeploymentPage() {
 
           {/* Countdown & Info */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-900 rounded-lg p-3">
-              <label className="text-xs text-gray-500 block mb-1">{t('preview.provider', 'Provider')}</label>
+            <div className="bg-warm-900 rounded-lg p-3">
+              <label className="text-xs text-warm-500 block mb-1">{t('preview.provider', 'Provider')}</label>
               <span className="text-sm text-white">{currentPreview.provider}</span>
             </div>
-            <div className="bg-gray-900 rounded-lg p-3">
-              <label className="text-xs text-gray-500 block mb-1">{t('preview.expiresIn', 'Expires in')}</label>
+            <div className="bg-warm-900 rounded-lg p-3">
+              <label className="text-xs text-warm-500 block mb-1">{t('preview.expiresIn', 'Expires in')}</label>
               {currentPreview.expiresAt ? (
                 <CountdownTimer expiresAt={currentPreview.expiresAt} />
               ) : (
-                <span className="text-sm text-gray-400">--</span>
+                <span className="text-sm text-warm-400">--</span>
               )}
             </div>
           </div>
@@ -312,20 +312,20 @@ export default function PreviewDeploymentPage() {
 
       {/* Deploying State */}
       {currentPreview && currentPreview.status === 'Deploying' && (
-        <div className="bg-gray-800 rounded-xl p-6 text-center">
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4" />
           <h3 className="text-lg font-bold mb-1">{t('preview.deployingTitle', 'Deploying Preview...')}</h3>
-          <p className="text-sm text-gray-400">{t('preview.deployingDescription', 'Your preview is being deployed to the edge. This usually takes less than 5 seconds.')}</p>
+          <p className="text-sm text-warm-400">{t('preview.deployingDescription', 'Your preview is being deployed to the edge. This usually takes less than 5 seconds.')}</p>
         </div>
       )}
 
       {/* History */}
       {history.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6">
+        <div className="bg-warm-800 rounded-xl p-6">
           <h3 className="text-lg font-bold mb-4">{t('preview.history', 'Preview History')}</h3>
           <div className="space-y-2">
             {history.map((preview) => (
-              <div key={preview.id} className="flex items-center justify-between py-2 px-3 bg-gray-900 rounded-lg">
+              <div key={preview.id} className="flex items-center justify-between py-2 px-3 bg-warm-900 rounded-lg">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className={`text-xs font-medium ${getStatusColor(preview.status)}`}>
                     {preview.status}
@@ -340,10 +340,10 @@ export default function PreviewDeploymentPage() {
                       {preview.previewUrl}
                     </a>
                   ) : (
-                    <span className="text-xs text-gray-500">--</span>
+                    <span className="text-xs text-warm-500">--</span>
                   )}
                 </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                <span className="text-xs text-warm-500 whitespace-nowrap ml-2">
                   {new Date(preview.createdAt).toLocaleString()}
                 </span>
               </div>

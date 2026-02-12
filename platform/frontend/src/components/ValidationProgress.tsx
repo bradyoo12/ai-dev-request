@@ -32,7 +32,7 @@ export default function ValidationProgress({ iterations, maxIterations, currentP
   }
 
   return (
-    <div className="bg-gray-900 rounded-xl p-4 mb-4" data-testid="validation-progress">
+    <div className="bg-warm-900 rounded-xl p-4 mb-4" data-testid="validation-progress">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {passed ? (
@@ -44,12 +44,12 @@ export default function ValidationProgress({ iterations, maxIterations, currentP
           )}
           <span className={`font-medium ${getPhaseColor()}`}>{getPhaseLabel()}</span>
         </div>
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-warm-400">
           {iterations}/{maxIterations}
         </span>
       </div>
 
-      <div className="w-full bg-gray-700 rounded-full h-2">
+      <div className="w-full bg-warm-700 rounded-full h-2">
         <div
           className={`h-2 rounded-full transition-all duration-500 ${getBarColor()}`}
           style={{ width: `${progressPercent}%` }}
@@ -68,11 +68,11 @@ export default function ValidationProgress({ iterations, maxIterations, currentP
                     : 'bg-blue-500 border-blue-500'
                   : i === iterations && !passed && currentPhase !== 'maxRetries'
                     ? 'border-blue-500 animate-pulse'
-                    : 'border-gray-600'
+                    : 'border-warm-600'
               }`}
               data-testid={`step-dot-${i}`}
             />
-            <span className="text-[10px] text-gray-500 mt-1">{i + 1}</span>
+            <span className="text-[10px] text-warm-500 mt-1">{i + 1}</span>
           </div>
         ))}
       </div>

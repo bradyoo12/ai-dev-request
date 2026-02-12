@@ -94,9 +94,9 @@ export default function VariantComparisonPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gray-900 rounded-lg p-6">
+      <div className="bg-warm-900 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-2">{t('variantComparison.title')}</h3>
-        <p className="text-gray-400 text-sm mb-4">{t('variantComparison.subtitle')}</p>
+        <p className="text-warm-400 text-sm mb-4">{t('variantComparison.subtitle')}</p>
 
         {error && (
           <div className="bg-red-900/20 border border-red-700 rounded p-3 mb-4 text-red-200 text-sm">
@@ -110,14 +110,14 @@ export default function VariantComparisonPage() {
             value={requestId}
             onChange={(e) => setRequestId(e.target.value)}
             placeholder={t('variantComparison.requestIdPlaceholder')}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
+            className="w-full bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm"
           />
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={t('variantComparison.descriptionPlaceholder')}
             rows={3}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm resize-none"
+            className="w-full bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm resize-none"
           />
           <div className="flex gap-3">
             <button
@@ -130,7 +130,7 @@ export default function VariantComparisonPage() {
             <button
               onClick={handleLoad}
               disabled={loading || !requestId.trim()}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white text-sm rounded transition-colors"
+              className="px-4 py-2 bg-warm-700 hover:bg-warm-600 disabled:opacity-50 text-white text-sm rounded transition-colors"
             >
               {loading ? t('variantComparison.loading') : t('variantComparison.loadExisting')}
             </button>
@@ -146,18 +146,18 @@ export default function VariantComparisonPage() {
             return (
               <div
                 key={variant.id}
-                className={`bg-gray-900 rounded-lg border transition-colors ${
+                className={`bg-warm-900 rounded-lg border transition-colors ${
                   variant.isSelected
                     ? 'border-green-500 ring-1 ring-green-500/30'
                     : activeVariant?.id === variant.id
                       ? 'border-blue-500'
-                      : 'border-gray-700/50 hover:border-gray-600'
+                      : 'border-warm-700/50 hover:border-warm-600'
                 }`}
               >
                 {/* Card Header */}
-                <div className="p-4 border-b border-gray-800">
+                <div className="p-4 border-b border-warm-800">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${approachColors[variant.approach] || 'bg-gray-600/20 text-gray-400 border-gray-700/50'}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${approachColors[variant.approach] || 'bg-warm-600/20 text-warm-400 border-warm-700/50'}`}>
                       {variant.approach}
                     </span>
                     {variant.isSelected && (
@@ -166,40 +166,40 @@ export default function VariantComparisonPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-300 mt-2">{variant.description}</p>
+                  <p className="text-sm text-warm-300 mt-2">{variant.description}</p>
                 </div>
 
                 {/* Metrics */}
-                <div className="p-4 border-b border-gray-800">
+                <div className="p-4 border-b border-warm-800">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-xs text-gray-500">{t('variantComparison.files')}</p>
+                      <p className="text-xs text-warm-500">{t('variantComparison.files')}</p>
                       <p className="text-lg font-semibold text-white">{variant.fileCount}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('variantComparison.loc')}</p>
+                      <p className="text-xs text-warm-500">{t('variantComparison.loc')}</p>
                       <p className="text-lg font-semibold text-white">{variant.linesOfCode}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('variantComparison.dependencies')}</p>
+                      <p className="text-xs text-warm-500">{t('variantComparison.dependencies')}</p>
                       <p className="text-lg font-semibold text-white">{variant.dependencyCount}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">{t('variantComparison.bundleSize')}</p>
+                      <p className="text-xs text-warm-500">{t('variantComparison.bundleSize')}</p>
                       <p className="text-lg font-semibold text-white">{variant.estimatedBundleSizeKb} KB</p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between text-xs">
-                    <span className="text-gray-500">
-                      {t('variantComparison.model')}: <span className={tierColors[variant.modelTier] || 'text-gray-400'}>{variant.modelTier}</span>
+                    <span className="text-warm-500">
+                      {t('variantComparison.model')}: <span className={tierColors[variant.modelTier] || 'text-warm-400'}>{variant.modelTier}</span>
                     </span>
-                    <span className="text-gray-500">{variant.tokensUsed} tokens</span>
+                    <span className="text-warm-500">{variant.tokensUsed} tokens</span>
                   </div>
                 </div>
 
                 {/* File List */}
-                <div className="p-4 border-b border-gray-800 max-h-[150px] overflow-y-auto">
-                  <p className="text-xs text-gray-500 mb-2">{t('variantComparison.fileList')}</p>
+                <div className="p-4 border-b border-warm-800 max-h-[150px] overflow-y-auto">
+                  <p className="text-xs text-warm-500 mb-2">{t('variantComparison.fileList')}</p>
                   <div className="space-y-1">
                     {files.map((file) => (
                       <button
@@ -208,7 +208,7 @@ export default function VariantComparisonPage() {
                         className={`block w-full text-left px-2 py-1 rounded text-xs transition-colors ${
                           activeFile?.path === file.path && activeVariant?.id === variant.id
                             ? 'bg-blue-900/30 text-blue-300'
-                            : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                            : 'text-warm-400 hover:bg-warm-800 hover:text-warm-200'
                         }`}
                       >
                         {file.path}
@@ -225,14 +225,14 @@ export default function VariantComparisonPage() {
                         key={star}
                         onClick={() => handleRate(variant.id, star)}
                         className={`text-lg transition-colors ${
-                          star <= variant.rating ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400/50'
+                          star <= variant.rating ? 'text-yellow-400' : 'text-warm-600 hover:text-yellow-400/50'
                         }`}
                       >
                         ★
                       </button>
                     ))}
                     {variant.rating > 0 && (
-                      <span className="text-xs text-gray-500 ml-2">{variant.rating}/5</span>
+                      <span className="text-xs text-warm-500 ml-2">{variant.rating}/5</span>
                     )}
                   </div>
                   <button
@@ -255,19 +255,19 @@ export default function VariantComparisonPage() {
 
       {/* Code Preview */}
       {activeFile && activeVariant && (
-        <div className="bg-gray-900 rounded-lg p-4">
+        <div className="bg-warm-900 rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
-            <h5 className="text-sm font-medium text-gray-300">
+            <h5 className="text-sm font-medium text-warm-300">
               {activeFile.path}
               <span className={`ml-2 px-2 py-0.5 rounded text-xs ${approachColors[activeVariant.approach] || ''}`}>
                 {activeVariant.approach}
               </span>
             </h5>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-warm-500">
               {activeFile.content.split('\n').length} {t('variantComparison.lines')}
             </span>
           </div>
-          <div className="bg-gray-950 rounded-lg p-4 overflow-auto max-h-[500px]">
+          <div className="bg-warm-950 rounded-lg p-4 overflow-auto max-h-[500px]">
             <pre className="text-sm text-green-300 font-mono whitespace-pre-wrap">{activeFile.content}</pre>
           </div>
         </div>
@@ -275,8 +275,8 @@ export default function VariantComparisonPage() {
 
       {/* Empty State */}
       {variants.length === 0 && !generating && !loading && (
-        <div className="bg-gray-900 rounded-lg p-12 text-center">
-          <p className="text-gray-400">{t('variantComparison.empty')}</p>
+        <div className="bg-warm-900 rounded-lg p-12 text-center">
+          <p className="text-warm-400">{t('variantComparison.empty')}</p>
         </div>
       )}
     </div>

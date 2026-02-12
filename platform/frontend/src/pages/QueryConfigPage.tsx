@@ -60,7 +60,7 @@ export default function QueryConfigPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('queryConfig.title', 'TanStack Query')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('queryConfig.subtitle', 'Configure server state management, caching, and data fetching patterns')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('queryConfig.subtitle', 'Configure server state management, caching, and data fetching patterns')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['configure', 'presets', 'patterns', 'stats'] as Tab[]).map((t2) => (
@@ -68,7 +68,7 @@ export default function QueryConfigPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`queryConfig.tabs.${t2}`, t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -81,7 +81,7 @@ export default function QueryConfigPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <h4 className="font-medium">{t('queryConfig.timing', 'Timing')}</h4>
-              <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-4">
+              <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span>{t('queryConfig.staleTime', 'Stale Time')}</span>
@@ -96,7 +96,7 @@ export default function QueryConfigPage() {
                     onChange={(e) => handleNumberChange('staleTimeMs', Number(e.target.value))}
                     className="w-full accent-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('queryConfig.staleTimeDesc', 'How long before data is considered stale')}</p>
+                  <p className="text-xs text-warm-500 mt-1">{t('queryConfig.staleTimeDesc', 'How long before data is considered stale')}</p>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
@@ -112,7 +112,7 @@ export default function QueryConfigPage() {
                     onChange={(e) => handleNumberChange('cacheTimeMs', Number(e.target.value))}
                     className="w-full accent-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('queryConfig.cacheTimeDesc', 'How long unused data stays in cache')}</p>
+                  <p className="text-xs text-warm-500 mt-1">{t('queryConfig.cacheTimeDesc', 'How long unused data stays in cache')}</p>
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-2">
@@ -149,7 +149,7 @@ export default function QueryConfigPage() {
 
             <div className="space-y-4">
               <h4 className="font-medium">{t('queryConfig.behavior', 'Behavior')}</h4>
-              <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-3">
+              <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 space-y-3">
                 {([
                   { key: 'refetchOnWindowFocus' as const, label: t('queryConfig.refetchOnFocus', 'Refetch on Window Focus'), desc: t('queryConfig.refetchOnFocusDesc', 'Re-fetch stale data when user returns to tab') },
                   { key: 'refetchOnReconnect' as const, label: t('queryConfig.refetchOnReconnect', 'Refetch on Reconnect'), desc: t('queryConfig.refetchOnReconnectDesc', 'Re-fetch when network connection is restored') },
@@ -161,12 +161,12 @@ export default function QueryConfigPage() {
                   <div key={toggle.key} className="flex items-center justify-between py-2">
                     <div>
                       <div className="text-sm">{toggle.label}</div>
-                      <div className="text-xs text-gray-500">{toggle.desc}</div>
+                      <div className="text-xs text-warm-500">{toggle.desc}</div>
                     </div>
                     <button
                       onClick={() => handleToggle(toggle.key, !config[toggle.key])}
                       className={`w-10 h-5 rounded-full transition-colors ${
-                        config[toggle.key] ? 'bg-blue-600' : 'bg-gray-600'
+                        config[toggle.key] ? 'bg-blue-600' : 'bg-warm-600'
                       }`}
                     >
                       <div className={`w-4 h-4 bg-white rounded-full transition-transform ${
@@ -184,7 +184,7 @@ export default function QueryConfigPage() {
       {tab === 'presets' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {presets.map((preset) => (
-            <div key={preset.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+            <div key={preset.id} className="bg-warm-800 border border-warm-700 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-sm">{preset.name}</span>
                 <button
@@ -194,23 +194,23 @@ export default function QueryConfigPage() {
                   {t('queryConfig.apply', 'Apply')}
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mb-3">{preset.description}</p>
+              <p className="text-xs text-warm-400 mb-3">{preset.description}</p>
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-gray-900 rounded p-2">
-                  <div className="text-gray-500">{t('queryConfig.staleTime', 'Stale Time')}</div>
+                <div className="bg-warm-900 rounded p-2">
+                  <div className="text-warm-500">{t('queryConfig.staleTime', 'Stale Time')}</div>
                   <div className="text-blue-400 font-medium">{formatMs(preset.staleTimeMs)}</div>
                 </div>
-                <div className="bg-gray-900 rounded p-2">
-                  <div className="text-gray-500">{t('queryConfig.cacheTime', 'Cache Time')}</div>
+                <div className="bg-warm-900 rounded p-2">
+                  <div className="text-warm-500">{t('queryConfig.cacheTime', 'Cache Time')}</div>
                   <div className="text-blue-400 font-medium">{formatMs(preset.cacheTimeMs)}</div>
                 </div>
-                <div className="bg-gray-900 rounded p-2">
-                  <div className="text-gray-500">{t('queryConfig.retries', 'Retries')}</div>
+                <div className="bg-warm-900 rounded p-2">
+                  <div className="text-warm-500">{t('queryConfig.retries', 'Retries')}</div>
                   <div className="text-blue-400 font-medium">{preset.retryCount}</div>
                 </div>
-                <div className="bg-gray-900 rounded p-2">
-                  <div className="text-gray-500">{t('queryConfig.windowFocus', 'Window Focus')}</div>
-                  <div className={preset.refetchOnWindowFocus ? 'text-green-400 font-medium' : 'text-gray-500 font-medium'}>
+                <div className="bg-warm-900 rounded p-2">
+                  <div className="text-warm-500">{t('queryConfig.windowFocus', 'Window Focus')}</div>
+                  <div className={preset.refetchOnWindowFocus ? 'text-green-400 font-medium' : 'text-warm-500 font-medium'}>
                     {preset.refetchOnWindowFocus ? 'On' : 'Off'}
                   </div>
                 </div>
@@ -224,17 +224,17 @@ export default function QueryConfigPage() {
         <div className="space-y-6">
           {categories.map((cat) => (
             <div key={cat}>
-              <h4 className="font-medium text-sm text-gray-400 mb-3">{cat}</h4>
+              <h4 className="font-medium text-sm text-warm-400 mb-3">{cat}</h4>
               <div className="space-y-3">
                 {patterns.filter(p => p.category === cat).map((pattern) => (
-                  <div key={pattern.id} className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-                    <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+                  <div key={pattern.id} className="bg-warm-800 border border-warm-700 rounded-lg overflow-hidden">
+                    <div className="px-4 py-3 border-b border-warm-700 flex items-center justify-between">
                       <div>
                         <span className="font-medium text-sm">{pattern.name}</span>
-                        <span className="text-xs text-gray-500 ml-2">{pattern.description}</span>
+                        <span className="text-xs text-warm-500 ml-2">{pattern.description}</span>
                       </div>
                     </div>
-                    <div className="p-4 bg-gray-900">
+                    <div className="p-4 bg-warm-900">
                       <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">{pattern.code}</pre>
                     </div>
                   </div>
@@ -248,44 +248,44 @@ export default function QueryConfigPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalQueries}</div>
-              <div className="text-sm text-gray-400">{t('queryConfig.stats.queries', 'Total Queries')}</div>
+              <div className="text-sm text-warm-400">{t('queryConfig.stats.queries', 'Total Queries')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalMutations}</div>
-              <div className="text-sm text-gray-400">{t('queryConfig.stats.mutations', 'Mutations')}</div>
+              <div className="text-sm text-warm-400">{t('queryConfig.stats.mutations', 'Mutations')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.cacheHitRate}%</div>
-              <div className="text-sm text-gray-400">{t('queryConfig.stats.hitRate', 'Cache Hit Rate')}</div>
+              <div className="text-sm text-warm-400">{t('queryConfig.stats.hitRate', 'Cache Hit Rate')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.cacheHits}</div>
-              <div className="text-sm text-gray-400">{t('queryConfig.stats.hits', 'Cache Hits')}</div>
+              <div className="text-sm text-warm-400">{t('queryConfig.stats.hits', 'Cache Hits')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.cacheMisses}</div>
-              <div className="text-sm text-gray-400">{t('queryConfig.stats.misses', 'Cache Misses')}</div>
+              <div className="text-sm text-warm-400">{t('queryConfig.stats.misses', 'Cache Misses')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-blue-400">{stats.activePreset}</div>
-              <div className="text-sm text-gray-400">{t('queryConfig.stats.preset', 'Active Preset')}</div>
+              <div className="text-sm text-warm-400">{t('queryConfig.stats.preset', 'Active Preset')}</div>
             </div>
           </div>
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+          <div className="bg-warm-800 border border-warm-700 rounded-lg p-4">
             <h4 className="font-medium mb-3">{t('queryConfig.stats.currentConfig', 'Current Configuration')}</h4>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <div className="text-gray-500">{t('queryConfig.staleTime', 'Stale Time')}</div>
+                <div className="text-warm-500">{t('queryConfig.staleTime', 'Stale Time')}</div>
                 <div className="text-blue-400 font-medium">{formatMs(stats.staleTimeMs)}</div>
               </div>
               <div>
-                <div className="text-gray-500">{t('queryConfig.cacheTime', 'Cache Time')}</div>
+                <div className="text-warm-500">{t('queryConfig.cacheTime', 'Cache Time')}</div>
                 <div className="text-blue-400 font-medium">{formatMs(stats.cacheTimeMs)}</div>
               </div>
               <div>
-                <div className="text-gray-500">{t('queryConfig.retries', 'Retries')}</div>
+                <div className="text-warm-500">{t('queryConfig.retries', 'Retries')}</div>
                 <div className="text-blue-400 font-medium">{stats.retryCount}</div>
               </div>
             </div>

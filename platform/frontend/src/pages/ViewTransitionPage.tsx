@@ -68,7 +68,7 @@ export default function ViewTransitionPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('viewTransition.title', 'View Transitions')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('viewTransition.subtitle', 'Add smooth animated page transitions to generated projects')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('viewTransition.subtitle', 'Add smooth animated page transitions to generated projects')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['presets', 'configure', 'preview', 'stats'] as Tab[]).map((t2) => (
@@ -76,7 +76,7 @@ export default function ViewTransitionPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`viewTransition.tabs.${t2}`, t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -93,23 +93,23 @@ export default function ViewTransitionPage() {
               <div key={category}>
                 <h4 className="font-medium mb-3 flex items-center gap-2">
                   <span className={`text-xs px-2 py-0.5 rounded ${categoryColors[category] || ''}`}>{category}</span>
-                  {category === 'Framer Motion' && <span className="text-xs text-gray-500">{t('viewTransition.requiresFramer', 'Requires Framer Motion')}</span>}
+                  {category === 'Framer Motion' && <span className="text-xs text-warm-500">{t('viewTransition.requiresFramer', 'Requires Framer Motion')}</span>}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {categoryPresets.map((preset) => (
                     <div
                       key={preset.id}
                       onClick={() => handleSelectPreset(preset.id)}
-                      className={`bg-gray-800 border rounded-lg p-4 cursor-pointer transition-all ${
-                        config?.transitionPreset === preset.id ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-700 hover:border-gray-500'
+                      className={`bg-warm-800 border rounded-lg p-4 cursor-pointer transition-all ${
+                        config?.transitionPreset === preset.id ? 'border-blue-500 ring-1 ring-blue-500' : 'border-warm-700 hover:border-warm-500'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-sm">{preset.name}</span>
-                        <span className="text-xs text-gray-500">{preset.duration}ms</span>
+                        <span className="text-xs text-warm-500">{preset.duration}ms</span>
                       </div>
-                      <p className="text-xs text-gray-400 mb-2">{preset.description}</p>
-                      <code className="text-xs text-gray-500 font-mono">{preset.css}</code>
+                      <p className="text-xs text-warm-400 mb-2">{preset.description}</p>
+                      <code className="text-xs text-warm-500 font-mono">{preset.css}</code>
                       {config?.transitionPreset === preset.id && (
                         <div className="mt-2 text-xs text-blue-400 font-medium">{t('viewTransition.selected', 'Selected')}</div>
                       )}
@@ -126,7 +126,7 @@ export default function ViewTransitionPage() {
         <div className="space-y-6">
           <div>
             <h4 className="font-medium mb-3">{t('viewTransition.duration', 'Transition Duration')}</h4>
-            <div className="flex items-center gap-4 bg-gray-800 border border-gray-700 rounded-lg p-4">
+            <div className="flex items-center gap-4 bg-warm-800 border border-warm-700 rounded-lg p-4">
               <input
                 type="range"
                 min={100}
@@ -155,11 +155,11 @@ export default function ViewTransitionPage() {
                     setConfig({ ...config, easingFunction: easing.id })
                   }}
                   className={`p-3 rounded-lg border text-left ${
-                    config.easingFunction === easing.id ? 'border-blue-500 bg-blue-900/20' : 'border-gray-700 bg-gray-800'
+                    config.easingFunction === easing.id ? 'border-blue-500 bg-blue-900/20' : 'border-warm-700 bg-warm-800'
                   }`}
                 >
                   <div className="font-medium text-sm">{easing.name}</div>
-                  <div className="text-xs text-gray-400">{easing.description}</div>
+                  <div className="text-xs text-warm-400">{easing.description}</div>
                 </button>
               ))}
             </div>
@@ -175,14 +175,14 @@ export default function ViewTransitionPage() {
                 { key: 'enableComponentAnimations' as const, label: t('viewTransition.enableComp', 'Component Animations'), desc: t('viewTransition.enableCompDesc', 'Add enter/exit animations to individual components') },
                 { key: 'enableLoadingAnimations' as const, label: t('viewTransition.enableLoading', 'Loading Animations'), desc: t('viewTransition.enableLoadingDesc', 'Animated skeleton loaders and spinners') },
               ]).map(({ key, label, desc }) => (
-                <div key={key} className="flex items-center justify-between bg-gray-800 border border-gray-700 rounded-lg p-4">
+                <div key={key} className="flex items-center justify-between bg-warm-800 border border-warm-700 rounded-lg p-4">
                   <div>
                     <div className="font-medium text-sm">{label}</div>
-                    <div className="text-xs text-gray-400">{desc}</div>
+                    <div className="text-xs text-warm-400">{desc}</div>
                   </div>
                   <button
                     onClick={() => handleToggle(key, !config[key])}
-                    className={`w-12 h-6 rounded-full transition-colors ${config[key] ? 'bg-blue-600' : 'bg-gray-600'}`}
+                    className={`w-12 h-6 rounded-full transition-colors ${config[key] ? 'bg-blue-600' : 'bg-warm-600'}`}
                   >
                     <span className={`block w-5 h-5 bg-white rounded-full shadow transform transition-transform ${config[key] ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
@@ -197,7 +197,7 @@ export default function ViewTransitionPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm text-gray-400">{t('viewTransition.currentPreset', 'Current Preset')}</div>
+              <div className="text-sm text-warm-400">{t('viewTransition.currentPreset', 'Current Preset')}</div>
               <div className="font-medium">{config?.transitionPreset || 'fade'} — {config?.transitionDurationMs || 300}ms — {config?.easingFunction || 'ease-in-out'}</div>
             </div>
             <button onClick={handleGenerateCss} className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
@@ -208,14 +208,14 @@ export default function ViewTransitionPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
               <h4 className="font-medium mb-3">{t('viewTransition.liveDemo', 'Live Demo')}</h4>
-              <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-                <div className="flex gap-1 p-2 bg-gray-800 border-b border-gray-700">
+              <div className="bg-warm-900 border border-warm-700 rounded-lg overflow-hidden">
+                <div className="flex gap-1 p-2 bg-warm-800 border-b border-warm-700">
                   {demoPages.map((page) => (
                     <button
                       key={page.id}
                       onClick={() => handleDemoNavigate(page.id)}
                       className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                        activeDemoPage === page.id ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                        activeDemoPage === page.id ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
                       }`}
                     >
                       {page.name}
@@ -235,7 +235,7 @@ export default function ViewTransitionPage() {
                     >
                       <div className="w-16 h-16 rounded-xl mx-auto mb-3" style={{ backgroundColor: page.color }} />
                       <div className="font-medium">{page.name}</div>
-                      <div className="text-xs text-gray-400">{page.description}</div>
+                      <div className="text-xs text-warm-400">{page.description}</div>
                     </div>
                   ))}
                 </div>
@@ -246,18 +246,18 @@ export default function ViewTransitionPage() {
               <h4 className="font-medium mb-3">{t('viewTransition.generatedCode', 'Generated CSS')}</h4>
               {cssResult ? (
                 <div className="space-y-3">
-                  <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-                    <div className="text-xs text-gray-500 mb-2">{t('viewTransition.keyframes', 'Keyframe Animation')}</div>
+                  <div className="bg-warm-900 border border-warm-700 rounded-lg p-4">
+                    <div className="text-xs text-warm-500 mb-2">{t('viewTransition.keyframes', 'Keyframe Animation')}</div>
                     <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">{cssResult.css}</pre>
                   </div>
-                  <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-                    <div className="text-xs text-gray-500 mb-2">{t('viewTransition.viewTransitionApi', 'View Transition API')}</div>
+                  <div className="bg-warm-900 border border-warm-700 rounded-lg p-4">
+                    <div className="text-xs text-warm-500 mb-2">{t('viewTransition.viewTransitionApi', 'View Transition API')}</div>
                     <pre className="text-sm text-blue-400 font-mono whitespace-pre-wrap">{cssResult.viewTransitionCss}</pre>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-center h-48 bg-gray-800/50 rounded-lg border border-dashed border-gray-600">
-                  <p className="text-sm text-gray-500">{t('viewTransition.cssPlaceholder', 'Click "Generate CSS" to see the output')}</p>
+                <div className="flex items-center justify-center h-48 bg-warm-800/50 rounded-lg border border-dashed border-warm-600">
+                  <p className="text-sm text-warm-500">{t('viewTransition.cssPlaceholder', 'Click "Generate CSS" to see the output')}</p>
                 </div>
               )}
             </div>
@@ -268,29 +268,29 @@ export default function ViewTransitionPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.currentPreset}</div>
-              <div className="text-sm text-gray-400">{t('viewTransition.stats.preset', 'Current Preset')}</div>
+              <div className="text-sm text-warm-400">{t('viewTransition.stats.preset', 'Current Preset')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.durationMs}ms</div>
-              <div className="text-sm text-gray-400">{t('viewTransition.stats.duration', 'Duration')}</div>
+              <div className="text-sm text-warm-400">{t('viewTransition.stats.duration', 'Duration')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.browserSupport}</div>
-              <div className="text-sm text-gray-400">{t('viewTransition.stats.browserSupport', 'Browser Support')}</div>
+              <div className="text-sm text-warm-400">{t('viewTransition.stats.browserSupport', 'Browser Support')}</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm">{t('viewTransition.stats.framerMotion', 'Framer Motion')}</span>
-                <span className={`text-xs px-2 py-0.5 rounded ${stats.framerMotionEnabled ? 'bg-green-900/30 text-green-400' : 'bg-gray-700 text-gray-400'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded ${stats.framerMotionEnabled ? 'bg-green-900/30 text-green-400' : 'bg-warm-700 text-warm-400'}`}>
                   {stats.framerMotionEnabled ? t('viewTransition.enabled', 'Enabled') : t('viewTransition.disabled', 'Disabled')}
                 </span>
               </div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm">{t('viewTransition.stats.projects', 'Projects with Transitions')}</span>
                 <span className="font-bold">{stats.projectsWithTransitions}</span>

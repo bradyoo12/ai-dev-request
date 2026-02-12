@@ -72,13 +72,13 @@ export default function ChurnDashboard() {
       case 'Canceled': return 'bg-red-600'
       case 'Renewed': return 'bg-purple-600'
       case 'Reactivated': return 'bg-teal-600'
-      default: return 'bg-gray-600'
+      default: return 'bg-warm-600'
     }
   }
 
   const getChangeIndicator = (value: number, inverted = false) => {
     const isPositive = inverted ? value < 0 : value > 0
-    if (value === 0) return <span className="text-gray-400 text-sm">-</span>
+    if (value === 0) return <span className="text-warm-400 text-sm">-</span>
     return (
       <span className={`text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
         {isPositive ? '\u25B2' : '\u25BC'} {Math.abs(value).toFixed(1)}%
@@ -92,7 +92,7 @@ export default function ChurnDashboard() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('churn.loading')}</p>
+        <p className="text-warm-400">{t('churn.loading')}</p>
       </div>
     )
   }
@@ -103,11 +103,11 @@ export default function ChurnDashboard() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-xl font-bold">{t('churn.title')}</h3>
-          <p className="text-gray-400 text-sm mt-1">{t('churn.description')}</p>
+          <p className="text-warm-400 text-sm mt-1">{t('churn.description')}</p>
         </div>
         <button
           onClick={() => exportChurnCsv()}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+          className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
         >
           {t('churn.exportCsv')}
         </button>
@@ -122,25 +122,25 @@ export default function ChurnDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('churn.activeSubscribers')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('churn.activeSubscribers')}</div>
           <div className="text-2xl font-bold">{overview?.activeSubscribers.toLocaleString() ?? 0}</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('churn.churnRate')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('churn.churnRate')}</div>
           <div className="text-2xl font-bold">{overview?.churnRate ?? 0}%</div>
           {overview && getChangeIndicator(Number(overview.churnRateChange), true)}
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('churn.mrr')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('churn.mrr')}</div>
           <div className="text-2xl font-bold">{formatKrw(Number(overview?.mrr ?? 0))}</div>
         </div>
-        <div className="bg-gray-800 rounded-xl p-4">
-          <div className="text-gray-400 text-sm mb-1">{t('churn.netGrowth')}</div>
+        <div className="bg-warm-800 rounded-xl p-4">
+          <div className="text-warm-400 text-sm mb-1">{t('churn.netGrowth')}</div>
           <div className="text-2xl font-bold">
             {(overview?.netGrowth ?? 0) >= 0 ? '+' : ''}{overview?.netGrowth ?? 0}
           </div>
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-warm-400">
             vs {overview?.netGrowthPrevious ?? 0} {t('churn.lastMonth')}
           </span>
         </div>
@@ -148,7 +148,7 @@ export default function ChurnDashboard() {
 
       {/* Trend Chart */}
       {trends.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6 mb-6">
+        <div className="bg-warm-800 rounded-xl p-6 mb-6">
           <h4 className="font-bold mb-4">{t('churn.trendTitle')}</h4>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trends}>
@@ -186,12 +186,12 @@ export default function ChurnDashboard() {
 
       {/* Churn by Plan */}
       {planData.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6 mb-6">
+        <div className="bg-warm-800 rounded-xl p-6 mb-6">
           <h4 className="font-bold mb-4">{t('churn.byPlanTitle')}</h4>
           <div className="overflow-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
+                <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                   <th className="pb-2">{t('churn.plan')}</th>
                   <th className="pb-2 text-right">{t('churn.active')}</th>
                   <th className="pb-2 text-right">{t('churn.churned')}</th>
@@ -201,7 +201,7 @@ export default function ChurnDashboard() {
               </thead>
               <tbody>
                 {planData.map(row => (
-                  <tr key={row.plan} className="border-b border-gray-700/50">
+                  <tr key={row.plan} className="border-b border-warm-700/50">
                     <td className="py-3 font-medium">{row.plan}</td>
                     <td className="py-3 text-right">{row.activeSubscribers.toLocaleString()}</td>
                     <td className="py-3 text-right">{row.churnedSubscribers}</td>
@@ -223,14 +223,14 @@ export default function ChurnDashboard() {
       )}
 
       {/* Subscription Events */}
-      <div className="bg-gray-800 rounded-xl p-6">
+      <div className="bg-warm-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-bold">{t('churn.eventsTitle')}</h4>
           <div className="flex gap-2">
             <select
               value={eventFilter}
               onChange={(e) => { setEventFilter(e.target.value); setEventsPage(1) }}
-              className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm"
+              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1.5 text-sm"
             >
               <option value="all">{t('churn.filter.allEvents')}</option>
               <option value="Created">{t('churn.event.created')}</option>
@@ -243,7 +243,7 @@ export default function ChurnDashboard() {
             <select
               value={planFilter}
               onChange={(e) => { setPlanFilter(e.target.value); setEventsPage(1) }}
-              className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm"
+              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1.5 text-sm"
             >
               <option value="all">{t('churn.filter.allPlans')}</option>
               <option value="Free">Free</option>
@@ -255,13 +255,13 @@ export default function ChurnDashboard() {
         </div>
 
         {events.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">{t('churn.noEvents')}</div>
+          <div className="text-center py-8 text-warm-400">{t('churn.noEvents')}</div>
         ) : (
           <>
             <div className="overflow-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
+                  <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                     <th className="pb-2">{t('churn.time')}</th>
                     <th className="pb-2">{t('churn.user')}</th>
                     <th className="pb-2">{t('churn.eventType')}</th>
@@ -270,8 +270,8 @@ export default function ChurnDashboard() {
                 </thead>
                 <tbody>
                   {events.map(event => (
-                    <tr key={event.id} className="border-b border-gray-700/30">
-                      <td className="py-2 text-sm text-gray-400">
+                    <tr key={event.id} className="border-b border-warm-700/30">
+                      <td className="py-2 text-sm text-warm-400">
                         {new Date(event.createdAt).toLocaleString()}
                       </td>
                       <td className="py-2 text-sm">
@@ -303,17 +303,17 @@ export default function ChurnDashboard() {
                 <button
                   onClick={() => setEventsPage(p => Math.max(1, p - 1))}
                   disabled={eventsPage === 1}
-                  className="px-3 py-1.5 bg-gray-900 hover:bg-gray-700 disabled:opacity-50 rounded-lg text-sm"
+                  className="px-3 py-1.5 bg-warm-900 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
                 >
                   &larr;
                 </button>
-                <span className="px-3 py-1.5 text-sm text-gray-400">
+                <span className="px-3 py-1.5 text-sm text-warm-400">
                   {eventsPage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setEventsPage(p => Math.min(totalPages, p + 1))}
                   disabled={eventsPage === totalPages}
-                  className="px-3 py-1.5 bg-gray-900 hover:bg-gray-700 disabled:opacity-50 rounded-lg text-sm"
+                  className="px-3 py-1.5 bg-warm-900 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
                 >
                   &rarr;
                 </button>

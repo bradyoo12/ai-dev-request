@@ -130,8 +130,8 @@ export default function GitHubSyncPage() {
       case 'syncing': return 'bg-yellow-900/50 text-yellow-400'
       case 'conflict': return 'bg-red-900/50 text-red-400'
       case 'error': return 'bg-red-900/50 text-red-400'
-      case 'disconnected': return 'bg-gray-700 text-gray-400'
-      default: return 'bg-gray-700 text-gray-400'
+      case 'disconnected': return 'bg-warm-700 text-warm-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -142,7 +142,7 @@ export default function GitHubSyncPage() {
       case 'syncing': return 'bg-yellow-400 animate-pulse'
       case 'conflict': return 'bg-red-400'
       case 'error': return 'bg-red-400'
-      default: return 'bg-gray-400'
+      default: return 'bg-warm-400'
     }
   }
 
@@ -159,7 +159,7 @@ export default function GitHubSyncPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('githubSync.loading', 'Loading sync status...')}</p>
+        <p className="text-warm-400">{t('githubSync.loading', 'Loading sync status...')}</p>
       </div>
     )
   }
@@ -174,14 +174,14 @@ export default function GitHubSyncPage() {
       )}
 
       {/* Project ID Selector */}
-      <div className="bg-gray-800 rounded-xl p-4">
+      <div className="bg-warm-800 rounded-xl p-4">
         <div className="flex items-center gap-3">
-          <label className="text-sm text-gray-400">{t('githubSync.projectId', 'Project ID')}:</label>
+          <label className="text-sm text-warm-400">{t('githubSync.projectId', 'Project ID')}:</label>
           <input
             type="number"
             value={projectIdInput}
             onChange={(e) => setProjectIdInput(e.target.value)}
-            className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white w-24"
+            className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1.5 text-sm text-white w-24"
             min={1}
           />
           <button
@@ -193,7 +193,7 @@ export default function GitHubSyncPage() {
           {history.length > 0 && (
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="ml-auto px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
+              className="ml-auto px-3 py-1.5 bg-warm-700 hover:bg-warm-600 text-warm-300 rounded-lg text-xs font-medium transition-colors"
             >
               {showHistory ? t('githubSync.hideHistory', 'Hide History') : t('githubSync.showHistory', 'Show History')} ({history.length})
             </button>
@@ -205,14 +205,14 @@ export default function GitHubSyncPage() {
       {syncStatus ? (
         <div className="space-y-6">
           {/* Status Card */}
-          <div className="bg-gray-800 rounded-xl p-5">
+          <div className="bg-warm-800 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${getStatusDot(syncStatus.status)}`}></div>
                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(syncStatus.status)}`}>
                   {syncStatus.status}
                 </span>
-                <span className="text-sm text-gray-300 font-mono">
+                <span className="text-sm text-warm-300 font-mono">
                   {syncStatus.gitHubRepoOwner}/{syncStatus.gitHubRepoName}
                 </span>
               </div>
@@ -228,26 +228,26 @@ export default function GitHubSyncPage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div>
-                <span className="text-gray-500">{t('githubSync.branch', 'Branch')}</span>
-                <p className="text-gray-300 font-mono">{syncStatus.branch}</p>
+                <span className="text-warm-500">{t('githubSync.branch', 'Branch')}</span>
+                <p className="text-warm-300 font-mono">{syncStatus.branch}</p>
               </div>
               <div>
-                <span className="text-gray-500">{t('githubSync.lastCommit', 'Last Commit')}</span>
-                <p className="text-gray-300 font-mono">{syncStatus.lastSyncCommitSha || '—'}</p>
+                <span className="text-warm-500">{t('githubSync.lastCommit', 'Last Commit')}</span>
+                <p className="text-warm-300 font-mono">{syncStatus.lastSyncCommitSha || '—'}</p>
               </div>
               <div>
-                <span className="text-gray-500">{t('githubSync.lastPush', 'Last Push')}</span>
-                <p className="text-gray-300">{syncStatus.lastPushAt ? new Date(syncStatus.lastPushAt).toLocaleString() : '—'}</p>
+                <span className="text-warm-500">{t('githubSync.lastPush', 'Last Push')}</span>
+                <p className="text-warm-300">{syncStatus.lastPushAt ? new Date(syncStatus.lastPushAt).toLocaleString() : '—'}</p>
               </div>
               <div>
-                <span className="text-gray-500">{t('githubSync.lastPull', 'Last Pull')}</span>
-                <p className="text-gray-300">{syncStatus.lastPullAt ? new Date(syncStatus.lastPullAt).toLocaleString() : '—'}</p>
+                <span className="text-warm-500">{t('githubSync.lastPull', 'Last Pull')}</span>
+                <p className="text-warm-300">{syncStatus.lastPullAt ? new Date(syncStatus.lastPullAt).toLocaleString() : '—'}</p>
               </div>
             </div>
           </div>
 
           {/* Sync Actions */}
-          <div className="bg-gray-800 rounded-xl p-5">
+          <div className="bg-warm-800 rounded-xl p-5">
             <h4 className="text-sm font-bold mb-4">{t('githubSync.actions', 'Sync Actions')}</h4>
             <div className="flex items-center gap-3">
               <button
@@ -280,7 +280,7 @@ export default function GitHubSyncPage() {
             <div className="bg-red-900/20 border border-red-800 rounded-xl p-5">
               <h4 className="text-sm font-bold text-red-400 mb-3">{t('githubSync.conflictTitle', 'Merge Conflicts Detected')}</h4>
               {syncStatus.conflictDetails && (
-                <pre className="bg-gray-900 rounded-lg p-3 text-xs text-gray-300 mb-4 overflow-x-auto">
+                <pre className="bg-warm-900 rounded-lg p-3 text-xs text-warm-300 mb-4 overflow-x-auto">
                   {syncStatus.conflictDetails}
                 </pre>
               )}
@@ -288,7 +288,7 @@ export default function GitHubSyncPage() {
                 <select
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value)}
-                  className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white flex-1"
+                  className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white flex-1"
                 >
                   <option value="">{t('githubSync.selectResolution', 'Select resolution strategy...')}</option>
                   <option value="ours">{t('githubSync.keepOurs', 'Keep our changes (generated code)')}</option>
@@ -308,31 +308,31 @@ export default function GitHubSyncPage() {
         </div>
       ) : (
         /* Connect Form */
-        <div className="bg-gray-800 rounded-xl p-6">
+        <div className="bg-warm-800 rounded-xl p-6">
           <h4 className="text-sm font-bold mb-4">{t('githubSync.connectTitle', 'Connect to GitHub Repository')}</h4>
-          <p className="text-sm text-gray-400 mb-4">
+          <p className="text-sm text-warm-400 mb-4">
             {t('githubSync.connectDescription', 'Link your project to a GitHub repository to enable two-way sync. Push generated code and pull your changes back.')}
           </p>
           <div className="flex items-end gap-3">
             <div className="flex-1">
-              <label className="text-xs text-gray-500 mb-1 block">{t('githubSync.repoOwner', 'Repository Owner')}</label>
+              <label className="text-xs text-warm-500 mb-1 block">{t('githubSync.repoOwner', 'Repository Owner')}</label>
               <input
                 type="text"
                 value={repoOwner}
                 onChange={(e) => setRepoOwner(e.target.value)}
                 placeholder="username-or-org"
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="w-full bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white"
               />
             </div>
-            <div className="text-gray-500 pb-2">/</div>
+            <div className="text-warm-500 pb-2">/</div>
             <div className="flex-1">
-              <label className="text-xs text-gray-500 mb-1 block">{t('githubSync.repoName', 'Repository Name')}</label>
+              <label className="text-xs text-warm-500 mb-1 block">{t('githubSync.repoName', 'Repository Name')}</label>
               <input
                 type="text"
                 value={repoName}
                 onChange={(e) => setRepoName(e.target.value)}
                 placeholder="my-project"
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="w-full bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white"
               />
             </div>
             <button
@@ -348,27 +348,27 @@ export default function GitHubSyncPage() {
 
       {/* Sync History */}
       {showHistory && history.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-5">
+        <div className="bg-warm-800 rounded-xl p-5">
           <h3 className="text-sm font-bold mb-3">{t('githubSync.historyTitle', 'Sync History')}</h3>
           <div className="space-y-2">
             {history.map((entry, idx) => (
-              <div key={idx} className="bg-gray-900 rounded-lg p-3 flex items-center justify-between">
+              <div key={idx} className="bg-warm-900 rounded-lg p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-sm">{getActionIcon(entry.action)}</span>
-                  <span className="text-sm text-gray-300 capitalize">{entry.action}</span>
+                  <span className="text-sm text-warm-300 capitalize">{entry.action}</span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                     entry.status === 'success' ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'
                   }`}>
                     {entry.status}
                   </span>
                   {entry.commitSha && (
-                    <span className="text-xs font-mono text-gray-500">{entry.commitSha}</span>
+                    <span className="text-xs font-mono text-warm-500">{entry.commitSha}</span>
                   )}
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-gray-500">{new Date(entry.timestamp).toLocaleString()}</span>
+                  <span className="text-xs text-warm-500">{new Date(entry.timestamp).toLocaleString()}</span>
                   {entry.details && (
-                    <p className="text-xs text-gray-400 mt-0.5">{entry.details}</p>
+                    <p className="text-xs text-warm-400 mt-0.5">{entry.details}</p>
                   )}
                 </div>
               </div>
@@ -380,15 +380,15 @@ export default function GitHubSyncPage() {
       {/* Disconnect Confirmation Dialog */}
       {showDisconnectConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-warm-800 rounded-xl p-6 w-full max-w-md">
             <h3 className="text-lg font-bold mb-4">{t('githubSync.disconnectTitle', 'Disconnect Repository')}</h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-warm-400 mb-4">
               {t('githubSync.disconnectWarning', 'This will remove the connection between your project and the GitHub repository. The repository itself will not be deleted.')}
             </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDisconnectConfirm(false)}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition-colors"
+                className="px-4 py-2 bg-warm-700 hover:bg-warm-600 text-warm-300 rounded-lg text-sm transition-colors"
               >
                 {t('githubSync.cancel', 'Cancel')}
               </button>

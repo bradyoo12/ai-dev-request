@@ -46,9 +46,9 @@ export default function PlanSelectionDialog({
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-2xl p-6 max-w-4xl w-full text-center">
+        <div className="bg-warm-800 rounded-2xl p-6 max-w-4xl w-full text-center">
           <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-400">{t('hosting.loading')}</p>
+          <p className="text-warm-400">{t('hosting.loading')}</p>
         </div>
       </div>
     )
@@ -59,9 +59,9 @@ export default function PlanSelectionDialog({
   if (error) {
     return (
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full text-center">
+        <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <button onClick={onCancel} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">{t('common.close')}</button>
+          <button onClick={onCancel} className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm">{t('common.close')}</button>
         </div>
       </div>
     )
@@ -69,9 +69,9 @@ export default function PlanSelectionDialog({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-gray-800 rounded-2xl p-6 max-w-4xl w-full my-8">
+      <div className="bg-warm-800 rounded-2xl p-6 max-w-4xl w-full my-8">
         <h3 className="text-xl font-bold mb-2">{t('hosting.selectPlan')}</h3>
-        <p className="text-gray-400 text-sm mb-4">{t('hosting.selectPlanDescription')}</p>
+        <p className="text-warm-400 text-sm mb-4">{t('hosting.selectPlanDescription')}</p>
 
         {recommendedPlanId && (
           <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-3 mb-4 text-sm text-blue-300">
@@ -90,7 +90,7 @@ export default function PlanSelectionDialog({
               className={`relative rounded-xl p-4 text-left transition-all ${
                 selectedPlanId === plan.id
                   ? 'bg-blue-900/50 border-2 border-blue-500'
-                  : 'bg-gray-900 border-2 border-gray-700 hover:border-gray-500'
+                  : 'bg-warm-900 border-2 border-warm-700 hover:border-warm-500'
               }`}
             >
               {plan.id === recommendedPlanId && (
@@ -104,17 +104,17 @@ export default function PlanSelectionDialog({
                   ? t('hosting.free')
                   : `$${plan.monthlyCostUsd}`}
                 {plan.monthlyCostUsd > 0 && (
-                  <span className="text-sm text-gray-400 font-normal">{t('hosting.perMonth')}</span>
+                  <span className="text-sm text-warm-400 font-normal">{t('hosting.perMonth')}</span>
                 )}
               </div>
-              <div className="space-y-1 text-sm text-gray-400">
+              <div className="space-y-1 text-sm text-warm-400">
                 <div>{plan.vcpu} {t('hosting.vcpu')}</div>
                 <div>{plan.memoryGb} GB RAM</div>
                 <div>{plan.supportsAutoscale ? t('hosting.autoScale') : t('hosting.noScaling')}</div>
                 <div>{plan.supportsCustomDomain ? t('hosting.customDomain') : t('hosting.noCustomDomain')}</div>
               </div>
               {plan.bestFor && (
-                <div className="mt-2 text-xs text-gray-500">{plan.bestFor}</div>
+                <div className="mt-2 text-xs text-warm-500">{plan.bestFor}</div>
               )}
             </button>
           ))}
@@ -122,15 +122,15 @@ export default function PlanSelectionDialog({
 
         {/* Confirmation summary */}
         {selectedPlan && (
-          <div className="bg-gray-900 rounded-xl p-4 mb-4">
+          <div className="bg-warm-900 rounded-xl p-4 mb-4">
             <h4 className="font-medium mb-3">{t('hosting.confirmTitle')}</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">{t('hosting.buildCost')}</span>
+                <span className="text-warm-400">{t('hosting.buildCost')}</span>
                 <span>{tokenCost} {t('settings.tokens.tokensUnit')} (${(tokenCost * TOKEN_TO_USD_RATE).toFixed(2)})</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">{t('hosting.monthlyCost')}</span>
+                <span className="text-warm-400">{t('hosting.monthlyCost')}</span>
                 <span className="font-bold">
                   {selectedPlan.monthlyCostUsd === 0
                     ? t('hosting.free')
@@ -141,21 +141,21 @@ export default function PlanSelectionDialog({
           </div>
         )}
 
-        <div className="text-xs text-gray-500 mb-4">
+        <div className="text-xs text-warm-500 mb-4">
           {t('hosting.billingNote')}
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl font-medium transition-colors"
+            className="flex-1 py-3 bg-warm-700 hover:bg-warm-600 rounded-xl font-medium transition-colors"
           >
             {t('tokens.confirm.cancel')}
           </button>
           <button
             onClick={() => selectedPlanId && onSelect(selectedPlanId)}
             disabled={!selectedPlanId}
-            className="flex-1 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-xl font-medium transition-colors"
+            className="flex-1 py-3 bg-green-600 hover:bg-green-700 disabled:bg-warm-600 rounded-xl font-medium transition-colors"
           >
             {t('hosting.buildAndDeploy')}
           </button>

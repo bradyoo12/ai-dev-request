@@ -150,12 +150,12 @@ export default function MySitesPage() {
   const getStatusIndicator = (status: string) => {
     switch (status) {
       case 'Running': return { color: 'bg-green-500', label: t('sites.status.running') }
-      case 'Pending': return { color: 'bg-gray-500', label: t('sites.status.pending') }
+      case 'Pending': return { color: 'bg-warm-500', label: t('sites.status.pending') }
       case 'Provisioning': return { color: 'bg-blue-500 animate-pulse', label: t('sites.status.provisioning') }
       case 'Building': return { color: 'bg-blue-500 animate-pulse', label: t('sites.status.building') }
       case 'Deploying': return { color: 'bg-blue-500 animate-pulse', label: t('sites.status.deploying') }
       case 'Failed': return { color: 'bg-red-500', label: t('sites.status.failed') }
-      default: return { color: 'bg-gray-500', label: status }
+      default: return { color: 'bg-warm-500', label: status }
     }
   }
 
@@ -173,14 +173,14 @@ export default function MySitesPage() {
     if (isSetup) return { bg: 'bg-blue-900/50 text-blue-400', label: t('domain.status.setting_up') }
     if (domain.status === 'Active') return { bg: 'bg-green-900/50 text-green-400', label: t('domain.status.active') }
     if (domain.status === 'Expired') return { bg: 'bg-red-900/50 text-red-400', label: t('domain.status.expired') }
-    return { bg: 'bg-gray-700 text-gray-400', label: domain.status }
+    return { bg: 'bg-warm-700 text-warm-400', label: domain.status }
   }
 
   if (loading) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('sites.loading')}</p>
+        <p className="text-warm-400">{t('sites.loading')}</p>
       </div>
     )
   }
@@ -189,7 +189,7 @@ export default function MySitesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{t('sites.title')}</h2>
-        <span className="text-gray-400 text-sm">{t('sites.count', { count: sites.length })}</span>
+        <span className="text-warm-400 text-sm">{t('sites.count', { count: sites.length })}</span>
       </div>
 
       {error && (
@@ -199,17 +199,17 @@ export default function MySitesPage() {
       )}
 
       {sites.length === 0 ? (
-        <div className="text-center py-16 bg-gray-800 rounded-2xl">
+        <div className="text-center py-16 bg-warm-800 rounded-2xl">
           <div className="text-6xl mb-4">🌐</div>
           <h3 className="text-xl font-bold mb-2">{t('sites.empty.title')}</h3>
-          <p className="text-gray-400">{t('sites.empty.description')}</p>
+          <p className="text-warm-400">{t('sites.empty.description')}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {sites.map(site => {
             const status = getStatusIndicator(site.status)
             return (
-              <div key={site.id} className="bg-gray-800 rounded-xl p-6">
+              <div key={site.id} className="bg-warm-800 rounded-xl p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${status.color}`}></div>
@@ -219,7 +219,7 @@ export default function MySitesPage() {
                     site.status === 'Running' ? 'bg-green-900/50 text-green-400' :
                     site.status === 'Failed' ? 'bg-red-900/50 text-red-400' :
                     isDeploying(site.status) ? 'bg-blue-900/50 text-blue-400' :
-                    'bg-gray-700 text-gray-400'
+                    'bg-warm-700 text-warm-400'
                   }`}>
                     {status.label}
                   </span>
@@ -227,26 +227,26 @@ export default function MySitesPage() {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-4">
                   <div>
-                    <div className="text-gray-500">{t('sites.created')}</div>
+                    <div className="text-warm-500">{t('sites.created')}</div>
                     <div>{formatDate(site.createdAt)}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500">{t('sites.resourceGroup')}</div>
+                    <div className="text-warm-500">{t('sites.resourceGroup')}</div>
                     <div className="font-mono text-xs truncate">{site.resourceGroupName || '—'}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500">{t('sites.region')}</div>
+                    <div className="text-warm-500">{t('sites.region')}</div>
                     <div>{site.region}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500">{t('sites.projectType')}</div>
+                    <div className="text-warm-500">{t('sites.projectType')}</div>
                     <div>{site.projectType || '—'}</div>
                   </div>
                 </div>
 
                 {site.previewUrl && (
-                  <div className="bg-gray-900 rounded-lg p-3 mb-4">
-                    <div className="text-gray-500 text-xs mb-1">URL</div>
+                  <div className="bg-warm-900 rounded-lg p-3 mb-4">
+                    <div className="text-warm-500 text-xs mb-1">URL</div>
                     <a
                       href={site.previewUrl}
                       target="_blank"
@@ -280,7 +280,7 @@ export default function MySitesPage() {
                   )}
                   <button
                     onClick={() => handleViewDetails(site.id)}
-                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+                    className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
                   >
                     {t('sites.details')}
                   </button>
@@ -308,45 +308,45 @@ export default function MySitesPage() {
       {/* Site Details Modal */}
       {selectedSite && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-warm-800 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold">{t('sites.detailTitle')}: {selectedSite.siteName}</h3>
               <button
                 onClick={() => { setSelectedSite(null); setSiteDomain(null) }}
-                className="text-gray-400 hover:text-white text-2xl"
+                className="text-warm-400 hover:text-white text-2xl"
               >
                 &times;
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="bg-gray-900 rounded-xl p-4">
+              <div className="bg-warm-900 rounded-xl p-4">
                 <h4 className="font-bold mb-3">{t('sites.generalInfo')}</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <div className="text-gray-500">{t('sites.siteName')}</div>
+                    <div className="text-warm-500">{t('sites.siteName')}</div>
                     <div>{selectedSite.siteName}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500">{t('sites.status.label')}</div>
+                    <div className="text-warm-500">{t('sites.status.label')}</div>
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${getStatusIndicator(selectedSite.status).color}`}></div>
                       {getStatusIndicator(selectedSite.status).label}
                     </div>
                   </div>
                   <div>
-                    <div className="text-gray-500">{t('sites.created')}</div>
+                    <div className="text-warm-500">{t('sites.created')}</div>
                     <div>{formatDate(selectedSite.createdAt)}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500">{t('sites.projectType')}</div>
+                    <div className="text-warm-500">{t('sites.projectType')}</div>
                     <div>{selectedSite.projectType || '—'}</div>
                   </div>
                 </div>
               </div>
 
               {/* Custom Domain Section */}
-              <div className="bg-gray-900 rounded-xl p-4">
+              <div className="bg-warm-900 rounded-xl p-4">
                 <h4 className="font-bold mb-3">{t('domain.title')}</h4>
 
                 {siteDomain ? (
@@ -363,19 +363,19 @@ export default function MySitesPage() {
 
                     {/* Domain setup progress */}
                     {(siteDomain.status === 'Pending' || siteDomain.status === 'Registering') && (
-                      <div className="bg-gray-800 rounded-lg p-3 space-y-2 text-sm">
+                      <div className="bg-warm-800 rounded-lg p-3 space-y-2 text-sm">
                         <div className="flex items-center gap-2">
                           <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
                           <span className="text-blue-400">{t('domain.setup.inProgress')}</span>
                         </div>
                         <div className="space-y-1 ml-6">
-                          <div className={siteDomain.status !== 'Pending' ? 'text-green-400' : 'text-gray-500'}>
+                          <div className={siteDomain.status !== 'Pending' ? 'text-green-400' : 'text-warm-500'}>
                             {siteDomain.status !== 'Pending' ? '\u2713' : '\u25CB'} {t('domain.setup.registration')}
                           </div>
-                          <div className={siteDomain.dnsStatus === 'Propagated' ? 'text-green-400' : 'text-gray-500'}>
+                          <div className={siteDomain.dnsStatus === 'Propagated' ? 'text-green-400' : 'text-warm-500'}>
                             {siteDomain.dnsStatus === 'Propagated' ? '\u2713' : '\u25CB'} {t('domain.setup.dns')}
                           </div>
-                          <div className={siteDomain.sslStatus === 'Active' ? 'text-green-400' : 'text-gray-500'}>
+                          <div className={siteDomain.sslStatus === 'Active' ? 'text-green-400' : 'text-warm-500'}>
                             {siteDomain.sslStatus === 'Active' ? '\u2713' : '\u25CB'} {t('domain.setup.ssl')}
                           </div>
                         </div>
@@ -386,29 +386,29 @@ export default function MySitesPage() {
                     {siteDomain.status === 'Active' && (
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <div className="text-gray-500">{t('domain.registered')}</div>
+                          <div className="text-warm-500">{t('domain.registered')}</div>
                           <div>{siteDomain.registeredAt ? formatDate(siteDomain.registeredAt) : '—'}</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">{t('domain.expires')}</div>
+                          <div className="text-warm-500">{t('domain.expires')}</div>
                           <div>{siteDomain.expiresAt ? formatDate(siteDomain.expiresAt) : '—'}</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">{t('domain.autoRenew')}</div>
+                          <div className="text-warm-500">{t('domain.autoRenew')}</div>
                           <div>{siteDomain.autoRenew ? t('domain.enabled') : t('domain.disabled')}</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">{t('domain.annualCost')}</div>
+                          <div className="text-warm-500">{t('domain.annualCost')}</div>
                           <div>${siteDomain.annualCostUsd.toFixed(2)}/{t('domain.year')}</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">SSL</div>
+                          <div className="text-warm-500">SSL</div>
                           <div className={siteDomain.sslStatus === 'Active' ? 'text-green-400' : 'text-yellow-400'}>
                             {siteDomain.sslStatus === 'Active' ? t('domain.sslActive') : siteDomain.sslStatus}
                           </div>
                         </div>
                         <div>
-                          <div className="text-gray-500">DNS</div>
+                          <div className="text-warm-500">DNS</div>
                           <div className={siteDomain.dnsStatus === 'Propagated' ? 'text-green-400' : 'text-yellow-400'}>
                             {siteDomain.dnsStatus === 'Propagated' ? t('domain.dnsPropagated') : siteDomain.dnsStatus}
                           </div>
@@ -416,7 +416,7 @@ export default function MySitesPage() {
                       </div>
                     )}
 
-                    <div className="text-xs text-gray-500 mt-2">{t('domain.managedNotice')}</div>
+                    <div className="text-xs text-warm-500 mt-2">{t('domain.managedNotice')}</div>
 
                     <button
                       onClick={handleDomainRemove}
@@ -428,7 +428,7 @@ export default function MySitesPage() {
                   </div>
                 ) : selectedSite.status === 'Running' ? (
                   <div className="space-y-3">
-                    <p className="text-sm text-gray-400">{t('domain.searchDescription')}</p>
+                    <p className="text-sm text-warm-400">{t('domain.searchDescription')}</p>
 
                     <div className="flex gap-2">
                       <input
@@ -437,12 +437,12 @@ export default function MySitesPage() {
                         onChange={(e) => setDomainQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleDomainSearch()}
                         placeholder={t('domain.searchPlaceholder')}
-                        className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-2 bg-warm-800 border border-warm-700 rounded-lg text-sm text-white placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <button
                         onClick={handleDomainSearch}
                         disabled={domainSearching || !domainQuery.trim()}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
                       >
                         {domainSearching ? t('auth.processing') : t('domain.search')}
                       </button>
@@ -453,19 +453,19 @@ export default function MySitesPage() {
                     )}
 
                     {domainResults.length > 0 && (
-                      <div className="bg-gray-800 rounded-lg overflow-hidden">
+                      <div className="bg-warm-800 rounded-lg overflow-hidden">
                         <table className="w-full text-sm">
                           <thead>
-                            <tr className="border-b border-gray-700">
-                              <th className="text-left py-2 px-3 text-gray-500 font-medium">{t('domain.columnDomain')}</th>
-                              <th className="text-center py-2 px-3 text-gray-500 font-medium">{t('domain.columnStatus')}</th>
-                              <th className="text-right py-2 px-3 text-gray-500 font-medium">{t('domain.columnPrice')}</th>
-                              <th className="text-right py-2 px-3 text-gray-500 font-medium"></th>
+                            <tr className="border-b border-warm-700">
+                              <th className="text-left py-2 px-3 text-warm-500 font-medium">{t('domain.columnDomain')}</th>
+                              <th className="text-center py-2 px-3 text-warm-500 font-medium">{t('domain.columnStatus')}</th>
+                              <th className="text-right py-2 px-3 text-warm-500 font-medium">{t('domain.columnPrice')}</th>
+                              <th className="text-right py-2 px-3 text-warm-500 font-medium"></th>
                             </tr>
                           </thead>
                           <tbody>
                             {domainResults.map((result) => (
-                              <tr key={result.domainName} className="border-b border-gray-700/50">
+                              <tr key={result.domainName} className="border-b border-warm-700/50">
                                 <td className="py-2 px-3 font-mono text-xs">{result.domainName}</td>
                                 <td className="py-2 px-3 text-center">
                                   {result.available ? (
@@ -495,39 +495,39 @@ export default function MySitesPage() {
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500">{t('domain.siteNotRunning')}</p>
+                  <p className="text-sm text-warm-500">{t('domain.siteNotRunning')}</p>
                 )}
               </div>
 
-              <div className="bg-gray-900 rounded-xl p-4">
+              <div className="bg-warm-900 rounded-xl p-4">
                 <h4 className="font-bold mb-3">{t('sites.azureResources')}</h4>
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">{t('sites.resourceGroup')}</span>
+                    <span className="text-warm-500">{t('sites.resourceGroup')}</span>
                     <span className="font-mono text-xs">{selectedSite.resourceGroupName || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">{t('sites.containerApp')}</span>
+                    <span className="text-warm-500">{t('sites.containerApp')}</span>
                     <span className="font-mono text-xs">{selectedSite.containerAppName || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">{t('sites.containerImage')}</span>
+                    <span className="text-warm-500">{t('sites.containerImage')}</span>
                     <span className="font-mono text-xs">{selectedSite.containerImageTag || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">{t('sites.region')}</span>
+                    <span className="text-warm-500">{t('sites.region')}</span>
                     <span>{selectedSite.region}</span>
                   </div>
                 </div>
               </div>
 
               {selectedSite.previewUrl && (
-                <div className="bg-gray-900 rounded-xl p-4">
+                <div className="bg-warm-900 rounded-xl p-4">
                   <h4 className="font-bold mb-3">{t('sites.urls')}</h4>
                   <div className="text-sm space-y-2">
                     {siteDomain?.status === 'Active' && (
                       <div>
-                        <div className="text-gray-500 mb-1">{t('domain.customDomain')}</div>
+                        <div className="text-warm-500 mb-1">{t('domain.customDomain')}</div>
                         <a
                           href={`https://${siteDomain.domainName}`}
                           target="_blank"
@@ -539,7 +539,7 @@ export default function MySitesPage() {
                       </div>
                     )}
                     <div>
-                      <div className="text-gray-500 mb-1">{t('sites.previewUrl')}</div>
+                      <div className="text-warm-500 mb-1">{t('sites.previewUrl')}</div>
                       <a
                         href={selectedSite.previewUrl}
                         target="_blank"
@@ -554,14 +554,14 @@ export default function MySitesPage() {
               )}
 
               {selectedSite.logs.length > 0 && (
-                <div className="bg-gray-900 rounded-xl p-4">
+                <div className="bg-warm-900 rounded-xl p-4">
                   <h4 className="font-bold mb-3">{t('sites.deploymentLog')}</h4>
                   <div className="bg-black rounded-lg p-3 font-mono text-xs overflow-y-auto max-h-64 space-y-1">
                     {selectedSite.logs.map((log, i) => (
                       <div key={i} className={`${
                         log.level === 'error' ? 'text-red-400' : 'text-green-400'
                       }`}>
-                        <span className="text-gray-600">
+                        <span className="text-warm-600">
                           {new Date(log.timestamp).toLocaleTimeString()}
                         </span>
                         {' '}{log.message}
@@ -585,7 +585,7 @@ export default function MySitesPage() {
               )}
               <button
                 onClick={() => { setSelectedSite(null); setSiteDomain(null) }}
-                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition-colors"
+                className="flex-1 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg font-medium transition-colors"
               >
                 {t('sites.close')}
               </button>
@@ -597,18 +597,18 @@ export default function MySitesPage() {
       {/* Domain Purchase Confirmation */}
       {purchaseConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+          <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full">
             <h3 className="text-xl font-bold mb-4">{t('domain.purchaseTitle')}</h3>
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-400">{t('domain.columnDomain')}</span>
+                <span className="text-warm-400">{t('domain.columnDomain')}</span>
                 <span className="font-mono">{purchaseConfirm.domainName}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-400">{t('domain.columnPrice')}</span>
+                <span className="text-warm-400">{t('domain.columnPrice')}</span>
                 <span>${purchaseConfirm.priceUsd?.toFixed(2)}/{t('domain.year')}</span>
               </div>
-              <div className="border-t border-gray-700 pt-3 text-sm text-gray-400 space-y-1">
+              <div className="border-t border-warm-700 pt-3 text-sm text-warm-400 space-y-1">
                 <div>{t('domain.includesRegistration')}</div>
                 <div>{t('domain.includesDns')}</div>
                 <div>{t('domain.includesSsl')}</div>
@@ -622,14 +622,14 @@ export default function MySitesPage() {
               <button
                 onClick={() => { setPurchaseConfirm(null); setDomainError('') }}
                 disabled={domainPurchasing}
-                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="flex-1 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg transition-colors"
               >
                 {t('tokens.confirm.cancel')}
               </button>
               <button
                 onClick={() => handleDomainPurchase(purchaseConfirm)}
                 disabled={domainPurchasing}
-                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
+                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
               >
                 {domainPurchasing ? t('auth.processing') : `${t('domain.purchaseButton')} $${purchaseConfirm.priceUsd?.toFixed(2)}`}
               </button>
@@ -641,13 +641,13 @@ export default function MySitesPage() {
       {/* Delete Confirmation Dialog */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 max-w-md w-full">
+          <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full">
             <h3 className="text-xl font-bold mb-4 text-red-400">{t('sites.deleteConfirm.title')}</h3>
-            <p className="text-gray-400 mb-6">{t('sites.deleteConfirm.description')}</p>
+            <p className="text-warm-400 mb-6">{t('sites.deleteConfirm.description')}</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                className="flex-1 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg transition-colors"
               >
                 {t('tokens.confirm.cancel')}
               </button>

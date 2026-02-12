@@ -69,7 +69,7 @@ export default function ApiCliPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('apiCli.loading', 'Loading API keys...')}</p>
+        <p className="text-warm-400">{t('apiCli.loading', 'Loading API keys...')}</p>
       </div>
     )
   }
@@ -81,7 +81,7 @@ export default function ApiCliPage() {
       {/* Header */}
       <div>
         <h2 className="text-lg font-bold">{t('apiCli.title', 'API & CLI')}</h2>
-        <p className="text-sm text-gray-400 mt-1">
+        <p className="text-sm text-warm-400 mt-1">
           {t('apiCli.subtitle', 'Manage API keys for programmatic access to the platform')}
         </p>
       </div>
@@ -100,7 +100,7 @@ export default function ApiCliPage() {
             {t('apiCli.keyCreated', 'API key created! Copy it now — it won\'t be shown again.')}
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 bg-gray-900 text-gray-200 px-3 py-2 rounded font-mono text-xs break-all">
+            <code className="flex-1 bg-warm-900 text-warm-200 px-3 py-2 rounded font-mono text-xs break-all">
               {newKey}
             </code>
             <button
@@ -112,7 +112,7 @@ export default function ApiCliPage() {
           </div>
           <button
             onClick={() => setNewKey(null)}
-            className="mt-2 text-xs text-gray-500 hover:text-gray-300"
+            className="mt-2 text-xs text-warm-500 hover:text-warm-300"
           >
             {t('apiCli.dismiss', 'Dismiss')}
           </button>
@@ -120,7 +120,7 @@ export default function ApiCliPage() {
       )}
 
       {/* Generate new key */}
-      <div className="bg-gray-800 rounded-xl p-5">
+      <div className="bg-warm-800 rounded-xl p-5">
         <h3 className="text-sm font-bold mb-3">{t('apiCli.generateTitle', 'Generate New Key')}</h3>
         <div className="flex items-center gap-3">
           <input
@@ -128,7 +128,7 @@ export default function ApiCliPage() {
             value={keyName}
             onChange={(e) => setKeyName(e.target.value)}
             placeholder={t('apiCli.keyNamePlaceholder', 'Key name (e.g., CI/CD, Development)')}
-            className="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500"
+            className="flex-1 bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 text-sm text-white placeholder-warm-500"
             maxLength={100}
           />
           <button
@@ -147,12 +147,12 @@ export default function ApiCliPage() {
       </div>
 
       {/* Active Keys */}
-      <div className="bg-gray-800 rounded-xl p-5">
+      <div className="bg-warm-800 rounded-xl p-5">
         <h3 className="text-sm font-bold mb-3">
           {t('apiCli.activeKeys', 'API Keys')} ({keys.length})
         </h3>
         {keys.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-6">
+          <p className="text-sm text-warm-500 text-center py-6">
             {t('apiCli.noKeys', 'No API keys yet. Generate one above to get started.')}
           </p>
         ) : (
@@ -160,14 +160,14 @@ export default function ApiCliPage() {
             {keys.map((key) => (
               <div
                 key={key.id}
-                className={`bg-gray-900 rounded-lg p-3 flex items-center justify-between ${
+                className={`bg-warm-900 rounded-lg p-3 flex items-center justify-between ${
                   key.status === 'Revoked' ? 'opacity-50' : ''
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div>
                     <p className="text-sm font-medium text-white">{key.name}</p>
-                    <p className="text-xs font-mono text-gray-500">{key.keyPrefix}</p>
+                    <p className="text-xs font-mono text-warm-500">{key.keyPrefix}</p>
                   </div>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                     key.status === 'Active'
@@ -178,7 +178,7 @@ export default function ApiCliPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="text-right text-xs text-gray-500">
+                  <div className="text-right text-xs text-warm-500">
                     <p>{t('apiCli.requests', 'Requests')}: {key.requestCount}</p>
                     <p>{new Date(key.createdAt).toLocaleDateString()}</p>
                   </div>
@@ -199,12 +199,12 @@ export default function ApiCliPage() {
       </div>
 
       {/* Quick Start Guide */}
-      <div className="bg-gray-800 rounded-xl p-5">
+      <div className="bg-warm-800 rounded-xl p-5">
         <h3 className="text-sm font-bold mb-3">{t('apiCli.quickStart', 'Quick Start')}</h3>
         <div className="space-y-4">
           <div>
-            <p className="text-xs text-gray-400 mb-1">{t('apiCli.curlExample', 'cURL — Submit a dev request')}</p>
-            <pre className="bg-gray-900 rounded p-3 text-xs text-gray-300 font-mono overflow-x-auto">
+            <p className="text-xs text-warm-400 mb-1">{t('apiCli.curlExample', 'cURL — Submit a dev request')}</p>
+            <pre className="bg-warm-900 rounded p-3 text-xs text-warm-300 font-mono overflow-x-auto">
 {`curl -X POST ${window.location.origin}/api/requests \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
@@ -212,8 +212,8 @@ export default function ApiCliPage() {
             </pre>
           </div>
           <div>
-            <p className="text-xs text-gray-400 mb-1">{t('apiCli.statusExample', 'Check request status')}</p>
-            <pre className="bg-gray-900 rounded p-3 text-xs text-gray-300 font-mono overflow-x-auto">
+            <p className="text-xs text-warm-400 mb-1">{t('apiCli.statusExample', 'Check request status')}</p>
+            <pre className="bg-warm-900 rounded p-3 text-xs text-warm-300 font-mono overflow-x-auto">
 {`curl ${window.location.origin}/api/requests/REQUEST_ID \\
   -H "Authorization: Bearer YOUR_API_KEY"`}
             </pre>

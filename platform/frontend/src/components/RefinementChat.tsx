@@ -241,14 +241,14 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
   }
 
   return (
-    <div className="bg-gray-900 rounded-2xl overflow-hidden flex flex-col" style={{ height: '500px' }}>
+    <div className="bg-warm-900 rounded-2xl overflow-hidden flex flex-col" style={{ height: '500px' }}>
       {/* Header */}
-      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+      <div className="bg-warm-800 px-4 py-3 border-b border-warm-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg">💬</span>
           <span className="font-medium">{t('refinement.title')}</span>
         </div>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-warm-400">
           {t('refinement.costPerMessage')}
         </span>
       </div>
@@ -256,7 +256,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
+          <div className="text-center text-warm-500 py-8">
             <p className="text-lg mb-2">{t('refinement.emptyTitle')}</p>
             <p className="text-sm">{t('refinement.emptyDescription')}</p>
             <div className="mt-4 space-y-2">
@@ -264,7 +264,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
                 <button
                   key={key}
                   onClick={() => setInput(t(key))}
-                  className="block w-full text-left text-sm bg-gray-800 hover:bg-gray-700 rounded-lg px-4 py-2 text-gray-300 transition-colors"
+                  className="block w-full text-left text-sm bg-warm-800 hover:bg-warm-700 rounded-lg px-4 py-2 text-warm-300 transition-colors"
                 >
                   {t(key)}
                 </button>
@@ -282,7 +282,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
               className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                 msg.role === 'user'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-100'
+                  : 'bg-warm-800 text-warm-100'
               }`}
             >
               <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
@@ -292,7 +292,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
                 </div>
               )}
               {msg.role === 'assistant' && hasFileChanges(msg.content) && (
-                <div className="mt-2 pt-2 border-t border-gray-700">
+                <div className="mt-2 pt-2 border-t border-warm-700">
                   {appliedMessages.has(msg.id) ? (
                     <span className="text-xs text-green-400 font-medium">
                       {t('refinement.changesAppliedBadge')}
@@ -301,7 +301,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
                     <button
                       onClick={() => handleApplyChanges(msg)}
                       disabled={applyingId === msg.id}
-                      className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 rounded-lg text-xs font-medium transition-colors"
+                      className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-warm-700 rounded-lg text-xs font-medium transition-colors"
                     >
                       {applyingId === msg.id
                         ? t('refinement.applying')
@@ -321,10 +321,10 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
               <div className="text-sm font-medium text-yellow-300 mb-2">
                 💡 {t('suggestions.confirmPrompt')}
               </div>
-              <div className="text-sm text-gray-300 mb-1">
+              <div className="text-sm text-warm-300 mb-1">
                 <strong>{pendingSuggestion.suggestion.title}</strong>
               </div>
-              <div className="text-xs text-gray-400 mb-3">
+              <div className="text-xs text-warm-400 mb-3">
                 {pendingSuggestion.suggestion.summary}
               </div>
               <div className="text-xs text-yellow-400 mb-3">
@@ -334,13 +334,13 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
                 <button
                   onClick={handleRegisterSuggestion}
                   disabled={registering}
-                  className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-700 rounded-lg text-sm font-medium transition-colors"
+                  className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-warm-700 rounded-lg text-sm font-medium transition-colors"
                 >
                   {registering ? t('suggestions.registering') : t('suggestions.confirmYes')}
                 </button>
                 <button
                   onClick={handleDeclineSuggestion}
-                  className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+                  className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
                 >
                   {t('suggestions.confirmNo')}
                 </button>
@@ -351,14 +351,14 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
 
         {sending && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] bg-gray-800 rounded-2xl px-4 py-3">
+            <div className="max-w-[80%] bg-warm-800 rounded-2xl px-4 py-3">
               {streamingContent ? (
-                <div className="whitespace-pre-wrap text-sm text-gray-100">
+                <div className="whitespace-pre-wrap text-sm text-warm-100">
                   {streamingContent}
                   <span className="inline-block w-2 h-4 bg-blue-400 ml-0.5 animate-pulse" />
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <div className="flex items-center gap-2 text-warm-400 text-sm">
                   <div className="flex gap-1">
                     <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
                     <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
@@ -382,7 +382,7 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
       )}
 
       {/* Input */}
-      <div className="border-t border-gray-700 p-3">
+      <div className="border-t border-warm-700 p-3">
         <div className="flex gap-2">
           <textarea
             value={input}
@@ -390,12 +390,12 @@ export default function RefinementChat({ requestId, onTokensUsed }: RefinementCh
             onKeyDown={handleKeyDown}
             placeholder={t('refinement.placeholder')}
             rows={2}
-            className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+            className="flex-1 bg-warm-800 border border-warm-700 rounded-xl px-4 py-2.5 text-white placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || sending}
-            className="self-end px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl text-sm font-medium transition-colors"
+            className="self-end px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-700 disabled:cursor-not-allowed rounded-xl text-sm font-medium transition-colors"
           >
             {t('refinement.send')}
           </button>

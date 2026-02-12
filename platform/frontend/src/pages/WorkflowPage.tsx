@@ -65,8 +65,8 @@ export default function WorkflowPage() {
       case 'running': return 'bg-blue-900/50 text-blue-400'
       case 'pending': return 'bg-yellow-900/50 text-yellow-400'
       case 'failed': return 'bg-red-900/50 text-red-400'
-      case 'cancelled': return 'bg-gray-700 text-gray-400'
-      default: return 'bg-gray-700 text-gray-400'
+      case 'cancelled': return 'bg-warm-700 text-warm-400'
+      default: return 'bg-warm-700 text-warm-400'
     }
   }
 
@@ -90,7 +90,7 @@ export default function WorkflowPage() {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('workflows.loading', 'Loading workflows...')}</p>
+        <p className="text-warm-400">{t('workflows.loading', 'Loading workflows...')}</p>
       </div>
     )
   }
@@ -105,13 +105,13 @@ export default function WorkflowPage() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 border-b border-gray-700 pb-2">
+      <div className="flex gap-2 border-b border-warm-700 pb-2">
         {(['list', 'metrics'] as const).map((tabKey) => (
           <button
             key={tabKey}
             onClick={() => setTab(tabKey)}
             className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
-              tab === tabKey ? 'bg-gray-800 text-white' : 'text-gray-400 hover:text-gray-200'
+              tab === tabKey ? 'bg-warm-800 text-white' : 'text-warm-400 hover:text-warm-200'
             }`}
           >
             {t(`workflows.tab.${tabKey}`, tabKey === 'list' ? 'Executions' : 'Metrics')}
@@ -125,7 +125,7 @@ export default function WorkflowPage() {
           <h3 className="text-lg font-bold mb-4">{t('workflows.list.title', 'Workflow Executions')}</h3>
 
           {workflows.length === 0 ? (
-            <div className="bg-gray-800 rounded-xl p-8 text-center text-gray-400">
+            <div className="bg-warm-800 rounded-xl p-8 text-center text-warm-400">
               <p>{t('workflows.list.empty', 'No workflows yet. Start one from a dev request.')}</p>
             </div>
           ) : (
@@ -135,7 +135,7 @@ export default function WorkflowPage() {
                 return (
                   <div
                     key={wf.id}
-                    className={`bg-gray-800 rounded-xl p-4 cursor-pointer transition-colors hover:bg-gray-750 ${
+                    className={`bg-warm-800 rounded-xl p-4 cursor-pointer transition-colors hover:bg-warm-750 ${
                       selectedWorkflow?.id === wf.id ? 'ring-1 ring-blue-500' : ''
                     }`}
                     onClick={() => setSelectedWorkflow(selectedWorkflow?.id === wf.id ? null : wf)}
@@ -143,9 +143,9 @@ export default function WorkflowPage() {
                     {/* Header */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-400">#{wf.id}</span>
+                        <span className="text-sm text-warm-400">#{wf.id}</span>
                         <span className="font-medium">{wf.workflowType}</span>
-                        <span className="text-xs text-gray-500">Request #{wf.devRequestId}</span>
+                        <span className="text-xs text-warm-500">Request #{wf.devRequestId}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(wf.status)}`}>
@@ -168,20 +168,20 @@ export default function WorkflowPage() {
                             <span>{step.name}</span>
                           </div>
                           {idx < steps.length - 1 && (
-                            <div className="w-4 h-px bg-gray-600 mx-0.5"></div>
+                            <div className="w-4 h-px bg-warm-600 mx-0.5"></div>
                           )}
                         </div>
                       ))}
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-2">
+                    <div className="text-xs text-warm-500 mt-2">
                       {new Date(wf.createdAt).toLocaleString()}
                       {wf.completedAt && ` -- ${new Date(wf.completedAt).toLocaleString()}`}
                     </div>
 
                     {/* Expanded Step Details */}
                     {selectedWorkflow?.id === wf.id && (
-                      <div className="mt-4 pt-4 border-t border-gray-700 space-y-3">
+                      <div className="mt-4 pt-4 border-t border-warm-700 space-y-3">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="text-sm font-bold">{t('workflows.steps.title', 'Step Details')}</h4>
                           {(wf.status === 'Running' || wf.status === 'Pending') && (
@@ -194,7 +194,7 @@ export default function WorkflowPage() {
                           )}
                         </div>
                         {steps.map((step) => (
-                          <div key={step.name} className="bg-gray-900 rounded-lg p-3">
+                          <div key={step.name} className="bg-warm-900 rounded-lg p-3">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(step.status)}`}>
@@ -212,7 +212,7 @@ export default function WorkflowPage() {
                               )}
                             </div>
                             {step.startedAt && (
-                              <div className="text-xs text-gray-500 mt-1">
+                              <div className="text-xs text-warm-500 mt-1">
                                 {t('workflows.steps.started', 'Started')}: {new Date(step.startedAt).toLocaleString()}
                                 {step.completedAt && (
                                   <span> | {t('workflows.steps.duration', 'Duration')}: {
@@ -245,39 +245,39 @@ export default function WorkflowPage() {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-800 rounded-xl p-4">
-              <div className="text-gray-400 text-sm">{t('workflows.metrics.total', 'Total')}</div>
+            <div className="bg-warm-800 rounded-xl p-4">
+              <div className="text-warm-400 text-sm">{t('workflows.metrics.total', 'Total')}</div>
               <div className="text-2xl font-bold">{metrics.totalWorkflows}</div>
             </div>
-            <div className="bg-gray-800 rounded-xl p-4">
-              <div className="text-gray-400 text-sm">{t('workflows.metrics.successRate', 'Success Rate')}</div>
+            <div className="bg-warm-800 rounded-xl p-4">
+              <div className="text-warm-400 text-sm">{t('workflows.metrics.successRate', 'Success Rate')}</div>
               <div className="text-2xl font-bold text-green-400">{metrics.successRate.toFixed(1)}%</div>
             </div>
-            <div className="bg-gray-800 rounded-xl p-4">
-              <div className="text-gray-400 text-sm">{t('workflows.metrics.avgDuration', 'Avg Duration')}</div>
+            <div className="bg-warm-800 rounded-xl p-4">
+              <div className="text-warm-400 text-sm">{t('workflows.metrics.avgDuration', 'Avg Duration')}</div>
               <div className="text-2xl font-bold">{formatDuration(metrics.avgDurationSeconds)}</div>
             </div>
-            <div className="bg-gray-800 rounded-xl p-4">
-              <div className="text-gray-400 text-sm">{t('workflows.metrics.running', 'Running')}</div>
+            <div className="bg-warm-800 rounded-xl p-4">
+              <div className="text-warm-400 text-sm">{t('workflows.metrics.running', 'Running')}</div>
               <div className="text-2xl font-bold text-blue-400">{metrics.runningWorkflows}</div>
             </div>
           </div>
 
           {/* Status Breakdown */}
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <h4 className="text-sm font-bold mb-4">{t('workflows.metrics.statusBreakdown', 'Status Breakdown')}</h4>
             <div className="flex gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-sm text-gray-300">{t('workflows.metrics.completed', 'Completed')}: {metrics.completedWorkflows}</span>
+                <span className="text-sm text-warm-300">{t('workflows.metrics.completed', 'Completed')}: {metrics.completedWorkflows}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span className="text-sm text-gray-300">{t('workflows.metrics.failed', 'Failed')}: {metrics.failedWorkflows}</span>
+                <span className="text-sm text-warm-300">{t('workflows.metrics.failed', 'Failed')}: {metrics.failedWorkflows}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                <span className="text-sm text-gray-300">{t('workflows.metrics.running', 'Running')}: {metrics.runningWorkflows}</span>
+                <span className="text-sm text-warm-300">{t('workflows.metrics.running', 'Running')}: {metrics.runningWorkflows}</span>
               </div>
             </div>
 
@@ -304,7 +304,7 @@ export default function WorkflowPage() {
                 )}
                 {(metrics.totalWorkflows - metrics.completedWorkflows - metrics.failedWorkflows - metrics.runningWorkflows) > 0 && (
                   <div
-                    className="bg-gray-600"
+                    className="bg-warm-600"
                     style={{ width: `${((metrics.totalWorkflows - metrics.completedWorkflows - metrics.failedWorkflows - metrics.runningWorkflows) / metrics.totalWorkflows) * 100}%` }}
                   ></div>
                 )}
@@ -314,19 +314,19 @@ export default function WorkflowPage() {
 
           {/* Step Failure Rates */}
           {metrics.stepFailureRates.length > 0 && (
-            <div className="bg-gray-800 rounded-xl p-6">
+            <div className="bg-warm-800 rounded-xl p-6">
               <h4 className="text-sm font-bold mb-4">{t('workflows.metrics.failurePoints', 'Common Failure Points')}</h4>
               <div className="space-y-3">
                 {metrics.stepFailureRates.map((sfr) => (
                   <div key={sfr.stepName} className="flex items-center gap-4">
-                    <span className="text-sm text-gray-300 w-28">{sfr.stepName}</span>
-                    <div className="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <span className="text-sm text-warm-300 w-28">{sfr.stepName}</span>
+                    <div className="flex-1 bg-warm-700 rounded-full h-3 overflow-hidden">
                       <div
                         className="bg-red-500 h-full rounded-full"
                         style={{ width: `${Math.min(sfr.failureRate, 100)}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-400 w-24 text-right">
+                    <span className="text-xs text-warm-400 w-24 text-right">
                       {sfr.failureCount} ({sfr.failureRate.toFixed(1)}%)
                     </span>
                   </div>

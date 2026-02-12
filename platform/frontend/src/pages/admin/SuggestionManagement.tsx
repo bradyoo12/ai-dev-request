@@ -68,8 +68,8 @@ export default function SuggestionManagement() {
       case 'implemented': return 'bg-green-600'
       case 'resolved': return 'bg-green-600'
       case 'on_hold': return 'bg-orange-600'
-      case 'closed': return 'bg-gray-600'
-      default: return 'bg-gray-600'
+      case 'closed': return 'bg-warm-600'
+      default: return 'bg-warm-600'
     }
   }
 
@@ -82,8 +82,8 @@ export default function SuggestionManagement() {
   const totalPages = Math.ceil(total / pageSize)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-      <header className="p-6 border-b border-gray-700">
+    <div className="min-h-screen bg-gradient-to-b from-warm-900 to-warm-800 text-white">
+      <header className="p-6 border-b border-warm-700">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold">Admin &gt; {t('feedback.admin.title')}</h1>
         </div>
@@ -94,7 +94,7 @@ export default function SuggestionManagement() {
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => { setStatusFilter('all'); setPage(1) }}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${statusFilter === 'all' ? 'bg-blue-600' : 'bg-gray-800 hover:bg-gray-700'}`}
+            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${statusFilter === 'all' ? 'bg-blue-600' : 'bg-warm-800 hover:bg-warm-700'}`}
           >
             {t('feedback.admin.all')} ({Object.values(statusCounts).reduce((a, b) => a + b, 0)})
           </button>
@@ -102,7 +102,7 @@ export default function SuggestionManagement() {
             <button
               key={status}
               onClick={() => { setStatusFilter(status); setPage(1) }}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${statusFilter === status ? getStatusColor(status) : 'bg-gray-800 hover:bg-gray-700'}`}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${statusFilter === status ? getStatusColor(status) : 'bg-warm-800 hover:bg-warm-700'}`}
             >
               {getStatusLabel(status)} ({statusCounts[status] || 0})
             </button>
@@ -114,7 +114,7 @@ export default function SuggestionManagement() {
           <select
             value={categoryFilter}
             onChange={e => { setCategoryFilter(e.target.value); setPage(1) }}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+            className="bg-warm-800 border border-warm-700 rounded-lg px-3 py-2 text-sm"
           >
             <option value="all">{t('suggestions.filter.all')}</option>
             <option value="feature_request">{t('suggestions.category.featureRequest')}</option>
@@ -122,21 +122,21 @@ export default function SuggestionManagement() {
             <option value="improvement">{t('suggestions.category.improvement')}</option>
             <option value="inquiry">{t('suggestions.category.inquiry')}</option>
           </select>
-          <span className="ml-auto text-sm text-gray-400">{t('suggestions.totalCount', { count: total })}</span>
+          <span className="ml-auto text-sm text-warm-400">{t('suggestions.totalCount', { count: total })}</span>
         </div>
 
         {/* Table */}
-        <div className="bg-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-warm-800 rounded-xl overflow-hidden">
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
             </div>
           ) : suggestions.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">{t('suggestions.empty')}</div>
+            <div className="text-center py-12 text-warm-400">{t('suggestions.empty')}</div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
+                <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                   <th className="p-4">#</th>
                   <th className="p-4">{t('feedback.admin.titleCol')}</th>
                   <th className="p-4">{t('feedback.admin.categoryCol')}</th>
@@ -148,11 +148,11 @@ export default function SuggestionManagement() {
               </thead>
               <tbody>
                 {suggestions.map(s => (
-                  <tr key={s.id} className="border-b border-gray-700/50 hover:bg-gray-700/30">
-                    <td className="p-4 text-gray-500">{s.id}</td>
+                  <tr key={s.id} className="border-b border-warm-700/50 hover:bg-warm-700/30">
+                    <td className="p-4 text-warm-500">{s.id}</td>
                     <td className="p-4">
                       <div className="font-medium text-white max-w-xs truncate">{s.title}</div>
-                      <div className="text-xs text-gray-500 mt-0.5 truncate max-w-xs">{s.description}</div>
+                      <div className="text-xs text-warm-500 mt-0.5 truncate max-w-xs">{s.description}</div>
                     </td>
                     <td className="p-4 text-sm">{t(`suggestions.category.${s.category === 'feature_request' ? 'featureRequest' : s.category === 'bug_report' ? 'bugReport' : s.category}`)}</td>
                     <td className="p-4">
@@ -161,12 +161,12 @@ export default function SuggestionManagement() {
                       </span>
                     </td>
                     <td className="p-4 text-yellow-400">{s.upvoteCount}</td>
-                    <td className="p-4 text-sm text-gray-400">{new Date(s.createdAt).toLocaleDateString()}</td>
+                    <td className="p-4 text-sm text-warm-400">{new Date(s.createdAt).toLocaleDateString()}</td>
                     <td className="p-4">
                       <div className="flex gap-2">
                         <button
                           onClick={() => { setActionDialog({ suggestion: s, type: 'status' }); setNewStatus(s.status) }}
-                          className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs transition-colors"
+                          className="px-3 py-1 bg-warm-600 hover:bg-warm-500 rounded text-xs transition-colors"
                         >
                           {t('feedback.admin.changeStatus')}
                         </button>
@@ -189,25 +189,25 @@ export default function SuggestionManagement() {
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-6">
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-              className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 rounded-lg text-sm">←</button>
-            <span className="px-3 py-1.5 text-sm text-gray-400">{page} / {totalPages}</span>
+              className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm">←</button>
+            <span className="px-3 py-1.5 text-sm text-warm-400">{page} / {totalPages}</span>
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-              className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 rounded-lg text-sm">→</button>
+              className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm">→</button>
           </div>
         )}
 
         {/* Action Dialog */}
         {actionDialog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-gray-800 rounded-xl p-6 w-96">
+            <div className="bg-warm-800 rounded-xl p-6 w-96">
               {actionDialog.type === 'status' ? (
                 <>
                   <h3 className="text-lg font-bold mb-4">{t('feedback.admin.changeStatus')}</h3>
-                  <p className="text-sm text-gray-400 mb-3">#{actionDialog.suggestion.id} — {actionDialog.suggestion.title}</p>
+                  <p className="text-sm text-warm-400 mb-3">#{actionDialog.suggestion.id} — {actionDialog.suggestion.title}</p>
                   <select
                     value={newStatus}
                     onChange={e => setNewStatus(e.target.value)}
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded mb-3"
+                    className="w-full p-2 bg-warm-900 border border-warm-700 rounded mb-3"
                   >
                     {allStatuses.map(s => (
                       <option key={s} value={s}>{getStatusLabel(s)}</option>
@@ -218,11 +218,11 @@ export default function SuggestionManagement() {
                     value={statusNote}
                     onChange={e => setStatusNote(e.target.value)}
                     placeholder={t('feedback.admin.notePlaceholder')}
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded mb-4 text-sm"
+                    className="w-full p-2 bg-warm-900 border border-warm-700 rounded mb-4 text-sm"
                   />
                   <div className="flex gap-3">
                     <button onClick={() => { setActionDialog(null); setStatusNote('') }}
-                      className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors">{t('tokens.confirm.cancel')}</button>
+                      className="flex-1 py-2 bg-warm-700 hover:bg-warm-600 rounded transition-colors">{t('tokens.confirm.cancel')}</button>
                     <button onClick={handleStatusChange}
                       className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors">{t('feedback.admin.apply')}</button>
                   </div>
@@ -230,18 +230,18 @@ export default function SuggestionManagement() {
               ) : (
                 <>
                   <h3 className="text-lg font-bold mb-4">{t('feedback.admin.reply')}</h3>
-                  <p className="text-sm text-gray-400 mb-3">#{actionDialog.suggestion.id} — {actionDialog.suggestion.title}</p>
+                  <p className="text-sm text-warm-400 mb-3">#{actionDialog.suggestion.id} — {actionDialog.suggestion.title}</p>
                   <textarea
                     value={replyContent}
                     onChange={e => setReplyContent(e.target.value)}
                     placeholder={t('feedback.admin.replyPlaceholder')}
-                    className="w-full h-32 p-2 bg-gray-900 border border-gray-700 rounded mb-4 text-sm resize-none"
+                    className="w-full h-32 p-2 bg-warm-900 border border-warm-700 rounded mb-4 text-sm resize-none"
                   />
                   <div className="flex gap-3">
                     <button onClick={() => { setActionDialog(null); setReplyContent('') }}
-                      className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors">{t('tokens.confirm.cancel')}</button>
+                      className="flex-1 py-2 bg-warm-700 hover:bg-warm-600 rounded transition-colors">{t('tokens.confirm.cancel')}</button>
                     <button onClick={handleReply} disabled={!replyContent.trim()}
-                      className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded transition-colors">{t('feedback.send')}</button>
+                      className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 rounded transition-colors">{t('feedback.send')}</button>
                   </div>
                 </>
               )}

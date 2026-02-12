@@ -165,7 +165,7 @@ export default function MarketplacePage() {
             type="button"
             disabled={!interactive}
             className={`text-lg transition-colors ${
-              star <= displayRating ? 'text-yellow-400' : 'text-gray-600'
+              star <= displayRating ? 'text-yellow-400' : 'text-warm-600'
             } ${interactive ? 'hover:text-yellow-300 cursor-pointer' : 'cursor-default'}`}
             onClick={() => interactive && templateId && handleRate(templateId, star)}
             onMouseEnter={() => interactive && setHoverRating(star)}
@@ -180,7 +180,7 @@ export default function MarketplacePage() {
 
   if (loading) {
     return (
-      <div className="text-center py-12 text-gray-400" data-testid="marketplace-loading">
+      <div className="text-center py-12 text-warm-400" data-testid="marketplace-loading">
         {t('marketplace.loading', 'Loading marketplace...')}
       </div>
     )
@@ -200,7 +200,7 @@ export default function MarketplacePage() {
           &larr; {t('marketplace.backToBrowse', 'Back to Marketplace')}
         </button>
 
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="text-xl font-bold">{selectedTemplate.name}</h3>
@@ -223,15 +223,15 @@ export default function MarketplacePage() {
             </button>
           </div>
 
-          <p className="text-gray-300 mb-4">{selectedTemplate.description}</p>
+          <p className="text-warm-300 mb-4">{selectedTemplate.description}</p>
 
           {/* Tech Stack Badges */}
           {techStackItems.length > 0 && (
             <div className="mb-4">
-              <div className="text-sm text-gray-400 mb-2">{t('marketplace.techStack', 'Tech Stack')}</div>
+              <div className="text-sm text-warm-400 mb-2">{t('marketplace.techStack', 'Tech Stack')}</div>
               <div className="flex flex-wrap gap-2">
                 {techStackItems.map(tech => (
-                  <span key={tech} className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded">
+                  <span key={tech} className="bg-warm-800 text-warm-300 text-xs px-2 py-1 rounded">
                     {tech}
                   </span>
                 ))}
@@ -242,7 +242,7 @@ export default function MarketplacePage() {
           {/* Tags */}
           {tagItems.length > 0 && (
             <div className="mb-4">
-              <div className="text-sm text-gray-400 mb-2">{t('marketplace.tags', 'Tags')}</div>
+              <div className="text-sm text-warm-400 mb-2">{t('marketplace.tags', 'Tags')}</div>
               <div className="flex flex-wrap gap-2">
                 {tagItems.map(tag => (
                   <span key={tag} className="bg-purple-600/20 text-purple-300 text-xs px-2 py-1 rounded">
@@ -254,14 +254,14 @@ export default function MarketplacePage() {
           )}
 
           {/* Stats */}
-          <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-800">
+          <div className="flex items-center gap-6 mt-4 pt-4 border-t border-warm-800">
             <div className="flex items-center gap-2">
               {renderStars(selectedTemplate.rating, true, selectedTemplate.id)}
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-warm-400">
                 {selectedTemplate.rating.toFixed(1)} ({selectedTemplate.ratingCount})
               </span>
             </div>
-            <div className="flex items-center gap-1 text-sm text-gray-400">
+            <div className="flex items-center gap-1 text-sm text-warm-400">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               {selectedTemplate.downloadCount} {t('marketplace.downloads', 'downloads')}
             </div>
@@ -282,35 +282,35 @@ export default function MarketplacePage() {
           &larr; {t('marketplace.backToBrowse', 'Back to Marketplace')}
         </button>
 
-        <div className="bg-gray-900 rounded-xl p-6">
+        <div className="bg-warm-900 rounded-xl p-6">
           <h3 className="text-lg font-bold mb-4">{t('marketplace.submitTitle', 'Submit a Template')}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('marketplace.templateName', 'Template Name')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('marketplace.templateName', 'Template Name')}</label>
               <input
                 type="text"
                 value={submitForm.name}
                 onChange={e => setSubmitForm({ ...submitForm, name: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
                 placeholder="My Awesome Template"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('marketplace.description', 'Description')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('marketplace.description', 'Description')}</label>
               <textarea
                 value={submitForm.description}
                 onChange={e => setSubmitForm({ ...submitForm, description: e.target.value })}
                 rows={3}
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none resize-none"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none resize-none"
                 placeholder="Describe what this template does..."
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('marketplace.category', 'Category')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('marketplace.category', 'Category')}</label>
               <select
                 value={submitForm.category}
                 onChange={e => setSubmitForm({ ...submitForm, category: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700"
               >
                 {CATEGORIES.filter(c => c.key !== 'all').map(cat => (
                   <option key={cat.key} value={cat.key}>{cat.label}</option>
@@ -318,32 +318,32 @@ export default function MarketplacePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('marketplace.techStackLabel', 'Tech Stack (comma-separated)')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('marketplace.techStackLabel', 'Tech Stack (comma-separated)')}</label>
               <input
                 type="text"
                 value={submitForm.techStack}
                 onChange={e => setSubmitForm({ ...submitForm, techStack: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
                 placeholder="React, TypeScript, Node.js"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('marketplace.tagsLabel', 'Tags (comma-separated)')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('marketplace.tagsLabel', 'Tags (comma-separated)')}</label>
               <input
                 type="text"
                 value={submitForm.tags || ''}
                 onChange={e => setSubmitForm({ ...submitForm, tags: e.target.value })}
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
                 placeholder="saas, starter, fullstack"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">{t('marketplace.templateDataLabel', 'Template Data (JSON)')}</label>
+              <label className="block text-sm text-warm-400 mb-1">{t('marketplace.templateDataLabel', 'Template Data (JSON)')}</label>
               <textarea
                 value={submitForm.templateData}
                 onChange={e => setSubmitForm({ ...submitForm, templateData: e.target.value })}
                 rows={4}
-                className="w-full bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none resize-none font-mono"
+                className="w-full bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none resize-none font-mono"
                 placeholder="{}"
               />
             </div>
@@ -399,14 +399,14 @@ export default function MarketplacePage() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder={t('marketplace.searchPlaceholder', 'Search templates...')}
-            className="w-full bg-gray-800 text-white rounded-lg px-4 py-2 text-sm border border-gray-700 focus:border-blue-500 outline-none"
+            className="w-full bg-warm-800 text-white rounded-lg px-4 py-2 text-sm border border-warm-700 focus:border-blue-500 outline-none"
             data-testid="marketplace-search"
           />
         </div>
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as SortBy)}
-          className="bg-gray-800 text-white rounded-lg px-3 py-2 text-sm border border-gray-700"
+          className="bg-warm-800 text-white rounded-lg px-3 py-2 text-sm border border-warm-700"
           data-testid="marketplace-sort"
         >
           <option value="popular">{t('marketplace.sortPopular', 'Popular')}</option>
@@ -416,7 +416,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex gap-1 bg-gray-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
+      <div className="flex gap-1 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
         {CATEGORIES.map(cat => {
           const catCount = categories.find(c => c.category === cat.key)?.count || 0
           return (
@@ -424,12 +424,12 @@ export default function MarketplacePage() {
               key={cat.key}
               onClick={() => setSelectedCategory(cat.key)}
               className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                selectedCategory === cat.key ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
+                selectedCategory === cat.key ? 'bg-blue-600 text-white' : 'text-warm-400 hover:text-white'
               }`}
             >
               {cat.label}
               {cat.key !== 'all' && catCount > 0 && (
-                <span className="ml-1 text-gray-500">({catCount})</span>
+                <span className="ml-1 text-warm-500">({catCount})</span>
               )}
             </button>
           )
@@ -459,7 +459,7 @@ export default function MarketplacePage() {
       <div>
         <h4 className="text-md font-bold mb-3">
           {t('marketplace.allTemplates', 'All Templates')}
-          <span className="text-gray-500 text-sm font-normal ml-2">({templates.length})</span>
+          <span className="text-warm-500 text-sm font-normal ml-2">({templates.length})</span>
         </h4>
         {templates.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -475,7 +475,7 @@ export default function MarketplacePage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-warm-400">
             {t('marketplace.noTemplates', 'No templates found. Try adjusting your search or filters.')}
           </div>
         )}
@@ -505,7 +505,7 @@ function TemplateCard({
   return (
     <div
       onClick={onSelect}
-      className="bg-gray-900 rounded-xl p-4 cursor-pointer hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-700"
+      className="bg-warm-900 rounded-xl p-4 cursor-pointer hover:bg-warm-800 transition-colors border border-warm-800 hover:border-warm-700"
       data-testid="template-card"
     >
       <div className="flex items-start justify-between mb-2">
@@ -516,22 +516,22 @@ function TemplateCard({
           </span>
         )}
       </div>
-      <p className="text-gray-400 text-xs mb-3 line-clamp-2">{template.description}</p>
+      <p className="text-warm-400 text-xs mb-3 line-clamp-2">{template.description}</p>
 
       {/* Tech Stack Badges */}
       <div className="flex flex-wrap gap-1 mb-3">
         {techStackItems.map(tech => (
-          <span key={tech} className="bg-gray-800 text-gray-300 text-[10px] px-1.5 py-0.5 rounded">
+          <span key={tech} className="bg-warm-800 text-warm-300 text-[10px] px-1.5 py-0.5 rounded">
             {tech}
           </span>
         ))}
         {parseTechStack(template.techStack).length > 3 && (
-          <span className="text-gray-500 text-[10px]">+{parseTechStack(template.techStack).length - 3}</span>
+          <span className="text-warm-500 text-[10px]">+{parseTechStack(template.techStack).length - 3}</span>
         )}
       </div>
 
       {/* Rating & Downloads */}
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="flex items-center justify-between text-xs text-warm-400">
         <div className="flex items-center gap-1">
           {renderStars(template.rating)}
           <span>{template.rating.toFixed(1)}</span>

@@ -57,25 +57,25 @@ export default function AgenticPlannerPage() {
       case 'running': return 'text-blue-400'
       case 'failed': return 'text-red-400'
       case 'approved': return 'text-yellow-400'
-      default: return 'text-gray-400'
+      default: return 'text-warm-400'
     }
   }
 
   const statusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      draft: 'bg-gray-700 text-gray-300',
+      draft: 'bg-warm-700 text-warm-300',
       approved: 'bg-yellow-900/30 text-yellow-400',
       running: 'bg-blue-900/30 text-blue-400',
       completed: 'bg-green-900/30 text-green-400',
       failed: 'bg-red-900/30 text-red-400',
     }
-    return colors[status] || 'bg-gray-700 text-gray-400'
+    return colors[status] || 'bg-warm-700 text-warm-400'
   }
 
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('agenticPlan.title', 'Agentic Planner')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('agenticPlan.subtitle', 'Break down complex requests into multi-step execution plans with AI')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('agenticPlan.subtitle', 'Break down complex requests into multi-step execution plans with AI')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['create', 'plans', 'stats'] as Tab[]).map((t2) => (
@@ -83,7 +83,7 @@ export default function AgenticPlannerPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`agenticPlan.tabs.${t2}`, t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -101,7 +101,7 @@ export default function AgenticPlannerPage() {
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder={t('agenticPlan.placeholder', 'Build a dashboard with user authentication, API backend, and data visualization...')}
                 rows={4}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                className="w-full bg-warm-800 border border-warm-700 rounded-lg p-3 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
               />
             </div>
             <div className="space-y-3">
@@ -111,7 +111,7 @@ export default function AgenticPlannerPage() {
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
                   placeholder="My App Plan"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
               <button
@@ -145,30 +145,30 @@ export default function AgenticPlannerPage() {
                 </div>
               </div>
 
-              <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+              <div className="bg-warm-900 border border-warm-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-gray-400">{t('agenticPlan.progress', 'Progress')}: {plan.completedSteps}/{plan.totalSteps}</span>
-                  <div className="w-48 h-2 bg-gray-700 rounded-full">
+                  <span className="text-sm text-warm-400">{t('agenticPlan.progress', 'Progress')}: {plan.completedSteps}/{plan.totalSteps}</span>
+                  <div className="w-48 h-2 bg-warm-700 rounded-full">
                     <div className="h-2 bg-blue-500 rounded-full transition-all" style={{ width: `${plan.totalSteps > 0 ? (plan.completedSteps / plan.totalSteps) * 100 : 0}%` }} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   {parseSteps(plan.stepsJson).map((step, i) => (
-                    <div key={step.id} className="flex items-center gap-3 bg-gray-800 border border-gray-700 rounded-lg p-3">
+                    <div key={step.id} className="flex items-center gap-3 bg-warm-800 border border-warm-700 rounded-lg p-3">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                         step.status === 'completed' ? 'bg-green-900/30 text-green-400' :
                         step.status === 'running' ? 'bg-blue-900/30 text-blue-400' :
                         step.status === 'failed' ? 'bg-red-900/30 text-red-400' :
-                        'bg-gray-700 text-gray-400'
+                        'bg-warm-700 text-warm-400'
                       }`}>
                         {step.status === 'completed' ? '✓' : i + 1}
                       </div>
                       <div className="flex-1">
                         <div className={`text-sm font-medium ${statusColor(step.status)}`}>{step.name}</div>
-                        <div className="text-xs text-gray-500">{step.description}</div>
+                        <div className="text-xs text-warm-500">{step.description}</div>
                       </div>
                       {step.timeMs > 0 && (
-                        <div className="text-xs text-gray-500">{step.timeMs}ms</div>
+                        <div className="text-xs text-warm-500">{step.timeMs}ms</div>
                       )}
                     </div>
                   ))}
@@ -176,21 +176,21 @@ export default function AgenticPlannerPage() {
               </div>
 
               <div className="grid grid-cols-4 gap-3">
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{plan.totalSteps}</div>
-                  <div className="text-xs text-gray-400">{t('agenticPlan.steps', 'Steps')}</div>
+                  <div className="text-xs text-warm-400">{t('agenticPlan.steps', 'Steps')}</div>
                 </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{plan.completedSteps}</div>
-                  <div className="text-xs text-gray-400">{t('agenticPlan.completed', 'Completed')}</div>
+                  <div className="text-xs text-warm-400">{t('agenticPlan.completed', 'Completed')}</div>
                 </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{plan.totalTokensUsed.toLocaleString()}</div>
-                  <div className="text-xs text-gray-400">{t('agenticPlan.tokens', 'Tokens')}</div>
+                  <div className="text-xs text-warm-400">{t('agenticPlan.tokens', 'Tokens')}</div>
                 </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 text-center">
+                <div className="bg-warm-800 border border-warm-700 rounded-lg p-3 text-center">
                   <div className="text-lg font-bold">{plan.totalTimeMs}ms</div>
-                  <div className="text-xs text-gray-400">{t('agenticPlan.time', 'Time')}</div>
+                  <div className="text-xs text-warm-400">{t('agenticPlan.time', 'Time')}</div>
                 </div>
               </div>
             </div>
@@ -201,17 +201,17 @@ export default function AgenticPlannerPage() {
       {tab === 'plans' && (
         <div className="space-y-3">
           {plans.length === 0 && (
-            <div className="text-center py-12 text-gray-500 text-sm">{t('agenticPlan.noPlans', 'No plans yet. Create your first plan!')}</div>
+            <div className="text-center py-12 text-warm-500 text-sm">{t('agenticPlan.noPlans', 'No plans yet. Create your first plan!')}</div>
           )}
           {plans.map((p) => (
-            <div key={p.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center justify-between">
+            <div key={p.id} className="bg-warm-800 border border-warm-700 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <div className="font-medium text-sm">{p.planName}</div>
-                <div className="text-xs text-gray-400 mt-1">{p.totalSteps} steps, {p.completedSteps} completed</div>
+                <div className="text-xs text-warm-400 mt-1">{p.totalSteps} steps, {p.completedSteps} completed</div>
               </div>
               <div className="flex items-center gap-3">
                 <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(p.status)}`}>{p.status}</span>
-                <span className="text-xs text-gray-500">{new Date(p.updatedAt).toLocaleDateString()}</span>
+                <span className="text-xs text-warm-500">{new Date(p.updatedAt).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
@@ -221,29 +221,29 @@ export default function AgenticPlannerPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalPlans}</div>
-              <div className="text-sm text-gray-400">{t('agenticPlan.stats.plans', 'Total Plans')}</div>
+              <div className="text-sm text-warm-400">{t('agenticPlan.stats.plans', 'Total Plans')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.completedPlans}</div>
-              <div className="text-sm text-gray-400">{t('agenticPlan.stats.completed', 'Completed')}</div>
+              <div className="text-sm text-warm-400">{t('agenticPlan.stats.completed', 'Completed')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.successRate}%</div>
-              <div className="text-sm text-gray-400">{t('agenticPlan.stats.successRate', 'Success Rate')}</div>
+              <div className="text-sm text-warm-400">{t('agenticPlan.stats.successRate', 'Success Rate')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalStepsExecuted}</div>
-              <div className="text-sm text-gray-400">{t('agenticPlan.stats.stepsExecuted', 'Steps Executed')}</div>
+              <div className="text-sm text-warm-400">{t('agenticPlan.stats.stepsExecuted', 'Steps Executed')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.averageStepsPerPlan}</div>
-              <div className="text-sm text-gray-400">{t('agenticPlan.stats.avgSteps', 'Avg Steps/Plan')}</div>
+              <div className="text-sm text-warm-400">{t('agenticPlan.stats.avgSteps', 'Avg Steps/Plan')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalTokensUsed.toLocaleString()}</div>
-              <div className="text-sm text-gray-400">{t('agenticPlan.stats.tokens', 'Tokens Used')}</div>
+              <div className="text-sm text-warm-400">{t('agenticPlan.stats.tokens', 'Tokens Used')}</div>
             </div>
           </div>
           {stats.recentPlans.length > 0 && (
@@ -251,14 +251,14 @@ export default function AgenticPlannerPage() {
               <h4 className="font-medium mb-3">{t('agenticPlan.stats.recent', 'Recent Plans')}</h4>
               <div className="space-y-2">
                 {stats.recentPlans.map((p, i) => (
-                  <div key={i} className="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center justify-between">
+                  <div key={i} className="bg-warm-800 border border-warm-700 rounded-lg p-3 flex items-center justify-between">
                     <div>
                       <span className="font-medium text-sm">{p.planName}</span>
-                      <span className="text-xs text-gray-400 ml-2">{p.completedSteps}/{p.totalSteps} steps</span>
+                      <span className="text-xs text-warm-400 ml-2">{p.completedSteps}/{p.totalSteps} steps</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(p.status)}`}>{p.status}</span>
-                      <span className="text-xs text-gray-500">{new Date(p.createdAt).toLocaleDateString()}</span>
+                      <span className="text-xs text-warm-500">{new Date(p.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 ))}

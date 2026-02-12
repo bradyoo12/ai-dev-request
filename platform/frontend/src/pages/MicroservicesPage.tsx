@@ -75,24 +75,24 @@ export default function MicroservicesPage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('micro.title')}</h2>
-        <p className="text-gray-400">{t('micro.loginRequired')}</p>
+        <p className="text-warm-400">{t('micro.loginRequired')}</p>
       </div>
     )
   }
 
   if (loading) {
-    return <div className="max-w-4xl mx-auto text-center py-8 text-gray-400">{t('micro.loading')}</div>
+    return <div className="max-w-4xl mx-auto text-center py-8 text-warm-400">{t('micro.loading')}</div>
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => navigate('/')} className="text-warm-400 hover:text-white transition-colors">
           &larr;
         </button>
         <div>
           <h2 className="text-2xl font-bold">{t('micro.title')}</h2>
-          <p className="text-sm text-gray-400 mt-1">{t('micro.description')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('micro.description')}</p>
         </div>
       </div>
 
@@ -107,20 +107,20 @@ export default function MicroservicesPage() {
       {!selected && (
         <div className="space-y-3">
           {blueprints.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">{t('micro.empty')}</p>
-              <p className="text-sm text-gray-500 mt-1">{t('micro.emptyHint')}</p>
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">{t('micro.empty')}</p>
+              <p className="text-sm text-warm-500 mt-1">{t('micro.emptyHint')}</p>
             </div>
           ) : (
             blueprints.map((bp) => (
               <button
                 key={bp.id}
                 onClick={() => handleSelect(bp)}
-                className="w-full bg-gray-800 rounded-lg p-4 flex items-center justify-between hover:bg-gray-750 transition-colors text-left"
+                className="w-full bg-warm-800 rounded-lg p-4 flex items-center justify-between hover:bg-warm-750 transition-colors text-left"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-white truncate">{bp.name}</p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-warm-500 mt-1">
                     {bp.serviceCount} {t('micro.services')} &middot; {new Date(bp.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -146,26 +146,26 @@ export default function MicroservicesPage() {
         <div className="space-y-4">
           <button
             onClick={() => { setSelected(null); setServices([]); setDependencies([]) }}
-            className="text-sm text-gray-400 hover:text-white transition-colors"
+            className="text-sm text-warm-400 hover:text-white transition-colors"
           >
             &larr; {t('micro.backToList')}
           </button>
 
-          <div className="bg-gray-800 rounded-lg p-4">
+          <div className="bg-warm-800 rounded-lg p-4">
             <h3 className="font-semibold text-white text-lg">{selected.name}</h3>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-warm-500 mt-1">
               {selected.serviceCount} {t('micro.services')} &middot; {new Date(selected.createdAt).toLocaleDateString()}
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+          <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
             {(['services', 'dependencies', 'docker', 'k8s'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-2 px-3 rounded-md text-xs font-medium transition-colors ${
-                  activeTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                  activeTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
                 }`}
               >
                 {t(`micro.tab.${tab}`)}
@@ -177,20 +177,20 @@ export default function MicroservicesPage() {
           {activeTab === 'services' && (
             <div className="grid gap-3 md:grid-cols-2">
               {services.map((svc) => (
-                <div key={svc.Name} className="bg-gray-800 rounded-lg p-4">
+                <div key={svc.Name} className="bg-warm-800 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${TYPE_COLORS[svc.Type] || 'bg-gray-700 text-gray-400'}`}>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${TYPE_COLORS[svc.Type] || 'bg-warm-700 text-warm-400'}`}>
                       {svc.Type}
                     </span>
-                    <span className="text-xs text-gray-500">{svc.Tech}</span>
-                    <span className="text-xs text-gray-600">:{svc.Port}</span>
+                    <span className="text-xs text-warm-500">{svc.Tech}</span>
+                    <span className="text-xs text-warm-600">:{svc.Port}</span>
                   </div>
                   <h4 className="text-sm font-medium text-white">{svc.Name}</h4>
-                  <p className="text-xs text-gray-400 mt-1">{svc.Description}</p>
+                  <p className="text-xs text-warm-400 mt-1">{svc.Description}</p>
                   {svc.Endpoints.length > 0 && (
                     <div className="mt-2 space-y-0.5">
                       {svc.Endpoints.map((ep, i) => (
-                        <code key={i} className="block text-xs text-gray-500 font-mono">{ep}</code>
+                        <code key={i} className="block text-xs text-warm-500 font-mono">{ep}</code>
                       ))}
                     </div>
                   )}
@@ -203,12 +203,12 @@ export default function MicroservicesPage() {
           {activeTab === 'dependencies' && (
             <div className="space-y-2">
               {dependencies.map((dep, i) => (
-                <div key={i} className="bg-gray-800 rounded-lg p-3 flex items-center gap-3">
+                <div key={i} className="bg-warm-800 rounded-lg p-3 flex items-center gap-3">
                   <span className="text-sm font-mono text-blue-400">{dep.From}</span>
-                  <span className="text-gray-500">&rarr;</span>
+                  <span className="text-warm-500">&rarr;</span>
                   <span className="text-sm font-mono text-green-400">{dep.To}</span>
-                  <span className="px-2 py-0.5 text-xs bg-gray-700 text-gray-300 rounded">{dep.Protocol}</span>
-                  <span className="text-xs text-gray-500 flex-1 truncate">{dep.Description}</span>
+                  <span className="px-2 py-0.5 text-xs bg-warm-700 text-warm-300 rounded">{dep.Protocol}</span>
+                  <span className="text-xs text-warm-500 flex-1 truncate">{dep.Description}</span>
                 </div>
               ))}
             </div>
@@ -216,17 +216,17 @@ export default function MicroservicesPage() {
 
           {/* Docker Compose Tab */}
           {activeTab === 'docker' && (
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-sm font-medium text-white">{t('micro.dockerCompose')}</h4>
                 <button
                   onClick={() => navigator.clipboard.writeText(selected.dockerComposeYaml || '')}
-                  className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition-colors"
+                  className="px-2 py-1 text-xs bg-warm-700 text-warm-300 rounded hover:bg-warm-600 transition-colors"
                 >
                   {t('micro.copy')}
                 </button>
               </div>
-              <pre className="text-xs text-gray-300 font-mono overflow-x-auto whitespace-pre max-h-96 overflow-y-auto">
+              <pre className="text-xs text-warm-300 font-mono overflow-x-auto whitespace-pre max-h-96 overflow-y-auto">
                 {selected.dockerComposeYaml || t('micro.noConfig')}
               </pre>
             </div>
@@ -234,17 +234,17 @@ export default function MicroservicesPage() {
 
           {/* K8s Tab */}
           {activeTab === 'k8s' && (
-            <div className="bg-gray-800 rounded-lg p-4">
+            <div className="bg-warm-800 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-sm font-medium text-white">{t('micro.k8sManifest')}</h4>
                 <button
                   onClick={() => navigator.clipboard.writeText(selected.k8sManifestYaml || '')}
-                  className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition-colors"
+                  className="px-2 py-1 text-xs bg-warm-700 text-warm-300 rounded hover:bg-warm-600 transition-colors"
                 >
                   {t('micro.copy')}
                 </button>
               </div>
-              <pre className="text-xs text-gray-300 font-mono overflow-x-auto whitespace-pre max-h-96 overflow-y-auto">
+              <pre className="text-xs text-warm-300 font-mono overflow-x-auto whitespace-pre max-h-96 overflow-y-auto">
                 {selected.k8sManifestYaml || t('micro.noConfig')}
               </pre>
             </div>

@@ -107,7 +107,7 @@ export default function GenerativeUiPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">{t('generativeUi.title')}</h2>
-        <p className="text-gray-500 mt-1">{t('generativeUi.description')}</p>
+        <p className="text-warm-500 mt-1">{t('generativeUi.description')}</p>
       </div>
 
       {!session ? (
@@ -137,15 +137,15 @@ export default function GenerativeUiPage() {
           <div className="bg-white rounded-lg border p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${session.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+                <div className={`w-3 h-3 rounded-full ${session.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-warm-400'}`} />
                 <div>
                   <h3 className="font-semibold">{session.sessionName}</h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-warm-500">
                     {t('generativeUi.model')}: {session.activeModel} · {t('generativeUi.tokens')}: {Math.round(session.totalTokensUsed).toLocaleString()}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm text-warm-500">
                 <span>{t('generativeUi.stats.messages')}: {session.totalMessages}</span>
                 <span>{t('generativeUi.stats.components')}: {session.generatedComponents}</span>
                 <span>{t('generativeUi.stats.toolCalls')}: {session.toolCallCount}</span>
@@ -160,7 +160,7 @@ export default function GenerativeUiPage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
-                  activeTab === tab ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'text-gray-500 hover:text-gray-700'
+                  activeTab === tab ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'text-warm-500 hover:text-warm-700'
                 }`}
               >
                 {t(`generativeUi.tab.${tab}`)}
@@ -176,7 +176,7 @@ export default function GenerativeUiPage() {
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 && (
-                  <div className="text-center text-gray-400 mt-20">
+                  <div className="text-center text-warm-400 mt-20">
                     <svg className="mx-auto h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
@@ -186,7 +186,7 @@ export default function GenerativeUiPage() {
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[80%] rounded-lg p-3 ${
-                      msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'
+                      msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-warm-100 text-warm-800'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                       {msg.componentType && (
@@ -201,7 +201,7 @@ export default function GenerativeUiPage() {
                             <div key={j} className="p-2 bg-white/10 rounded border border-white/20 text-xs">
                               <span className="font-medium">{t('generativeUi.toolCall')}: </span>
                               <span className="font-mono">{tc.name}</span>
-                              <span className="text-gray-400 ml-2">→ {tc.result}</span>
+                              <span className="text-warm-400 ml-2">→ {tc.result}</span>
                             </div>
                           ))}
                         </div>
@@ -214,11 +214,11 @@ export default function GenerativeUiPage() {
                 ))}
                 {sending && (
                   <div className="flex justify-start">
-                    <div className="bg-gray-100 rounded-lg p-3">
+                    <div className="bg-warm-100 rounded-lg p-3">
                       <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        <div className="w-2 h-2 bg-warm-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-warm-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-warm-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export default function GenerativeUiPage() {
                     {sending ? t('generativeUi.sending') : t('generativeUi.send')}
                   </button>
                 </div>
-                <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                <div className="flex items-center gap-4 mt-2 text-xs text-warm-400">
                   <span>{t('generativeUi.streamingLabel')}: {session.streamingEnabled ? '✓' : '✗'}</span>
                   <span>{t('generativeUi.generativeUiLabel')}: {session.generativeUiEnabled ? '✓' : '✗'}</span>
                   <span>{t('generativeUi.enterToSend')}</span>
@@ -260,7 +260,7 @@ export default function GenerativeUiPage() {
             <div className="bg-white rounded-lg border p-6">
               <h3 className="font-semibold mb-4">{t('generativeUi.componentsTitle')}</h3>
               {session.generatedComponents === 0 ? (
-                <p className="text-gray-400 text-center py-8">{t('generativeUi.noComponents')}</p>
+                <p className="text-warm-400 text-center py-8">{t('generativeUi.noComponents')}</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Array.from({ length: session.generatedComponents }, (_, i) => (
@@ -269,7 +269,7 @@ export default function GenerativeUiPage() {
                         <span className="font-medium text-sm">Component {i + 1}</span>
                         <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">generated</span>
                       </div>
-                      <div className="bg-gray-50 rounded p-3 font-mono text-xs text-gray-600">
+                      <div className="bg-warm-50 rounded p-3 font-mono text-xs text-warm-600">
                         {'<GeneratedComponent />'}
                       </div>
                     </div>
@@ -294,8 +294,8 @@ export default function GenerativeUiPage() {
                     </div>
                     <div>
                       <h4 className="font-medium text-sm">{tool.name}</h4>
-                      <p className="text-sm text-gray-500 mt-1">{tool.description}</p>
-                      <span className="text-xs px-2 py-0.5 bg-gray-100 rounded mt-2 inline-block">{tool.category}</span>
+                      <p className="text-sm text-warm-500 mt-1">{tool.description}</p>
+                      <span className="text-xs px-2 py-0.5 bg-warm-100 rounded mt-2 inline-block">{tool.category}</span>
                     </div>
                   </div>
                 ))}
@@ -311,11 +311,11 @@ export default function GenerativeUiPage() {
               <div className="flex items-center justify-between py-3 border-b">
                 <div>
                   <p className="font-medium text-sm">{t('generativeUi.enableStreaming')}</p>
-                  <p className="text-xs text-gray-500">{t('generativeUi.enableStreamingDesc')}</p>
+                  <p className="text-xs text-warm-500">{t('generativeUi.enableStreamingDesc')}</p>
                 </div>
                 <button
                   onClick={() => handleUpdateSettings({ streamingEnabled: !session.streamingEnabled })}
-                  className={`w-12 h-6 rounded-full transition-colors ${session.streamingEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  className={`w-12 h-6 rounded-full transition-colors ${session.streamingEnabled ? 'bg-blue-600' : 'bg-warm-300'}`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${session.streamingEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
@@ -324,11 +324,11 @@ export default function GenerativeUiPage() {
               <div className="flex items-center justify-between py-3 border-b">
                 <div>
                   <p className="font-medium text-sm">{t('generativeUi.enableGenerativeUi')}</p>
-                  <p className="text-xs text-gray-500">{t('generativeUi.enableGenerativeUiDesc')}</p>
+                  <p className="text-xs text-warm-500">{t('generativeUi.enableGenerativeUiDesc')}</p>
                 </div>
                 <button
                   onClick={() => handleUpdateSettings({ generativeUiEnabled: !session.generativeUiEnabled })}
-                  className={`w-12 h-6 rounded-full transition-colors ${session.generativeUiEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  className={`w-12 h-6 rounded-full transition-colors ${session.generativeUiEnabled ? 'bg-blue-600' : 'bg-warm-300'}`}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${session.generativeUiEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
@@ -350,21 +350,21 @@ export default function GenerativeUiPage() {
               <div className="py-3">
                 <h4 className="font-medium text-sm mb-3">{t('generativeUi.sessionStats')}</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="bg-warm-50 rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold text-blue-600">{session.totalMessages}</p>
-                    <p className="text-xs text-gray-500">{t('generativeUi.stats.totalMessages')}</p>
+                    <p className="text-xs text-warm-500">{t('generativeUi.stats.totalMessages')}</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="bg-warm-50 rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold text-green-600">{session.generatedComponents}</p>
-                    <p className="text-xs text-gray-500">{t('generativeUi.stats.generatedComponents')}</p>
+                    <p className="text-xs text-warm-500">{t('generativeUi.stats.generatedComponents')}</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="bg-warm-50 rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold text-purple-600">{session.toolCallCount}</p>
-                    <p className="text-xs text-gray-500">{t('generativeUi.stats.toolCallsTotal')}</p>
+                    <p className="text-xs text-warm-500">{t('generativeUi.stats.toolCallsTotal')}</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                  <div className="bg-warm-50 rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold text-orange-600">${session.estimatedCost.toFixed(4)}</p>
-                    <p className="text-xs text-gray-500">{t('generativeUi.stats.estimatedCost')}</p>
+                    <p className="text-xs text-warm-500">{t('generativeUi.stats.estimatedCost')}</p>
                   </div>
                 </div>
               </div>

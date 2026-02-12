@@ -175,8 +175,8 @@ export default function LanguageManagement() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
-      <header className="p-6 border-b border-gray-700">
+    <div className="min-h-screen bg-gradient-to-b from-warm-900 to-warm-800 text-white">
+      <header className="p-6 border-b border-warm-700">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold">Admin &gt; {t('admin.languages.title')}</h1>
         </div>
@@ -184,7 +184,7 @@ export default function LanguageManagement() {
 
       <main className="max-w-6xl mx-auto p-6">
         {/* Language List */}
-        <div className="bg-gray-800 rounded-xl p-6 mb-6">
+        <div className="bg-warm-800 rounded-xl p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">{t('admin.languages.title')}</h2>
             <button
@@ -197,7 +197,7 @@ export default function LanguageManagement() {
 
           <table className="w-full">
             <thead>
-              <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
+              <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                 <th className="pb-2">{t('admin.languages.code')}</th>
                 <th className="pb-2">{t('admin.languages.name')}</th>
                 <th className="pb-2">{t('admin.languages.status')}</th>
@@ -207,7 +207,7 @@ export default function LanguageManagement() {
             </thead>
             <tbody>
               {languages.map(lang => (
-                <tr key={lang.code} className="border-b border-gray-700/50 hover:bg-gray-700/30">
+                <tr key={lang.code} className="border-b border-warm-700/50 hover:bg-warm-700/30">
                   <td className="py-3 font-mono">{lang.code}</td>
                   <td className="py-3">{lang.nativeName} ({lang.name})</td>
                   <td className="py-3">
@@ -216,31 +216,31 @@ export default function LanguageManagement() {
                     ) : lang.isActive ? (
                       <span className="px-2 py-1 bg-green-600 rounded text-xs">{t('admin.languages.active')}</span>
                     ) : (
-                      <span className="px-2 py-1 bg-gray-600 rounded text-xs">{t('admin.languages.inactive')}</span>
+                      <span className="px-2 py-1 bg-warm-600 rounded text-xs">{t('admin.languages.inactive')}</span>
                     )}
                   </td>
                   <td className="py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                      <div className="w-24 h-2 bg-warm-700 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-blue-500 rounded-full"
                           style={{ width: `${Math.round(lang.translationProgress)}%` }}
                         />
                       </div>
-                      <span className="text-sm text-gray-400">{Math.round(lang.translationProgress)}%</span>
+                      <span className="text-sm text-warm-400">{Math.round(lang.translationProgress)}%</span>
                     </div>
                   </td>
                   <td className="py-3">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSelectLanguage(lang.code)}
-                        className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs transition-colors"
+                        className="px-3 py-1 bg-warm-600 hover:bg-warm-500 rounded text-xs transition-colors"
                       >
                         {t('admin.languages.edit')}
                       </button>
                       <button
                         onClick={() => handleExport(lang.code)}
-                        className="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs transition-colors"
+                        className="px-3 py-1 bg-warm-600 hover:bg-warm-500 rounded text-xs transition-colors"
                       >
                         {t('admin.languages.export')}
                       </button>
@@ -262,7 +262,7 @@ export default function LanguageManagement() {
 
         {/* Translation Editor */}
         {selectedLang && (
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">
                 {t('admin.translations.title')} — {languages.find(l => l.code === selectedLang)?.nativeName} ({selectedLang})
@@ -270,20 +270,20 @@ export default function LanguageManagement() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleImport(selectedLang)}
-                  className="px-3 py-1.5 bg-gray-600 hover:bg-gray-500 rounded text-sm transition-colors"
+                  className="px-3 py-1.5 bg-warm-600 hover:bg-warm-500 rounded text-sm transition-colors"
                 >
                   {t('admin.translations.importJson')}
                 </button>
                 <button
                   onClick={() => handleExport(selectedLang)}
-                  className="px-3 py-1.5 bg-gray-600 hover:bg-gray-500 rounded text-sm transition-colors"
+                  className="px-3 py-1.5 bg-warm-600 hover:bg-warm-500 rounded text-sm transition-colors"
                 >
                   {t('admin.translations.exportJson')}
                 </button>
                 <button
                   onClick={handleSaveTranslations}
                   disabled={Object.keys(editedTranslations).length === 0}
-                  className="px-4 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded text-sm transition-colors"
+                  className="px-4 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-warm-600 disabled:cursor-not-allowed rounded text-sm transition-colors"
                 >
                   {t('admin.translations.save')} ({Object.keys(editedTranslations).length})
                 </button>
@@ -297,9 +297,9 @@ export default function LanguageManagement() {
                 value={filterText}
                 onChange={e => setFilterText(e.target.value)}
                 placeholder={t('admin.translations.filter')}
-                className="flex-1 p-2 bg-gray-900 border border-gray-700 rounded text-sm"
+                className="flex-1 p-2 bg-warm-900 border border-warm-700 rounded text-sm"
               />
-              <label className="flex items-center gap-2 text-sm text-gray-400">
+              <label className="flex items-center gap-2 text-sm text-warm-400">
                 <input
                   type="checkbox"
                   checked={missingOnly}
@@ -315,8 +315,8 @@ export default function LanguageManagement() {
             {/* Translation Table */}
             <div className="overflow-auto max-h-[600px]">
               <table className="w-full">
-                <thead className="sticky top-0 bg-gray-800">
-                  <tr className="text-left text-gray-400 text-sm border-b border-gray-700">
+                <thead className="sticky top-0 bg-warm-800">
+                  <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                     <th className="pb-2 w-1/4">{t('admin.translations.key')}</th>
                     <th className="pb-2 w-1/4">{t('admin.translations.reference')}</th>
                     <th className="pb-2 w-1/2">{t('admin.translations.translation')}</th>
@@ -327,16 +327,16 @@ export default function LanguageManagement() {
                     const compositeKey = `${entry.namespace}:${entry.key}`
                     const currentValue = editedTranslations[compositeKey] ?? entry.value
                     return (
-                      <tr key={compositeKey} className={`border-b border-gray-700/30 ${entry.isMissing ? 'bg-yellow-900/10' : ''}`}>
-                        <td className="py-2 font-mono text-xs text-gray-400">{entry.namespace}.{entry.key}</td>
-                        <td className="py-2 text-sm text-gray-300">{entry.referenceValue}</td>
+                      <tr key={compositeKey} className={`border-b border-warm-700/30 ${entry.isMissing ? 'bg-yellow-900/10' : ''}`}>
+                        <td className="py-2 font-mono text-xs text-warm-400">{entry.namespace}.{entry.key}</td>
+                        <td className="py-2 text-sm text-warm-300">{entry.referenceValue}</td>
                         <td className="py-2">
                           <input
                             type="text"
                             value={currentValue}
                             onChange={e => setEditedTranslations(prev => ({ ...prev, [compositeKey]: e.target.value }))}
-                            className={`w-full p-1.5 bg-gray-900 border rounded text-sm ${
-                              entry.isMissing ? 'border-yellow-600' : 'border-gray-700'
+                            className={`w-full p-1.5 bg-warm-900 border rounded text-sm ${
+                              entry.isMissing ? 'border-yellow-600' : 'border-warm-700'
                             }`}
                             placeholder={entry.isMissing ? '⚠️ Missing' : ''}
                           />
@@ -353,45 +353,45 @@ export default function LanguageManagement() {
         {/* Add Language Dialog */}
         {showAddDialog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-gray-800 rounded-xl p-6 w-96">
+            <div className="bg-warm-800 rounded-xl p-6 w-96">
               <h3 className="text-lg font-bold mb-4">{t('admin.languages.addNewLanguage')}</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.languageCode')}</label>
+                  <label className="block text-sm text-warm-400 mb-1">{t('admin.languages.languageCode')}</label>
                   <input
                     type="text"
                     value={newLang.code}
                     onChange={e => setNewLang(prev => ({ ...prev, code: e.target.value }))}
                     placeholder="en"
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                    className="w-full p-2 bg-warm-900 border border-warm-700 rounded"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.languageName')}</label>
+                  <label className="block text-sm text-warm-400 mb-1">{t('admin.languages.languageName')}</label>
                   <input
                     type="text"
                     value={newLang.name}
                     onChange={e => setNewLang(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="English"
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                    className="w-full p-2 bg-warm-900 border border-warm-700 rounded"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.nativeName')}</label>
+                  <label className="block text-sm text-warm-400 mb-1">{t('admin.languages.nativeName')}</label>
                   <input
                     type="text"
                     value={newLang.nativeName}
                     onChange={e => setNewLang(prev => ({ ...prev, nativeName: e.target.value }))}
                     placeholder="English"
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                    className="w-full p-2 bg-warm-900 border border-warm-700 rounded"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">{t('admin.languages.copyFrom')}</label>
+                  <label className="block text-sm text-warm-400 mb-1">{t('admin.languages.copyFrom')}</label>
                   <select
                     value={newLang.copyFromCode}
                     onChange={e => setNewLang(prev => ({ ...prev, copyFromCode: e.target.value }))}
-                    className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+                    className="w-full p-2 bg-warm-900 border border-warm-700 rounded"
                   >
                     <option value="">{t('admin.languages.emptyStart')}</option>
                     {languages.map(l => (
@@ -403,14 +403,14 @@ export default function LanguageManagement() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowAddDialog(false)}
-                  className="flex-1 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                  className="flex-1 py-2 bg-warm-700 hover:bg-warm-600 rounded transition-colors"
                 >
                   {t('tokens.confirm.cancel')}
                 </button>
                 <button
                   onClick={handleAddLanguage}
                   disabled={!newLang.code || !newLang.name || !newLang.nativeName}
-                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded transition-colors"
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 rounded transition-colors"
                 >
                   {t('admin.languages.addLanguage')}
                 </button>

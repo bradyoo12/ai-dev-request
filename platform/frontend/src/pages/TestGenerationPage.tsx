@@ -93,27 +93,27 @@ export default function TestGenerationPage() {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xl font-bold">{t('testGeneration.title', 'AI Test Generation')}</h3>
-          <p className="text-gray-400 text-sm mt-1">{t('testGeneration.subtitle', 'Auto-generate unit, integration, and E2E tests for your project')}</p>
+          <p className="text-warm-400 text-sm mt-1">{t('testGeneration.subtitle', 'Auto-generate unit, integration, and E2E tests for your project')}</p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-gray-400">{t('testGeneration.projectId', 'Project ID')}:</label>
+          <label className="text-sm text-warm-400">{t('testGeneration.projectId', 'Project ID')}:</label>
           <input
             type="number"
             min={1}
             value={projectId}
             onChange={(e) => setProjectId(Number(e.target.value))}
-            className="w-20 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"
+            className="w-20 bg-warm-700 border border-warm-600 rounded px-2 py-1 text-sm"
           />
           <button
             onClick={handleGenerate}
             disabled={generating}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-warm-600 rounded-lg text-sm font-medium transition-colors"
           >
             {generating ? t('testGeneration.generating', 'Generating...') : t('testGeneration.generate', 'Generate Tests')}
           </button>
           <button
             onClick={loadHistory}
-            className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+            className="px-3 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
           >
             {t('testGeneration.history', 'History')}
           </button>
@@ -133,57 +133,57 @@ export default function TestGenerationPage() {
       {!loading && record && (
         <>
           {/* Summary Card */}
-          <div className="bg-gray-800 rounded-xl p-6">
+          <div className="bg-warm-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   record.status === 'completed' ? 'bg-green-900/50 text-green-300' :
                   record.status === 'generating' ? 'bg-blue-900/50 text-blue-300' :
                   record.status === 'failed' ? 'bg-red-900/50 text-red-300' :
-                  'bg-gray-700 text-gray-300'
+                  'bg-warm-700 text-warm-300'
                 }`}>
                   {record.status}
                 </span>
-                <span className="text-sm text-gray-400">v{record.generationVersion}</span>
+                <span className="text-sm text-warm-400">v{record.generationVersion}</span>
               </div>
               {record.completedAt && (
-                <span className="text-xs text-gray-500">{new Date(record.completedAt).toLocaleString()}</span>
+                <span className="text-xs text-warm-500">{new Date(record.completedAt).toLocaleString()}</span>
               )}
             </div>
 
             {record.summary && (
-              <p className="text-gray-300 text-sm mb-4">{record.summary}</p>
+              <p className="text-warm-300 text-sm mb-4">{record.summary}</p>
             )}
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+              <div className="bg-warm-700/50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-blue-400">{record.testFilesGenerated}</div>
-                <div className="text-xs text-gray-400 mt-1">{t('testGeneration.stats.files', 'Test Files')}</div>
+                <div className="text-xs text-warm-400 mt-1">{t('testGeneration.stats.files', 'Test Files')}</div>
               </div>
-              <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+              <div className="bg-warm-700/50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-green-400">{record.totalTestCount}</div>
-                <div className="text-xs text-gray-400 mt-1">{t('testGeneration.stats.tests', 'Total Tests')}</div>
+                <div className="text-xs text-warm-400 mt-1">{t('testGeneration.stats.tests', 'Total Tests')}</div>
               </div>
-              <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+              <div className="bg-warm-700/50 rounded-lg p-3 text-center">
                 <div className="text-2xl font-bold text-purple-400">{record.coverageEstimate}%</div>
-                <div className="text-xs text-gray-400 mt-1">{t('testGeneration.stats.coverage', 'Est. Coverage')}</div>
+                <div className="text-xs text-warm-400 mt-1">{t('testGeneration.stats.coverage', 'Est. Coverage')}</div>
               </div>
-              <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+              <div className="bg-warm-700/50 rounded-lg p-3 text-center">
                 <div className="text-sm font-medium text-yellow-400 truncate">{record.testFramework || '—'}</div>
-                <div className="text-xs text-gray-400 mt-1">{t('testGeneration.stats.framework', 'Framework')}</div>
+                <div className="text-xs text-warm-400 mt-1">{t('testGeneration.stats.framework', 'Framework')}</div>
               </div>
             </div>
           </div>
 
           {/* Coverage Bar */}
           {record.status === 'completed' && (
-            <div className="bg-gray-800 rounded-xl p-4">
+            <div className="bg-warm-800 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">{t('testGeneration.coverageBar', 'Estimated Coverage')}</span>
-                <span className="text-sm text-gray-400">{record.coverageEstimate}%</span>
+                <span className="text-sm text-warm-400">{record.coverageEstimate}%</span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-3">
+              <div className="w-full bg-warm-700 rounded-full h-3">
                 <div
                   className={`h-3 rounded-full transition-all ${
                     record.coverageEstimate >= 80 ? 'bg-green-500' :
@@ -198,7 +198,7 @@ export default function TestGenerationPage() {
 
           {/* Test Files List */}
           {testFiles.length > 0 && (
-            <div className="bg-gray-800 rounded-xl p-6">
+            <div className="bg-warm-800 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-semibold">{t('testGeneration.files', 'Generated Test Files')}</h4>
                 <div className="flex gap-2">
@@ -209,7 +209,7 @@ export default function TestGenerationPage() {
                       className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                         typeFilter === type
                           ? 'bg-blue-600 text-white'
-                          : 'bg-gray-700 text-gray-400 hover:text-white'
+                          : 'bg-warm-700 text-warm-400 hover:text-white'
                       }`}
                     >
                       {type === 'all' ? `All (${testFiles.length})` :
@@ -226,7 +226,7 @@ export default function TestGenerationPage() {
                   <div
                     key={idx}
                     onClick={() => setSelectedFile(selectedFile?.path === file.path ? null : file)}
-                    className="bg-gray-700/50 rounded-lg p-3 cursor-pointer hover:bg-gray-700 transition-colors"
+                    className="bg-warm-700/50 rounded-lg p-3 cursor-pointer hover:bg-warm-700 transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -239,10 +239,10 @@ export default function TestGenerationPage() {
                         </span>
                         <span className="text-sm font-mono">{file.path}</span>
                       </div>
-                      <span className="text-xs text-gray-400">{file.testCount} {t('testGeneration.testsLabel', 'tests')}</span>
+                      <span className="text-xs text-warm-400">{file.testCount} {t('testGeneration.testsLabel', 'tests')}</span>
                     </div>
                     {selectedFile?.path === file.path && file.content && (
-                      <pre className="mt-3 p-3 bg-gray-900 rounded text-xs text-gray-300 overflow-x-auto max-h-80">
+                      <pre className="mt-3 p-3 bg-warm-900 rounded text-xs text-warm-300 overflow-x-auto max-h-80">
                         {file.content}
                       </pre>
                     )}
@@ -255,45 +255,45 @@ export default function TestGenerationPage() {
       )}
 
       {!loading && !record && (
-        <div className="bg-gray-800 rounded-xl p-12 text-center">
-          <div className="text-gray-400 mb-4">
+        <div className="bg-warm-800 rounded-xl p-12 text-center">
+          <div className="text-warm-400 mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3">
               <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
               <polyline points="14 2 14 8 20 8"/>
               <path d="m9 15 2 2 4-4"/>
             </svg>
           </div>
-          <p className="text-gray-400">{t('testGeneration.empty', 'No test generation results yet. Click "Generate Tests" to start.')}</p>
+          <p className="text-warm-400">{t('testGeneration.empty', 'No test generation results yet. Click "Generate Tests" to start.')}</p>
         </div>
       )}
 
       {/* History Modal */}
       {showHistory && (
-        <div className="bg-gray-800 rounded-xl p-6">
+        <div className="bg-warm-800 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold">{t('testGeneration.historyTitle', 'Generation History')}</h4>
-            <button onClick={() => setShowHistory(false)} className="text-gray-400 hover:text-white text-sm">
+            <button onClick={() => setShowHistory(false)} className="text-warm-400 hover:text-white text-sm">
               {t('testGeneration.close', 'Close')}
             </button>
           </div>
           {history.length === 0 ? (
-            <p className="text-gray-400 text-sm">{t('testGeneration.noHistory', 'No generation history.')}</p>
+            <p className="text-warm-400 text-sm">{t('testGeneration.noHistory', 'No generation history.')}</p>
           ) : (
             <div className="space-y-2">
               {history.map(h => (
-                <div key={h.id} className="bg-gray-700/50 rounded-lg p-3 flex items-center justify-between">
+                <div key={h.id} className="bg-warm-700/50 rounded-lg p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                       h.status === 'completed' ? 'bg-green-900/50 text-green-300' :
                       h.status === 'failed' ? 'bg-red-900/50 text-red-300' :
-                      'bg-gray-600 text-gray-300'
+                      'bg-warm-600 text-warm-300'
                     }`}>
                       {h.status}
                     </span>
                     <span className="text-sm">v{h.generationVersion}</span>
-                    <span className="text-xs text-gray-400">{h.testFilesGenerated} files, {h.totalTestCount} tests</span>
+                    <span className="text-xs text-warm-400">{h.testFilesGenerated} files, {h.totalTestCount} tests</span>
                   </div>
-                  <span className="text-xs text-gray-500">{new Date(h.createdAt).toLocaleString()}</span>
+                  <span className="text-xs text-warm-500">{new Date(h.createdAt).toLocaleString()}</span>
                 </div>
               ))}
             </div>

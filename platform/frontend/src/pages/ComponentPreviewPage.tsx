@@ -99,7 +99,7 @@ export default function ComponentPreviewPage() {
   }, [activePreview?.chatHistory])
 
   const statusColors: Record<string, string> = {
-    draft: 'bg-gray-600/20 text-gray-400',
+    draft: 'bg-warm-600/20 text-warm-400',
     generating: 'bg-yellow-600/20 text-yellow-400',
     ready: 'bg-green-600/20 text-green-400',
     exported: 'bg-blue-600/20 text-blue-400',
@@ -108,9 +108,9 @@ export default function ComponentPreviewPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gray-900 rounded-lg p-6">
+      <div className="bg-warm-900 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-2">{t('componentPreview.title')}</h3>
-        <p className="text-gray-400 text-sm mb-4">{t('componentPreview.subtitle')}</p>
+        <p className="text-warm-400 text-sm mb-4">{t('componentPreview.subtitle')}</p>
 
         {error && (
           <div className="bg-red-900/20 border border-red-700 rounded p-3 mb-4 text-red-200 text-sm">
@@ -125,14 +125,14 @@ export default function ComponentPreviewPage() {
             value={componentName}
             onChange={(e) => setComponentName(e.target.value)}
             placeholder={t('componentPreview.namePlaceholder')}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
+            className="w-full bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm"
           />
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder={t('componentPreview.promptPlaceholder')}
             rows={3}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm resize-none"
+            className="w-full bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm resize-none"
           />
           <button
             onClick={handleCreate}
@@ -147,12 +147,12 @@ export default function ComponentPreviewPage() {
       {/* Main Layout: Preview List + Active Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Component List */}
-        <div className="bg-gray-900 rounded-lg p-6">
+        <div className="bg-warm-900 rounded-lg p-6">
           <h4 className="text-md font-semibold mb-4">{t('componentPreview.myComponents')}</h4>
           {loading ? (
-            <p className="text-gray-400 text-sm">{t('componentPreview.loadingList')}</p>
+            <p className="text-warm-400 text-sm">{t('componentPreview.loadingList')}</p>
           ) : previews.length === 0 ? (
-            <p className="text-gray-500 text-sm">{t('componentPreview.empty')}</p>
+            <p className="text-warm-500 text-sm">{t('componentPreview.empty')}</p>
           ) : (
             <div className="space-y-2">
               {previews.map((p) => (
@@ -162,16 +162,16 @@ export default function ComponentPreviewPage() {
                   className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     activePreview?.id === p.id
                       ? 'border-blue-500 bg-blue-900/20'
-                      : 'border-gray-700/50 bg-gray-800/30 hover:border-gray-600'
+                      : 'border-warm-700/50 bg-warm-800/30 hover:border-warm-600'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-medium text-white text-sm">{p.componentName}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[p.status] || 'bg-gray-600/20 text-gray-400'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[p.status] || 'bg-warm-600/20 text-warm-400'}`}>
                       {p.status}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-warm-500">
                     v{p.iterationCount} &middot; {new Date(p.updatedAt).toLocaleDateString()}
                   </p>
                   <button
@@ -190,10 +190,10 @@ export default function ComponentPreviewPage() {
         {activePreview ? (
           <div className="lg:col-span-2 space-y-4">
             {/* Preview Header */}
-            <div className="bg-gray-900 rounded-lg p-4 flex items-center justify-between">
+            <div className="bg-warm-900 rounded-lg p-4 flex items-center justify-between">
               <div>
                 <h4 className="font-semibold text-white">{activePreview.componentName}</h4>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-warm-400">
                   {t('componentPreview.iteration')} {activePreview.iterationCount} &middot;{' '}
                   <span className={`px-1.5 py-0.5 rounded text-xs ${statusColors[activePreview.status] || ''}`}>
                     {activePreview.status}
@@ -210,16 +210,16 @@ export default function ComponentPreviewPage() {
             </div>
 
             {/* Code Preview */}
-            <div className="bg-gray-900 rounded-lg p-4">
-              <h5 className="text-sm font-medium text-gray-300 mb-3">{t('componentPreview.codePreview')}</h5>
-              <div className="bg-gray-950 rounded-lg p-4 overflow-auto max-h-[400px]">
+            <div className="bg-warm-900 rounded-lg p-4">
+              <h5 className="text-sm font-medium text-warm-300 mb-3">{t('componentPreview.codePreview')}</h5>
+              <div className="bg-warm-950 rounded-lg p-4 overflow-auto max-h-[400px]">
                 <pre className="text-sm text-green-300 font-mono whitespace-pre-wrap">{activePreview.code}</pre>
               </div>
             </div>
 
             {/* Live Preview (iframe sandbox) */}
-            <div className="bg-gray-900 rounded-lg p-4">
-              <h5 className="text-sm font-medium text-gray-300 mb-3">{t('componentPreview.livePreview')}</h5>
+            <div className="bg-warm-900 rounded-lg p-4">
+              <h5 className="text-sm font-medium text-warm-300 mb-3">{t('componentPreview.livePreview')}</h5>
               <div className="bg-white rounded-lg overflow-hidden" style={{ height: '300px' }}>
                 <iframe
                   srcDoc={generatePreviewHtml(activePreview.code)}
@@ -231,8 +231,8 @@ export default function ComponentPreviewPage() {
             </div>
 
             {/* Chat / Iteration */}
-            <div className="bg-gray-900 rounded-lg p-4">
-              <h5 className="text-sm font-medium text-gray-300 mb-3">{t('componentPreview.chatTitle')}</h5>
+            <div className="bg-warm-900 rounded-lg p-4">
+              <h5 className="text-sm font-medium text-warm-300 mb-3">{t('componentPreview.chatTitle')}</h5>
               <div className="space-y-3 max-h-[300px] overflow-y-auto mb-4">
                 {(activePreview.chatHistory as ChatMessage[]).map((msg, idx) => (
                   <div
@@ -240,10 +240,10 @@ export default function ComponentPreviewPage() {
                     className={`p-3 rounded-lg text-sm ${
                       msg.role === 'user'
                         ? 'bg-blue-900/20 border border-blue-700/30 text-blue-200 ml-8'
-                        : 'bg-gray-800/50 border border-gray-700/30 text-gray-300 mr-8'
+                        : 'bg-warm-800/50 border border-warm-700/30 text-warm-300 mr-8'
                     }`}
                   >
-                    <span className="text-xs text-gray-500 block mb-1">
+                    <span className="text-xs text-warm-500 block mb-1">
                       {msg.role === 'user' ? t('componentPreview.you') : t('componentPreview.ai')}
                     </span>
                     {msg.content}
@@ -258,7 +258,7 @@ export default function ComponentPreviewPage() {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleIterate()}
                   placeholder={t('componentPreview.chatPlaceholder')}
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
+                  className="flex-1 bg-warm-800 border border-warm-700 rounded px-3 py-2 text-white text-sm"
                   disabled={iterating}
                 />
                 <button
@@ -272,8 +272,8 @@ export default function ComponentPreviewPage() {
             </div>
           </div>
         ) : (
-          <div className="lg:col-span-2 bg-gray-900 rounded-lg p-12 text-center">
-            <p className="text-gray-400">{t('componentPreview.selectOrCreate')}</p>
+          <div className="lg:col-span-2 bg-warm-900 rounded-lg p-12 text-center">
+            <p className="text-warm-400">{t('componentPreview.selectOrCreate')}</p>
           </div>
         )}
       </div>
@@ -305,5 +305,5 @@ function extractJsx(code: string): string {
     jsx = jsx.replace(/\{[^}]*\}/g, '')
     return jsx
   }
-  return '<div class="p-6 text-gray-500">Preview will appear here</div>'
+  return '<div class="p-6 text-warm-500">Preview will appear here</div>'
 }

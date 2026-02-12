@@ -49,8 +49,8 @@ export default function MobilePreview({ requestId, previewUrl, platform }: Mobil
             <QRCodeSVG value={snackUrl} size={128} />
           </div>
           <div className="flex-1">
-            <p className="text-sm text-gray-300 mb-3">{t('mobile.previewDescription')}</p>
-            <div className="text-xs text-gray-400 space-y-1 mb-4">
+            <p className="text-sm text-warm-300 mb-3">{t('mobile.previewDescription')}</p>
+            <div className="text-xs text-warm-400 space-y-1 mb-4">
               <p>1. {t('mobile.step1')}</p>
               <p>2. {t('mobile.step2')}</p>
               <p>3. {t('mobile.step3')}</p>
@@ -70,7 +70,7 @@ export default function MobilePreview({ requestId, previewUrl, platform }: Mobil
           {loading ? (
             <div>
               <div className="animate-spin w-8 h-8 border-3 border-purple-500 border-t-transparent rounded-full mx-auto mb-3"></div>
-              <p className="text-sm text-gray-400">{t('mobile.generating')}</p>
+              <p className="text-sm text-warm-400">{t('mobile.generating')}</p>
             </div>
           ) : error ? (
             <div>
@@ -84,7 +84,7 @@ export default function MobilePreview({ requestId, previewUrl, platform }: Mobil
             </div>
           ) : (
             <div>
-              <p className="text-sm text-gray-400 mb-3">{t('mobile.generateDescription')}</p>
+              <p className="text-sm text-warm-400 mb-3">{t('mobile.generateDescription')}</p>
               <button
                 onClick={handleGenerate}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors"

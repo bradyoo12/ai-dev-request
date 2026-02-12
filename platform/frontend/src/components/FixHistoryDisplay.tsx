@@ -32,11 +32,11 @@ export default function FixHistoryDisplay({ fixHistory, validationPassed, iterat
   }
 
   return (
-    <div className="bg-gray-900 rounded-xl p-4 mb-4" data-testid="fix-history-display">
+    <div className="bg-warm-900 rounded-xl p-4 mb-4" data-testid="fix-history-display">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="font-bold text-gray-300">{t('validation.fixHistory')}</h4>
+        <h4 className="font-bold text-warm-300">{t('validation.fixHistory')}</h4>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-warm-400">
             {t('validation.iterations')}: {iterations}
           </span>
           <span
@@ -56,33 +56,33 @@ export default function FixHistoryDisplay({ fixHistory, validationPassed, iterat
         {fixHistory.map((entry) => {
           const isExpanded = expandedItems.has(entry.iteration)
           return (
-            <div key={entry.iteration} className="bg-gray-800 rounded-lg overflow-hidden">
+            <div key={entry.iteration} className="bg-warm-800 rounded-lg overflow-hidden">
               <button
                 type="button"
                 onClick={() => toggleExpand(entry.iteration)}
-                className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-750 transition-colors"
+                className="w-full flex items-center justify-between p-3 text-left hover:bg-warm-750 transition-colors"
                 data-testid={`fix-history-toggle-${entry.iteration}`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-300">
+                  <span className="text-sm font-medium text-warm-300">
                     #{entry.iteration}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-warm-500">
                     {entry.issues.length} {t('validation.issuesFound')}
                   </span>
                 </div>
-                <span className={`text-gray-400 text-sm transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                <span className={`text-warm-400 text-sm transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
                   &#9660;
                 </span>
               </button>
 
               {isExpanded && (
-                <div className="px-3 pb-3 border-t border-gray-700" data-testid={`fix-history-content-${entry.iteration}`}>
+                <div className="px-3 pb-3 border-t border-warm-700" data-testid={`fix-history-content-${entry.iteration}`}>
                   <div className="mt-2">
                     <div className="text-xs text-red-400 font-medium mb-1">
                       {entry.issues.length} {t('validation.issuesFound')}:
                     </div>
-                    <ul className="list-disc list-inside text-xs text-gray-400 space-y-0.5 mb-2">
+                    <ul className="list-disc list-inside text-xs text-warm-400 space-y-0.5 mb-2">
                       {entry.issues.map((issue, idx) => (
                         <li key={idx}>{issue}</li>
                       ))}
@@ -92,7 +92,7 @@ export default function FixHistoryDisplay({ fixHistory, validationPassed, iterat
                     <div className="text-xs text-blue-400 font-medium mb-1">
                       {t('validation.fixApplied')}:
                     </div>
-                    <p className="text-xs text-gray-400">{entry.fixDescription}</p>
+                    <p className="text-xs text-warm-400">{entry.fixDescription}</p>
                   </div>
                 </div>
               )}

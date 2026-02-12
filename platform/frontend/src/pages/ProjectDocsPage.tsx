@@ -94,7 +94,7 @@ export default function ProjectDocsPage() {
       completed: 'bg-green-900/30 text-green-400',
       failed: 'bg-red-900/30 text-red-400',
     }
-    return colors[status] || 'bg-gray-700 text-gray-400'
+    return colors[status] || 'bg-warm-700 text-warm-400'
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -107,7 +107,7 @@ export default function ProjectDocsPage() {
   return (
     <div>
       <h3 className="text-xl font-bold mb-4">{t('projectDocs.title', 'Project Documentation')}</h3>
-      <p className="text-gray-400 text-sm mb-6">{t('projectDocs.subtitle', 'Auto-generate comprehensive documentation for your projects with architecture overview, component docs, API reference, and interactive Q&A.')}</p>
+      <p className="text-warm-400 text-sm mb-6">{t('projectDocs.subtitle', 'Auto-generate comprehensive documentation for your projects with architecture overview, component docs, API reference, and interactive Q&A.')}</p>
 
       <div className="flex gap-2 mb-6">
         {(['generate', 'qa', 'library', 'stats'] as Tab[]).map((t2) => (
@@ -115,7 +115,7 @@ export default function ProjectDocsPage() {
             key={t2}
             onClick={() => setTab(t2)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === t2 ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              tab === t2 ? 'bg-blue-600 text-white' : 'bg-warm-800 text-warm-400 hover:text-white'
             }`}
           >
             {t(`projectDocs.tabs.${t2}`, t2 === 'qa' ? 'Q&A' : t2.charAt(0).toUpperCase() + t2.slice(1))}
@@ -125,7 +125,7 @@ export default function ProjectDocsPage() {
 
       {tab === 'generate' && (
         <div className="space-y-6">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6">
+          <div className="bg-warm-900 border border-warm-700 rounded-lg p-6">
             <h4 className="font-medium mb-4">{t('projectDocs.generateTitle', 'Generate Documentation')}</h4>
             <div className="space-y-4">
               <div>
@@ -134,7 +134,7 @@ export default function ProjectDocsPage() {
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   placeholder={t('projectDocs.projectNamePlaceholder', 'e.g., My E-Commerce Platform')}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -144,7 +144,7 @@ export default function ProjectDocsPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t('projectDocs.descriptionPlaceholder', 'Describe your project features, tech stack, and key requirements... (e.g., React frontend with REST API, PostgreSQL database, JWT auth)')}
                   rows={4}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none resize-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-3 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none resize-none"
                 />
               </div>
               <button
@@ -161,7 +161,7 @@ export default function ProjectDocsPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">{generatedDoc.projectName}</h4>
-                <div className="flex items-center gap-3 text-xs text-gray-400">
+                <div className="flex items-center gap-3 text-xs text-warm-400">
                   <span>{generatedDoc.sourceFilesCount} files</span>
                   <span>{generatedDoc.totalLinesAnalyzed.toLocaleString()} lines</span>
                   <span>{generatedDoc.generationTimeMs}ms</span>
@@ -175,10 +175,10 @@ export default function ProjectDocsPage() {
                 { key: 'api', title: t('projectDocs.sections.api', 'API Reference'), content: generatedDoc.apiReference },
                 { key: 'setup', title: t('projectDocs.sections.setup', 'Setup Guide'), content: generatedDoc.setupGuide },
               ].map((section) => (
-                <div key={section.key} className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+                <div key={section.key} className="bg-warm-900 border border-warm-700 rounded-lg overflow-hidden">
                   <button
                     onClick={() => toggleSection(section.key)}
-                    className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-800 transition-colors"
+                    className="w-full flex items-center justify-between p-4 text-left hover:bg-warm-800 transition-colors"
                   >
                     <span className="font-medium text-sm">{section.title}</span>
                     <svg
@@ -197,7 +197,7 @@ export default function ProjectDocsPage() {
                     </svg>
                   </button>
                   {expandedSections[section.key] && (
-                    <div className="px-4 pb-4 text-sm text-gray-300 whitespace-pre-wrap border-t border-gray-700 pt-3">
+                    <div className="px-4 pb-4 text-sm text-warm-300 whitespace-pre-wrap border-t border-warm-700 pt-3">
                       {section.content}
                     </div>
                   )}
@@ -210,7 +210,7 @@ export default function ProjectDocsPage() {
 
       {tab === 'qa' && (
         <div className="space-y-6">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6">
+          <div className="bg-warm-900 border border-warm-700 rounded-lg p-6">
             <h4 className="font-medium mb-4">{t('projectDocs.qaTitle', 'Ask About Your Project')}</h4>
             <div className="space-y-4">
               <div>
@@ -221,7 +221,7 @@ export default function ProjectDocsPage() {
                     setSelectedDocId(e.target.value)
                     setQaDoc(docs.find(d => d.id === e.target.value) || null)
                   }}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm focus:border-blue-500 focus:outline-none"
                 >
                   {docs.length === 0 && <option value="">No documentation available</option>}
                   {docs.map((d) => (
@@ -235,7 +235,7 @@ export default function ProjectDocsPage() {
                   onChange={(e) => setQuestion(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={t('projectDocs.questionPlaceholder', 'Ask a question about the project... (e.g., How is the API structured?)')}
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg p-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                  className="flex-1 bg-warm-800 border border-warm-700 rounded-lg p-2 text-sm placeholder-warm-500 focus:border-blue-500 focus:outline-none"
                 />
                 <button
                   onClick={handleAsk}
@@ -251,9 +251,9 @@ export default function ProjectDocsPage() {
           {qaDoc && (
             <div className="space-y-3">
               <h4 className="font-medium text-sm">{t('projectDocs.qaHistory', 'Q&A History')} - {qaDoc.projectName}</h4>
-              <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 max-h-[500px] overflow-y-auto">
+              <div className="bg-warm-900 border border-warm-700 rounded-lg p-4 max-h-[500px] overflow-y-auto">
                 {parseQaHistory(qaDoc.qaHistoryJson).length === 0 && (
-                  <div className="text-center py-8 text-gray-500 text-sm">{t('projectDocs.noQa', 'No questions asked yet. Ask your first question above!')}</div>
+                  <div className="text-center py-8 text-warm-500 text-sm">{t('projectDocs.noQa', 'No questions asked yet. Ask your first question above!')}</div>
                 )}
                 {parseQaHistory(qaDoc.qaHistoryJson).map((entry, i) => (
                   <div key={i} className="mb-4">
@@ -263,7 +263,7 @@ export default function ProjectDocsPage() {
                       </div>
                     </div>
                     <div className="flex justify-start">
-                      <div className="max-w-[80%] rounded-lg p-3 text-sm bg-gray-800 text-gray-200 border border-gray-700">
+                      <div className="max-w-[80%] rounded-lg p-3 text-sm bg-warm-800 text-warm-200 border border-warm-700">
                         {entry.answer}
                       </div>
                     </div>
@@ -278,16 +278,16 @@ export default function ProjectDocsPage() {
       {tab === 'library' && (
         <div className="space-y-3">
           {libraryDocs.length === 0 && (
-            <div className="text-center py-12 text-gray-500 text-sm">{t('projectDocs.noLibrary', 'No documentation generated yet. Go to the Generate tab to create your first!')}</div>
+            <div className="text-center py-12 text-warm-500 text-sm">{t('projectDocs.noLibrary', 'No documentation generated yet. Go to the Generate tab to create your first!')}</div>
           )}
           {viewDoc && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4">
+            <div className="bg-warm-900 border border-warm-700 rounded-lg p-4 mb-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <h4 className="font-medium">{viewDoc.projectName}</h4>
                   <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(viewDoc.status)}`}>{viewDoc.status}</span>
                 </div>
-                <button onClick={() => setViewDoc(null)} className="text-sm text-gray-400 hover:text-white">Close</button>
+                <button onClick={() => setViewDoc(null)} className="text-sm text-warm-400 hover:text-white">Close</button>
               </div>
               <div className="max-h-[400px] overflow-y-auto space-y-3">
                 {[
@@ -296,26 +296,26 @@ export default function ProjectDocsPage() {
                   { title: 'API Reference', content: viewDoc.apiReference },
                   { title: 'Setup Guide', content: viewDoc.setupGuide },
                 ].map((section, i) => (
-                  <div key={i} className="bg-gray-800 border border-gray-700 rounded-lg p-3">
-                    <h5 className="text-xs font-medium text-gray-400 mb-2">{section.title}</h5>
-                    <div className="text-xs text-gray-300 whitespace-pre-wrap">{section.content}</div>
+                  <div key={i} className="bg-warm-800 border border-warm-700 rounded-lg p-3">
+                    <h5 className="text-xs font-medium text-warm-400 mb-2">{section.title}</h5>
+                    <div className="text-xs text-warm-300 whitespace-pre-wrap">{section.content}</div>
                   </div>
                 ))}
               </div>
-              <div className="mt-3 text-xs text-gray-400">
+              <div className="mt-3 text-xs text-warm-400">
                 {viewDoc.sourceFilesCount} files, {viewDoc.totalLinesAnalyzed.toLocaleString()} lines, {viewDoc.generationTimeMs}ms generation time
               </div>
             </div>
           )}
           {libraryDocs.map((d) => (
-            <div key={d.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center justify-between">
+            <div key={d.id} className="bg-warm-800 border border-warm-700 rounded-lg p-4 flex items-center justify-between">
               <div className="flex-1 cursor-pointer" onClick={() => setViewDoc(d)}>
                 <div className="font-medium text-sm">{d.projectName}</div>
-                <div className="text-xs text-gray-400 mt-1">{d.sourceFilesCount} files, {d.totalLinesAnalyzed.toLocaleString()} lines analyzed</div>
+                <div className="text-xs text-warm-400 mt-1">{d.sourceFilesCount} files, {d.totalLinesAnalyzed.toLocaleString()} lines analyzed</div>
               </div>
               <div className="flex items-center gap-3">
                 <span className={`text-xs px-2 py-0.5 rounded ${statusBadge(d.status)}`}>{d.status}</span>
-                <span className="text-xs text-gray-500">{new Date(d.createdAt).toLocaleDateString()}</span>
+                <span className="text-xs text-warm-500">{new Date(d.createdAt).toLocaleDateString()}</span>
                 <button
                   onClick={() => handleDelete(d.id)}
                   className="text-xs text-red-400 hover:text-red-300 transition-colors"
@@ -331,32 +331,32 @@ export default function ProjectDocsPage() {
       {tab === 'stats' && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.totalDocs}</div>
-              <div className="text-sm text-gray-400">{t('projectDocs.stats.totalDocs', 'Total Docs')}</div>
+              <div className="text-sm text-warm-400">{t('projectDocs.stats.totalDocs', 'Total Docs')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-blue-400">{stats.totalFilesAnalyzed}</div>
-              <div className="text-sm text-gray-400">{t('projectDocs.stats.filesAnalyzed', 'Files Analyzed')}</div>
+              <div className="text-sm text-warm-400">{t('projectDocs.stats.filesAnalyzed', 'Files Analyzed')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-400">{stats.totalLinesAnalyzed.toLocaleString()}</div>
-              <div className="text-sm text-gray-400">{t('projectDocs.stats.linesAnalyzed', 'Lines Analyzed')}</div>
+              <div className="text-sm text-warm-400">{t('projectDocs.stats.linesAnalyzed', 'Lines Analyzed')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold">{stats.avgGenerationTimeMs}ms</div>
-              <div className="text-sm text-gray-400">{t('projectDocs.stats.avgGenTime', 'Avg Generation Time')}</div>
+              <div className="text-sm text-warm-400">{t('projectDocs.stats.avgGenTime', 'Avg Generation Time')}</div>
             </div>
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center">
+            <div className="bg-warm-800 border border-warm-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-purple-400">{stats.totalTokensUsed.toLocaleString()}</div>
-              <div className="text-sm text-gray-400">{t('projectDocs.stats.tokensUsed', 'Tokens Used')}</div>
+              <div className="text-sm text-warm-400">{t('projectDocs.stats.tokensUsed', 'Tokens Used')}</div>
             </div>
           </div>
         </div>
       )}
 
       {tab === 'stats' && !stats && (
-        <div className="text-center py-12 text-gray-500 text-sm">{t('projectDocs.stats.loading', 'Loading stats...')}</div>
+        <div className="text-center py-12 text-warm-500 text-sm">{t('projectDocs.stats.loading', 'Loading stats...')}</div>
       )}
     </div>
   )

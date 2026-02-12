@@ -74,7 +74,7 @@ export default function PlatformUpgradePage() {
       case 'Runtime': return 'bg-orange-100 text-orange-800'
       case 'Language': return 'bg-yellow-100 text-yellow-800'
       case 'DevTools': return 'bg-pink-100 text-pink-800'
-      default: return 'bg-gray-100 text-gray-800'
+      default: return 'bg-warm-100 text-warm-800'
     }
   }
 
@@ -82,7 +82,7 @@ export default function PlatformUpgradePage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold">{t('platformUpgrade.title')}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t('platformUpgrade.description')}</p>
+        <p className="text-sm text-warm-500 mt-1">{t('platformUpgrade.description')}</p>
       </div>
 
       {!status ? (
@@ -94,15 +94,15 @@ export default function PlatformUpgradePage() {
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-white border rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-blue-600">{status.currentDotNetVersion}</div>
-              <div className="text-sm text-gray-500">.NET</div>
+              <div className="text-sm text-warm-500">.NET</div>
             </div>
             <div className="bg-white border rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-600">{status.currentEfCoreVersion}</div>
-              <div className="text-sm text-gray-500">EF Core</div>
+              <div className="text-sm text-warm-500">EF Core</div>
             </div>
             <div className="bg-white border rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-purple-600">C# {status.currentCSharpVersion}</div>
-              <div className="text-sm text-gray-500">{t('platformUpgrade.language')}</div>
+              <div className="text-sm text-warm-500">{t('platformUpgrade.language')}</div>
             </div>
           </div>
 
@@ -111,7 +111,7 @@ export default function PlatformUpgradePage() {
               <button
                 key={tb}
                 onClick={() => setTab(tb)}
-                className={`px-4 py-2 text-sm rounded-t-lg ${tab === tb ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+                className={`px-4 py-2 text-sm rounded-t-lg ${tab === tb ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-700' : 'text-warm-500 hover:text-warm-700'}`}
               >
                 {t(`platformUpgrade.tab.${tb}`)}
               </button>
@@ -131,11 +131,11 @@ export default function PlatformUpgradePage() {
                   <div key={key} className="flex items-center justify-between bg-white border rounded-lg p-4">
                     <div>
                       <div className="font-medium">{label}</div>
-                      <div className="text-sm text-gray-500">{desc}</div>
+                      <div className="text-sm text-warm-500">{desc}</div>
                     </div>
                     <button
                       onClick={() => handleToggle(key, !status[key])}
-                      className={`w-12 h-6 rounded-full transition-colors ${status[key] ? 'bg-blue-600' : 'bg-gray-300'}`}
+                      className={`w-12 h-6 rounded-full transition-colors ${status[key] ? 'bg-blue-600' : 'bg-warm-300'}`}
                     >
                       <span className={`block w-5 h-5 bg-white rounded-full shadow transform transition-transform ${status[key] ? 'translate-x-6' : 'translate-x-0.5'}`} />
                     </button>
@@ -150,37 +150,37 @@ export default function PlatformUpgradePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{perf.avgQueryTimeMs}ms</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.perf.avgQuery')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.perf.avgQuery')}</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{perf.p95QueryTimeMs}ms</div>
-                  <div className="text-sm text-gray-500">P95</div>
+                  <div className="text-sm text-warm-500">P95</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{perf.p99QueryTimeMs}ms</div>
-                  <div className="text-sm text-gray-500">P99</div>
+                  <div className="text-sm text-warm-500">P99</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{perf.totalQueriesExecuted.toLocaleString()}</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.perf.totalQueries')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.perf.totalQueries')}</div>
                 </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">{perf.cacheHitRate}%</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.perf.cacheHit')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.perf.cacheHit')}</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{perf.memoryUsageMb} MB</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.perf.memory')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.perf.memory')}</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{perf.cpuUsagePercent}%</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.perf.cpu')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.perf.cpu')}</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">{perf.throughputRequestsPerSec}</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.perf.throughput')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.perf.throughput')}</div>
                 </div>
               </div>
             </div>
@@ -191,23 +191,23 @@ export default function PlatformUpgradePage() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{vectorStats.vectorIndexCount}</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.vector.indexes')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.vector.indexes')}</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold">{vectorStats.vectorDimensions}</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.vector.dimensions')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.vector.dimensions')}</div>
                 </div>
                 <div className="bg-white border rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">{vectorStats.vectorSearchAvgMs}ms</div>
-                  <div className="text-sm text-gray-500">{t('platformUpgrade.vector.avgSearch')}</div>
+                  <div className="text-sm text-warm-500">{t('platformUpgrade.vector.avgSearch')}</div>
                 </div>
               </div>
-              <div className={`p-4 rounded-lg border ${vectorStats.enabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+              <div className={`p-4 rounded-lg border ${vectorStats.enabled ? 'bg-green-50 border-green-200' : 'bg-warm-50 border-warm-200'}`}>
                 <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${vectorStats.enabled ? 'bg-green-500' : 'bg-gray-400'}`} />
+                  <span className={`w-3 h-3 rounded-full ${vectorStats.enabled ? 'bg-green-500' : 'bg-warm-400'}`} />
                   <span className="font-medium">{vectorStats.enabled ? t('platformUpgrade.vector.enabled') : t('platformUpgrade.vector.disabled')}</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-1">{t('platformUpgrade.vector.description')}</p>
+                <p className="text-sm text-warm-500 mt-1">{t('platformUpgrade.vector.description')}</p>
               </div>
             </div>
           )}
@@ -221,7 +221,7 @@ export default function PlatformUpgradePage() {
                     <span className={`px-2 py-0.5 rounded-full text-xs ${categoryColor(f.category)}`}>{f.category}</span>
                     <span className={`px-2 py-0.5 rounded-full text-xs ${f.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{f.status}</span>
                   </div>
-                  <div className="text-sm text-gray-500">{f.description}</div>
+                  <div className="text-sm text-warm-500">{f.description}</div>
                 </div>
               ))}
             </div>
@@ -248,11 +248,11 @@ export default function PlatformUpgradePage() {
                       <div className="font-medium mb-2">{row.label}</div>
                       <div className="flex items-center gap-4">
                         <div className="text-sm">
-                          <span className="text-gray-500">.NET 9:</span> <span className="font-mono">{row.old}</span>
+                          <span className="text-warm-500">.NET 9:</span> <span className="font-mono">{row.old}</span>
                         </div>
-                        <span className="text-gray-300">→</span>
+                        <span className="text-warm-300">→</span>
                         <div className="text-sm">
-                          <span className="text-gray-500">.NET 10:</span> <span className="font-mono text-green-600">{row.new_}</span>
+                          <span className="text-warm-500">.NET 10:</span> <span className="font-mono text-green-600">{row.new_}</span>
                         </div>
                         <span className="text-sm font-bold text-green-600">{row.imp} faster</span>
                       </div>

@@ -115,7 +115,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-gray-400">{t('settings.loading')}</p>
+        <p className="text-warm-400">{t('settings.loading')}</p>
       </div>
     )
   }
@@ -148,20 +148,20 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
           <h3 className="text-lg font-bold mb-4">{t('settings.tokens.balance')}</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <div className="text-gray-300 text-sm">{t('settings.tokens.currentBalance')}</div>
+              <div className="text-warm-300 text-sm">{t('settings.tokens.currentBalance')}</div>
               <div className="text-3xl font-bold">{overview.balance.toLocaleString()}</div>
-              <div className="text-gray-400 text-sm">
+              <div className="text-warm-400 text-sm">
                 ≈ ${overview.balanceValueUsd.toFixed(2)}
               </div>
             </div>
             <div>
-              <div className="text-gray-300 text-sm">{t('settings.tokens.totalEarned')}</div>
+              <div className="text-warm-300 text-sm">{t('settings.tokens.totalEarned')}</div>
               <div className="text-xl font-bold text-green-400">
                 +{overview.totalEarned.toLocaleString()}
               </div>
             </div>
             <div>
-              <div className="text-gray-300 text-sm">{t('settings.tokens.totalSpent')}</div>
+              <div className="text-warm-300 text-sm">{t('settings.tokens.totalSpent')}</div>
               <div className="text-xl font-bold text-orange-400">
                 -{overview.totalSpent.toLocaleString()}
               </div>
@@ -180,14 +180,14 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
 
       {/* Token Costs Per Action */}
       {overview && overview.pricing.length > 0 && (
-        <div className="bg-gray-800 rounded-xl p-6">
+        <div className="bg-warm-800 rounded-xl p-6">
           <h3 className="text-lg font-bold mb-4">{t('settings.tokens.costPerAction')}</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {overview.pricing.map((p) => (
-              <div key={p.actionType} className="bg-gray-900 rounded-lg p-3 text-center">
-                <div className="text-gray-400 text-sm">{getActionLabel(p.actionType)}</div>
+              <div key={p.actionType} className="bg-warm-900 rounded-lg p-3 text-center">
+                <div className="text-warm-400 text-sm">{getActionLabel(p.actionType)}</div>
                 <div className="text-xl font-bold">{p.tokenCost}</div>
-                <div className="text-gray-500 text-xs">≈ ${p.approxUsd.toFixed(2)}</div>
+                <div className="text-warm-500 text-xs">≈ ${p.approxUsd.toFixed(2)}</div>
               </div>
             ))}
           </div>
@@ -195,13 +195,13 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
       )}
 
       {/* Transaction History */}
-      <div className="bg-gray-800 rounded-xl p-6">
+      <div className="bg-warm-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">{t('settings.tokens.history')}</h3>
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1 text-sm"
+            className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1 text-sm"
           >
             <option value="">{t('settings.tokens.allActions')}</option>
             <option value="welcome_bonus">{t('settings.tokens.action.welcome_bonus')}</option>
@@ -214,13 +214,13 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
         </div>
 
         {transactions.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">{t('settings.tokens.noHistory')}</p>
+          <p className="text-warm-500 text-center py-4">{t('settings.tokens.noHistory')}</p>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-700">
+                  <tr className="text-warm-400 border-b border-warm-700">
                     <th className="text-left py-2 px-2">{t('settings.tokens.historyDate')}</th>
                     <th className="text-left py-2 px-2">{t('settings.tokens.historyAction')}</th>
                     <th className="text-left py-2 px-2">{t('settings.tokens.historyDescription')}</th>
@@ -230,12 +230,12 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
                 </thead>
                 <tbody>
                   {transactions.map((tx) => (
-                    <tr key={tx.id} className="border-b border-gray-700/50">
-                      <td className="py-2 px-2 text-gray-400 whitespace-nowrap">
+                    <tr key={tx.id} className="border-b border-warm-700/50">
+                      <td className="py-2 px-2 text-warm-400 whitespace-nowrap">
                         {formatDate(tx.createdAt)}
                       </td>
                       <td className="py-2 px-2">{getActionLabel(tx.action)}</td>
-                      <td className="py-2 px-2 text-gray-400">{tx.description}</td>
+                      <td className="py-2 px-2 text-warm-400">{tx.description}</td>
                       <td
                         className={`py-2 px-2 text-right font-medium ${
                           tx.amount > 0 ? 'text-green-400' : 'text-orange-400'
@@ -244,7 +244,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
                         {tx.amount > 0 ? '+' : ''}
                         {tx.amount.toLocaleString()}
                       </td>
-                      <td className="py-2 px-2 text-right text-gray-400">
+                      <td className="py-2 px-2 text-right text-warm-400">
                         {tx.balanceAfter.toLocaleString()}
                       </td>
                     </tr>
@@ -257,7 +257,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
               <div className="text-center mt-4">
                 <button
                   onClick={loadMoreHistory}
-                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors"
+                  className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
                 >
                   {t('settings.tokens.loadMore')}
                 </button>
@@ -270,12 +270,12 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
       {/* Buy Tokens Dialog */}
       {showBuyDialog && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-warm-800 rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold">{t('settings.tokens.buyTokens')}</h3>
               <button
                 onClick={() => setShowBuyDialog(false)}
-                className="text-gray-400 hover:text-white text-2xl"
+                className="text-warm-400 hover:text-white text-2xl"
               >
                 &times;
               </button>
@@ -288,7 +288,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
                 className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors border ${
                   paymentMethod === 'stripe'
                     ? 'bg-blue-600 border-blue-500 text-white'
-                    : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500'
+                    : 'bg-warm-900 border-warm-700 text-warm-400 hover:border-warm-500'
                 }`}
               >
                 {t('payments.methodCard')}
@@ -298,7 +298,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
                 className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors border ${
                   paymentMethod === 'crypto'
                     ? 'bg-orange-600 border-orange-500 text-white'
-                    : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500'
+                    : 'bg-warm-900 border-warm-700 text-warm-400 hover:border-warm-500'
                 }`}
               >
                 {t('payments.methodCrypto')}
@@ -315,11 +315,11 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
               {packages.map((pkg) => (
                 <div
                   key={pkg.id}
-                  className="bg-gray-900 rounded-xl p-4 flex items-center justify-between hover:bg-gray-700/50 transition-colors"
+                  className="bg-warm-900 rounded-xl p-4 flex items-center justify-between hover:bg-warm-700/50 transition-colors"
                 >
                   <div>
                     <div className="font-bold">{pkg.name}</div>
-                    <div className="text-gray-400 text-sm">
+                    <div className="text-warm-400 text-sm">
                       {pkg.tokenAmount.toLocaleString()} {t('settings.tokens.tokensUnit')}
                     </div>
                     {pkg.discountPercent > 0 && (
@@ -331,7 +331,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
                   <button
                     onClick={() => handleBuyTokens(pkg)}
                     disabled={purchasing}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:bg-gray-600 ${
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors disabled:bg-warm-600 ${
                       paymentMethod === 'crypto'
                         ? 'bg-orange-600 hover:bg-orange-700'
                         : 'bg-blue-600 hover:bg-blue-700'
@@ -343,7 +343,7 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
               ))}
             </div>
 
-            <p className="text-gray-500 text-xs mt-4 text-center">
+            <p className="text-warm-500 text-xs mt-4 text-center">
               {t('settings.tokens.simulatedPayment')}
             </p>
           </div>

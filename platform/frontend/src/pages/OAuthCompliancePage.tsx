@@ -110,11 +110,11 @@ export default function OAuthCompliancePage() {
   function providerColor(provider: string) {
     switch (provider.toLowerCase()) {
       case 'google': return 'text-blue-400 bg-blue-900/40'
-      case 'apple': return 'text-gray-200 bg-gray-700'
+      case 'apple': return 'text-warm-200 bg-warm-700'
       case 'github': return 'text-purple-400 bg-purple-900/40'
       case 'facebook': return 'text-sky-400 bg-sky-900/40'
       case 'microsoft': return 'text-teal-400 bg-teal-900/40'
-      default: return 'text-gray-400 bg-gray-700'
+      default: return 'text-warm-400 bg-warm-700'
     }
   }
 
@@ -122,7 +122,7 @@ export default function OAuthCompliancePage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('oauth.title', 'OAuth Compliance')}</h2>
-        <p className="text-gray-400">{t('oauth.loginRequired', 'Please log in to view OAuth compliance data.')}</p>
+        <p className="text-warm-400">{t('oauth.loginRequired', 'Please log in to view OAuth compliance data.')}</p>
       </div>
     )
   }
@@ -131,7 +131,7 @@ export default function OAuthCompliancePage() {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <h2 className="text-2xl font-bold mb-2">{t('oauth.title', 'OAuth Compliance')}</h2>
-        <p className="text-gray-400">{t('oauth.noProject', 'No project selected. Go to your project and run an OAuth analysis.')}</p>
+        <p className="text-warm-400">{t('oauth.noProject', 'No project selected. Go to your project and run an OAuth analysis.')}</p>
       </div>
     )
   }
@@ -142,7 +142,7 @@ export default function OAuthCompliancePage() {
       <div className="flex items-center gap-3">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">{t('oauth.title', 'OAuth Compliance')}</h2>
-          <p className="text-sm text-gray-400 mt-1">{t('oauth.description', 'OAuth scope analysis, minimization, and compliance documentation')}</p>
+          <p className="text-sm text-warm-400 mt-1">{t('oauth.description', 'OAuth scope analysis, minimization, and compliance documentation')}</p>
         </div>
         <div className="flex gap-2">
           {report && report.status === 'analyzed' && (
@@ -174,35 +174,35 @@ export default function OAuthCompliancePage() {
       {/* Summary Cards */}
       {report && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-white">{report.totalScopesDetected}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('oauth.totalScopes', 'Total Scopes')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('oauth.totalScopes', 'Total Scopes')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-orange-400">{report.overPermissionedCount}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('oauth.overPermissioned', 'Over-Permissioned')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('oauth.overPermissioned', 'Over-Permissioned')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-green-400">{report.totalScopesDetected - report.overPermissionedCount}</div>
-            <div className="text-xs text-gray-400 mt-1">{t('oauth.minimal', 'Minimal')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('oauth.minimal', 'Minimal')}</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-warm-800 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-purple-400">
               {new Set(detectedScopes.map(s => s.provider)).size}
             </div>
-            <div className="text-xs text-gray-400 mt-1">{t('oauth.providers', 'Providers')}</div>
+            <div className="text-xs text-warm-400 mt-1">{t('oauth.providers', 'Providers')}</div>
           </div>
         </div>
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+      <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
         {(['scopes', 'recommendations', 'docs'] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              activeTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
             }`}
           >
             {tab === 'scopes' && `${t('oauth.tab.scopes', 'Scopes')} (${scopes.length})`}
@@ -213,19 +213,19 @@ export default function OAuthCompliancePage() {
       </div>
 
       {loading && (
-        <div className="text-center py-8 text-gray-400">{t('oauth.loading', 'Loading...')}</div>
+        <div className="text-center py-8 text-warm-400">{t('oauth.loading', 'Loading...')}</div>
       )}
 
       {/* Scopes Tab */}
       {!loading && activeTab === 'scopes' && (
         <div className="space-y-3">
           {scopes.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">{t('oauth.noScopes', 'No OAuth scopes detected. Run an analysis to scan your project.')}</p>
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">{t('oauth.noScopes', 'No OAuth scopes detected. Run an analysis to scan your project.')}</p>
             </div>
           ) : (
             scopes.map((scope, i) => (
-              <div key={i} className="bg-gray-800 rounded-lg p-4">
+              <div key={i} className="bg-warm-800 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -239,21 +239,21 @@ export default function OAuthCompliancePage() {
                       )}
                     </div>
                     <h4 className="text-sm font-medium text-white font-mono">{scope.scope}</h4>
-                    <p className="text-xs text-gray-400 mt-1">{scope.description}</p>
+                    <p className="text-xs text-warm-400 mt-1">{scope.description}</p>
                     {scope.justification && (
                       <p className="text-xs mt-1">
-                        <span className="text-gray-500">{t('oauth.justification', 'Justification')}:</span>{' '}
-                        <span className="text-gray-300">{scope.justification}</span>
+                        <span className="text-warm-500">{t('oauth.justification', 'Justification')}:</span>{' '}
+                        <span className="text-warm-300">{scope.justification}</span>
                       </p>
                     )}
                     {scope.minimalAlternative && (
                       <p className="text-xs mt-1">
-                        <span className="text-gray-500">{t('oauth.alternative', 'Suggested')}:</span>{' '}
+                        <span className="text-warm-500">{t('oauth.alternative', 'Suggested')}:</span>{' '}
                         <span className="text-green-400 font-mono">{scope.minimalAlternative}</span>
                       </p>
                     )}
                   </div>
-                  <span className="px-1.5 py-0.5 rounded text-xs bg-gray-700 text-gray-300 shrink-0">
+                  <span className="px-1.5 py-0.5 rounded text-xs bg-warm-700 text-warm-300 shrink-0">
                     {scope.detectedInFile}
                   </span>
                 </div>
@@ -267,8 +267,8 @@ export default function OAuthCompliancePage() {
       {!loading && activeTab === 'recommendations' && (
         <div className="space-y-3">
           {recommendations.length === 0 ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">
                 {report
                   ? t('oauth.noRecommendations', 'No recommendations. All scopes appear minimal!')
                   : t('oauth.noAnalysis', 'No analysis results. Run an OAuth scope analysis first.')}
@@ -282,7 +282,7 @@ export default function OAuthCompliancePage() {
                 </p>
               </div>
               {recommendations.map((rec, i) => (
-                <div key={i} className="bg-gray-800 rounded-lg p-4">
+                <div key={i} className="bg-warm-800 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${
                       rec.severity === 'warning' ? 'bg-orange-400' : 'bg-blue-400'
@@ -297,12 +297,12 @@ export default function OAuthCompliancePage() {
                         <span className="font-mono text-red-400 line-through">{rec.currentScope}</span>
                         {rec.recommendedScope && (
                           <>
-                            <span className="text-gray-500 mx-2">-&gt;</span>
+                            <span className="text-warm-500 mx-2">-&gt;</span>
                             <span className="font-mono text-green-400">{rec.recommendedScope}</span>
                           </>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">{rec.reason}</p>
+                      <p className="text-xs text-warm-400 mt-1">{rec.reason}</p>
                     </div>
                   </div>
                 </div>
@@ -316,8 +316,8 @@ export default function OAuthCompliancePage() {
       {!loading && activeTab === 'docs' && (
         <div className="space-y-4">
           {!complianceDocs ? (
-            <div className="text-center py-12 bg-gray-800/50 rounded-lg">
-              <p className="text-gray-400">{t('oauth.noDocs', 'No compliance docs generated yet.')}</p>
+            <div className="text-center py-12 bg-warm-800/50 rounded-lg">
+              <p className="text-warm-400">{t('oauth.noDocs', 'No compliance docs generated yet.')}</p>
               {report && (
                 <button
                   onClick={handleGenerateDocs}
@@ -331,13 +331,13 @@ export default function OAuthCompliancePage() {
           ) : (
             <>
               {/* Doc Sub-tabs */}
-              <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+              <div className="flex gap-1 bg-warm-800 rounded-lg p-1">
                 {(['privacy', 'usage', 'justifications', 'provider'] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveDocTab(tab)}
                     className={`flex-1 py-2 px-3 rounded-md text-xs font-medium transition-colors ${
-                      activeDocTab === tab ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+                      activeDocTab === tab ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
                     }`}
                   >
                     {tab === 'privacy' && t('oauth.doc.privacy', 'Privacy Policy')}
@@ -349,7 +349,7 @@ export default function OAuthCompliancePage() {
               </div>
 
               {/* Doc Content */}
-              <div className="bg-gray-800 rounded-lg p-4">
+              <div className="bg-warm-800 rounded-lg p-4">
                 <div className="flex justify-end mb-3">
                   <button
                     onClick={() => {
@@ -360,13 +360,13 @@ export default function OAuthCompliancePage() {
                       const filename = `oauth-${activeDocTab}-${requestId.substring(0, 8)}.md`
                       handleExportMarkdown(content, filename)
                     }}
-                    className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-xs font-medium transition-colors"
+                    className="px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded text-xs font-medium transition-colors"
                   >
                     {t('oauth.exportMarkdown', 'Export Markdown')}
                   </button>
                 </div>
                 <div className="prose prose-invert prose-sm max-w-none">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-300 font-sans leading-relaxed">
+                  <pre className="whitespace-pre-wrap text-sm text-warm-300 font-sans leading-relaxed">
                     {activeDocTab === 'privacy' && complianceDocs.privacyPolicy}
                     {activeDocTab === 'usage' && complianceDocs.dataUsageDisclosure}
                     {activeDocTab === 'justifications' && complianceDocs.scopeJustifications}

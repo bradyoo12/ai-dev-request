@@ -285,11 +285,11 @@ export default function A2APage() {
 
       {/* Register Agent Dialog */}
       {showRegisterDialog && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="register-dialog-title">
           <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">{t('a2a.agents.register')}</h3>
-              <button onClick={() => setShowRegisterDialog(false)} className="text-warm-400 hover:text-white text-2xl">&times;</button>
+              <h3 id="register-dialog-title" className="text-lg font-bold">{t('a2a.agents.register')}</h3>
+              <button onClick={() => setShowRegisterDialog(false)} className="text-warm-400 hover:text-white text-2xl" aria-label={t('common.close', 'Close')}>&times;</button>
             </div>
             <div className="space-y-3">
               <div>
@@ -342,11 +342,11 @@ export default function A2APage() {
 
       {/* Grant Consent Dialog */}
       {showConsentDialog && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="consent-dialog-title">
           <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">{t('a2a.consents.grant')}</h3>
-              <button onClick={() => setShowConsentDialog(false)} className="text-warm-400 hover:text-white text-2xl">&times;</button>
+              <h3 id="consent-dialog-title" className="text-lg font-bold">{t('a2a.consents.grant')}</h3>
+              <button onClick={() => setShowConsentDialog(false)} className="text-warm-400 hover:text-white text-2xl" aria-label={t('common.close', 'Close')}>&times;</button>
             </div>
             <div className="space-y-3">
               <div>

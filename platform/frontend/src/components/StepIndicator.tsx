@@ -32,8 +32,11 @@ export default function StepIndicator({ viewState }: StepIndicatorProps) {
 
   if (viewState === 'form' || viewState === 'error') return null
 
+  const totalSteps = steps.length
+  const progressPercent = Math.round((currentIndex / (totalSteps - 1)) * 100)
+
   return (
-    <div className="mb-8">
+    <div className="mb-8" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100} aria-label={t('wizard.step.progress', `Step ${currentIndex + 1} of ${totalSteps}`)}>
       <div className="flex items-center justify-between">
         {steps.map((step, index) => {
           const Icon = step.icon

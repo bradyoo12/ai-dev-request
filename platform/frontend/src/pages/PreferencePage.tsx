@@ -214,9 +214,9 @@ export default function PreferencePage() {
       )}
 
       {showAddDialog && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowAddDialog(false)}>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowAddDialog(false)} role="dialog" aria-modal="true" aria-labelledby="preference-add-dialog-title">
           <div className="bg-warm-800 rounded-xl p-6 w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-4">{t('preference.addTitle')}</h3>
+            <h3 id="preference-add-dialog-title" className="text-lg font-semibold mb-4">{t('preference.addTitle')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm text-warm-400 mb-1">{t('preference.categoryLabel')}</label>
@@ -269,9 +269,9 @@ export default function PreferencePage() {
       )}
 
       {deleteAllConfirm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setDeleteAllConfirm(false)}>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setDeleteAllConfirm(false)} role="dialog" aria-modal="true" aria-labelledby="preference-delete-dialog-title">
           <div className="bg-warm-800 rounded-xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-2">{t('preference.deleteAllTitle')}</h3>
+            <h3 id="preference-delete-dialog-title" className="text-lg font-semibold mb-2">{t('preference.deleteAllTitle')}</h3>
             <p className="text-sm text-warm-400 mb-4">{t('preference.deleteAllConfirm')}</p>
             <div className="flex gap-2 justify-end">
               <button

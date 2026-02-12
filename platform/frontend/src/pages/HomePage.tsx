@@ -185,6 +185,21 @@ export default function HomePage() {
     }
   }
 
+  // Close dialogs on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (confirmDialog) setConfirmDialog(null)
+        else if (githubDialog) { setGithubDialog(false); setGithubToken(''); setGithubRepoName('') }
+        else if (insufficientDialog) setInsufficientDialog(null)
+      }
+    }
+    if (confirmDialog || githubDialog || insufficientDialog) {
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }
+  }, [confirmDialog, githubDialog, insufficientDialog])
+
   // Cleanup polling on unmount
   useEffect(() => {
     return () => {
@@ -458,7 +473,8 @@ export default function HomePage() {
                 <div className="relative inline-block">
                   <img src={screenshotPreview} alt="Screenshot preview" className="max-h-48 rounded-xl border border-warm-700" />
                   <button type="button" onClick={handleScreenshotRemove}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full text-xs flex items-center justify-center transition-colors">
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full text-xs flex items-center justify-center transition-colors"
+                    aria-label={t('screenshot.remove', 'Remove screenshot')}>
                     ✕
                   </button>
                 </div>
@@ -534,14 +550,14 @@ export default function HomePage() {
         )}
 
         {viewState === 'submitting' && (
-          <div className="text-center py-12">
-            <div className="animate-spin w-16 h-16 border-4 border-accent-blue border-t-transparent rounded-full mx-auto mb-6"></div>
+          <div className="text-center py-12" aria-live="polite">
+            <div className="animate-spin w-16 h-16 border-4 border-accent-blue border-t-transparent rounded-full mx-auto mb-6" role="status" aria-label={t('status.submitting')}></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.submitting')}</h3>
           </div>
         )}
 
         {viewState === 'analyzing' && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" aria-live="polite">
             <div className="animate-pulse"><div className="text-6xl mb-6">🤖</div></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.analyzing')}</h3>
             <p className="text-warm-400">{t('status.analyzingDetail')}</p>
@@ -608,7 +624,7 @@ export default function HomePage() {
         )}
 
         {viewState === 'generatingProposal' && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" aria-live="polite">
             <div className="animate-pulse"><div className="text-6xl mb-6">📝</div></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.generatingProposal')}</h3>
             <p className="text-warm-400">{t('status.generatingProposalDetail')}</p>
@@ -710,14 +726,14 @@ export default function HomePage() {
         )}
 
         {viewState === 'approving' && (
-          <div className="text-center py-12">
-            <div className="animate-spin w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+          <div className="text-center py-12" aria-live="polite">
+            <div className="animate-spin w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-6" role="status" aria-label={t('status.approving')}></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.approving')}</h3>
           </div>
         )}
 
         {viewState === 'building' && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" aria-live="polite">
             <div className="animate-pulse"><div className="text-6xl mb-6">🔨</div></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.building')}</h3>
             <p className="text-warm-400">{t('status.buildingDetail')}</p>
@@ -744,7 +760,7 @@ export default function HomePage() {
         )}
 
         {viewState === 'verifying' && (
-          <div className="text-center py-12">
+          <div className="text-center py-12" aria-live="polite">
             <div className="animate-pulse"><div className="text-6xl mb-6">🔍</div></div>
             <h3 className="text-2xl font-bold mb-2">{t('status.verifying')}</h3>
             <p className="text-warm-400">{t('status.verifyingDetail')}</p>
@@ -1047,7 +1063,7 @@ export default function HomePage() {
             )}
 
             {deployStatus && (
-              <div className={`rounded-xl p-4 mb-4 ${
+              <div aria-live="polite" className={`rounded-xl p-4 mb-4 ${
                 deployStatus.status === 'Running'
                   ? 'bg-green-900/30 border border-green-700'
                   : deployStatus.status === 'Failed'
@@ -1177,8 +1193,8 @@ export default function HomePage() {
         )}
 
         {viewState === 'error' && (
-          <div className="text-center py-8">
-            <div className="text-6xl mb-6">❌</div>
+          <div className="text-center py-8" role="alert">
+            <div className="text-6xl mb-6" aria-hidden="true">❌</div>
             <h3 className="text-2xl font-bold mb-4">{t('error.title')}</h3>
             <p className="text-red-400 mb-6">{errorMessage}</p>
             <button onClick={() => setViewState('form')}
@@ -1207,9 +1223,9 @@ export default function HomePage() {
 
       {/* Token Confirmation Dialog */}
       {confirmDialog && (
-        <div className="fixed inset-0 bg-warm-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-warm-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="confirm-dialog-title">
           <div className="glass-heavy rounded-2xl p-6 max-w-md shadow-premium-xl w-full">
-            <h3 className="text-xl font-bold mb-4">{t(`tokens.confirm.${confirmDialog.action}.title`)}</h3>
+            <h3 id="confirm-dialog-title" className="text-xl font-bold mb-4">{t(`tokens.confirm.${confirmDialog.action}.title`)}</h3>
             <p className="text-warm-400 mb-4">{t(`tokens.confirm.${confirmDialog.action}.description`)}</p>
             <div className="bg-warm-900 rounded-lg p-4 mb-4 space-y-2">
               <div className="flex justify-between">
@@ -1247,9 +1263,9 @@ export default function HomePage() {
 
       {/* GitHub Export Dialog */}
       {githubDialog && (
-        <div className="fixed inset-0 bg-warm-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-warm-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="github-dialog-title">
           <div className="glass-heavy rounded-2xl p-6 max-w-md shadow-premium-xl w-full">
-            <h3 className="text-xl font-bold mb-4">{t('export.githubTitle')}</h3>
+            <h3 id="github-dialog-title" className="text-xl font-bold mb-4">{t('export.githubTitle')}</h3>
             <p className="text-warm-400 text-sm mb-4">{t('export.githubDescription')}</p>
             <div className="space-y-3 mb-4">
               <div>
@@ -1282,9 +1298,9 @@ export default function HomePage() {
 
       {/* Insufficient Tokens Dialog */}
       {insufficientDialog && (
-        <div className="fixed inset-0 bg-warm-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-warm-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="insufficient-dialog-title">
           <div className="glass-heavy rounded-2xl p-6 max-w-md shadow-premium-xl w-full">
-            <h3 className="text-xl font-bold mb-4 text-orange-400">{t('tokens.insufficient.title')}</h3>
+            <h3 id="insufficient-dialog-title" className="text-xl font-bold mb-4 text-orange-400">{t('tokens.insufficient.title')}</h3>
             <p className="text-warm-400 mb-4">
               {t(`tokens.confirm.${insufficientDialog.action}.title`)} {t('tokens.insufficient.requires', { count: insufficientDialog.required })}
             </p>

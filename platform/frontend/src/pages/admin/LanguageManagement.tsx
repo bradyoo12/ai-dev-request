@@ -352,9 +352,9 @@ export default function LanguageManagement() {
 
         {/* Add Language Dialog */}
         {showAddDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="add-language-dialog-title">
             <div className="bg-warm-800 rounded-xl p-6 w-96">
-              <h3 className="text-lg font-bold mb-4">{t('admin.languages.addNewLanguage')}</h3>
+              <h3 id="add-language-dialog-title" className="text-lg font-bold mb-4">{t('admin.languages.addNewLanguage')}</h3>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm text-warm-400 mb-1">{t('admin.languages.languageCode')}</label>

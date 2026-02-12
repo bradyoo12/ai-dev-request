@@ -530,9 +530,9 @@ export default function SpecificationPage() {
 
       {/* Reject Dialog */}
       {showRejectDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="reject-dialog-title">
           <div className="bg-warm-800 rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold mb-4">{t('specs.rejectTitle', 'Reject Specification')}</h3>
+            <h3 id="reject-dialog-title" className="text-lg font-bold mb-4">{t('specs.rejectTitle', 'Reject Specification')}</h3>
             <textarea
               value={rejectFeedback}
               onChange={(e) => setRejectFeedback(e.target.value)}

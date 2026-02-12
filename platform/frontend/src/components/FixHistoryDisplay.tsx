@@ -62,6 +62,7 @@ export default function FixHistoryDisplay({ fixHistory, validationPassed, iterat
                 onClick={() => toggleExpand(entry.iteration)}
                 className="w-full flex items-center justify-between p-3 text-left hover:bg-warm-750 transition-colors"
                 data-testid={`fix-history-toggle-${entry.iteration}`}
+                aria-expanded={isExpanded}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-warm-300">
@@ -71,7 +72,7 @@ export default function FixHistoryDisplay({ fixHistory, validationPassed, iterat
                     {entry.issues.length} {t('validation.issuesFound')}
                   </span>
                 </div>
-                <span className={`text-warm-400 text-sm transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                <span className={`text-warm-400 text-sm transition-transform ${isExpanded ? 'rotate-180' : ''}`} aria-hidden="true">
                   &#9660;
                 </span>
               </button>

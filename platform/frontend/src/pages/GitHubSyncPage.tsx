@@ -379,9 +379,9 @@ export default function GitHubSyncPage() {
 
       {/* Disconnect Confirmation Dialog */}
       {showDisconnectConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="disconnect-dialog-title">
           <div className="bg-warm-800 rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold mb-4">{t('githubSync.disconnectTitle', 'Disconnect Repository')}</h3>
+            <h3 id="disconnect-dialog-title" className="text-lg font-bold mb-4">{t('githubSync.disconnectTitle', 'Disconnect Repository')}</h3>
             <p className="text-sm text-warm-400 mb-4">
               {t('githubSync.disconnectWarning', 'This will remove the connection between your project and the GitHub repository. The repository itself will not be deleted.')}
             </p>

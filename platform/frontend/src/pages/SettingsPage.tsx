@@ -269,13 +269,14 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
 
       {/* Buy Tokens Dialog */}
       {showBuyDialog && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="buy-tokens-dialog-title">
           <div className="bg-warm-800 rounded-2xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">{t('settings.tokens.buyTokens')}</h3>
+              <h3 id="buy-tokens-dialog-title" className="text-xl font-bold">{t('settings.tokens.buyTokens')}</h3>
               <button
                 onClick={() => setShowBuyDialog(false)}
                 className="text-warm-400 hover:text-white text-2xl"
+                aria-label={t('common.close', 'Close')}
               >
                 &times;
               </button>

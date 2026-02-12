@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getHostingPlans, getRecommendedPlan } from '../api/hosting'
 import type { HostingPlan } from '../api/hosting'
@@ -24,6 +24,15 @@ export default function PlanSelectionDialog({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onCancel()
+  }, [onCancel])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -45,9 +54,9 @@ export default function PlanSelectionDialog({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-label={t('hosting.loading')}>
         <div className="bg-warm-800 rounded-2xl p-6 max-w-4xl w-full text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" role="status" aria-label={t('hosting.loading')}></div>
           <p className="text-warm-400">{t('hosting.loading')}</p>
         </div>
       </div>
@@ -58,9 +67,9 @@ export default function PlanSelectionDialog({
 
   if (error) {
     return (
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
         <div className="bg-warm-800 rounded-2xl p-6 max-w-md w-full text-center">
-          <p className="text-red-400 mb-4">{error}</p>
+          <p className="text-red-400 mb-4" role="alert">{error}</p>
           <button onClick={onCancel} className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm">{t('common.close')}</button>
         </div>
       </div>
@@ -68,9 +77,9 @@ export default function PlanSelectionDialog({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="plan-dialog-title">
       <div className="bg-warm-800 rounded-2xl p-6 max-w-4xl w-full my-8">
-        <h3 className="text-xl font-bold mb-2">{t('hosting.selectPlan')}</h3>
+        <h3 id="plan-dialog-title" className="text-xl font-bold mb-2">{t('hosting.selectPlan')}</h3>
         <p className="text-warm-400 text-sm mb-4">{t('hosting.selectPlanDescription')}</p>
 
         {recommendedPlanId && (

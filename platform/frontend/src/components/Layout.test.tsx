@@ -5,6 +5,7 @@ const mockNavigate = vi.fn()
 vi.mock('react-router-dom', () => ({
   Outlet: () => <div data-testid="outlet">Outlet</div>,
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/', search: '', hash: '', state: null, key: 'default' }),
   Link: ({ children, to, onClick }: any) => <a href={to} onClick={onClick}>{children}</a>,
 }))
 

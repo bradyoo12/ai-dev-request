@@ -198,11 +198,11 @@ export default function SuggestionManagement() {
 
         {/* Action Dialog */}
         {actionDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="action-dialog-title">
             <div className="bg-warm-800 rounded-xl p-6 w-96">
               {actionDialog.type === 'status' ? (
                 <>
-                  <h3 className="text-lg font-bold mb-4">{t('feedback.admin.changeStatus')}</h3>
+                  <h3 id="action-dialog-title" className="text-lg font-bold mb-4">{t('feedback.admin.changeStatus')}</h3>
                   <p className="text-sm text-warm-400 mb-3">#{actionDialog.suggestion.id} — {actionDialog.suggestion.title}</p>
                   <select
                     value={newStatus}

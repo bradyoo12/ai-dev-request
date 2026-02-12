@@ -65,10 +65,11 @@ export default function QualityConfidenceBadge({ score, dimensions, size = 'md' 
           {dimensionKeys.map((dim) => {
             const value = dimensions[dim.key]
             const dimColors = getScoreColor(value)
+            const dimLabel = t(dim.labelKey, dim.fallback)
             return (
               <div key={dim.key} className="flex items-center gap-3">
-                <span className="text-xs text-warm-400 w-28 text-right">{t(dim.labelKey, dim.fallback)}</span>
-                <div className="flex-1 bg-warm-700 rounded-full overflow-hidden">
+                <span className="text-xs text-warm-400 w-28 text-right">{dimLabel}</span>
+                <div className="flex-1 bg-warm-700 rounded-full overflow-hidden" role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100} aria-label={`${dimLabel}: ${value}%`}>
                   <div
                     className={`${config.bar} rounded-full transition-all ${dimColors.bg}`}
                     style={{ width: `${value}%` }}

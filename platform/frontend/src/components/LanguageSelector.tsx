@@ -53,6 +53,9 @@ export default function LanguageSelector() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1 px-3 py-1.5 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-label={`${currentLang?.nativeName || i18n.language} - Change language`}
       >
         <span>🌐</span>
         <span>{currentLang?.nativeName || i18n.language}</span>
@@ -60,11 +63,13 @@ export default function LanguageSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-40 bg-warm-800 border border-warm-700 rounded-lg shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 mt-1 w-40 bg-warm-800 border border-warm-700 rounded-lg shadow-xl z-50 overflow-hidden" role="listbox" aria-label="Language selection">
           {languages.map(lang => (
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
+              role="option"
+              aria-selected={i18n.language === lang.code}
               className={`w-full px-4 py-2 text-left text-sm hover:bg-warm-700 transition-colors flex items-center justify-between ${
                 i18n.language === lang.code ? 'text-blue-400' : 'text-white'
               }`}

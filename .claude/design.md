@@ -1597,3 +1597,12 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: Live preview for React/Vanilla, console output capture, error highlighting, memory usage tracking, share & fork
 - **Frontend**: `BrowserIdePage` in Settings at `/settings/browser-ide` with 4 sub-tabs (Execute, History, Runtimes, Stats)
 - **Ticket**: #476 — `Browser IDE for instant code execution (PlayCode-style)`
+
+### Agentic Governance (Guardrails & Approval Workflows)
+- **Backend**: `GovernanceAction` entity + `GovernanceController` (`api/governance`)
+- **Endpoints**: POST evaluate (action classification + guardrail check), GET list, DELETE {id}, GET stats (by classification), GET rules (anonymous, 5 rules)
+- **Action Classification**: safe (auto-approved), reversible (proceed with caution), destructive (requires approval / blocked)
+- **Governance Rules**: Protected Branch Guard (critical), Schema Migration Review (high), Secret Exposure Prevention (critical), Mass Deletion Guard (high), Action Audit Trail (medium)
+- **Features**: Pre-execution hooks, approval workflows, audit logging, rollback capability
+- **Frontend**: `GovernancePage` in Settings at `/settings/governance` with 4 sub-tabs (Evaluate, History, Rules, Stats)
+- **Ticket**: #477 — `Agentic governance and guardrails for safe AI deployment`

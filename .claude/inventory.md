@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 100 Controllers | 85 Services | 110 Entities | 95 Pages | 89 API modules | 32 Components
+**Counts**: 101 Controllers | 86 Services | 111 Entities | 96 Pages | 90 API modules | 32 Components
 
 ---
 
@@ -100,6 +100,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | BackgroundAgentController | /api/background-agents | Background agent workers |
 | SubagentOrchestrationController | /api/subagent | Subagent task orchestration |
 | AgentAutomationController | /api/agent-automation | Agent automation rules |
+| AgentSkillController | /api/agent-skills | Agent skills CRUD and management |
 | LangGraphWorkflowController | /api/langgraph | LangGraph workflow engine |
 | AgenticPlanController | /api/agentic-plan | Autonomous planning system |
 | WorkflowController | /api/workflows | Durable workflow orchestration |
@@ -298,6 +299,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | SubagentOrchestrationService | Subagent task orchestration |
 | TaskDecompositionService | Task decomposition for agents |
 | ResultAggregationService | Multi-agent result aggregation |
+| AgentSkillService | Agent skills management and detection |
 | WorkflowOrchestrationService | Durable workflow engine |
 | LangGraphWorkflowService | LangGraph workflow execution |
 | A2AService | Agent-to-agent protocol |
@@ -336,7 +338,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 
 ## Backend Entities
 
-All under `platform/backend/AiDevRequest.API/Entities/`. 110 entities total.
+All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 
 ### Core Domain
 
@@ -453,6 +455,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 110 entities total.
 | SubagentTask | Subagent task record |
 | ParallelOrchestration | Parallel orchestration session |
 | AgentAutomation | Agent automation rule |
+| AgentSkill | Agent skill instruction pack |
 | AgenticPlan | Autonomous plan |
 | WorkflowExecution | Workflow execution instance |
 | WorkflowExecutionState | Workflow state snapshot |
@@ -517,7 +520,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 110 entities total.
 
 ## Frontend Pages
 
-All under `platform/frontend/src/pages/`. 95 pages total.
+All under `platform/frontend/src/pages/`. 96 pages total.
 
 ### Home & Navigation
 
@@ -618,6 +621,7 @@ All under `platform/frontend/src/pages/`. 95 pages total.
 | BackgroundAgentPage | /settings/background-agents | Background agents |
 | SubagentOrchestrationPage | /settings/orchestration | Subagent orchestration |
 | AgentAutomationPage | /settings/agent-automation | Agent automation |
+| AgentSkillsPage | /settings/agent-skills | Agent skills management |
 | LangGraphWorkflowPage | /langgraph-workflows/:workflowId | LangGraph workflow detail |
 | AgenticPlannerPage | /settings/agentic-plan | Autonomous planner |
 | WorkflowPage | /settings/workflows | Workflow management |
@@ -769,7 +773,7 @@ All under `platform/frontend/src/components/`.
 
 ## Frontend API Modules
 
-All under `platform/frontend/src/api/`. 89 modules total.
+All under `platform/frontend/src/api/`. 90 modules total.
 
 ### Core
 
@@ -858,6 +862,7 @@ All under `platform/frontend/src/api/`. 89 modules total.
 | backgroundagent.ts | BackgroundAgentController | Background agents |
 | orchestration.ts | SubagentOrchestrationController | Subagent orchestration |
 | agent-automation.ts | AgentAutomationController | Agent automation |
+| agent-skills.ts | AgentSkillController | Agent skills |
 | langgraph-workflows.ts | LangGraphWorkflowController | LangGraph workflows |
 | workflows.ts | WorkflowController | Durable workflows |
 | a2a.ts | A2AController | Agent-to-agent |

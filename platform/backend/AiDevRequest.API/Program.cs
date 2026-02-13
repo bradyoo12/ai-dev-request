@@ -96,6 +96,7 @@ builder.Services.AddScoped<IDatabaseBranchService, DatabaseBranchService>();
 builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 builder.Services.AddScoped<IUsageMeteringService, UsageMeteringService>();
 builder.Services.AddScoped<IAgentInboxService, AgentInboxService>();
+builder.Services.AddScoped<IAgentSkillService, AgentSkillService>();
 builder.Services.AddScoped<GitBranchService>();
 
 // Add JWT Authentication
@@ -276,7 +277,8 @@ app.UseExceptionHandler(errorApp =>
             "component_previews",
             "generation_variants",
             "performance_profiles",
-            "data_schemas" };
+            "data_schemas",
+            "agent_skills" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

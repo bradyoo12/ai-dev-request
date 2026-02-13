@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- TODO: Upgrade to net10.0 when .NET 10 SDK is released (November 2025) -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
     <PackageReference Include="Stripe.net" Version="47.4.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+    <!-- TODO: Upgrade to 10.0.x versions when .NET 10 is released -->
   </ItemGroup>
 
   <ItemGroup>

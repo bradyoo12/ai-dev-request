@@ -137,6 +137,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HybridCacheEntry> HybridCacheEntries => Set<HybridCacheEntry>();
     public DbSet<PlaywrightHealingResult> PlaywrightHealingResults => Set<PlaywrightHealingResult>();
     public DbSet<SelfHealingRun> SelfHealingRuns => Set<SelfHealingRun>();
+    public DbSet<OrganizationalMemory> OrganizationalMemories => Set<OrganizationalMemory>();
     public DbSet<ProductionSandbox> ProductionSandboxes => Set<ProductionSandbox>();
     public DbSet<OrgMemory> OrgMemories => Set<OrgMemory>();
     public DbSet<AiAgentRule> AiAgentRules => Set<AiAgentRule>();
@@ -171,6 +172,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ConfidenceScore> ConfidenceScores => Set<ConfidenceScore>();
     public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
     public DbSet<AgentInboxItem> AgentInboxItems => Set<AgentInboxItem>();
+    public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

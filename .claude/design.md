@@ -1510,3 +1510,20 @@ Structured autonomous development with agent loops, tools, subagents, and MCP ex
 - **Frontend**: `AgentSdkPage` in Settings with 4 sub-tabs (Execute, History, Models, Stats). Execute tab shows agent loop metrics, tool breakdown, subagent details, skill invocations, MCP server connections
 - **Entity**: `AgentSdkSession` with ProjectName, TaskDescription, ToolCallsTotal/Succeeded, SubagentsSpawned, SkillsInvoked, McpServersConnected, ContextTokensUsed, ContextCompressions, RetryAttempts, SuccessRate, DurationMs, AgentModel, Status
 - **Ticket**: #470 — `Claude Agent SDK for structured autonomous development workflows`
+
+### Autonomous Terminal Execution (Safety Controls)
+
+Configurable terminal execution with policy-based safety controls, allowlist/denylist, and security levels:
+- **Backend**: `TerminalExecution` entity tracking command executions. `TerminalExecutionController` with policy matching against static allow/deny lists
+- **Endpoints**:
+  - `GET /api/terminal-execution` — list executions (50 limit)
+  - `POST /api/terminal-execution/execute` — execute command with deny list check → block, allow list check → auto-approve, security level enforcement
+  - `DELETE /api/terminal-execution/{id}` — delete execution
+  - `GET /api/terminal-execution/stats` — execution statistics (by category)
+  - `GET /api/terminal-execution/policies` — allow list, deny list, security levels (anonymous)
+- **Security Levels**: safe (standard commands only), cautious (with confirmation), restricted (admin approval required)
+- **Categories**: build, test, lint, format, deploy, custom
+- **Policy System**: Static AllowList (patterns → auto-approve) and DenyList (patterns → block with reason)
+- **Frontend**: `TerminalExecutionPage` in Settings at `/settings/auto-terminal` with 4 sub-tabs (Execute, History, Policies, Stats)
+- **Entity**: `TerminalExecution` with ProjectName, Command, Category, AutoApproved, Blocked, BlockReason, ExitCode, OutputLines, DurationMs, SecurityLevel, Status
+- **Ticket**: #471 — `Autonomous terminal execution with configurable safety controls`

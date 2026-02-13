@@ -1648,3 +1648,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: Success rate and latency tracking, cost-per-request monitoring, automatic rollback on >10% error rate or >$0.04 cost/request, monitoring alerts (critical/warning/info), health status (healthy/degraded/critical/rolled-back), rollback version tracking
 - **Frontend**: `AgenticWorkflowsPage` in Settings at `/settings/agentic-workflows` with 4 sub-tabs (Deploy, History, Strategies, Stats)
 - **Ticket**: #482 — `Production-ready agentic workflows (deployment & monitoring)`
+
+### Agent Trace — AI Code Attribution
+- **Backend**: `AgentTrace` entity + `AgentTraceController` (`api/agent-trace`)
+- **Endpoints**: POST analyze (file-level AI vs human attribution with compliance scoring), GET list, DELETE {id}, GET stats (by author type), GET formats (anonymous, 4 trace standards)
+- **Trace Standards**: Agent Trace v1 (Cursor/Cognition/Cloudflare/Vercel), SPDX AI Extension, SARIF+AI Annotations, CycloneDX AI BOM
+- **Features**: AI percentage per file, author type classification (ai/human/mixed), compliance status (compliant/review-needed/non-compliant), conversation tracking, model attribution
+- **Frontend**: `AgentTracePage` in Settings at `/settings/agent-trace` with 4 sub-tabs (Analyze, History, Formats, Stats)
+- **Ticket**: #502 — `Agent Trace open standard for AI code attribution and transparency`

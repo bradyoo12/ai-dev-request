@@ -133,6 +133,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CodeReviewAgent> CodeReviewAgents => Set<CodeReviewAgent>();
     public DbSet<MultiAgentReview> MultiAgentReviews => Set<MultiAgentReview>();
     public DbSet<LangGraphWorkflow> LangGraphWorkflows => Set<LangGraphWorkflow>();
+    public DbSet<HybridCacheEntry> HybridCacheEntries => Set<HybridCacheEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

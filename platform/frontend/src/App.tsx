@@ -91,6 +91,7 @@ function App() {
             <Route path="/support" element={<Suspense fallback={LazyFallback}><SupportBoardPage /></Suspense>} />
             <Route path="/settings/orchestration" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/langgraph" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/settings/hybrid-cache" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" /></div>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />
           </Route>

@@ -1,5 +1,6 @@
 using System.Text;
 using AiDevRequest.API.Data;
+using AiDevRequest.API.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiDevRequest.API.Services;
@@ -8,6 +9,8 @@ public interface ILogStreamService
 {
     Task StreamLogsAsync(string containerId, Guid previewId, CancellationToken cancellationToken);
     Task<List<LogEntry>> GetLogsAsync(Guid previewId);
+    Task<List<ProjectLogEntry>> GetProjectLogsAsync(Guid projectId, LogQueryParams? queryParams = null);
+    Task AddProjectLogAsync(Guid projectId, LogLevel level, string source, string message);
 }
 
 public class LogStreamService : ILogStreamService
@@ -86,6 +89,75 @@ public class LogStreamService : ILogStreamService
 
         _logger.LogInformation("Log streaming completed for preview {PreviewId}", previewId);
     }
+
+    public async Task<List<ProjectLogEntry>> GetProjectLogsAsync(Guid projectId, LogQueryParams? queryParams = null)
+    {
+        var query = _context.ProjectLogs
+            .Where(l => l.ProjectId == projectId)
+            .AsQueryable();
+
+        // Apply filters
+        if (queryParams != null)
+        {
+            if (queryParams.Level.HasValue)
+            {
+                query = query.Where(l => l.Level == queryParams.Level.Value);
+            }
+
+            if (!string.IsNullOrEmpty(queryParams.Source))
+            {
+                query = query.Where(l => l.Source == queryParams.Source);
+            }
+
+            if (!string.IsNullOrEmpty(queryParams.Search))
+            {
+                query = query.Where(l => l.Message.Contains(queryParams.Search));
+            }
+
+            if (queryParams.From.HasValue)
+            {
+                query = query.Where(l => l.Timestamp >= queryParams.From.Value);
+            }
+
+            if (queryParams.To.HasValue)
+            {
+                query = query.Where(l => l.Timestamp <= queryParams.To.Value);
+            }
+        }
+
+        var logs = await query
+            .OrderByDescending(l => l.Timestamp)
+            .Take(queryParams?.Limit ?? 100)
+            .ToListAsync();
+
+        return logs.Select(l => new ProjectLogEntry
+        {
+            Id = l.Id,
+            ProjectId = l.ProjectId,
+            Level = l.Level.ToString().ToLower(),
+            Source = l.Source,
+            Message = l.Message,
+            Timestamp = l.Timestamp
+        }).ToList();
+    }
+
+    public async Task AddProjectLogAsync(Guid projectId, LogLevel level, string source, string message)
+    {
+        var log = new ProjectLog
+        {
+            ProjectId = projectId,
+            Level = level,
+            Source = source,
+            Message = message,
+            Timestamp = DateTime.UtcNow
+        };
+
+        _context.ProjectLogs.Add(log);
+        await _context.SaveChangesAsync();
+
+        _logger.LogDebug("Added project log: {ProjectId} [{Level}] {Source}: {Message}",
+            projectId, level, source, message);
+    }
 }
 
 public class LogEntry
@@ -93,4 +165,24 @@ public class LogEntry
     public DateTime Timestamp { get; set; }
     public string Level { get; set; } = "info";
     public string Message { get; set; } = "";
+}
+
+public class ProjectLogEntry
+{
+    public Guid Id { get; set; }
+    public Guid ProjectId { get; set; }
+    public string Level { get; set; } = "";
+    public string Source { get; set; } = "";
+    public string Message { get; set; } = "";
+    public DateTime Timestamp { get; set; }
+}
+
+public class LogQueryParams
+{
+    public LogLevel? Level { get; set; }
+    public string? Source { get; set; }
+    public string? Search { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    public int Limit { get; set; } = 100;
 }

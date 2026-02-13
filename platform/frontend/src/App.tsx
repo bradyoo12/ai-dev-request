@@ -10,6 +10,8 @@ import './App.css'
 
 const LazyFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" /></div>
 const SettingsLayout = lazy(() => import('./pages/SettingsLayout'))
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
+const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'))
 const SitesPage = lazy(() => import('./pages/SitesPage'))
 const SuggestionsPage = lazy(() => import('./pages/SuggestionsPage'))
 const AdminChurnPage = lazy(() => import('./pages/AdminChurnPage'))
@@ -75,6 +77,8 @@ function App() {
             <Route path="/settings/agent-automation" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/usage-dashboard" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/ai-model" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/projects" element={<Suspense fallback={LazyFallback}><ProjectsPage /></Suspense>} />
+            <Route path="/projects/:id" element={<Suspense fallback={LazyFallback}><ProjectDetailPage /></Suspense>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />

@@ -67,6 +67,7 @@ export default function Layout() {
   // --- Authenticated primary nav items (always visible) ---
   const authPrimaryNav = (
     <>
+      <button onClick={() => navigateProtected('/projects')} className={navLinkClass} aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}>{t('header.projects')}</button>
       <button onClick={() => navigateProtected('/sites')} className={navLinkClass} aria-current={currentPath === '/sites' ? 'page' : undefined}>{t('header.mySites')}</button>
       <button onClick={() => navigateProtected('/suggestions')} className={navLinkClass} aria-current={currentPath === '/suggestions' ? 'page' : undefined}>{t('header.suggestions')}</button>
       <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>

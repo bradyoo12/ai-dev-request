@@ -133,7 +133,7 @@ public class CreditController : ControllerBase
 
             return Ok(new CreditBalanceDto
             {
-                Credits = balance.Balance,
+                Balance = balance.Balance,
                 TotalEarned = balance.TotalEarned,
                 TotalSpent = balance.TotalSpent,
                 ValueUsd = Math.Round(balance.Balance * TokenPricing.TokenToUsdRate, 2),
@@ -144,7 +144,7 @@ public class CreditController : ControllerBase
             _logger.LogError(ex, "Failed to get credit balance");
             return Ok(new CreditBalanceDto
             {
-                Credits = 0,
+                Balance = 0,
                 TotalEarned = 0,
                 TotalSpent = 0,
                 ValueUsd = 0,
@@ -286,7 +286,7 @@ public record CreditPackageItemDto
 
 public record CreditBalanceDto
 {
-    public int Credits { get; init; }
+    public int Balance { get; init; }
     public int TotalEarned { get; init; }
     public int TotalSpent { get; init; }
     public decimal ValueUsd { get; init; }

@@ -28,6 +28,7 @@ export interface CreditBalance {
   balance: number
   totalEarned: number
   totalSpent: number
+  valueUsd?: number
 }
 
 export interface CreditTransaction {

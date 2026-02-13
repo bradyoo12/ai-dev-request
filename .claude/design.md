@@ -1656,3 +1656,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: AI percentage per file, author type classification (ai/human/mixed), compliance status (compliant/review-needed/non-compliant), conversation tracking, model attribution
 - **Frontend**: `AgentTracePage` in Settings at `/settings/agent-trace` with 4 sub-tabs (Analyze, History, Formats, Stats)
 - **Ticket**: #502 — `Agent Trace open standard for AI code attribution and transparency`
+
+### AI Task Confidence Scoring
+- **Backend**: `ConfidenceScore` entity + `ConfidenceScoreController` (`api/confidence-scores`)
+- **Endpoints**: POST evaluate (multi-factor confidence analysis), GET list, DELETE {id}, GET stats (by confidence level), GET levels (anonymous, green/yellow/red)
+- **Scoring Factors**: Description clarity, technical specificity, scope definition, ambiguity check, feasibility assessment
+- **Features**: Green/yellow/red confidence levels with score percentages, complexity/ambiguity/feasibility ratings, refinement suggestions for low-confidence requests, estimated effort, accuracy tracking
+- **Frontend**: `ConfidenceScorePage` in Settings at `/settings/confidence-scoring` with 4 sub-tabs (Evaluate, History, Levels, Stats)
+- **Ticket**: #503 — `AI task confidence scoring with batch issue triage`

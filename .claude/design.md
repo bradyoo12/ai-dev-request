@@ -1494,3 +1494,19 @@ Standardized browser automation with direct DOM access via Chrome WebMCP protoco
 - **Frontend**: `WebMcpPage` in Settings with 4 sub-tabs (Connect, History, Browsers, Stats). Connect tab shows session metrics, semantic elements, capabilities checklist, and action log
 - **Entity**: `WebMcpSession` with TargetUrl, BrowserType, ElementsDiscovered, ActionsPerformed, EventsCaptured, DomNodesAnalyzed, SemanticAccuracy, ActionReliability, SessionDurationMs, Protocol, Status
 - **Ticket**: #469 — `Chrome WebMCP integration for standardized browser automation`
+
+### Claude Agent SDK (Autonomous Development)
+
+Structured autonomous development with agent loops, tools, subagents, and MCP extensibility:
+- **Backend**: `AgentSdkSession` entity tracking agent execution with tool calls, subagents, skills, and MCP metrics. `AgentSdkController` with execute, list, delete, stats, and models endpoints
+- **Endpoints**:
+  - `GET /api/agent-sdk` — list sessions (50 limit)
+  - `POST /api/agent-sdk/execute` — execute agent with tool breakdown, subagent details, skill invocations, MCP server connections, and agent loop metrics
+  - `DELETE /api/agent-sdk/{id}` — delete session
+  - `GET /api/agent-sdk/stats` — session statistics (by model)
+  - `GET /api/agent-sdk/models` — list 3 Claude models: Opus 4.6 (recommended), Sonnet 4.5, Haiku 4.5 (anonymous)
+- **Agent Loop**: Tracks turns, tool calls, context window usage, compressions, retries
+- **Tools**: Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch, Task — with per-tool call counts and success rates
+- **Frontend**: `AgentSdkPage` in Settings with 4 sub-tabs (Execute, History, Models, Stats). Execute tab shows agent loop metrics, tool breakdown, subagent details, skill invocations, MCP server connections
+- **Entity**: `AgentSdkSession` with ProjectName, TaskDescription, ToolCallsTotal/Succeeded, SubagentsSpawned, SkillsInvoked, McpServersConnected, ContextTokensUsed, ContextCompressions, RetryAttempts, SuccessRate, DurationMs, AgentModel, Status
+- **Ticket**: #470 — `Claude Agent SDK for structured autonomous development workflows`

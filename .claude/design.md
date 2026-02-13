@@ -1185,3 +1185,20 @@ Autonomous testing loop that tests generated code in live browsers, detects fail
 - **Browsers**: Chromium, Firefox, WebKit
 - **Entity**: `SelfHealingRun` with ProjectName, TestCommand, BrowserType, Status, CurrentAttempt, MaxAttempts, ErrorsJson, FixesJson, TestDurationMs, HealingDurationMs, TestsPassed, TestsFailed, FinalResult
 - **Ticket**: #423 — `Self-healing code with autonomous testing loop in live browser`
+
+## Production-Connected Sandboxes
+
+v0.dev-style sandboxes with auto-imported environment variables from cloud providers:
+- **Backend**: `ProductionSandbox` entity tracking sandboxes with provider, env vars, services, region, and OAuth status. `ProductionSandboxController` with CRUD, stop, delete, stats, and providers endpoints
+- **Endpoints**:
+  - `GET /api/production-sandboxes` — list sandboxes (filterable by provider)
+  - `GET /api/production-sandboxes/{id}` — get sandbox details
+  - `POST /api/production-sandboxes` — create sandbox with auto-imported env vars
+  - `POST /api/production-sandboxes/{id}/stop` — stop a running sandbox
+  - `DELETE /api/production-sandboxes/{id}` — delete sandbox
+  - `GET /api/production-sandboxes/stats` — sandbox statistics (by provider/status)
+  - `GET /api/production-sandboxes/providers` — list cloud providers (anonymous)
+- **Frontend**: `ProductionSandboxPage` in Settings with 3 sub-tabs (Create, Sandboxes, Stats). Create tab has form with provider selector and shows imported env vars/services. Sandboxes tab has stop/delete actions. Stats tab shows by-provider and by-status breakdowns
+- **Providers**: Azure (App Service, SQL, Storage, Key Vault), AWS (RDS, S3, Lambda, CloudWatch), Vercel (Postgres, Blob, Edge Functions, KV)
+- **Entity**: `ProductionSandbox` with SandboxName, Provider, Status, EnvVarsJson, EnvVarCount, ServicesJson, ServiceCount, Region, OAuthConnected, UptimeMinutes, CostUsd
+- **Ticket**: #424 — `Production-connected sandboxes with environment variable import`

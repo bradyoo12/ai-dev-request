@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class TursoDatabase : BaseEntity
+public class TursoDatabase
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string DatabaseName { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;          // primary region: us-east, eu-west, ap-southeast, etc.
@@ -22,4 +21,5 @@ public class TursoDatabase : BaseEntity
     public long TotalWrites { get; set; }
     public string SyncMode { get; set; } = "automatic";        // automatic, manual, scheduled
     public string Status { get; set; } = "active";             // active, syncing, branched, archived
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

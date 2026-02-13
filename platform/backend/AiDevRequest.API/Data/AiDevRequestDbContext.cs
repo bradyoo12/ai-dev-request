@@ -168,7 +168,6 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HybridValidation> HybridValidations => Set<HybridValidation>();
     public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
     public DbSet<AgenticWorkflow> AgenticWorkflows => Set<AgenticWorkflow>();
-    public DbSet<AgentTrace> AgentTraces => Set<AgentTrace>();
     public DbSet<ConfidenceScore> ConfidenceScores => Set<ConfidenceScore>();
     public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
 

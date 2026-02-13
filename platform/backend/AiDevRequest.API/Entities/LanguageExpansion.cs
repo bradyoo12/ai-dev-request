@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class LanguageExpansion : BaseEntity
+public class LanguageExpansion
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string SourceLanguage { get; set; } = "en";
     public string TargetLanguage { get; set; } = string.Empty;
@@ -18,4 +17,5 @@ public class LanguageExpansion : BaseEntity
     public bool RtlSupport { get; set; }
     public double TranslationTimeMs { get; set; }
     public string Status { get; set; } = "completed";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

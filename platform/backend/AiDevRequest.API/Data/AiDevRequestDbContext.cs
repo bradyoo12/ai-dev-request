@@ -153,6 +153,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VisionToCodeResult> VisionToCodeResults => Set<VisionToCodeResult>();
     public DbSet<DotnetUpgradeResult> DotnetUpgradeResults => Set<DotnetUpgradeResult>();
     public DbSet<ParallelAgentRun> ParallelAgentRuns => Set<ParallelAgentRun>();
+    public DbSet<WebMcpSession> WebMcpSessions => Set<WebMcpSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

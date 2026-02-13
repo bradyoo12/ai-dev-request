@@ -2,7 +2,7 @@ import { getAuthHeaders } from './auth'
 import { apiCache } from '../utils/apiCache'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
-const API_TIMEOUT = 10000 // 10 seconds
+const API_TIMEOUT = 5000 // 5 seconds
 
 export interface SupportPost {
   id: string
@@ -58,7 +58,7 @@ export async function getSupportPosts(
         throw err
       }
     },
-    10000, // Cache for 10 seconds
+    30000, // Cache for 30 seconds
     true // Use stale-while-revalidate for instant response
   )
 }

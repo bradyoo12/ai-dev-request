@@ -413,8 +413,25 @@ export default function SupportBoardPage() {
 
       {/* Posts list */}
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" />
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="glass-card rounded-xl p-4 animate-pulse">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="h-4 bg-warm-700/50 rounded w-3/4" />
+                  <div className="h-3 bg-warm-700/30 rounded w-full" />
+                  <div className="h-3 bg-warm-700/30 rounded w-5/6" />
+                </div>
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <div className="h-5 w-16 bg-warm-700/50 rounded-full" />
+                  <div className="h-5 w-16 bg-warm-700/50 rounded-full" />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                <div className="h-3 w-20 bg-warm-700/30 rounded" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : error ? (
         <div className="glass-card rounded-2xl p-6 text-center">

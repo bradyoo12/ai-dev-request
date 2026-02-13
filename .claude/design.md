@@ -1632,3 +1632,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Each type has 4 rules**: e.g., db-migration: No destructive DDL, Foreign key integrity, Index validation, Data type compatibility
 - **Frontend**: `HybridValidationPage` in Settings at `/settings/hybrid-validation` with 4 sub-tabs (Validate, History, Operations, Stats)
 - **Ticket**: #480 — `Hybrid AI + deterministic logic for critical workflows`
+
+### Agent-to-Agent Communication Protocols (MCP Extensions)
+- **Backend**: `AgentMessage` entity + `AgentMessageController` (`api/agent-messages`)
+- **Endpoints**: POST send (structured message delivery with protocol validation), GET list, DELETE {id}, GET stats (by message type), GET protocols (anonymous, 5 protocols)
+- **Protocols**: Task Delegation (ACK), Resource Locking (ACK), Progress Reporting, Conflict Resolution (ACK), Heartbeat
+- **Features**: Priority levels (low/normal/high/critical), delivery status tracking, acknowledgment, correlation IDs, structured payloads per protocol type
+- **Frontend**: `AgentMessagesPage` in Settings at `/settings/agent-messages` with 4 sub-tabs (Send, History, Protocols, Stats)
+- **Ticket**: #481 — `Agent-to-agent communication protocols (MCP extensions)`

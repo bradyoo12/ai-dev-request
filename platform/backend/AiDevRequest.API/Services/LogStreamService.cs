@@ -10,7 +10,7 @@ public interface ILogStreamService
     Task StreamLogsAsync(string containerId, Guid previewId, CancellationToken cancellationToken);
     Task<List<LogEntry>> GetLogsAsync(Guid previewId);
     Task<List<ProjectLogEntry>> GetProjectLogsAsync(Guid projectId, LogQueryParams? queryParams = null);
-    Task AddProjectLogAsync(Guid projectId, LogLevel level, string source, string message);
+    Task AddProjectLogAsync(Guid projectId, Entities.LogLevel level, string source, string message);
 }
 
 public class LogStreamService : ILogStreamService
@@ -141,7 +141,7 @@ public class LogStreamService : ILogStreamService
         }).ToList();
     }
 
-    public async Task AddProjectLogAsync(Guid projectId, LogLevel level, string source, string message)
+    public async Task AddProjectLogAsync(Guid projectId, Entities.LogLevel level, string source, string message)
     {
         var log = new ProjectLog
         {
@@ -179,7 +179,7 @@ public class ProjectLogEntry
 
 public class LogQueryParams
 {
-    public LogLevel? Level { get; set; }
+    public Entities.LogLevel? Level { get; set; }
     public string? Source { get; set; }
     public string? Search { get; set; }
     public DateTime? From { get; set; }

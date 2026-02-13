@@ -130,6 +130,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AgentAutomationConfig> AgentAutomationConfigs => Set<AgentAutomationConfig>();
     public DbSet<SubagentTask> SubagentTasks => Set<SubagentTask>();
     public DbSet<ParallelOrchestration> ParallelOrchestrations => Set<ParallelOrchestration>();
+    public DbSet<CodeReviewAgent> CodeReviewAgents => Set<CodeReviewAgent>();
+    public DbSet<MultiAgentReview> MultiAgentReviews => Set<MultiAgentReview>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -45,6 +45,7 @@ builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>(
 builder.Services.AddScoped<IAccessibilityService, AccessibilityService>();
 builder.Services.AddScoped<ITestGenerationService, TestGenerationService>();
 builder.Services.AddScoped<ICodeReviewService, CodeReviewService>();
+builder.Services.AddScoped<IMultiAgentReviewService, MultiAgentReviewService>();
 builder.Services.AddScoped<ICiCdService, CiCdService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();

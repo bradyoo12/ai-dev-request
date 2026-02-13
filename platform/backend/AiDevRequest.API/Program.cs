@@ -105,6 +105,8 @@ builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 builder.Services.AddScoped<IUsageMeteringService, UsageMeteringService>();
 builder.Services.AddScoped<IAgentInboxService, AgentInboxService>();
 builder.Services.AddScoped<IAgentSkillService, AgentSkillService>();
+builder.Services.AddScoped<IAutonomousTestingService, AutonomousTestingService>();
+builder.Services.AddScoped<ILogStreamService, LogStreamService>();
 builder.Services.AddScoped<GitBranchService>();
 
 // Add JWT Authentication

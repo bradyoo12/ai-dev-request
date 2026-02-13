@@ -1134,3 +1134,21 @@ DAG-based multi-agent workflow orchestration for code generation pipelines:
 - **Templates**: Code Review Pipeline, Full-Stack Generator, Test Automation
 - **Entity**: `LangGraphWorkflow` with NodesJson, EdgesJson, ExecutionStateJson, TotalNodes, CompletedNodes, FailedNodes, StampedeProtectionEnabled, CacheHitsCount, TotalExecutions, AvgExecutionTimeMs
 - **Ticket**: #420 — `LangGraph multi-agent orchestration for code generation workflow`
+
+## HybridCache Multi-Tenant Performance Optimization
+
+.NET 9 HybridCache with L1/L2 caching and cache stampede protection:
+- **Backend**: `HybridCacheEntry` entity tracking cache keys, layers, hit/miss counts, stampede protection, cost savings. `HybridCacheController` with CRUD, invalidation, stats, and categories endpoints
+- **Endpoints**:
+  - `GET /api/hybrid-cache/entries` — list cache entries (filterable by category)
+  - `POST /api/hybrid-cache/entries` — create cache entry
+  - `GET /api/hybrid-cache/entries/{id}` — get entry details
+  - `POST /api/hybrid-cache/entries/{id}/invalidate` — invalidate single entry
+  - `POST /api/hybrid-cache/invalidate-all` — bulk invalidate (filterable by category)
+  - `GET /api/hybrid-cache/stats` — cache performance stats (hit rate, latency, cost saved, by category/layer)
+  - `GET /api/hybrid-cache/categories` — list cache categories (anonymous)
+- **Frontend**: `HybridCachePage` in Settings with 3 sub-tabs (Overview, Entries, Stats). Overview shows hit rate, cost savings, stampede blocked, category breakdown, and L1/L2 layer stats. Entries tab has category filter and bulk invalidation. Stats tab shows detailed metrics
+- **Cache Layers**: L1 (In-Memory), L2 (Distributed)
+- **Categories**: AI Analysis, Templates, Scaffolds, Project Data, Model Responses, General
+- **Entity**: `HybridCacheEntry` with CacheKey, CacheLayer, Category, SizeBytes, HitCount, MissCount, StampedeProtected, StampedeBlockedCount, AvgLatencyMs, CostSavedUsd, TtlSeconds, ExpiresAt
+- **Ticket**: #421 — `.NET 9 HybridCache for multi-tenant performance optimization`

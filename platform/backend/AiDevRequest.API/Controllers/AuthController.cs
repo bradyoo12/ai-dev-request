@@ -162,6 +162,7 @@ public class AuthController : ControllerBase
 
     [HttpGet("{provider}/url")]
     [ProducesResponseType(typeof(AuthUrlResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult<AuthUrlResponseDto> GetAuthUrl(string provider, [FromQuery] string redirectUri, [FromQuery] string? state)
     {
         var validProviders = new[] { "google", "kakao", "line", "apple" };
@@ -170,9 +171,16 @@ public class AuthController : ControllerBase
             return BadRequest(new { error = $"Unknown provider: {provider}" });
         }
 
-        var url = _socialAuthService.GetAuthorizationUrl(provider, redirectUri, state ?? Guid.NewGuid().ToString("N"));
-
-        return Ok(new AuthUrlResponseDto { Url = url });
+        try
+        {
+            var url = _socialAuthService.GetAuthorizationUrl(provider, redirectUri, state ?? Guid.NewGuid().ToString("N"));
+            return Ok(new AuthUrlResponseDto { Url = url });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "OAuth configuration error for {Provider}", provider);
+            return BadRequest(new { error = $"{provider} login is not configured. Please contact support." });
+        }
     }
 
     [HttpGet("me")]

@@ -392,4 +392,19 @@ public class AuthControllerTests
         var response = okResult.Value.Should().BeOfType<AuthUrlResponseDto>().Subject;
         response.Url.Should().Contain("google.com");
     }
+
+    [Fact]
+    public void GetAuthUrl_ReturnsBadRequest_WhenProviderNotConfigured()
+    {
+        var socialAuthService = new Mock<ISocialAuthService>();
+        socialAuthService.Setup(s => s.GetAuthorizationUrl("line", It.IsAny<string>(), It.IsAny<string>()))
+            .Throws(new InvalidOperationException("LINE ChannelId not configured"));
+
+        var controller = CreateController(socialAuthService: socialAuthService);
+        ControllerTestHelper.SetupAnonymous(controller);
+
+        var result = controller.GetAuthUrl("line", "https://callback.com", "state123");
+
+        result.Result.Should().BeOfType<BadRequestObjectResult>();
+    }
 }

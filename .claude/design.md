@@ -1302,3 +1302,19 @@ Hybrid search combining vector similarity, keyword matching, and fusion algorith
 - **Frontend**: `VectorSearchPage` in Settings with 4 sub-tabs (Search, Indexes, Configure, Stats). Search tab runs queries with mode selector showing fused/vector/keyword scores. Indexes tab lists configs with mode badges. Configure tab has index name, provider, search mode (hybrid/vector/keyword), fusion algorithm (RRF/linear/weighted), vector/keyword weight sliders, top-K, checkboxes. Stats tab shows aggregate metrics and breakdowns
 - **Entity**: `VectorSearchConfig` with Provider (qdrant/pinecone/weaviate/pgvector), SearchMode (hybrid/vector-only/keyword-only), FusionAlgorithm (rrf/linear/weighted), VectorWeight, KeywordWeight, TopK, SimilarityThreshold, QueryExpansion, MetadataFiltering, VectorDimension, TotalVectors, AvgQueryLatencyMs, TotalQueries, Status
 - **Ticket**: #438 — `Hybrid vector search for organizational memory (enhance #425)`
+
+### REPL-Based Testing (Fast Verification with Potemkin Detection)
+
+REPL-based test execution that's 3x faster and 10x cheaper than browser automation, with Potemkin interface detection and DB state verification:
+- **Backend**: `ReplTestSession` entity with test mode, runtime, pass/fail counts, Potemkin detections, DB state checks, log captures, speedup factor, and cost reduction metrics. `ReplTestController` with run tests, list sessions, delete, stats, and runtimes endpoints
+- **Endpoints**:
+  - `GET /api/repl-test` — list sessions (50 limit)
+  - `GET /api/repl-test/{id}` — get session
+  - `POST /api/repl-test/run` — run tests with simulated results including Potemkin detection and DB verification
+  - `DELETE /api/repl-test/{id}` — delete session
+  - `GET /api/repl-test/stats` — testing statistics (by mode, by runtime)
+  - `GET /api/repl-test/runtimes` — list 4 runtimes: Node.js, Deno, Bun, Python (anonymous)
+- **Runtimes**: Node.js (#339933), Deno (#000000), Bun (#FBF0DF), Python (#3776AB)
+- **Frontend**: `ReplTestPage` in Settings with 4 sub-tabs (Run, Sessions, Compare, Stats). Run tab executes tests with mode/runtime selection showing results with Potemkin/DB Verified tags. Sessions tab shows past test runs. Compare tab shows REPL vs Browser performance comparison table. Stats tab shows sessions/tests/pass rate/speedup/cost reduction metrics
+- **Entity**: `ReplTestSession` with TestMode (repl/browser/hybrid), Runtime (node/deno/bun/python), TotalTests, PassedTests, FailedTests, PotemkinDetections, DbStateChecks, LogsCaptured, AvgLatencyMs, SpeedupFactor, CostReduction, Status, ResultSummary
+- **Ticket**: #440 — `REPL-based testing for 3x faster verification (enhance #423)`

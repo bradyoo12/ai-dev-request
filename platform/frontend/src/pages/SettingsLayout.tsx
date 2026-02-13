@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import SettingsPage from './SettingsPage'
@@ -229,6 +229,48 @@ export default function SettingsLayout() {
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
+  // Mobile scroll tracking for tab bar
+  const tabBarRef = useRef<HTMLDivElement>(null)
+  const [atScrollStart, setAtScrollStart] = useState(true)
+  const [atScrollEnd, setAtScrollEnd] = useState(false)
+
+  const updateScrollIndicators = useCallback(() => {
+    const el = tabBarRef.current
+    if (!el) return
+    setAtScrollStart(el.scrollLeft <= 4)
+    setAtScrollEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4)
+  }, [])
+
+  useEffect(() => {
+    const el = tabBarRef.current
+    if (!el) return
+    updateScrollIndicators()
+    el.addEventListener('scroll', updateScrollIndicators, { passive: true })
+    let resizeObserver: ResizeObserver | undefined
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(updateScrollIndicators)
+      resizeObserver.observe(el)
+    }
+    return () => {
+      el.removeEventListener('scroll', updateScrollIndicators)
+      resizeObserver?.disconnect()
+    }
+  }, [updateScrollIndicators])
+
+  // Scroll active tab into view on mount / tab change
+  useEffect(() => {
+    const el = tabBarRef.current
+    if (!el) return
+    // Active tab has bg-warm-700 class
+    const activeBtn = el.querySelector('.bg-warm-700') as HTMLElement | null
+    if (activeBtn) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+      })
+    }
+  }, [settingsTab])
+
   useEffect(() => {
     if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== settingsTab) {
       setSettingsTab(tabParam)
@@ -254,7 +296,8 @@ export default function SettingsLayout() {
         </button>
         <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
       </div>
-      <div className="flex gap-1 mb-6 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap" role="tablist" aria-label={t('settings.title')}>
+      <div className="settings-tab-wrapper mb-6" data-scroll-start={String(atScrollStart)} data-scroll-end={String(atScrollEnd)}>
+      <div ref={tabBarRef} className="settings-tab-bar flex gap-1 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap" role="tablist" aria-label={t('settings.title')}>
         <button
           onClick={() => setSettingsTab('tokens')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
@@ -1439,6 +1482,7 @@ export default function SettingsLayout() {
             {t('settings.tabs.agentSkills', 'Agent Skills')}
           </span>
         </button>
+      </div>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}

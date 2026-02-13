@@ -95,6 +95,7 @@ builder.Services.AddScoped<ISelfHealingTestService, SelfHealingTestService>();
 builder.Services.AddScoped<IDatabaseBranchService, DatabaseBranchService>();
 builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 builder.Services.AddScoped<IUsageMeteringService, UsageMeteringService>();
+builder.Services.AddScoped<IAgentInboxService, AgentInboxService>();
 builder.Services.AddScoped<GitBranchService>();
 
 // Add JWT Authentication

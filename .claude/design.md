@@ -1478,3 +1478,19 @@ Simulated parallel agent execution with git worktree isolation and auto-merge:
 - **Frontend**: `ParallelAgentsPage` in Settings with 4 sub-tabs (Execute, History, Modes, Stats). Execute tab launches parallel agents with speed comparison, merge timeline, agent details, and subtask breakdown
 - **Entity**: `ParallelAgentRun` with ProjectName, TaskDescription, AgentCount, SubtasksTotal/Completed, MergeConflicts, AutoResolved, FilesModified, LinesChanged, DurationMs, SpeedupFactor, IsolationMode, Status
 - **Ticket**: #464 — `Parallel agent execution with git worktrees (Cursor 2.0 pattern)`
+
+### Chrome WebMCP (Browser Automation)
+
+Standardized browser automation with direct DOM access via Chrome WebMCP protocol:
+- **Backend**: `WebMcpSession` entity tracking browser sessions with semantic accuracy metrics. `WebMcpController` with connect, list, delete, stats, and browsers endpoints
+- **Endpoints**:
+  - `GET /api/webmcp` — list sessions (50 limit)
+  - `POST /api/webmcp/connect` — connect to URL via WebMCP protocol, returns session result with actions, events, semantic elements, and capabilities
+  - `DELETE /api/webmcp/{id}` — delete session
+  - `GET /api/webmcp/stats` — session statistics (by browser)
+  - `GET /api/webmcp/browsers` — list 4 browsers: Chrome/Edge (v2), Safari (v1), Firefox (coming soon) (anonymous)
+- **Capabilities**: Direct DOM Access, Event Listening, Semantic Understanding, Cross-Browser, Form AutoFill, Screenshot-Free
+- **Semantic Elements**: interactive, navigation, content, form, media categories with element counts
+- **Frontend**: `WebMcpPage` in Settings with 4 sub-tabs (Connect, History, Browsers, Stats). Connect tab shows session metrics, semantic elements, capabilities checklist, and action log
+- **Entity**: `WebMcpSession` with TargetUrl, BrowserType, ElementsDiscovered, ActionsPerformed, EventsCaptured, DomNodesAnalyzed, SemanticAccuracy, ActionReliability, SessionDurationMs, Protocol, Status
+- **Ticket**: #469 — `Chrome WebMCP integration for standardized browser automation`

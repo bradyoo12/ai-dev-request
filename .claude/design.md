@@ -1351,3 +1351,18 @@ Multi-file editing with plan-first workflow, model tier selection, and diff prev
 - **Frontend**: `ComposerPage` in Settings with 4 sub-tabs (Compose, Plans, Modes, Stats). Compose tab creates plans with mode/model selection, shows plan overview with step/file/line counts and approve/reject buttons, plus diff preview. Plans tab lists all plans with status badges. Modes tab shows composer modes and model tiers. Stats tab shows aggregate metrics and breakdowns
 - **Entity**: `ComposerPlan` with PlanMode (plan-first/direct/interactive), ModelTier (haiku/sonnet/opus), TotalSteps, CompletedSteps, FilesChanged, LinesAdded, LinesRemoved, EstimatedTokens, ActualTokens, DiffPreviewShown, PlanApproved, Status, PlanSummary
 - **Ticket**: #442 — `Multi-file Composer with Plan Mode (Cursor pattern)`
+
+### .NET 9 Performance Optimization Benchmarks
+
+Backend performance benchmarking and optimization with .NET 9 features (JSON, HTTP/3, Startup, AOT, GC):
+- **Backend**: `PerformanceOptimization` entity with benchmark metrics, latency comparison, memory savings, throughput. `PerformanceOptController` with benchmark execution, list, delete, stats, and categories endpoints
+- **Endpoints**:
+  - `GET /api/performance-opt` — list optimizations (50 limit)
+  - `POST /api/performance-opt/benchmark` — run benchmark with simulated metrics (max 50 per user)
+  - `DELETE /api/performance-opt/{id}` — delete optimization
+  - `GET /api/performance-opt/stats` — optimization statistics (by category, by status)
+  - `GET /api/performance-opt/categories` — list 5 categories: JSON, HTTP/2&3, Startup, AOT, GC (anonymous)
+- **Categories**: JSON Serialization (#3B82F6, 35%), HTTP/2 & HTTP/3 (#10B981, 20%), Startup Time (#F59E0B, 15%), Native AOT (#8B5CF6, 35%), Garbage Collection (#EF4444, 10%)
+- **Frontend**: `DotnetPerfPage` in Settings with 4 sub-tabs (Benchmark, History, Categories, Stats). Benchmark tab runs performance tests showing improvement %, memory saved %, throughput, latency comparison, and detailed breakdown. History tab lists past benchmarks. Categories tab shows optimization categories and key features. Stats tab shows aggregate metrics
+- **Entity**: `PerformanceOptimization` with Category (json/http/startup/aot/gc), BaselineLatencyMs, OptimizedLatencyMs, ImprovementPercent, MemoryBeforeMb, MemoryAfterMb, MemorySavedPercent, BenchmarkRuns, ThroughputRps, Status
+- **Ticket**: #444 — `Leverage .NET 9 performance optimizations (AOT, JSON, HTTP/3)`

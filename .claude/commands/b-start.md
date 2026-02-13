@@ -38,12 +38,13 @@ This command orchestrates the entire development workflow using Agent Teams for 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    b-start (Team Orchestrator)                    │
 ├─────────────────────────────────────────────────────────────────┤
-│  1. Check policy.md & design.md                                  │
+│  1. Check policy.md, design.md, inventory.md, conventions.md       │
 │  2. Audit all tickets for alignment                              │
 │  3. b-ready team → plan, implement, unit tests, E2E test, PR      │
 │  4. b-progress → merge PR to main, move to In Review             │
 │  4b. GitHub Actions health check → find & fix CI failures        │
 │  5. b-review team → parallel test + verify on staging            │
+│  5e-ii. Doc maintenance → update inventory/design if changed     │
 │  6. b-modernize team → parallel research + create suggestions    │
 │  7. Site audit → visit live site, find errors, create tickets    │
 │  8. Report status & loop back to step 1                          │
@@ -149,6 +150,21 @@ Read and internalize the project guidelines. These are living documents that get
    - Know system components
    - Understand data flow
    - Learn technology stack
+
+3. **Read Inventory** (`.claude/inventory.md`):
+   - Know what controllers, services, entities, pages already exist
+   - Find existing code by domain before creating new files
+   - Avoid creating duplicate features
+
+4. **Read Conventions** (`.claude/conventions.md`):
+   - Follow file placement rules
+   - Use correct naming patterns
+   - Apply standard coding patterns
+
+5. **Read Infrastructure** (`.claude/infrastructure.md`):
+   - Know deployment targets and URLs
+   - Understand CI/CD pipeline
+   - Know required environment variables
 
 ### Step 2: Audit All Tickets for Alignment
 
@@ -551,36 +567,50 @@ After a ticket is verified and completed, update the project documentation to re
    gh api "repos/bradyoo12/ai-dev-request/pulls/<pr_number>/files" --jq '[.[] | .filename]'
    ```
 
-3. **Update `.claude/design.md`** if the ticket introduced:
-   - New components, pages, or routes
-   - New API endpoints or backend services
+3. **Update `.claude/inventory.md`** if the ticket introduced:
+   - New controllers, services, or entities → add under the appropriate domain section
+   - New frontend pages or components → add under the appropriate feature area
+   - New API modules → add with backend controller mapping
+   - Removed or renamed files → update or remove entries
+
+4. **Update `.claude/design.md`** if the ticket introduced:
+   - New API endpoints or backend services with significant functionality
    - New database tables or schema changes
    - Changes to the architecture or data flow
    - New integrations or third-party services
    - Updated tech stack or dependencies
 
-4. **Update `.claude/policy.md`** if the ticket introduced:
+5. **Update `.claude/conventions.md`** if the ticket introduced:
+   - New coding patterns or conventions
+   - Changes to file placement rules
+   - New testing patterns
+
+6. **Update `.claude/infrastructure.md`** if the ticket introduced:
+   - New environment variables or configuration
+   - Changes to CI/CD pipeline or deployment
+   - New Azure resources or Docker changes
+
+7. **Update `.claude/policy.md`** if the ticket introduced:
    - New development rules or conventions
    - Changes to the build/test/deploy process
-   - New environment variables or configuration requirements
    - Updated quality standards or review criteria
    - New labels, workflows, or ticket management changes
 
-5. **How to update:**
+8. **How to update:**
    - Read the current file
    - Identify the relevant section(s) to update
    - Make minimal, targeted edits — only add/change what the completed ticket affects
    - Do NOT remove existing content unless it is now incorrect
    - Do NOT rewrite entire sections — surgical updates only
 
-6. **Commit and push the documentation updates** (worktree-safe — push to main without checking it out):
+9. **Commit and push the documentation updates** (worktree-safe — push to main without checking it out):
    ```bash
-   git add .claude/policy.md .claude/design.md
-   git commit -m "docs: update policy and design docs after completing #<issue_number>"
+   git add .claude/inventory.md .claude/design.md .claude/conventions.md .claude/infrastructure.md .claude/policy.md
+   git commit -m "docs: update .claude/ docs after completing #<issue_number>"
    git push origin HEAD:main
    ```
 
-7. If neither file needs updating (e.g., the ticket was a minor bug fix with no architectural impact), skip this step and log: "No doc updates needed for #<issue_number>"
+10. If no files need updating (e.g., the ticket was a minor bug fix with no impact), skip this step and log: "No doc updates needed for #<issue_number>"
 
 ### Step 6: b-modernize — Research with Agent Team
 

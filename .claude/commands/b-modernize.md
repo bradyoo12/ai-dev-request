@@ -18,10 +18,15 @@ allowed-prompts:
 ## Context
 
 AI Dev Request is a SaaS platform for AI-powered development automation:
-- **Backend**: .NET 9, BradYoo.Core, PostgreSQL
-- **Frontend**: React + Vite + shadcn/ui + Zustand + Tailwind CSS
-- **AI**: Claude API (requirement analysis + code generation)
+- **Backend**: .NET 10 LTS, C# 14, EF Core 10, BradYoo.Core, PostgreSQL + pgvector
+- **Frontend**: React 19 + Vite 7 + TypeScript 5.9 + shadcn/ui + Tailwind CSS 4 + Framer Motion
+- **AI**: Claude API (Anthropic SDK 5.9) — requirement analysis + code generation
 - **Core**: Automated dev request → analysis → proposal → build pipeline
+
+**Reference docs** (read before auditing):
+- `.claude/inventory.md` — Complete file/feature map (find any controller, service, page)
+- `.claude/conventions.md` — Coding patterns, file placement, naming rules
+- `.claude/infrastructure.md` — Deployment, CI/CD, Azure config, env vars
 
 ## Operating Modes
 
@@ -116,18 +121,15 @@ Before looking externally, review the current codebase for improvement opportuni
 
 ### How to Audit
 
-1. Read `.claude/design.md` and `.claude/policy.md`
-2. Use Glob to discover key source files:
-   ```
-   platform/frontend/src/**/*.{ts,tsx}
-   platform/backend/AiDevRequest.API/**/*.cs
-   ```
+1. Read `.claude/design.md`, `.claude/policy.md`, `.claude/inventory.md`, and `.claude/conventions.md`
+2. Use `inventory.md` to identify key files by domain — no need to glob from scratch
 3. Read and review files systematically — prioritize:
    - Entry points (App.tsx, routes, controllers)
    - State management (stores, contexts)
    - API integration (services, hooks)
    - Shared components and utilities
-4. For each finding, record:
+4. Cross-reference `conventions.md` to flag deviations from established patterns
+5. For each finding, record:
    - **File & location**: Which file and roughly what area
    - **Issue**: What's wrong or could be better
    - **Suggestion**: Specific improvement

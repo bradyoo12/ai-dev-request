@@ -1383,3 +1383,18 @@ Intelligent routing between AI models (Claude Opus, Claude Sonnet, GPT-Codex, GP
 - **Frontend**: `MultiModelRoutingPage` in Settings with 4 sub-tabs (Simulate, Rules, Models, Stats). Simulate tab routes tasks to best model showing comparison cards. Rules tab creates and manages routing rules. Models tab shows AI model specs and routing strategies. Stats tab shows aggregate metrics
 - **Entity**: `ModelRoutingRule` with TaskType (code-generation/reasoning/refactoring/testing/review), PrimaryModel, FallbackModel, RoutingStrategy, CostThreshold, LatencyThresholdMs, TotalRequests, PrimaryHits, FallbackHits, AvgPrimaryLatencyMs, AvgFallbackLatencyMs, AccuracyScore, Status
 - **Ticket**: #454 — `Multi-model AI routing with GPT-5.3-Codex + Claude Opus 4.6`
+
+### Biome Toolchain Integration (Fast Linting & Formatting)
+
+Rust-based all-in-one linting and formatting replacing ESLint + Prettier with 4x faster performance:
+- **Backend**: `BiomeLintResult` entity with lint/format metrics, speedup comparison, type-aware rules. `BiomeLintController` with run, list, delete, stats, and presets endpoints
+- **Endpoints**:
+  - `GET /api/biome-lint` — list lint results (50 limit)
+  - `POST /api/biome-lint/run` — run lint analysis comparing Biome vs ESLint+Prettier (max 50 per user)
+  - `DELETE /api/biome-lint/{id}` — delete lint result
+  - `GET /api/biome-lint/stats` — lint statistics (by toolchain, by preset)
+  - `GET /api/biome-lint/presets` — list 3 presets: recommended/strict/minimal (anonymous)
+- **Presets**: Recommended (150 rules, #3B82F6), Strict (220 rules, #EF4444), Minimal (60 rules, #10B981)
+- **Frontend**: `BiomeLintPage` in Settings with 4 sub-tabs (Run, History, Presets, Stats). Run tab compares Biome vs ESLint+Prettier speed with detailed breakdown. History tab lists past runs. Presets tab shows config presets and key features. Stats tab shows aggregate metrics
+- **Entity**: `BiomeLintResult` with Toolchain (biome/eslint-prettier), LintDurationMs, FormatDurationMs, TotalDurationMs, SpeedupFactor, TypeAwareEnabled, TypeAwareIssues, ConfigPreset, Errors, Warnings, AutoFixed, Status
+- **Ticket**: #456 — `Biome toolchain integration for 4x faster linting and formatting`

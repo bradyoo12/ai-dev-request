@@ -87,42 +87,67 @@ public class MultiAgentTestController : ControllerBase
     [HttpGet("sessions")]
     public async Task<ActionResult<List<MultiAgentTestSession>>> GetSessions([FromQuery] Guid? devRequestId)
     {
-        if (devRequestId.HasValue)
+        try
         {
-            var sessions = await _testService.GetSessionsAsync(devRequestId.Value);
-            return Ok(sessions);
+            if (devRequestId.HasValue)
+            {
+                var sessions = await _testService.GetSessionsAsync(devRequestId.Value);
+                return Ok(sessions);
+            }
+
+            // Return all sessions if no filter
+            var allSessions = await _context.MultiAgentTestSessions
+                .OrderByDescending(s => s.CreatedAt)
+                .Take(50)
+                .ToListAsync();
+
+            return Ok(allSessions);
         }
-
-        // Return all sessions if no filter
-        var allSessions = await _context.MultiAgentTestSessions
-            .OrderByDescending(s => s.CreatedAt)
-            .Take(50)
-            .ToListAsync();
-
-        return Ok(allSessions);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve multi-agent test sessions");
+            // Return empty list instead of 500 error to prevent UI from breaking
+            return Ok(new List<MultiAgentTestSession>());
+        }
     }
 
     [HttpGet("sessions/{id}/personas")]
     public async Task<ActionResult<List<TestPersona>>> GetSessionPersonas(Guid id)
     {
-        var personas = await _context.TestPersonas
-            .Where(p => p.SessionId == id)
-            .OrderBy(p => p.PersonaType)
-            .ToListAsync();
+        try
+        {
+            var personas = await _context.TestPersonas
+                .Where(p => p.SessionId == id)
+                .OrderBy(p => p.PersonaType)
+                .ToListAsync();
 
-        return Ok(personas);
+            return Ok(personas);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve personas for session {SessionId}", id);
+            return Ok(new List<TestPersona>());
+        }
     }
 
     [HttpGet("sessions/{id}/issues")]
     public async Task<ActionResult<List<ConcurrencyIssue>>> GetSessionIssues(Guid id)
     {
-        var issues = await _context.ConcurrencyIssues
-            .Where(i => i.SessionId == id)
-            .OrderByDescending(i => i.Severity == "critical" ? 4 : i.Severity == "high" ? 3 : i.Severity == "medium" ? 2 : 1)
-            .ThenByDescending(i => i.DetectedAt)
-            .ToListAsync();
+        try
+        {
+            var issues = await _context.ConcurrencyIssues
+                .Where(i => i.SessionId == id)
+                .OrderByDescending(i => i.Severity == "critical" ? 4 : i.Severity == "high" ? 3 : i.Severity == "medium" ? 2 : 1)
+                .ThenByDescending(i => i.DetectedAt)
+                .ToListAsync();
 
-        return Ok(issues);
+            return Ok(issues);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to retrieve issues for session {SessionId}", id);
+            return Ok(new List<ConcurrencyIssue>());
+        }
     }
 
     [HttpPost("sessions/{id}/refine")]

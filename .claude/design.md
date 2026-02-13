@@ -1218,3 +1218,18 @@ Factory.ai-style persistent organizational memory with vector DB for cross-sessi
 - **Frontend**: `OrgMemoryPage` in Settings with 4 sub-tabs (Create, Browse, Search, Stats). Create tab has form with title, content, scope, category, source project fields and shows available categories. Browse tab lists all memories with scope badges and delete action. Search tab has query input with scope filter. Stats tab shows aggregate metrics and by-category breakdown
 - **Entity**: `OrgMemory` with Scope, Category, Title, Content, SourceProject, Relevance, UsageCount, TagsJson, EmbeddingStatus (pending/indexed/failed)
 - **Ticket**: #425 — `Persistent organizational memory across sessions with vector DB`
+
+### Background Agents (Async Testing & Monitoring)
+
+Cursor-style background agents that run tasks asynchronously without blocking the main generation workflow:
+- **Backend**: `BackgroundAgent` entity with agent type (general/frontend/backend/testing/refactor), status tracking, progress steps, resource metrics (CPU/memory/tokens/cost), and simulated execution. `BackgroundAgentController` with list, get, spawn, stop, stats, types endpoints
+- **Endpoints**:
+  - `GET /api/background-agents` — list agents (filterable by status)
+  - `GET /api/background-agents/{id}` — get agent details with logs, steps, packages
+  - `POST /api/background-agents/spawn` — spawn agent (5 concurrent limit)
+  - `POST /api/background-agents/{id}/stop` — stop running agent
+  - `GET /api/background-agents/stats` — agent statistics (total, active, completed, failed, tokens, cost, PRs, avg time)
+  - `GET /api/background-agents/types` — list agent types with descriptions
+- **Frontend**: `BackgroundAgentPage` in Settings with 4 sub-tabs (Dashboard, Agents, Spawn, Logs). Dashboard shows stats cards and agent types. Agents tab has status filter, progress bars, and detail panel. Spawn tab has form with project ID, agent name, task, type, priority. Logs tab shows timestamped entries
+- **Entity**: `BackgroundAgent` with AgentName, TaskDescription, Status, BranchName, AgentType, Priority, TotalSteps/CompletedSteps/ProgressPercent, Files/Tests metrics, CPU/Memory/Tokens/Cost, PullRequest tracking, LogEntries/Steps/InstalledPackages JSON
+- **Ticket**: #434 — `Background agents for async testing and monitoring`

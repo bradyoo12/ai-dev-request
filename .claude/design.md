@@ -1152,3 +1152,20 @@ DAG-based multi-agent workflow orchestration for code generation pipelines:
 - **Categories**: AI Analysis, Templates, Scaffolds, Project Data, Model Responses, General
 - **Entity**: `HybridCacheEntry` with CacheKey, CacheLayer, Category, SizeBytes, HitCount, MissCount, StampedeProtected, StampedeBlockedCount, AvgLatencyMs, CostSavedUsd, TtlSeconds, ExpiresAt
 - **Ticket**: #421 — `.NET 9 HybridCache for multi-tenant performance optimization`
+
+## Self-Healing Playwright Tests
+
+AI-powered self-healing test selector repair with MCP integration:
+- **Backend**: `PlaywrightHealingResult` entity tracking healing results with original/healed selectors, strategies, confidence, and timing. `PlaywrightHealingController` with heal, approve, reject, stats, and strategies endpoints
+- **Endpoints**:
+  - `GET /api/playwright-healing/results` — list healing results (filterable by status)
+  - `GET /api/playwright-healing/results/{id}` — get result details
+  - `POST /api/playwright-healing/heal` — heal a broken test selector (AI-powered)
+  - `POST /api/playwright-healing/results/{id}/approve` — approve manual-review healing
+  - `POST /api/playwright-healing/results/{id}/reject` — reject manual-review healing
+  - `GET /api/playwright-healing/stats` — healing statistics (heal rate, confidence, by strategy)
+  - `GET /api/playwright-healing/strategies` — list healing strategies (anonymous)
+- **Frontend**: `PlaywrightHealingPage` in Settings with 3 sub-tabs (Heal, Results, Stats). Heal tab has form for test file/name/selector with real-time healing result display. Results tab shows history with approve/reject for manual-review items. Stats tab shows metrics and by-strategy breakdown
+- **Healing Strategies**: Closest Match (DOM similarity), AI Suggest (AI-generated alternatives), Fallback Chain (cascading selectors)
+- **Entity**: `PlaywrightHealingResult` with TestFile, TestName, OriginalSelector, HealedSelector, HealingStrategy, Confidence, Status, HealingAttempts, HealingTimeMs
+- **Ticket**: #422 — `Self-healing Playwright tests with AI using Playwright MCP`

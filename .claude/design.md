@@ -1446,3 +1446,19 @@ Simulated image-to-code generation converting screenshots, mockups, and sketches
 - **Frontend**: `VisionToCodePage` in Settings with 4 sub-tabs (Generate, History, Image Types, Stats). Generate tab creates components from images with style analysis and accuracy metrics. Image Types tab shows supported formats and vision features
 - **Entity**: `VisionToCodeResult` with ImageName, ImageType, ComponentsGenerated, LinesOfCode, Framework, StylingEngine, StyleMatchScore, LayoutAccuracy, ColorAccuracy, TypographyAccuracy, ProcessingMs, Refinements, Status
 - **Ticket**: #462 — `Vision-to-code: generate UI from screenshots and mockups`
+
+### .NET 10 LTS Upgrade Analysis
+
+Simulated .NET 10 LTS upgrade path analysis with performance benchmarks and C# 14 adoption tracking:
+- **Backend**: `DotnetUpgradeResult` entity with performance metrics and feature toggles. `DotnetUpgradeController` with analyze, list, delete, stats, and features endpoints
+- **Endpoints**:
+  - `GET /api/dotnet-upgrade` — list analyses (50 limit)
+  - `POST /api/dotnet-upgrade/analyze` — analyze upgrade path with performance comparison, package upgrades, and C# 14 adoption (max 50 per user)
+  - `DELETE /api/dotnet-upgrade/{id}` — delete analysis
+  - `GET /api/dotnet-upgrade/stats` — upgrade statistics (by source version)
+  - `GET /api/dotnet-upgrade/features` — list 5 .NET 10 features: EF Core Vector Search, C# 14, MCP, Native AOT, ASP.NET Core 10 (anonymous)
+- **Feature Toggles**: EF Core Vector Search, Native AOT, MCP Support
+- **Performance Metrics**: Startup Time Reduction, Memory Reduction, Throughput Increase, GC Pause improvement
+- **Frontend**: `DotnetUpgradePage` in Settings with 4 sub-tabs (Analyze, History, Features, Stats). Analyze tab shows .NET 9 vs 10 performance comparison, package upgrades with breaking change flags, and C# 14 feature adoptions
+- **Entity**: `DotnetUpgradeResult` with ProjectName, CurrentVersion, TargetVersion, PackagesUpgraded, BreakingChanges, DeprecationWarnings, CSharp14Adoptions, StartupTimeReduction, MemoryReduction, ThroughputIncrease, VectorSearchEnabled, NativeAotEnabled, McpSupportEnabled, Status
+- **Ticket**: #463 — `.NET 10 LTS upgrade with EF Core vector search and C# 14`

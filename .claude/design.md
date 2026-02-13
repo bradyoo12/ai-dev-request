@@ -1462,3 +1462,19 @@ Simulated .NET 10 LTS upgrade path analysis with performance benchmarks and C# 1
 - **Frontend**: `DotnetUpgradePage` in Settings with 4 sub-tabs (Analyze, History, Features, Stats). Analyze tab shows .NET 9 vs 10 performance comparison, package upgrades with breaking change flags, and C# 14 feature adoptions
 - **Entity**: `DotnetUpgradeResult` with ProjectName, CurrentVersion, TargetVersion, PackagesUpgraded, BreakingChanges, DeprecationWarnings, CSharp14Adoptions, StartupTimeReduction, MemoryReduction, ThroughputIncrease, VectorSearchEnabled, NativeAotEnabled, McpSupportEnabled, Status
 - **Ticket**: #463 — `.NET 10 LTS upgrade with EF Core vector search and C# 14`
+
+### Parallel Agent Execution (Worktree Isolation)
+
+Simulated parallel agent execution with git worktree isolation and auto-merge:
+- **Backend**: `ParallelAgentRun` entity with agent metrics and merge tracking. `ParallelAgentController` with execute, list, delete, stats, and modes endpoints
+- **Endpoints**:
+  - `GET /api/parallel-agents` — list runs (50 limit)
+  - `POST /api/parallel-agents/execute` — launch parallel agents with task decomposition, agent details, subtask breakdown, merge timeline, and speed comparison (max 50 per user)
+  - `DELETE /api/parallel-agents/{id}` — delete run
+  - `GET /api/parallel-agents/stats` — run statistics (by isolation mode)
+  - `GET /api/parallel-agents/modes` — list 3 modes: worktree/branch/fork (anonymous)
+- **Isolation Modes**: Git Worktree (recommended), Branch Per Agent, Fork Isolation
+- **Execution Details**: Agent names/branches/worktrees, subtask decomposition with assignments, merge timeline phases, sequential vs parallel speed comparison
+- **Frontend**: `ParallelAgentsPage` in Settings with 4 sub-tabs (Execute, History, Modes, Stats). Execute tab launches parallel agents with speed comparison, merge timeline, agent details, and subtask breakdown
+- **Entity**: `ParallelAgentRun` with ProjectName, TaskDescription, AgentCount, SubtasksTotal/Completed, MergeConflicts, AutoResolved, FilesModified, LinesChanged, DurationMs, SpeedupFactor, IsolationMode, Status
+- **Ticket**: #464 — `Parallel agent execution with git worktrees (Cursor 2.0 pattern)`

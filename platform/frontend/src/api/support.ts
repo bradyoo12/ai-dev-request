@@ -1,6 +1,7 @@
 import { getAuthHeaders } from './auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_TIMEOUT = 10000 // 10 seconds
 
 export interface SupportPost {
   id: string
@@ -23,6 +24,14 @@ export interface SupportPostListResponse {
   pageSize: number
 }
 
+function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = API_TIMEOUT): Promise<Response> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timeoutId))
+}
+
 export async function getSupportPosts(
   page = 1,
   pageSize = 10,
@@ -32,15 +41,29 @@ export async function getSupportPosts(
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), sort })
   if (category && category !== 'all') params.set('category', category)
 
-  const res = await fetch(`${API_BASE_URL}/api/support?${params}`)
-  if (!res.ok) throw new Error('Failed to load support posts')
-  return res.json()
+  try {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support?${params}`)
+    if (!res.ok) throw new Error('Failed to load support posts')
+    return res.json()
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw err
+  }
 }
 
 export async function getSupportPost(id: string): Promise<SupportPost> {
-  const res = await fetch(`${API_BASE_URL}/api/support/${id}`)
-  if (!res.ok) throw new Error('Failed to load support post')
-  return res.json()
+  try {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/${id}`)
+    if (!res.ok) throw new Error('Failed to load support post')
+    return res.json()
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw err
+  }
 }
 
 export async function createSupportPost(
@@ -48,37 +71,58 @@ export async function createSupportPost(
   content: string,
   category?: string
 ): Promise<SupportPost> {
-  const res = await fetch(`${API_BASE_URL}/api/support`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ title, content, category }),
-  })
-  if (!res.ok) throw new Error('Failed to create support post')
-  return res.json()
+  try {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ title, content, category }),
+    })
+    if (!res.ok) throw new Error('Failed to create support post')
+    return res.json()
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw err
+  }
 }
 
 export async function setRewardCredit(
   id: string,
   rewardCredit: number
 ): Promise<{ id: string; rewardCredit: number; rewardedByUserId: string; rewardedAt: string }> {
-  const res = await fetch(`${API_BASE_URL}/api/support/${id}/reward`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ rewardCredit }),
-  })
-  if (!res.ok) throw new Error('Failed to set reward credit')
-  return res.json()
+  try {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/${id}/reward`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ rewardCredit }),
+    })
+    if (!res.ok) throw new Error('Failed to set reward credit')
+    return res.json()
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw err
+  }
 }
 
 export async function updateSupportStatus(
   id: string,
   status: string
 ): Promise<{ id: string; status: string; previousStatus: string }> {
-  const res = await fetch(`${API_BASE_URL}/api/support/${id}/status`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
-  })
-  if (!res.ok) throw new Error('Failed to update status')
-  return res.json()
+  try {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/${id}/status`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status }),
+    })
+    if (!res.ok) throw new Error('Failed to update status')
+    return res.json()
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw err
+  }
 }

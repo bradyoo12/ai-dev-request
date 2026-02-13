@@ -1,83 +1,45 @@
 # AI Dev Request Platform
 
-## Overview
-
-AI-powered development request platform. Users submit natural language development requests, and the platform analyzes, proposes, and builds software automatically.
+AI-powered development request platform. Users submit natural language requests, and the platform analyzes, proposes, and builds software automatically.
 
 ## Repository
 
-- **Repo**: bradyoo12/ai-dev-request
-- **Default Branch**: main
+- **Repo**: bradyoo12/ai-dev-request | **Branch**: main
 - **Project Board**: https://github.com/users/bradyoo12/projects/26
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 + Vite + TypeScript + shadcn/ui + Zustand + Tailwind CSS |
-| Backend | .NET 9 + BradYoo.Core |
-| AI Engine | Claude API |
-| Database | PostgreSQL |
-| Infra | Azure Container Apps |
+| Frontend | React 19 + Vite 7 + TypeScript 5.9 + shadcn/ui + Tailwind CSS 4 + Framer Motion |
+| Backend | .NET 10 LTS + C# 14 + EF Core 10 + BradYoo.Core |
+| AI Engine | Claude API (Anthropic SDK 5.9) |
+| Database | PostgreSQL + pgvector (HNSW vector search) |
+| Infra | Azure Container Apps + Static Web Apps |
+| CI/CD | GitHub Actions |
 
-## Project Structure
-
-```
-ai-dev-request/
-├── platform/
-│   ├── backend/AiDevRequest.API/   # .NET 9 API
-│   ├── frontend/src/               # React web app
-│   └── ai-engine/                  # Claude API integration
-├── projects/                       # Generated customer projects
-├── templates/                      # Scaffolding templates
-└── .claude/                        # Claude Code config
-```
-
-## Key Files Reference
-
-| Purpose | Path |
-|---------|------|
-| API Server | platform/backend/AiDevRequest.API/ |
-| React App | platform/frontend/src/ |
-| AI Engine | platform/ai-engine/ |
-| Templates | templates/ |
-| Generated Projects | projects/ |
-
-## Working with This Project
-
-### Before Making Changes
-
-1. Check `.claude/policy.md` for development rules
-2. Check `.claude/design.md` for architecture decisions
-3. Run tests before committing
-
-### BradYoo.Core Dependency
-
-This project depends on bradyoo-core for shared infrastructure:
-```csharp
-// In .csproj
-<ProjectReference Include="..\..\bradyoo-core\packages\core-backend\src\BradYoo.Core\BradYoo.Core.csproj" />
-```
-
-Changes to bradyoo-core may affect this project. Test after core updates.
-
-### Frontend Commands
+## Quick Commands
 
 ```bash
-cd platform/frontend
-npm install        # Install dependencies
-npm run dev        # Start dev server
-npm run build      # Production build
-npm test           # Run tests
-npx playwright test  # E2E tests
+# Frontend
+cd platform/frontend && npm install && npm run dev      # Dev server
+cd platform/frontend && npm run build                    # Build
+cd platform/frontend && npm test                         # E2E (Playwright)
+cd platform/frontend && npx vitest run                   # Unit tests
+
+# Backend
+cd platform/backend/AiDevRequest.API && dotnet build     # Build
+cd platform/backend && dotnet test                       # Unit tests
 ```
 
-### Backend Commands
+## Reference Files
 
-```bash
-cd platform/backend/AiDevRequest.API
-dotnet restore     # Restore packages
-dotnet build       # Build
-dotnet test        # Run tests
-dotnet run         # Start server
-```
+| File | Purpose |
+|------|---------|
+| `.claude/policy.md` | Development rules, ticket workflow, GitHub API strategy |
+| `.claude/design.md` | Architecture, entities by domain, feature details |
+| `.claude/inventory.md` | Complete file/feature map — find any controller, service, page |
+| `.claude/conventions.md` | Coding patterns, file placement, naming rules |
+| `.claude/infrastructure.md` | Deployment, CI/CD, Azure config, env vars |
+
+**Before making changes**: Check `policy.md` for rules, `inventory.md` to find existing code, `conventions.md` for patterns.

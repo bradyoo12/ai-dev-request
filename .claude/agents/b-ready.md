@@ -21,6 +21,9 @@ gh auth switch -u bradyoo12
 **Before processing any ticket, read and verify alignment with:**
 1. `.claude/policy.md` - Ensure workflow follows policy rules
 2. `.claude/design.md` - Ensure implementation aligns with architecture
+3. `.claude/inventory.md` - Know what already exists, find relevant files, avoid duplicates
+4. `.claude/conventions.md` - Follow file placement, naming, and coding patterns
+5. `.claude/infrastructure.md` - Understand deployment targets and env vars
 
 ## Operating Modes
 
@@ -179,6 +182,18 @@ This runs tests against the local Vite preview server (port 4173), auto-started 
    ```bash
    git push -u origin <branch_name>
    ```
+
+### Step 7b: Update .claude/ Documentation
+
+Before creating the PR, update `.claude/inventory.md` if this ticket introduced new files:
+
+1. **Check what was added**: Review staged changes for new controllers, services, entities, pages, API modules, or components
+2. **Update `inventory.md`**: Add new entries to the appropriate domain section, matching existing table format
+3. **Update `conventions.md`**: If new coding patterns, naming conventions, or file placement rules were established
+4. **Update `infrastructure.md`**: If new environment variables, deployment config, or CI/CD changes were introduced
+5. **Stage the doc updates**: `git add .claude/inventory.md .claude/conventions.md .claude/infrastructure.md`
+
+Only update files that actually changed. Skip if no new files or patterns were introduced.
 
 ### Step 8: Create Pull Request
 ```bash

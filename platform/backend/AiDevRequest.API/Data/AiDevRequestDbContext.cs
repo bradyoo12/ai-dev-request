@@ -167,6 +167,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HybridValidation> HybridValidations => Set<HybridValidation>();
     public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
     public DbSet<AgenticWorkflow> AgenticWorkflows => Set<AgenticWorkflow>();
+    public DbSet<AgentTrace> AgentTraces => Set<AgentTrace>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

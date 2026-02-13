@@ -43,6 +43,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>();
 builder.Services.AddScoped<IAccessibilityService, AccessibilityService>();
+builder.Services.AddScoped<IAgentTraceService, AgentTraceService>();
 builder.Services.AddScoped<ITestGenerationService, TestGenerationService>();
 builder.Services.AddScoped<ICodeReviewService, CodeReviewService>();
 builder.Services.AddScoped<IMultiAgentReviewService, MultiAgentReviewService>();

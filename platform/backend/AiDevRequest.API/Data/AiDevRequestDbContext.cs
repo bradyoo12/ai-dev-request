@@ -36,6 +36,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ProjectVersion> ProjectVersions => Set<ProjectVersion>();
     public DbSet<ProjectTemplate> ProjectTemplates => Set<ProjectTemplate>();
     public DbSet<AgentCard> AgentCards => Set<AgentCard>();
+    public DbSet<AgentTrace> AgentTraces => Set<AgentTrace>();
     public DbSet<A2ATask> A2ATasks => Set<A2ATask>();
     public DbSet<A2AArtifact> A2AArtifacts => Set<A2AArtifact>();
     public DbSet<A2AConsent> A2AConsents => Set<A2AConsent>();

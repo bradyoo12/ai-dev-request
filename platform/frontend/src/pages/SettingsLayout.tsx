@@ -105,8 +105,8 @@ import InferenceCostPage from './InferenceCostPage'
 import LanguageExpansionPage from './LanguageExpansionPage'
 import HybridValidationPage from './HybridValidationPage'
 import AgentMessagesPage from './AgentMessagesPage'
-import AgenticWorkflowsPage from './AgenticWorkflowsPage'
 import AgentTracePage from './AgentTracePage'
+import AgenticWorkflowsPage from './AgenticWorkflowsPage'
 import ConfidenceScorePage from './ConfidenceScorePage'
 import AiModelMarketplacePage from './AiModelMarketplacePage'
 import { useAuth } from '../contexts/AuthContext'
@@ -213,6 +213,7 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/language-expansion' ? 'language-expansion' as SettingsTab
     : location.pathname === '/settings/hybrid-validation' ? 'hybrid-validation' as SettingsTab
     : location.pathname === '/settings/agent-messages' ? 'agent-messages' as SettingsTab
+    : location.pathname === '/settings/agent-trace' ? 'agent-trace' as SettingsTab
     : location.pathname === '/settings/agentic-workflows' ? 'agentic-workflows' as SettingsTab
     : location.pathname === '/settings/agent-trace' ? 'agent-trace' as SettingsTab
     : location.pathname === '/settings/confidence-scoring' ? 'confidence-scoring' as SettingsTab
@@ -1337,6 +1338,17 @@ export default function SettingsLayout() {
           </span>
         </button>
         <button
+          onClick={() => setSettingsTab('agent-trace')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'agent-trace' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            {t('settings.tabs.agentTrace', 'Agent Trace')}
+          </span>
+        </button>
+        <button
           onClick={() => setSettingsTab('agentic-workflows')}
           className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
             settingsTab === 'agentic-workflows' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
@@ -1485,6 +1497,7 @@ export default function SettingsLayout() {
       {settingsTab === 'language-expansion' && <LanguageExpansionPage />}
       {settingsTab === 'hybrid-validation' && <HybridValidationPage />}
       {settingsTab === 'agent-messages' && <AgentMessagesPage />}
+      {settingsTab === 'agent-trace' && <AgentTracePage />}
       {settingsTab === 'agentic-workflows' && <AgenticWorkflowsPage />}
       {settingsTab === 'agent-trace' && <AgentTracePage />}
       {settingsTab === 'confidence-scoring' && <ConfidenceScorePage />}

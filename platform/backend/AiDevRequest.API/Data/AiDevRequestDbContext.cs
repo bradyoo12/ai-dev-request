@@ -150,6 +150,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<BiomeLintResult> BiomeLintResults => Set<BiomeLintResult>();
     public DbSet<CodebaseGraph> CodebaseGraphs => Set<CodebaseGraph>();
     public DbSet<BuildToolchainResult> BuildToolchainResults => Set<BuildToolchainResult>();
+    public DbSet<VisionToCodeResult> VisionToCodeResults => Set<VisionToCodeResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

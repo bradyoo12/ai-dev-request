@@ -66,6 +66,57 @@ Teams are used within a single ticket to parallelize independent work:
 
 **Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
 
+### How to Wait for Agents (CRITICAL)
+
+**When spawning agents, you MUST actually wait for results. Saying "waiting..." in text is NOT enough.**
+
+**Method 1: Synchronous Spawning (RECOMMENDED)**
+- Use Task tool WITHOUT `run_in_background` parameter
+- The Task call blocks until the agent completes
+- Results come back immediately as tool results
+- Example:
+  ```
+  Task(subagent_type: "general-purpose", team_name: "ready-123", name: "planner", prompt: "...")
+  <blocks here - no other work happens>
+  <tool result appears with agent output>
+  <now you can continue>
+  ```
+
+**Method 2: Parallel Synchronous Spawning**
+- Spawn multiple agents in a SINGLE message with multiple Task calls
+- All agents run simultaneously, but the message blocks until ALL complete
+- Results come back as separate tool results
+- Example:
+  ```
+  <single message with two Task calls>
+  Task(name: "test-runner", ...)
+  Task(name: "ai-verifier", ...)
+  <blocks here until BOTH agents finish>
+  <two tool results appear>
+  <now you can continue>
+  ```
+
+**Method 3: Background Tasks (ONLY if you have other work to do)**
+- Spawn with `run_in_background: true`
+- Continue with other work
+- Later, use `TaskOutput(task_id: <id>, block: true)` to retrieve results
+- Example:
+  ```
+  Task(run_in_background: true, ...)
+  <tool result has task_id and output_file>
+  <do other work>
+  TaskOutput(task_id: "...", block: true)
+  <blocks here>
+  <results appear>
+  ```
+
+**CRITICAL RULES:**
+- ✅ **DO** use Task tool and wait for tool results before continuing
+- ✅ **DO** spawn multiple agents in parallel when they can work independently
+- ❌ **NEVER** say "waiting for agents..." and then continue in the same turn
+- ❌ **NEVER** assume agents will "send messages when done" without blocking on Task or TaskOutput
+- ❌ **NEVER** move to the next step until you have agent results in hand
+
 ## Step 0: Worktree Setup (Multi-Instance Safe)
 
 Each b-start instance MUST operate in its own dedicated git worktree so that multiple instances can run in parallel without conflicting on the same working directory.
@@ -292,25 +343,22 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Task: "Run full test suite"
    - Task: "Commit, push, and create PR"
 
-3. Spawn the **planner** agent (general-purpose, team_name: ready-<ticket_number>):
+3. **Spawn planner and wait** (use synchronous Task - see "How to Wait for Agents" above):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "planner", prompt: "...")
+   ```
    - Reads the ticket, policy.md, and design.md
    - Creates a detailed implementation plan
    - Posts the plan as a comment on the issue
    - Creates the feature branch: `<ticket_number>-<slug>`
-   - Assigns frontend and backend tasks to the respective agents
-   - Sends message to frontend-dev and backend-dev with their assignments
+   - Implements ALL changes directly (frontend AND backend)
+   - Commits all work
+   - **WAIT**: Task tool blocks here until planner completes and returns results
 
-4. Spawn **frontend-dev** agent (general-purpose, team_name: ready-<ticket_number>):
-   - Waits for assignment from planner
-   - Implements frontend changes following the plan
-   - Reports completion to planner
-
-5. Spawn **backend-dev** agent (general-purpose, team_name: ready-<ticket_number>):
-   - Waits for assignment from planner
-   - Implements backend changes following the plan
-   - Reports completion to planner
-
-6. After frontend-dev and backend-dev complete, spawn **unit-test-analyst** agent (general-purpose, team_name: ready-<ticket_number>):
+4. **After planner completes, spawn unit-test-analyst and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "unit-test-analyst", prompt: "...")
+   ```
    - Identifies all files added or modified by the current ticket (diff against main)
    - For each modified/new file, checks if corresponding unit test files exist:
      - Frontend: `*.test.ts` / `*.test.tsx` alongside or in `__tests__/` directories
@@ -328,9 +376,13 @@ Implement and locally test ONE Ready ticket using an Agent Team.
      - Frontend: `npx vitest run` (or `npm test -- --watchAll=false`)
      - Backend: `dotnet test`
    - If new tests fail, fixes them (up to 3 attempts)
-   - Reports results to planner: how many tests added, coverage summary
+   - Reports results: how many tests added, coverage summary
+   - **WAIT**: Task tool blocks here until unit-test-analyst completes and returns results
 
-7. After unit-test-analyst completes, spawn **e2e-test-analyst** agent (general-purpose, team_name: ready-<ticket_number>):
+5. **After unit-test-analyst completes, spawn e2e-test-analyst and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "e2e-test-analyst", prompt: "...")
+   ```
    - Identifies new user-facing features added by the current ticket:
      - New pages and routes
      - New forms with submission workflows
@@ -348,32 +400,45 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Creates or updates Playwright tests following existing patterns in `platform/frontend/e2e/`
    - Runs E2E tests to verify they pass: `npm test` in platform/frontend
    - If new tests fail, fixes them (up to 3 attempts)
-   - Reports results to planner: how many tests added/updated
+   - Reports results: how many tests added/updated
+   - **WAIT**: Task tool blocks here until e2e-test-analyst completes and returns results
 
-8. After e2e-test-analyst completes, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
+6. **After e2e-test-analyst completes, spawn tester and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "tester", prompt: "...")
+   ```
    - Runs `npm run build` in platform/frontend
    - Runs full Playwright E2E suite: `npm test` in platform/frontend
-   - Reports results to planner
+   - Reports results
    - If tests fail: attempt fixes (up to 3 attempts), then report
+   - **WAIT**: Task tool blocks here until tester completes and returns results
 
-9. Planner handles final steps:
+7. **After tester completes, spawn final-committer and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "final-committer", prompt: "...")
+   ```
    - Commits all changes (including new unit tests and E2E tests) with "Refs #<ticket_number>"
    - Pushes branch and creates PR
    - Reports success/failure
+   - **WAIT**: Task tool blocks here until final-committer completes and returns results
 
-10. Shut down all agents and delete the team:
+8. **After final-committer completes, shut down all agents and delete the team:**
    ```
-   SendMessage: shutdown_request to each agent
+   SendMessage: shutdown_request to each agent (wait for shutdown_response from each)
    TeamDelete
    ```
 
 **For single-scope or simple tickets — use single Task agent:**
 
 Spawn a single general-purpose agent via Task tool (no team needed):
+```
+Task(subagent_type: "general-purpose", name: "implementer", prompt: "Implement ticket #<number>...")
+```
 - Read ticket, create plan, create branch
 - Implement changes
 - Run tests
 - Commit, push, create PR
+- **WAIT**: Task tool blocks here until the agent completes and returns results
 - This follows the same workflow as `.claude/agents/b-ready.md`
 
 #### Step 3d: Handle Failures
@@ -562,12 +627,20 @@ Verify changes on staging using parallel agents.
    cd platform/frontend && npm install
    ```
 
-3. Spawn **test-runner** agent (general-purpose, team_name: review-<ticket_number>):
+3. **Spawn BOTH agents in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
+
+   In a SINGLE message, spawn both agents with two Task calls:
+   ```
+   Task(subagent_type: "general-purpose", team_name: "review-<ticket_number>", name: "test-runner", prompt: "...")
+   Task(subagent_type: "general-purpose", team_name: "review-<ticket_number>", name: "ai-verifier", prompt: "...")
+   ```
+
+   **test-runner** agent:
    - Installs Playwright: `npx playwright install chromium`
    - Runs FULL Playwright E2E suite against staging: `npm run test:staging`
    - Reports pass/fail results with details
 
-4. Spawn **ai-verifier** agent (general-purpose, team_name: review-<ticket_number>) IN PARALLEL:
+   **ai-verifier** agent:
    - Reads the ticket requirements
    - Reads the "How to Test" comment
    - Uses WebFetch to verify staging URL is accessible
@@ -575,7 +648,7 @@ Verify changes on staging using parallel agents.
    - Checks for console errors, performance, visual correctness
    - Reports verification results
 
-5. Wait for both agents to complete and collect results
+   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
 #### Step 5c: Handle Results
 
@@ -731,17 +804,25 @@ Before researching new technologies, use Playwright to test all links and button
    TeamCreate: modernize
    ```
 
-2. Spawn **tech-scout** agent (general-purpose, team_name: modernize):
+2. **Spawn BOTH scouts in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
+
+   In a SINGLE message, spawn both agents with two Task calls:
+   ```
+   Task(subagent_type: "general-purpose", team_name: "modernize", name: "tech-scout", prompt: "...")
+   Task(subagent_type: "general-purpose", team_name: "modernize", name: "competitor-scout", prompt: "...")
+   ```
+
+   **tech-scout** agent:
    - Searches for recent technologies: AI code generation, agent frameworks, .NET innovations, React ecosystem, DevOps tools
    - Evaluates relevance, effort, and impact scores
    - Reports top findings with scores
 
-3. Spawn **competitor-scout** agent (general-purpose, team_name: modernize) IN PARALLEL:
+   **competitor-scout** agent:
    - Researches competitor features: Replit, Base44, Bolt.new, v0.dev, Cursor
    - Evaluates differentiation, user value, feasibility
    - Reports top findings with scores
 
-4. Wait for both scouts to complete
+   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
 #### Step 6d: Create Tickets
 
@@ -786,7 +867,15 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
    TeamCreate: site-audit
    ```
 
-2. Spawn **error-checker** agent (general-purpose, team_name: site-audit):
+2. **Spawn BOTH agents in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
+
+   In a SINGLE message, spawn both agents with two Task calls:
+   ```
+   Task(subagent_type: "general-purpose", team_name: "site-audit", name: "error-checker", prompt: "...")
+   Task(subagent_type: "general-purpose", team_name: "site-audit", name: "ux-reviewer", prompt: "...")
+   ```
+
+   **error-checker** agent:
    - Use WebFetch to visit `https://icy-desert-07c08ba00.2.azurestaticapps.net/`
    - Check for:
      - HTTP errors (4xx, 5xx responses)
@@ -798,7 +887,7 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
    - Navigate to all discoverable pages/routes from the main page
    - Report all errors found with severity (critical/major/minor)
 
-3. Spawn **ux-reviewer** agent (general-purpose, team_name: site-audit) IN PARALLEL:
+   **ux-reviewer** agent:
    - Use WebFetch to visit `https://icy-desert-07c08ba00.2.azurestaticapps.net/`
    - Read `.claude/design.md` to understand the intended UX
    - Evaluate:
@@ -811,7 +900,7 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
      - **Missing features**: Compare against design.md — what's described but not implemented?
    - Report all findings with impact score (1-5) and suggested improvement
 
-4. Wait for both agents to complete and collect results
+   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
 #### Step 7c: Create Tickets
 

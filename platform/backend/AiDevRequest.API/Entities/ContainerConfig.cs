@@ -4,6 +4,9 @@ public class ContainerConfig
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public int ProjectId { get; set; }
+    public Guid? DevRequestId { get; set; }
+    public string? Vcpu { get; set; }
+    public string? MemoryGb { get; set; }
     public string DetectedStack { get; set; } = string.Empty; // nodejs, dotnet, python, static
     public string Dockerfile { get; set; } = string.Empty;
     public string? ComposeFile { get; set; }

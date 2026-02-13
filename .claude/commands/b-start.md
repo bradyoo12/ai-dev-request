@@ -30,6 +30,75 @@ Project settings are defined in `.claude/policy.md` under "Project Settings" sec
 gh auth switch -u bradyoo12
 ```
 
+**Available GitHub Accounts for Rate Limit Rotation:**
+- `bradyoo12` (brad.yoo@xbert.io) - Primary account
+- `yoohoony` (yoohoony@gmail.com) - Secondary account for rate limit failover
+
+## Rate Limit Management and Account Switching
+
+**GitHub API has separate rate limits:**
+- **REST API**: 5,000 requests/hour per account
+- **GraphQL API**: 5,000 points/hour per account
+- **Search API**: 30 requests/minute per account
+
+**When to Check Rate Limits:**
+- Before starting each cycle (Step 1)
+- After any GraphQL operation (project board operations)
+- When encountering 403/429 errors
+
+**Rate Limit Check Command:**
+```bash
+# Check current rate limit status
+gh api rate_limit --jq '{
+  rest: .resources.core | "REST: \(.remaining)/\(.limit) (resets at \(.reset | strftime("%H:%M:%S")))",
+  graphql: .resources.graphql | "GraphQL: \(.remaining)/\(.limit) (resets at \(.reset | strftime("%H:%M:%S")))",
+  search: .resources.search | "Search: \(.remaining)/\(.limit) (resets at \(.reset | strftime("%H:%M:%S")))"
+}'
+```
+
+**Account Switching Protocol:**
+
+When any rate limit drops below 20% remaining OR hits 403/429 errors:
+
+1. **Check which account is currently active:**
+   ```bash
+   CURRENT_USER=$(gh api user --jq '.login')
+   echo "Current account: $CURRENT_USER"
+   ```
+
+2. **Switch to the alternate account:**
+   ```bash
+   if [ "$CURRENT_USER" = "bradyoo12" ]; then
+     echo "Switching to secondary account (yoohoony)..."
+     gh auth switch -u yoohoony
+   else
+     echo "Switching to primary account (bradyoo12)..."
+     gh auth switch -u bradyoo12
+   fi
+   ```
+
+3. **Verify the switch succeeded:**
+   ```bash
+   NEW_USER=$(gh api user --jq '.login')
+   echo "Now using account: $NEW_USER"
+
+   # Check new account's rate limits
+   gh api rate_limit --jq '.resources.graphql | "GraphQL: \(.remaining)/\(.limit)"'
+   ```
+
+4. **If both accounts are rate-limited:**
+   - Log: "Both accounts rate-limited. Waiting for reset..."
+   - Check reset time for both accounts
+   - Sleep until the earliest reset time (with 1-minute buffer)
+   - Resume operation
+
+**CRITICAL: Add rate limit checks at these steps:**
+- **Step 1.5**: Check before fetching project board
+- **Step 3a**: Check before claiming ticket (GraphQL operations)
+- **Step 4**: Check before merging PR and moving status
+- **Step 5c**: Check before moving ticket to Done
+- **Step 6d/7c**: Check before creating multiple tickets
+
 ## Overview
 
 This command orchestrates the entire development workflow using Agent Teams for parallelism within each ticket:
@@ -274,14 +343,39 @@ Read and internalize the project guidelines. These are living documents that get
 
 **CRITICAL RATE LIMIT OPTIMIZATION:** Use the project board cache to minimize GraphQL API calls. The cache stores project data for 5 minutes, reducing API calls from ~6 per cycle to ~0-1 per cycle.
 
-1. **Check cache status and fetch project items** (uses cache if < 5 min old, otherwise fetches fresh):
+1. **Check rate limits and switch accounts if needed:**
+   ```bash
+   echo "=== Rate Limit Check ==="
+   GRAPHQL_REMAINING=$(gh api rate_limit --jq '.resources.graphql.remaining')
+   GRAPHQL_LIMIT=$(gh api rate_limit --jq '.resources.graphql.limit')
+   GRAPHQL_PERCENT=$((GRAPHQL_REMAINING * 100 / GRAPHQL_LIMIT))
+
+   echo "GraphQL: $GRAPHQL_REMAINING/$GRAPHQL_LIMIT ($GRAPHQL_PERCENT%)"
+
+   # Switch accounts if below 20% remaining
+   if [ $GRAPHQL_PERCENT -lt 20 ]; then
+     CURRENT_USER=$(gh api user --jq '.login')
+     if [ "$CURRENT_USER" = "bradyoo12" ]; then
+       echo "⚠️ Low rate limit ($GRAPHQL_PERCENT%) - switching to yoohoony account"
+       gh auth switch -u yoohoony
+     else
+       echo "⚠️ Low rate limit ($GRAPHQL_PERCENT%) - switching to bradyoo12 account"
+       gh auth switch -u bradyoo12
+     fi
+     # Verify new account has better limits
+     NEW_REMAINING=$(gh api rate_limit --jq '.resources.graphql.remaining')
+     echo "✓ Switched - new limit: $NEW_REMAINING"
+   fi
+   ```
+
+2. **Check cache status and fetch project items** (uses cache if < 5 min old, otherwise fetches fresh):
    ```bash
    echo "=== Cache Status ==="
    bash .claude/scripts/gh-project-cache.sh status
 
    PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
 
-   echo "=== GraphQL Rate Limit ==="
+   echo "=== GraphQL Rate Limit After Fetch ==="
    gh api rate_limit --jq '.resources.graphql | "Used: \(.used)/\(.limit) | Remaining: \(.remaining)"'
    ```
 
@@ -295,18 +389,36 @@ Read and internalize the project guidelines. These are living documents that get
 
 Check all tickets in the project to ensure they align with policy and design:
 
-1. Use the cached project items from Step 1.5:
+1. **Check REST API rate limits** (audit may need REST API calls for issue details):
+   ```bash
+   REST_REMAINING=$(gh api rate_limit --jq '.resources.core.remaining')
+   REST_PERCENT=$((REST_REMAINING * 100 / 5000))
+
+   if [ $REST_PERCENT -lt 20 ]; then
+     CURRENT_USER=$(gh api user --jq '.login')
+     if [ "$CURRENT_USER" = "bradyoo12" ]; then
+       echo "⚠️ Low REST API limit ($REST_PERCENT%) - switching to yoohoony"
+       gh auth switch -u yoohoony
+     else
+       echo "⚠️ Low REST API limit ($REST_PERCENT%) - switching to bradyoo12"
+       gh auth switch -u bradyoo12
+     fi
+     echo "✓ Switched accounts for Step 2 audit"
+   fi
+   ```
+
+2. Use the cached project items from Step 1.5:
    ```bash
    # Use $PROJECT_ITEMS instead of re-fetching
    echo "$PROJECT_ITEMS" | jq '...'
    ```
 
-2. For each ticket in the project (filter by `type: "Issue"`):
+3. For each ticket in the project (filter by `type: "Issue"`):
    - Analyze if the ticket aligns with `.claude/policy.md` rules
    - Analyze if the ticket aligns with `.claude/design.md` architecture
    - Check for conflicts or inconsistencies
 
-3. **If a ticket is OUT OF ALIGNMENT, classify the block:**
+4. **If a ticket is OUT OF ALIGNMENT, classify the block:**
 
    **Hard Block** (needs human action) → add `on hold` label:
    - Security concerns, production-critical changes, unclear requirements, repeated test failures
@@ -321,7 +433,7 @@ Check all tickets in the project to ensure they align with policy and design:
    - Do NOT add `on hold` label — just skip the ticket this cycle
    - Log: "Skipping #<number>: <reason> — will retry next cycle"
 
-4. Log summary of audit results
+5. Log summary of audit results
 
 ### Step 3: b-ready — Implement with Agent Team
 
@@ -338,17 +450,28 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
 3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
-4. **IMMEDIATELY move the ticket to "In Progress"** — this is the FIRST action, before reading the ticket, classifying it, or doing anything else:
+4. **Check GraphQL rate limit before claiming** (claiming uses GraphQL):
+   ```bash
+   GRAPHQL_REMAINING=$(gh api rate_limit --jq '.resources.graphql.remaining')
+   GRAPHQL_PERCENT=$((GRAPHQL_REMAINING * 100 / 5000))
+
+   if [ $GRAPHQL_PERCENT -lt 20 ]; then
+     CURRENT_USER=$(gh api user --jq '.login')
+     [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u yoohoony || gh auth switch -u bradyoo12
+     echo "✓ Switched accounts before claiming ticket"
+   fi
+   ```
+5. **IMMEDIATELY move the ticket to "In Progress"** — this is the FIRST action, before reading the ticket, classifying it, or doing anything else:
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-5. **Verify the claim succeeded** — force-refresh the cache to get the latest state:
+6. **Verify the claim succeeded** — force-refresh the cache to get the latest state:
    ```bash
    PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get true)
    ```
    - If the ticket is already "In Progress" (claimed by another instance between your fetch and your edit), **skip this ticket** and go back to step 1 to find the next Ready ticket.
-6. Log: "Claimed ticket #<number> — moved to In Progress"
+7. Log: "Claimed ticket #<number> — moved to In Progress"
 
 **Do NOT read the ticket details, classify scope, or create teams until the claim is confirmed.**
 
@@ -600,38 +723,52 @@ If the team fails or gets stuck:
 
 Merge PRs to main. This is a simple operation — no team needed.
 
-1. Log "Starting b-progress..."
-2. Find "In Progress" tickets with open PRs (no `on hold` label):
+1. **Check rate limits** (Step 4 uses both REST and GraphQL):
+   ```bash
+   REST_REMAINING=$(gh api rate_limit --jq '.resources.core.remaining')
+   GRAPHQL_REMAINING=$(gh api rate_limit --jq '.resources.graphql.remaining')
+   REST_PERCENT=$((REST_REMAINING * 100 / 5000))
+   GRAPHQL_PERCENT=$((GRAPHQL_REMAINING * 100 / 5000))
+
+   if [ $REST_PERCENT -lt 20 ] || [ $GRAPHQL_PERCENT -lt 20 ]; then
+     CURRENT_USER=$(gh api user --jq '.login')
+     [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u yoohoony || gh auth switch -u bradyoo12
+     echo "✓ Switched accounts for Step 4 (merge PR + status change)"
+   fi
+   ```
+
+2. Log "Starting b-progress..."
+3. Find "In Progress" tickets with open PRs (no `on hold` label):
    ```bash
    # Use cached $PROJECT_ITEMS for project board state
    echo "$PROJECT_ITEMS" | jq '...'
    # Only fetch PRs from REST API (separate rate limit)
    gh api "repos/bradyoo12/ai-dev-request/pulls?state=open&per_page=100" --jq '[.[] | {number, headRefName: .head.ref, url: .html_url}]'
    ```
-3. Verify PR is mergeable (REST):
+4. Verify PR is mergeable (REST):
    ```bash
    gh api "repos/bradyoo12/ai-dev-request/pulls/<pr_number>" --jq '{mergeable, mergeable_state}'
    ```
-4. Merge (REST):
+5. Merge (REST):
    ```bash
    gh api --method PUT "repos/bradyoo12/ai-dev-request/pulls/<pr_number>/merge" -f merge_method=merge
    gh api --method DELETE "repos/bradyoo12/ai-dev-request/git/refs/heads/<branch_name>"
    ```
-5. Move ticket to "In Review":
+6. Move ticket to "In Review":
    ```bash
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-6. **Invalidate the cache** so Step 5 gets fresh data:
+7. **Invalidate the cache** so Step 5 gets fresh data:
    ```bash
    bash .claude/scripts/gh-project-cache.sh invalidate
    ```
-7. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
-8. Cleanup (worktree-safe — never checks out `main` branch):
+8. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
+9. Cleanup (worktree-safe — never checks out `main` branch):
    ```bash
    git fetch origin && git checkout --detach origin/main
    ```
-9. **Delete stale branches** (local and remote) that have been fully merged:
+10. **Delete stale branches** (local and remote) that have been fully merged:
    ```bash
    # Delete merged local branches (never delete main/master)
    git branch --merged origin/main | grep -vE '^\*|main|master' | xargs -r git branch -d
@@ -1179,6 +1316,13 @@ Log the current status of the project board:
 
 ## Important Notes
 
+- **Account Switching Strategy** — Two GitHub accounts are available to double the effective rate limit:
+  - Primary: `bradyoo12` (brad.yoo@xbert.io)
+  - Secondary: `yoohoony` (yoohoony@gmail.com)
+  - Switch accounts when any rate limit drops below 20% remaining
+  - Check rate limits before high-volume operations (Steps 1.5, 2, 3a, 4, 5c, 6d, 7c)
+  - If both accounts are rate-limited, wait until the earliest reset time
+  - Each account has separate rate limits: REST (5000/hr), GraphQL (5000/hr), Search (30/min)
 - **Rate Limit Optimization** — The project board is fetched in Step 1.5 and cached in `$PROJECT_ITEMS` for reuse throughout the cycle. Only re-fetch when necessary:
   - After claiming a ticket in Step 3a (to verify the claim)
   - Before Step 5a (after Step 4 made changes)

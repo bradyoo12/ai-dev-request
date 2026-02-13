@@ -4,6 +4,7 @@ using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using LogLevel = AiDevRequest.API.Entities.LogLevel;
 
 namespace AiDevRequest.API.Controllers;
 

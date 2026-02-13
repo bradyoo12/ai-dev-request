@@ -103,10 +103,11 @@ public class ProjectAggregationService : IProjectAggregationService
                 .FirstOrDefaultAsync(h => h.Id == deployment.HostingPlanId);
         }
 
-        // Get container config (note: ContainerConfig.ProjectId is int, not Guid)
-        // This relationship needs to be fixed in the schema
-        var containerConfig = await _context.ContainerConfigs
-            .FirstOrDefaultAsync();
+        // Get container config
+        // TODO: ContainerConfig doesn't have DevRequestId field yet
+        ContainerConfig? containerConfig = null;
+        // var containerConfig = await _context.ContainerConfigs
+        //     .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
 
         // Calculate cost breakdown
         ProjectCostBreakdown? costBreakdown = null;
@@ -144,9 +145,10 @@ public class ProjectAggregationService : IProjectAggregationService
             PlanStorageGb = hostingPlan?.StorageGb,
             PlanBandwidthGb = hostingPlan?.BandwidthGb,
 
-            // Container info (ContainerConfig doesn't have Vcpu/MemoryGb properties)
-            ContainerVcpu = null,
-            ContainerMemoryGb = null,
+            // Container info
+            // TODO: ContainerConfig schema needs Vcpu and MemoryGb fields
+            ContainerVcpu = null, // containerConfig?.Vcpu,
+            ContainerMemoryGb = null, // containerConfig?.MemoryGb,
 
             // Cost breakdown
             CostBreakdown = costBreakdown

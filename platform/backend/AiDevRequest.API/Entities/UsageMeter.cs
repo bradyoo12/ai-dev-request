@@ -12,6 +12,7 @@ public class UsageMeter
     public string Status { get; set; } = "pending"; // pending, billed, credited
     public string Outcome { get; set; } = "success"; // success, failed, partial
     public string? MetadataJson { get; set; } // JSON with model, tokens, duration details
+    public DateTime RecordedAt { get; set; } = DateTime.UtcNow;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? BilledAt { get; set; }
 }

@@ -41,7 +41,26 @@ Check if the user's original request (`$ARGUMENTS`) references any files or imag
 
 4. **If text/code files are found**, read their content for inclusion in the ticket body.
 
-## Step 3: Create Ticket Content
+## Step 3: Check for Duplicate Issues
+
+**Before creating a new ticket**, search for existing open issues with similar titles to avoid duplicates:
+
+```bash
+# Search for similar issues (returns JSON with number, title, url, state)
+gh issue list --repo bradyoo12/ai-dev-request --limit 20 --state open --search "in:title {key-terms-from-request}" --json number,title,url,state
+```
+
+**Duplicate Detection Logic**:
+1. Extract key terms from the user's request (e.g., "projects menu", "cost", "logs")
+2. Search existing open issues using those terms
+3. **If an exact or very similar match is found** (>80% title similarity):
+   - Skip ticket creation
+   - Use the existing issue URL
+   - Jump directly to Step 5 (add to project)
+   - Report: "Found existing issue #{number} - adding to project instead"
+4. **If no duplicate found**: Proceed to create new ticket
+
+## Step 4: Create Ticket Content
 
 Create a ticket with the following sections:
 
@@ -81,14 +100,18 @@ If any files or images were detected in Step 2, add an **Attachments** section:
 
 For UI/UX related tickets, include ASCII art mockups (in addition to any uploaded image mockups).
 
-## Step 4: Create GitHub Issue
+## Step 5: Create GitHub Issue
+
+**IMPORTANT**: Only execute this step if no duplicate was found in Step 3.
 
 ```bash
 # REST — avoids GraphQL rate limit. Read body from draft file:
-BODY=$(cat {draft-file}) && gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="$BODY"
+BODY=$(cat {draft-file}) && gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="$BODY" --jq '.html_url'
 ```
 
-## Step 5: Add to AI Dev Request Project and Set Status to Ready
+**Error Handling**: If the command fails or returns an error, DO NOT retry immediately. Check if an issue was created despite the error by searching for the title before attempting again.
+
+## Step 6: Add to AI Dev Request Project and Set Status to Ready
 
 **Important**: The project belongs to the `bradyoo12` GitHub account. Ensure this account is active before running project commands.
 
@@ -112,8 +135,10 @@ Report the created issue URL and confirm it was added to the project with **Read
 
 - All tickets go to `bradyoo12/ai-dev-request` repository
 - Create the ticket immediately without asking for confirmation
+- **CRITICAL: Always check for duplicate issues in Step 3** before creating a new ticket
 - **Always include ASCII mockups for UI/UX tickets**
 - **Always check for attached files/images** in the user's request before creating the ticket
 - Images are uploaded to `.github/issue-assets/` in the repo and referenced via raw URLs
 - Text/code file contents are included inline in the ticket body using fenced code blocks
 - If an image upload fails (e.g., file not found, API error), note it in the ticket body and continue
+- If issue creation fails but the issue was created (check by searching), use the existing issue URL instead of retrying

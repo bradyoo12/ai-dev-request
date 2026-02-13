@@ -13,6 +13,8 @@ public interface IWorkflowOrchestrationService
     Task<WorkflowExecution> CancelWorkflowAsync(int executionId);
     Task<List<WorkflowExecution>> ListWorkflowsAsync(Guid? requestId = null);
     Task<WorkflowMetrics> GetWorkflowMetricsAsync();
+    Task<WorkflowExecution> ExecutePreviewDeploymentStepAsync(int executionId);
+    Task<WorkflowExecution> ExecuteAutonomousTestingStepAsync(int executionId);
 }
 
 public class WorkflowStep
@@ -46,14 +48,28 @@ public class WorkflowOrchestrationService : IWorkflowOrchestrationService
 {
     private readonly AiDevRequestDbContext _context;
     private readonly ILogger<WorkflowOrchestrationService> _logger;
+    private readonly IPreviewDeploymentService _previewDeploymentService;
+    private readonly ISandboxExecutionService _sandboxExecutionService;
+    private readonly ILogStreamService _logStreamService;
+    private readonly IAutonomousTestingService _autonomousTestingService;
 
     private static readonly string[] DefaultPipelineSteps =
-        ["analysis", "proposal", "generation", "validation", "deployment"];
+        ["analysis", "proposal", "generation", "validation", "preview_deployment", "autonomous_testing_loop", "deployment"];
 
-    public WorkflowOrchestrationService(AiDevRequestDbContext context, ILogger<WorkflowOrchestrationService> logger)
+    public WorkflowOrchestrationService(
+        AiDevRequestDbContext context,
+        ILogger<WorkflowOrchestrationService> logger,
+        IPreviewDeploymentService previewDeploymentService,
+        ISandboxExecutionService sandboxExecutionService,
+        ILogStreamService logStreamService,
+        IAutonomousTestingService autonomousTestingService)
     {
         _context = context;
         _logger = logger;
+        _previewDeploymentService = previewDeploymentService;
+        _sandboxExecutionService = sandboxExecutionService;
+        _logStreamService = logStreamService;
+        _autonomousTestingService = autonomousTestingService;
     }
 
     public async Task<WorkflowExecution> StartWorkflowAsync(Guid requestId, string workflowType)
@@ -200,5 +216,200 @@ public class WorkflowOrchestrationService : IWorkflowOrchestrationService
             AvgDurationSeconds = avgDuration,
             StepFailureRates = stepFailureRates
         };
+    }
+
+    public async Task<WorkflowExecution> ExecutePreviewDeploymentStepAsync(int executionId)
+    {
+        var execution = await _context.WorkflowExecutions.FindAsync(executionId)
+            ?? throw new InvalidOperationException("Workflow execution not found.");
+
+        var steps = JsonSerializer.Deserialize<List<WorkflowStep>>(execution.StepsJson) ?? [];
+        var step = steps.FirstOrDefault(s => s.Name == "preview_deployment")
+            ?? throw new InvalidOperationException("preview_deployment step not found in workflow.");
+
+        try
+        {
+            step.Status = "running";
+            step.StartedAt = DateTime.UtcNow;
+            execution.StepsJson = JsonSerializer.Serialize(steps);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Executing preview deployment step for workflow {ExecutionId}", executionId);
+
+            // Get the dev request
+            var devRequest = await _context.DevRequests
+                .FirstOrDefaultAsync(r => r.Id == execution.DevRequestId)
+                ?? throw new InvalidOperationException($"Dev request {execution.DevRequestId} not found");
+
+            // Step 1: Create preview deployment
+            var preview = await _previewDeploymentService.DeployPreviewAsync(
+                execution.DevRequestId,
+                devRequest.UserId);
+
+            _logger.LogInformation(
+                "Preview deployed for workflow {ExecutionId}: {PreviewUrl}",
+                executionId, preview.PreviewUrl);
+
+            // Step 2: Start sandbox execution
+            var sandbox = await _sandboxExecutionService.ExecuteInSandbox(
+                execution.DevRequestId,
+                "preview",
+                "npm run build && npm run preview",
+                "container");
+
+            _logger.LogInformation(
+                "Sandbox execution started for workflow {ExecutionId}: {SandboxId}",
+                executionId, sandbox.Id);
+
+            // Step 3: Stream logs (fire-and-forget)
+            _ = Task.Run(() => _logStreamService.StreamLogsAsync(
+                sandbox.Id.ToString(),
+                preview.Id,
+                CancellationToken.None));
+
+            // Mark step as completed
+            step.Status = "completed";
+            step.CompletedAt = DateTime.UtcNow;
+            execution.StepsJson = JsonSerializer.Serialize(steps);
+            execution.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Preview deployment step completed for workflow {ExecutionId}",
+                executionId);
+
+            return execution;
+        }
+        catch (Exception ex)
+        {
+            step.Status = "failed";
+            step.Error = ex.Message;
+            step.CompletedAt = DateTime.UtcNow;
+            execution.Status = WorkflowStatus.Failed;
+            execution.StepsJson = JsonSerializer.Serialize(steps);
+            execution.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogError(ex,
+                "Preview deployment step failed for workflow {ExecutionId}",
+                executionId);
+
+            throw;
+        }
+    }
+
+    public async Task<WorkflowExecution> ExecuteAutonomousTestingStepAsync(int executionId)
+    {
+        var execution = await _context.WorkflowExecutions.FindAsync(executionId)
+            ?? throw new InvalidOperationException("Workflow execution not found.");
+
+        var steps = JsonSerializer.Deserialize<List<WorkflowStep>>(execution.StepsJson) ?? [];
+        var step = steps.FirstOrDefault(s => s.Name == "autonomous_testing_loop")
+            ?? throw new InvalidOperationException("autonomous_testing_loop step not found in workflow.");
+
+        try
+        {
+            step.Status = "running";
+            step.StartedAt = DateTime.UtcNow;
+            execution.StepsJson = JsonSerializer.Serialize(steps);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Executing autonomous testing loop step for workflow {ExecutionId}",
+                executionId);
+
+            // Get the latest preview deployment for this dev request
+            var preview = await _context.PreviewDeployments
+                .Where(p => p.DevRequestId == execution.DevRequestId && p.Status == PreviewDeploymentStatus.Deployed)
+                .OrderByDescending(p => p.CreatedAt)
+                .FirstOrDefaultAsync()
+                ?? throw new InvalidOperationException(
+                    $"No deployed preview found for dev request {execution.DevRequestId}");
+
+            // Start autonomous testing loop (fire-and-forget with max 3 iterations)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var testExecution = await _autonomousTestingService.StartAutonomousTestingLoopAsync(
+                        execution.DevRequestId,
+                        preview.Id,
+                        maxIterations: 3);
+
+                    // Update step status based on test results
+                    var updatedSteps = JsonSerializer.Deserialize<List<WorkflowStep>>(execution.StepsJson) ?? [];
+                    var updatedStep = updatedSteps.FirstOrDefault(s => s.Name == "autonomous_testing_loop");
+
+                    if (updatedStep != null)
+                    {
+                        if (testExecution.TestsPassed)
+                        {
+                            updatedStep.Status = "completed";
+                            updatedStep.CompletedAt = DateTime.UtcNow;
+                            _logger.LogInformation(
+                                "Autonomous testing passed for workflow {ExecutionId}",
+                                executionId);
+                        }
+                        else
+                        {
+                            updatedStep.Status = "failed";
+                            updatedStep.Error = testExecution.FinalTestResult ?? "Tests failed after max iterations";
+                            updatedStep.CompletedAt = DateTime.UtcNow;
+                            execution.Status = WorkflowStatus.Failed;
+                            _logger.LogWarning(
+                                "Autonomous testing failed for workflow {ExecutionId}: {Error}",
+                                executionId, updatedStep.Error);
+                        }
+
+                        execution.StepsJson = JsonSerializer.Serialize(updatedSteps);
+                        execution.UpdatedAt = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "Error in autonomous testing loop for workflow {ExecutionId}",
+                        executionId);
+
+                    var updatedSteps = JsonSerializer.Deserialize<List<WorkflowStep>>(execution.StepsJson) ?? [];
+                    var updatedStep = updatedSteps.FirstOrDefault(s => s.Name == "autonomous_testing_loop");
+
+                    if (updatedStep != null)
+                    {
+                        updatedStep.Status = "failed";
+                        updatedStep.Error = ex.Message;
+                        updatedStep.CompletedAt = DateTime.UtcNow;
+                        execution.Status = WorkflowStatus.Failed;
+                        execution.StepsJson = JsonSerializer.Serialize(updatedSteps);
+                        execution.UpdatedAt = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            });
+
+            // Return immediately (async processing)
+            _logger.LogInformation(
+                "Autonomous testing loop started for workflow {ExecutionId}",
+                executionId);
+
+            return execution;
+        }
+        catch (Exception ex)
+        {
+            step.Status = "failed";
+            step.Error = ex.Message;
+            step.CompletedAt = DateTime.UtcNow;
+            execution.Status = WorkflowStatus.Failed;
+            execution.StepsJson = JsonSerializer.Serialize(steps);
+            execution.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            _logger.LogError(ex,
+                "Autonomous testing step failed for workflow {ExecutionId}",
+                executionId);
+
+            throw;
+        }
     }
 }

@@ -121,6 +121,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<BidirectionalGitSync> BidirectionalGitSyncs => Set<BidirectionalGitSync>();
     public DbSet<DevRequestBranch> DevRequestBranches => Set<DevRequestBranch>();
     public DbSet<SelfHealingTestResult> SelfHealingTestResults => Set<SelfHealingTestResult>();
+    public DbSet<AutonomousTestExecution> AutonomousTestExecutions => Set<AutonomousTestExecution>();
     public DbSet<DatabaseBranch> DatabaseBranches => Set<DatabaseBranch>();
     public DbSet<SandboxExecution> SandboxExecutions => Set<SandboxExecution>();
     public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();

@@ -143,6 +143,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CodeLintResult> CodeLintResults => Set<CodeLintResult>();
     public DbSet<VectorSearchConfig> VectorSearchConfigs => Set<VectorSearchConfig>();
     public DbSet<ReplTestSession> ReplTestSessions => Set<ReplTestSession>();
+    public DbSet<AgentTerminalSession> AgentTerminalSessions => Set<AgentTerminalSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

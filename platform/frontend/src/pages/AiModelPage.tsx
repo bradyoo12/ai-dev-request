@@ -125,7 +125,7 @@ export default function AiModelPage() {
       {/* Models Tab */}
       {subTab === 'models' && (
         <div className="space-y-4">
-          <p className="text-sm text-warm-400">{t('aiModel.modelsDescription', 'Choose between speed and capability for your AI engine')}</p>
+          <p className="text-sm text-warm-400">{t('aiModel.modelsDescription', 'Choose between speed and capability for code generation')}</p>
           <div className="grid grid-cols-2 gap-4">
             {models.map(model => {
               const isSelected = config?.selectedModel === model.id

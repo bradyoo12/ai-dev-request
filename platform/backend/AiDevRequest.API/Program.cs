@@ -60,6 +60,7 @@ builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IFigmaImportService, FigmaImportService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IDiscoveryService, DiscoveryService>();
 builder.Services.AddScoped<ITechTrendService, TechTrendService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IMicroserviceService, MicroserviceService>();

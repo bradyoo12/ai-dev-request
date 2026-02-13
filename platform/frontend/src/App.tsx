@@ -28,6 +28,7 @@ const BuyCreditsPage = lazy(() => import('./pages/BuyCreditsPage'))
 const SupportBoardPage = lazy(() => import('./pages/SupportBoardPage'))
 // const SubagentOrchestrationPage = lazy(() => import('./pages/SubagentOrchestrationPage'))
 const IterativeRefinementPage = lazy(() => import('./pages/IterativeRefinementPage'))
+const DiscoveryWizardPage = lazy(() => import('./pages/DiscoveryWizardPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
             <Route path="/settings/test-generation" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/collaborative-editing" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/onboarding" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/onboarding/discovery" element={<Suspense fallback={LazyFallback}><DiscoveryWizardPage /></Suspense>} />
             <Route path="/settings/version-history" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/component-preview" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/variant-comparison" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />

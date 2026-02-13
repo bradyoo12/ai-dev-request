@@ -46,6 +46,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<UserPreferenceSummary> UserPreferenceSummaries => Set<UserPreferenceSummary>();
     public DbSet<UserInterest> UserInterests => Set<UserInterest>();
     public DbSet<AppRecommendation> AppRecommendations => Set<AppRecommendation>();
+    public DbSet<DiscoveryQuestionnaire> DiscoveryQuestionnaires => Set<DiscoveryQuestionnaire>();
+    public DbSet<DiscoveryRecommendation> DiscoveryRecommendations => Set<DiscoveryRecommendation>();
     public DbSet<TrendReport> TrendReports => Set<TrendReport>();
     public DbSet<ProjectReview> ProjectReviews => Set<ProjectReview>();
     public DbSet<UpdateRecommendation> UpdateRecommendations => Set<UpdateRecommendation>();

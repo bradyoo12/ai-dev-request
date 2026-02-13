@@ -2,6 +2,19 @@ import { test, expect } from '@playwright/test';
 
 test.describe('AI Model Settings', () => {
   test.beforeEach(async ({ page }) => {
+    // Set up mock authentication so ProtectedRoute allows access
+    await page.goto('/');
+    await page.evaluate(() => {
+      const mockUser = {
+        id: 'test-user-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('ai-dev-user', JSON.stringify(mockUser));
+      localStorage.setItem('ai-dev-jwt', 'mock-jwt-token-123');
+    });
+
     // Mock the providers API endpoint
     await page.route('**/api/ai-model/providers', async (route) => {
       await route.fulfill({
@@ -390,24 +403,25 @@ test.describe('AI Model Settings', () => {
     const configureTab = page.locator('button:has-text("Configure")');
     await configureTab.click();
 
-    // Wait for effort levels to load
-    await page.waitForTimeout(1000);
+    // Wait for the Adaptive Thinking section to render (depends on effort levels API)
+    const adaptiveSection = page.getByRole('heading', { name: 'Adaptive Thinking' });
+    await expect(adaptiveSection).toBeVisible({ timeout: 5000 });
 
-    // Find the effort level dropdown for Analysis
-    const selects = await page.locator('select').all();
+    // Find the first effort level select within the Adaptive Thinking section
+    // The section contains the heading, description, and task config rows with selects
+    const analysisRow = page.locator('div:has(> div > label:text("Analysis"))');
+    const analysisSelect = analysisRow.locator('select').first();
+    await expect(analysisSelect).toBeVisible({ timeout: 5000 });
 
-    // Change first task (analysis) from Medium to High
-    if (selects.length > 1) {
-      const analysisSelect = selects[1]; // First is provider selector, second should be first task
-      await analysisSelect.selectOption('High');
+    // Change analysis from Medium to High
+    await analysisSelect.selectOption('High');
 
-      // Wait for API call to complete
-      await page.waitForTimeout(500);
+    // Wait for API call to complete
+    await page.waitForTimeout(500);
 
-      // Verify the selection persisted
-      const selectedValue = await analysisSelect.inputValue();
-      expect(selectedValue).toBe('High');
-    }
+    // Verify the selection persisted
+    const selectedValue = await analysisSelect.inputValue();
+    expect(selectedValue).toBe('High');
   });
 
   test('displays structured outputs toggle', async ({ page }) => {
@@ -421,8 +435,8 @@ test.describe('AI Model Settings', () => {
     // Wait for structured outputs section
     await page.waitForTimeout(500);
 
-    // Check for Structured Outputs heading
-    await expect(page.getByRole('heading', { name: 'Structured Outputs' }).or(page.getByText('Structured Outputs'))).toBeVisible();
+    // Check for Structured Outputs heading (use first() to avoid strict mode violation)
+    await expect(page.getByRole('heading', { name: 'Structured Outputs' })).toBeVisible();
   });
 
   test('toggles structured outputs on and off', async ({ page }) => {
@@ -464,8 +478,8 @@ test.describe('AI Model Settings', () => {
     // Wait for cost estimate to appear
     await page.waitForTimeout(500);
 
-    // Check for cost estimate text
-    await expect(page.getByText('Cost Estimate').or(page.getByText('cost'))).toBeVisible();
+    // Check for cost estimate text (use exact match to avoid strict mode violation)
+    await expect(page.getByText('Cost Estimate:', { exact: true })).toBeVisible();
   });
 
   test('verifies all 8 task types are displayed', async ({ page }) => {

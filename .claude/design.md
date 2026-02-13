@@ -1623,3 +1623,12 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Analysis Output**: Sample translations, missing key detection, recommendations for quality improvement
 - **Frontend**: `LanguageExpansionPage` in Settings at `/settings/language-expansion` with 4 sub-tabs (Translate, History, Languages, Stats)
 - **Ticket**: #479 — `Expand language support beyond en/ko`
+
+### Hybrid AI + Deterministic Validation
+- **Backend**: `HybridValidation` entity + `HybridValidationController` (`api/hybrid-validation`)
+- **Endpoints**: POST validate (AI output validation with retry logic), GET list, DELETE {id}, GET stats (by operation type), GET operations (anonymous, 5 types)
+- **Operation Types**: db-migration (critical), git-operation (high), file-operation (medium), api-validation (high), security-check (critical)
+- **Validation Flow**: AI generates output → deterministic rules check → if fail, AI retries with error context → max 3 retries → fallback to safe defaults
+- **Each type has 4 rules**: e.g., db-migration: No destructive DDL, Foreign key integrity, Index validation, Data type compatibility
+- **Frontend**: `HybridValidationPage` in Settings at `/settings/hybrid-validation` with 4 sub-tabs (Validate, History, Operations, Stats)
+- **Ticket**: #480 — `Hybrid AI + deterministic logic for critical workflows`

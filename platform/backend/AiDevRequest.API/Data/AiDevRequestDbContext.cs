@@ -141,6 +141,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AiAgentRule> AiAgentRules => Set<AiAgentRule>();
     public DbSet<ServerComponentConfig> ServerComponentConfigs => Set<ServerComponentConfig>();
     public DbSet<CodeLintResult> CodeLintResults => Set<CodeLintResult>();
+    public DbSet<VectorSearchConfig> VectorSearchConfigs => Set<VectorSearchConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

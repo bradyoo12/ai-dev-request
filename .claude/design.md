@@ -1640,3 +1640,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: Priority levels (low/normal/high/critical), delivery status tracking, acknowledgment, correlation IDs, structured payloads per protocol type
 - **Frontend**: `AgentMessagesPage` in Settings at `/settings/agent-messages` with 4 sub-tabs (Send, History, Protocols, Stats)
 - **Ticket**: #481 — `Agent-to-agent communication protocols (MCP extensions)`
+
+### Production-Ready Agentic Workflows
+- **Backend**: `AgenticWorkflow` entity + `AgenticWorkflowController` (`api/agentic-workflows`)
+- **Endpoints**: POST deploy (simulated deployment with metrics and auto-rollback), GET list, DELETE {id}, GET stats (by strategy), GET strategies (anonymous, 4 strategies)
+- **Deployment Strategies**: Canary (5%→100%, low risk), Blue-Green (instant switch, medium), Rolling (gradual, medium), Full (immediate, high)
+- **Features**: Success rate and latency tracking, cost-per-request monitoring, automatic rollback on >10% error rate or >$0.04 cost/request, monitoring alerts (critical/warning/info), health status (healthy/degraded/critical/rolled-back), rollback version tracking
+- **Frontend**: `AgenticWorkflowsPage` in Settings at `/settings/agentic-workflows` with 4 sub-tabs (Deploy, History, Strategies, Stats)
+- **Ticket**: #482 — `Production-ready agentic workflows (deployment & monitoring)`

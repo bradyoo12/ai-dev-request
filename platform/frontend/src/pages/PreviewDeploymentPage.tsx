@@ -9,6 +9,7 @@ import {
   listPreviews,
   type PreviewDeployment,
 } from '../api/preview'
+import { promoteToProduction, type PromotionResult } from '../api/promotion'
 
 function generateQrCodeSvg(url: string): string {
   // Simple QR-like SVG placeholder that encodes the URL visually
@@ -112,6 +113,8 @@ export default function PreviewDeploymentPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [promoting, setPromoting] = useState(false)
+  const [promotionResult, setPromotionResult] = useState<PromotionResult | null>(null)
 
   const loadData = useCallback(async () => {
     if (!requestId) return
@@ -165,6 +168,20 @@ export default function PreviewDeploymentPage() {
     }
   }
 
+  async function handlePromote() {
+    if (!currentPreview || !requestId) return
+    setPromoting(true)
+    setError('')
+    try {
+      const result = await promoteToProduction(requestId, currentPreview.id)
+      setPromotionResult(result)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Promotion failed')
+    } finally {
+      setPromoting(false)
+    }
+  }
+
   function handleCopyUrl() {
     if (currentPreview?.previewUrl) {
       navigator.clipboard.writeText(currentPreview.previewUrl)
@@ -214,6 +231,23 @@ export default function PreviewDeploymentPage() {
         <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-sm text-red-300">
           {error}
           <button onClick={() => setError('')} className="ml-2 text-red-400 hover:text-red-200">&times;</button>
+        </div>
+      )}
+
+      {promotionResult && (
+        <div className="bg-green-900/30 border border-green-700 rounded-lg p-4">
+          <h3 className="font-bold text-green-300 mb-2">✅ Promoted to Production</h3>
+          <p className="text-sm text-green-200 mb-2">{promotionResult.message}</p>
+          {promotionResult.productionUrl && (
+            <a
+              href={promotionResult.productionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 text-sm font-mono"
+            >
+              {promotionResult.productionUrl}
+            </a>
+          )}
         </div>
       )}
 
@@ -298,8 +332,15 @@ export default function PreviewDeploymentPage() {
             </div>
           </div>
 
-          {/* Expire Button */}
-          <div className="flex justify-end">
+          {/* Action Buttons */}
+          <div className="flex justify-between">
+            <button
+              onClick={handlePromote}
+              disabled={promoting}
+              className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
+            >
+              {promoting ? 'Promoting...' : 'Promote to Production'}
+            </button>
             <button
               onClick={handleExpire}
               className="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 border border-red-700 text-red-300 rounded-lg text-sm font-medium transition-colors"

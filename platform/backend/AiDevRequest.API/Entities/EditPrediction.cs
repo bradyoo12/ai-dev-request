@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class EditPrediction : BaseEntity
+public class EditPrediction
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string SourceFile { get; set; } = string.Empty;
     public string ChangeType { get; set; } = string.Empty;      // rename, delete, modify-signature, add-parameter, change-type, move
@@ -19,4 +18,5 @@ public class EditPrediction : BaseEntity
     public int TestFilesAffected { get; set; }
     public double AnalysisTimeMs { get; set; }
     public string Status { get; set; } = "completed";          // completed, analyzing, partial
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

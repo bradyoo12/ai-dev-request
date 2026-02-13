@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class GovernanceAction : BaseEntity
+public class GovernanceAction
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string ActionType { get; set; } = string.Empty;         // git-push, file-delete, schema-change, secret-modify, mass-delete
     public string ActionDescription { get; set; } = string.Empty;
@@ -20,4 +19,5 @@ public class GovernanceAction : BaseEntity
     public int AffectedFiles { get; set; }
     public string AuditTrail { get; set; } = string.Empty;
     public string Status { get; set; } = "completed";              // completed, blocked, pending-approval, rolled-back
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

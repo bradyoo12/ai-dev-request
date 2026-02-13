@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class BrowserIdeSession : BaseEntity
+public class BrowserIdeSession
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string Runtime { get; set; } = string.Empty;         // react, node, vanilla, typescript
     public string Code { get; set; } = string.Empty;
@@ -19,4 +18,5 @@ public class BrowserIdeSession : BaseEntity
     public int ForkCount { get; set; }
     public double MemoryUsageMb { get; set; }
     public string Status { get; set; } = "completed";           // completed, running, error, shared
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class InferenceCostRecord : BaseEntity
+public class InferenceCostRecord
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string RequestType { get; set; } = string.Empty;      // simple, complex, critical
     public string ModelUsed { get; set; } = string.Empty;        // haiku, sonnet, opus
@@ -21,4 +20,5 @@ public class InferenceCostRecord : BaseEntity
     public double LatencyMs { get; set; }
     public string OptimizationStrategy { get; set; } = string.Empty;  // routing, caching, batching, reuse
     public string Status { get; set; } = "completed";
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

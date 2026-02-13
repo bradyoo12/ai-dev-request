@@ -1,9 +1,8 @@
-using BradYoo.Core.Common.Entities;
-
 namespace AiDevRequest.API.Entities;
 
-public class WorkersAiDeployment : BaseEntity
+public class WorkersAiDeployment
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ProjectName { get; set; } = string.Empty;
     public string ModelId { get; set; } = string.Empty;        // e.g. @cf/meta/llama-3-8b-instruct
     public string ModelCategory { get; set; } = string.Empty;  // text-generation, image-classification, embeddings, speech-to-text, translation
@@ -18,4 +17,5 @@ public class WorkersAiDeployment : BaseEntity
     public bool ZeroColdStart { get; set; }
     public double SuccessRate { get; set; }
     public string Status { get; set; } = "active";              // active, deploying, error, archived
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -97,6 +97,9 @@ builder.Services.AddScoped<IPerformanceProfileService, PerformanceProfileService
 builder.Services.AddScoped<ISchemaDesignerService, SchemaDesignerService>();
 builder.Services.AddScoped<ISelfHealingTestService, SelfHealingTestService>();
 builder.Services.AddScoped<IDatabaseBranchService, DatabaseBranchService>();
+builder.Services.AddScoped<IMultiAgentTestService, MultiAgentTestService>();
+builder.Services.AddScoped<IPersonaSimulationService, PersonaSimulationService>();
+builder.Services.AddScoped<IConcurrencyDetectionService, ConcurrencyDetectionService>();
 builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 builder.Services.AddScoped<IUsageMeteringService, UsageMeteringService>();
 builder.Services.AddScoped<IAgentInboxService, AgentInboxService>();

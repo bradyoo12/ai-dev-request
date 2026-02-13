@@ -480,7 +480,7 @@ export default function HomePage() {
               <label className="block text-sm font-medium mb-2 text-warm-400">{t('screenshot.label')}</label>
               {screenshotPreview ? (
                 <div className="relative inline-block">
-                  <img src={screenshotPreview} alt="Screenshot preview" className="max-h-48 rounded-xl border border-warm-700" />
+                  <img src={screenshotPreview} alt={screenshotFile?.name ? `Uploaded screenshot: ${screenshotFile.name}` : 'Screenshot preview'} className="max-h-48 rounded-xl border border-warm-700" />
                   <button type="button" onClick={handleScreenshotRemove}
                     className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full text-xs flex items-center justify-center transition-colors"
                     aria-label={t('screenshot.remove', 'Remove screenshot')}>

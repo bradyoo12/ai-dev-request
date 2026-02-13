@@ -1169,3 +1169,19 @@ AI-powered self-healing test selector repair with MCP integration:
 - **Healing Strategies**: Closest Match (DOM similarity), AI Suggest (AI-generated alternatives), Fallback Chain (cascading selectors)
 - **Entity**: `PlaywrightHealingResult` with TestFile, TestName, OriginalSelector, HealedSelector, HealingStrategy, Confidence, Status, HealingAttempts, HealingTimeMs
 - **Ticket**: #422 — `Self-healing Playwright tests with AI using Playwright MCP`
+
+## Self-Healing Code with Autonomous Testing Loop
+
+Autonomous testing loop that tests generated code in live browsers, detects failures, and auto-regenerates fixes:
+- **Backend**: `SelfHealingRun` entity tracking healing runs with project name, test command, browser type, error/fix JSON, and test pass/fail counts. `SelfHealingController` with endpoints for starting runs, retrying, stats, and browsers
+- **Endpoints**:
+  - `GET /api/self-healing/runs` — list healing runs (filterable by status)
+  - `GET /api/self-healing/runs/{id}` — get run details
+  - `POST /api/self-healing/runs` — start a new healing run (simulated)
+  - `POST /api/self-healing/runs/{id}/retry` — retry a failed run
+  - `GET /api/self-healing/stats` — healing statistics (pass rate, heal rate, by browser/result)
+  - `GET /api/self-healing/browsers` — list supported browsers (anonymous)
+- **Frontend**: `SelfHealingPage` in Settings with 3 sub-tabs (Start, Runs, Stats). Start tab has form for project name, test command, browser selector, max attempts. Shows errors detected and fixes applied inline. Runs tab has retry functionality. Stats tab shows by-browser and by-result breakdowns
+- **Browsers**: Chromium, Firefox, WebKit
+- **Entity**: `SelfHealingRun` with ProjectName, TestCommand, BrowserType, Status, CurrentAttempt, MaxAttempts, ErrorsJson, FixesJson, TestDurationMs, HealingDurationMs, TestsPassed, TestsFailed, FinalResult
+- **Ticket**: #423 — `Self-healing code with autonomous testing loop in live browser`

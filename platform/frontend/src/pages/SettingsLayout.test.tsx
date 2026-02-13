@@ -17,9 +17,11 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
 }))
 
+const mockRequireAuth = vi.fn(() => true)
 vi.mock('../contexts/AuthContext', () => ({
   useAuth: () => ({
     setTokenBalance: vi.fn(),
+    requireAuth: mockRequireAuth,
   }),
 }))
 
@@ -256,5 +258,25 @@ describe('SettingsLayout', () => {
     const user = userEvent.setup()
     await user.click(screen.getByText('settings.tabs.billing'))
     expect(screen.getByTestId('billing-page')).toBeInTheDocument()
+  })
+
+  it('redirects to "/" when not authenticated (defensive auth check)', () => {
+    mockRequireAuth.mockReturnValue(false)
+    render(<SettingsLayout />)
+    expect(mockNavigate).toHaveBeenCalledWith('/')
+  })
+
+  it('does not redirect when authenticated', () => {
+    mockRequireAuth.mockReturnValue(true)
+    mockNavigate.mockClear()
+    render(<SettingsLayout />)
+    expect(mockNavigate).not.toHaveBeenCalledWith('/')
+  })
+
+  it('calls requireAuth on component mount', () => {
+    mockRequireAuth.mockClear()
+    mockRequireAuth.mockReturnValue(true)
+    render(<SettingsLayout />)
+    expect(mockRequireAuth).toHaveBeenCalled()
   })
 })

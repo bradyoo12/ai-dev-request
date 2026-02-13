@@ -22,7 +22,20 @@ export default function DatabaseBranchPage() {
   const [diffLoading, setDiffLoading] = useState<string | null>(null)
 
   useEffect(() => {
-    loadBranches()
+    const loadData = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        await loadBranches()
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : t('dbBranch.error.loadFailed', 'Failed to load database branches')
+        setError(errorMessage)
+        console.error('DatabaseBranchPage error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
   }, [projectId])
 
   function parseJson<T>(json: string | null | undefined): T[] {
@@ -36,16 +49,9 @@ export default function DatabaseBranchPage() {
   }
 
   async function loadBranches() {
-    setLoading(true)
     setError('')
-    try {
-      const data = await listDatabaseBranches(projectId)
-      setBranches(data)
-    } catch {
-      setError(t('dbBranch.error.loadFailed', 'Failed to load database branches'))
-    } finally {
-      setLoading(false)
-    }
+    const data = await listDatabaseBranches(projectId)
+    setBranches(data)
   }
 
   async function handleCreate() {
@@ -152,7 +158,19 @@ export default function DatabaseBranchPage() {
       </div>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-sm">{error}</div>
+        <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 text-red-300 text-sm flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={() => {
+              setError('')
+              setLoading(true)
+              loadBranches().finally(() => setLoading(false))
+            }}
+            className="ml-3 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs transition-colors"
+          >
+            {t('dbBranch.retry', 'Retry')}
+          </button>
+        </div>
       )}
 
       {loading && (

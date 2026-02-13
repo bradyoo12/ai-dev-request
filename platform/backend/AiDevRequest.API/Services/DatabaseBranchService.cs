@@ -13,6 +13,7 @@ public interface IDatabaseBranchService
     Task<DatabaseBranch> MergeBranch(Guid branchId);
     Task<DatabaseBranch> DiscardBranch(Guid branchId);
     Task<SchemaDiffResult> GetSchemaDiff(Guid branchId);
+    Task<List<DatabaseBranch>> GetActiveBranchSessions(Guid devRequestId);
 }
 
 public class DatabaseBranchService : IDatabaseBranchService
@@ -152,6 +153,16 @@ public class DatabaseBranchService : IDatabaseBranchService
             UnchangedTables = unchanged,
             PendingMigrations = migrations,
         };
+    }
+
+    public async Task<List<DatabaseBranch>> GetActiveBranchSessions(Guid devRequestId)
+    {
+        _logger.LogInformation("Retrieving active database branch sessions for project {ProjectId}", devRequestId);
+
+        return await _context.DatabaseBranches
+            .Where(b => b.DevRequestId == devRequestId && b.Status == "active")
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync();
     }
 }
 

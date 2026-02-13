@@ -61,7 +61,10 @@ export async function listDatabaseBranches(projectId: string): Promise<DatabaseB
   const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/db/branches`, {
     headers: authHeaders(),
   })
-  if (!response.ok) return []
+  if (!response.ok) {
+    console.error('Failed to load database branches', { status: response.status, projectId })
+    return []
+  }
   return response.json()
 }
 
@@ -69,7 +72,10 @@ export async function getDatabaseBranch(projectId: string, branchId: string): Pr
   const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/db/branches/${branchId}`, {
     headers: authHeaders(),
   })
-  if (!response.ok) return null
+  if (!response.ok) {
+    console.error('Failed to load database branch', { status: response.status, projectId, branchId })
+    return null
+  }
   return response.json()
 }
 
@@ -101,6 +107,20 @@ export async function getDatabaseBranchDiff(projectId: string, branchId: string)
   const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/db/branches/${branchId}/diff`, {
     headers: authHeaders(),
   })
-  if (!response.ok) return null
+  if (!response.ok) {
+    console.error('Failed to load database branch diff', { status: response.status, projectId, branchId })
+    return null
+  }
+  return response.json()
+}
+
+export async function getDatabaseBranchSessions(projectId: string): Promise<DatabaseBranch[]> {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/db/branches/sessions`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) {
+    console.error('Failed to load database branch sessions')
+    return [] // Return empty array instead of throwing
+  }
   return response.json()
 }

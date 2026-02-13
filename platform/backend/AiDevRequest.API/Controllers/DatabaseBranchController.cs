@@ -23,28 +23,70 @@ public class DatabaseBranchController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Creating database branch '{BranchName}' for project {ProjectId}", request.BranchName, id);
             var branch = await _branchService.CreateBranch(id, request.BranchName);
             return Ok(MapDto(branch));
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(ex, "Invalid operation while creating branch '{BranchName}' for project {ProjectId}", request.BranchName, id);
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create branch '{BranchName}' for project {ProjectId}", request.BranchName, id);
+            return StatusCode(500, new { error = "Failed to create database branch" });
         }
     }
 
     [HttpGet]
     public async Task<IActionResult> ListBranches(Guid id)
     {
-        var branches = await _branchService.ListBranches(id);
-        return Ok(branches.Select(MapDto));
+        try
+        {
+            var branches = await _branchService.ListBranches(id);
+            return Ok(branches.Select(MapDto));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to list branches for project {ProjectId}", id);
+            return StatusCode(500, new { error = "Failed to retrieve database branches" });
+        }
+    }
+
+    [HttpGet("sessions")]
+    public async Task<IActionResult> GetActiveSessions(Guid id)
+    {
+        try
+        {
+            var sessions = await _branchService.GetActiveBranchSessions(id);
+            return Ok(sessions.Select(MapDto));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get active branch sessions for project {ProjectId}", id);
+            return StatusCode(500, new { error = "Failed to retrieve database branch sessions" });
+        }
     }
 
     [HttpGet("{branchId:guid}")]
     public async Task<IActionResult> GetBranch(Guid id, Guid branchId)
     {
-        var branch = await _branchService.GetBranch(branchId);
-        if (branch == null) return NotFound();
-        return Ok(MapDto(branch));
+        try
+        {
+            var branch = await _branchService.GetBranch(branchId);
+            if (branch == null)
+            {
+                _logger.LogWarning("Branch {BranchId} not found for project {ProjectId}", branchId, id);
+                return NotFound(new { error = "Branch not found" });
+            }
+            return Ok(MapDto(branch));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get branch {BranchId} for project {ProjectId}", branchId, id);
+            return StatusCode(500, new { error = "Failed to retrieve database branch" });
+        }
     }
 
     [HttpPost("{branchId:guid}/merge")]
@@ -52,12 +94,19 @@ public class DatabaseBranchController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Merging database branch {BranchId} for project {ProjectId}", branchId, id);
             var branch = await _branchService.MergeBranch(branchId);
             return Ok(MapDto(branch));
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(ex, "Invalid operation while merging branch {BranchId} for project {ProjectId}", branchId, id);
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to merge branch {BranchId} for project {ProjectId}", branchId, id);
+            return StatusCode(500, new { error = "Failed to merge database branch" });
         }
     }
 
@@ -66,12 +115,19 @@ public class DatabaseBranchController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("Discarding database branch {BranchId} for project {ProjectId}", branchId, id);
             var branch = await _branchService.DiscardBranch(branchId);
             return Ok(MapDto(branch));
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(ex, "Invalid operation while discarding branch {BranchId} for project {ProjectId}", branchId, id);
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to discard branch {BranchId} for project {ProjectId}", branchId, id);
+            return StatusCode(500, new { error = "Failed to discard database branch" });
         }
     }
 
@@ -85,7 +141,13 @@ public class DatabaseBranchController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
+            _logger.LogWarning(ex, "Invalid operation while getting schema diff for branch {BranchId} in project {ProjectId}", branchId, id);
             return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get schema diff for branch {BranchId} in project {ProjectId}", branchId, id);
+            return StatusCode(500, new { error = "Failed to retrieve schema diff" });
         }
     }
 

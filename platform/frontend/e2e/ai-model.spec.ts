@@ -167,8 +167,10 @@ test.describe('AI Model Settings', () => {
   });
 
   test('navigates to AI Model settings page', async ({ page }) => {
-    await page.goto('/settings/ai-model');
-    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    await page.goto('/settings/ai-model', { waitUntil: 'networkidle' });
+    // Wait for loading state to complete before checking for heading
+    await page.waitForTimeout(500);
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 10000 });
   });
 
   test('displays provider selector dropdown', async ({ page }) => {

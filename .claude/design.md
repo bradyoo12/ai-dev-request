@@ -1543,3 +1543,19 @@ Edge-native SQLite database provisioning with global replication, vector search,
 - **Frontend**: `TursoDatabasePage` in Settings at `/settings/turso-database` with 4 sub-tabs (Provision, History, Regions, Stats)
 - **Entity**: `TursoDatabase` with ProjectName, DatabaseName, Region, ReplicaCount, ReplicaRegions, SizeBytes, TableCount, VectorSearchEnabled, VectorDimensions, SchemaBranchingEnabled, ActiveBranches, EmbeddedReplicaEnabled, ReadLatencyMs, WriteLatencyMs, SyncMode, Status
 - **Ticket**: #472 — `Turso embedded SQLite for edge-native project databases`
+
+### Cloudflare Workers AI (Edge Inference)
+
+Edge-deployed AI inference with serverless GPU, zero cold starts, and 180+ global locations:
+- **Backend**: `WorkersAiDeployment` entity tracking AI model deployments. `WorkersAiController` with deploy, list, delete, stats, and models endpoints
+- **Endpoints**:
+  - `GET /api/workers-ai` — list deployments (50 limit)
+  - `POST /api/workers-ai/deploy` — deploy model to edge with category, region, custom model support
+  - `DELETE /api/workers-ai/{id}` — delete deployment
+  - `GET /api/workers-ai/stats` — deployment statistics (by category)
+  - `GET /api/workers-ai/models` — list 6 pre-configured models: Llama 3.1, Mistral 7B, BGE, Whisper, ResNet-50, M2M100 (anonymous)
+- **Model Categories**: text-generation, embeddings, image-classification, speech-to-text, translation
+- **Features**: Zero cold starts (Infire Engine), serverless GPU, global edge (180+ locations), custom model deployment (Hugging Face/upload), pay-per-inference
+- **Frontend**: `WorkersAiPage` in Settings at `/settings/workers-ai` with 4 sub-tabs (Deploy, History, Models, Stats)
+- **Entity**: `WorkersAiDeployment` with ProjectName, ModelId, ModelCategory, EdgeRegion, EdgeLocations, InferenceLatencyMs, TotalInferences, TokensProcessed, CostUsd, CustomModel, CustomModelSource, ZeroColdStart, SuccessRate, Status
+- **Ticket**: #473 — `Cloudflare Workers AI for edge-deployed inference and model serving`

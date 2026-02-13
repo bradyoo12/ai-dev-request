@@ -158,6 +158,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TerminalExecution> TerminalExecutions => Set<TerminalExecution>();
     public DbSet<TursoDatabase> TursoDatabases => Set<TursoDatabase>();
     public DbSet<WorkersAiDeployment> WorkersAiDeployments => Set<WorkersAiDeployment>();
+    public DbSet<ReactUseHookDemo> ReactUseHookDemos => Set<ReactUseHookDemo>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

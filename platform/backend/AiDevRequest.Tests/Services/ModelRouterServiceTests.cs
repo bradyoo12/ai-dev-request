@@ -53,9 +53,9 @@ public class ModelRouterServiceTests
     // --- GetModelId tests ---
 
     [Theory]
-    [InlineData(ModelTier.Haiku, "claude-haiku-4-5-20251001")]
-    [InlineData(ModelTier.Sonnet, "claude-sonnet-4-5-20250929")]
-    [InlineData(ModelTier.Opus, "claude-opus-4-6")]
+    [InlineData(ModelTier.Haiku, "claude:claude-haiku-4-5-20251001")]
+    [InlineData(ModelTier.Sonnet, "claude:claude-sonnet-4-5-20250929")]
+    [InlineData(ModelTier.Opus, "claude:claude-opus-4-6")]
     public void GetModelId_ReturnsExpectedModelId(ModelTier tier, string expectedModelId)
     {
         var service = CreateService();

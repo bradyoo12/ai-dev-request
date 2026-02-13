@@ -12,7 +12,21 @@ public class PreviewDeployment
 
     public string? PreviewUrl { get; set; }
 
-    public string Provider { get; set; } = "azure-static-web-apps";
+    public string Provider { get; set; } = "azure-container-instances";
+
+    public string? ContainerGroupName { get; set; }
+
+    public string? ContainerName { get; set; }
+
+    public string? Region { get; set; }
+
+    public string? ResourceGroupName { get; set; }
+
+    public int Port { get; set; } = 3000;
+
+    public string? ImageUri { get; set; }
+
+    public string? Fqdn { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

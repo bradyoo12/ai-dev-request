@@ -9,6 +9,7 @@ import {
   listPreviews,
   type PreviewDeployment,
 } from '../api/preview'
+import { ContainerLogsModal } from '../components/ContainerLogsModal'
 import { promoteToProduction, type PromotionResult } from '../api/promotion'
 
 function generateQrCodeSvg(url: string): string {
@@ -58,6 +59,9 @@ function getStatusColor(status: string): string {
   switch (status) {
     case 'Deployed': return 'text-green-400'
     case 'Deploying': return 'text-yellow-400'
+    case 'BuildingImage': return 'text-blue-400'
+    case 'PushingImage': return 'text-purple-400'
+    case 'CreatingContainer': return 'text-yellow-400'
     case 'Pending': return 'text-blue-400'
     case 'Expired': return 'text-warm-400'
     case 'Failed': return 'text-red-400'
@@ -69,6 +73,9 @@ function getStatusBadge(status: string): string {
   switch (status) {
     case 'Deployed': return 'bg-green-900/40 border-green-700 text-green-300'
     case 'Deploying': return 'bg-yellow-900/40 border-yellow-700 text-yellow-300'
+    case 'BuildingImage': return 'bg-blue-900/40 border-blue-700 text-blue-300'
+    case 'PushingImage': return 'bg-purple-900/40 border-purple-700 text-purple-300'
+    case 'CreatingContainer': return 'bg-yellow-900/40 border-yellow-700 text-yellow-300'
     case 'Pending': return 'bg-blue-900/40 border-blue-700 text-blue-300'
     case 'Expired': return 'bg-warm-900/40 border-warm-700 text-warm-400'
     case 'Failed': return 'bg-red-900/40 border-red-700 text-red-300'
@@ -113,6 +120,7 @@ export default function PreviewDeploymentPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [showLogs, setShowLogs] = useState(false)
   const [promoting, setPromoting] = useState(false)
   const [promotionResult, setPromotionResult] = useState<PromotionResult | null>(null)
 
@@ -320,7 +328,11 @@ export default function PreviewDeploymentPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-warm-900 rounded-lg p-3">
               <label className="text-xs text-warm-500 block mb-1">{t('preview.provider', 'Provider')}</label>
-              <span className="text-sm text-white">{currentPreview.provider}</span>
+              <span className="text-sm text-white">
+                {currentPreview.provider === 'AzureContainerInstances'
+                  ? 'Azure Container Instances'
+                  : currentPreview.provider}
+              </span>
             </div>
             <div className="bg-warm-900 rounded-lg p-3">
               <label className="text-xs text-warm-500 block mb-1">{t('preview.expiresIn', 'Expires in')}</label>
@@ -332,8 +344,32 @@ export default function PreviewDeploymentPage() {
             </div>
           </div>
 
+          {/* Container Details */}
+          {(currentPreview.region || currentPreview.fqdn || currentPreview.port) && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {currentPreview.region && (
+                <div className="bg-warm-900 rounded-lg p-3">
+                  <label className="text-xs text-warm-500 block mb-1">{t('preview.region', 'Region')}</label>
+                  <span className="text-sm text-white">{currentPreview.region}</span>
+                </div>
+              )}
+              {currentPreview.fqdn && (
+                <div className="bg-warm-900 rounded-lg p-3">
+                  <label className="text-xs text-warm-500 block mb-1">{t('preview.fqdn', 'FQDN')}</label>
+                  <span className="text-sm text-white font-mono break-all">{currentPreview.fqdn}</span>
+                </div>
+              )}
+              {currentPreview.port && (
+                <div className="bg-warm-900 rounded-lg p-3">
+                  <label className="text-xs text-warm-500 block mb-1">{t('preview.port', 'Port')}</label>
+                  <span className="text-sm text-white">{currentPreview.port}</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Action Buttons */}
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-3">
             <button
               onClick={handlePromote}
               disabled={promoting}
@@ -341,12 +377,20 @@ export default function PreviewDeploymentPage() {
             >
               {promoting ? 'Promoting...' : 'Promote to Production'}
             </button>
-            <button
-              onClick={handleExpire}
-              className="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 border border-red-700 text-red-300 rounded-lg text-sm font-medium transition-colors"
-            >
-              {t('preview.tearDown', 'Tear Down Preview')}
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogs(true)}
+                className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-700 text-blue-300 rounded-lg text-sm font-medium transition-colors"
+              >
+                {t('preview.viewLogs', 'View Logs')}
+              </button>
+              <button
+                onClick={handleExpire}
+                className="px-4 py-2 bg-red-600/20 hover:bg-red-600/40 border border-red-700 text-red-300 rounded-lg text-sm font-medium transition-colors"
+              >
+                {t('preview.tearDown', 'Tear Down Preview')}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -357,6 +401,33 @@ export default function PreviewDeploymentPage() {
           <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4" />
           <h3 className="text-lg font-bold mb-1">{t('preview.deployingTitle', 'Deploying Preview...')}</h3>
           <p className="text-sm text-warm-400">{t('preview.deployingDescription', 'Your preview is being deployed to the edge. This usually takes less than 5 seconds.')}</p>
+        </div>
+      )}
+
+      {/* Building Image State */}
+      {currentPreview && currentPreview.status === 'BuildingImage' && (
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <h3 className="text-lg font-bold mb-1">{t('preview.buildingImage', 'Building Docker Image...')}</h3>
+          <p className="text-sm text-warm-400">{t('preview.buildingImageDescription', 'Generating Dockerfile and building container image')}</p>
+        </div>
+      )}
+
+      {/* Pushing Image State */}
+      {currentPreview && currentPreview.status === 'PushingImage' && (
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <h3 className="text-lg font-bold mb-1">{t('preview.pushingImage', 'Pushing to Registry...')}</h3>
+          <p className="text-sm text-warm-400">{t('preview.pushingImageDescription', 'Uploading image to Azure Container Registry')}</p>
+        </div>
+      )}
+
+      {/* Creating Container State */}
+      {currentPreview && currentPreview.status === 'CreatingContainer' && (
+        <div className="bg-warm-800 rounded-xl p-6 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <h3 className="text-lg font-bold mb-1">{t('preview.creatingContainer', 'Creating Container...')}</h3>
+          <p className="text-sm text-warm-400">{t('preview.creatingContainerDescription', 'Provisioning Azure Container Instance with public IP')}</p>
         </div>
       )}
 
@@ -392,6 +463,13 @@ export default function PreviewDeploymentPage() {
           </div>
         </div>
       )}
+
+      {/* Container Logs Modal */}
+      <ContainerLogsModal
+        projectId={requestId}
+        isOpen={showLogs}
+        onClose={() => setShowLogs(false)}
+      />
     </div>
   )
 }

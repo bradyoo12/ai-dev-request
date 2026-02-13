@@ -72,6 +72,23 @@ public class PreviewController : ControllerBase
         return Ok(previews.Select(ToDto).ToList());
     }
 
+    [HttpGet("preview/logs")]
+    [ProducesResponseType(typeof(ContainerLogsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<ContainerLogsDto>> GetPreviewLogs(Guid projectId)
+    {
+        try
+        {
+            var logs = await _previewService.GetContainerLogsAsync(projectId);
+            return Ok(new ContainerLogsDto { Logs = logs });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpPost("preview/{previewId}/promote")]
     [ProducesResponseType(typeof(PromotionResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -106,7 +123,6 @@ public class PreviewController : ControllerBase
             Reason = errorMessage
         });
     }
-
     private static PreviewDeploymentDto ToDto(Entities.PreviewDeployment p) => new()
     {
         Id = p.Id,
@@ -114,6 +130,10 @@ public class PreviewController : ControllerBase
         Status = p.Status.ToString(),
         PreviewUrl = p.PreviewUrl,
         Provider = p.Provider,
+        ContainerGroupName = p.ContainerGroupName,
+        Region = p.Region,
+        Fqdn = p.Fqdn,
+        Port = p.Port,
         DeployedAt = p.DeployedAt,
         ExpiresAt = p.ExpiresAt,
         CreatedAt = p.CreatedAt,
@@ -127,6 +147,10 @@ public record PreviewDeploymentDto
     public string Status { get; init; } = "";
     public string? PreviewUrl { get; init; }
     public string Provider { get; init; } = "";
+    public string? ContainerGroupName { get; init; }
+    public string? Region { get; init; }
+    public string? Fqdn { get; init; }
+    public int Port { get; init; }
     public DateTime? DeployedAt { get; init; }
     public DateTime? ExpiresAt { get; init; }
     public DateTime CreatedAt { get; init; }
@@ -135,6 +159,11 @@ public record PreviewDeploymentDto
 public record PreviewUrlDto
 {
     public string PreviewUrl { get; init; } = "";
+}
+
+public record ContainerLogsDto
+{
+    public string Logs { get; init; } = "";
 }
 
 public record PromotionResultDto

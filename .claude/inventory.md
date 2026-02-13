@@ -338,7 +338,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 
 ## Backend Entities
 
-All under `platform/backend/AiDevRequest.API/Entities/`. 110 entities total.
+All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 
 ### Core Domain
 
@@ -520,7 +520,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 110 entities total.
 
 ## Frontend Pages
 
-All under `platform/frontend/src/pages/`. 95 pages total.
+All under `platform/frontend/src/pages/`. 96 pages total.
 
 ### Home & Navigation
 
@@ -773,7 +773,7 @@ All under `platform/frontend/src/components/`.
 
 ## Frontend API Modules
 
-All under `platform/frontend/src/api/`. 89 modules total.
+All under `platform/frontend/src/api/`. 90 modules total.
 
 ### Core
 

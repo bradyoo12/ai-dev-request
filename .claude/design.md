@@ -103,6 +103,7 @@ User Request (natural language)
 | DatabaseBranch | Git-like database branch for preview environments with schema versioning and merge/discard |
 | SandboxExecution | Sandboxed code execution record with isolation level, resource usage, and security violation tracking |
 | AgentInboxItem | End-user feedback item from deployed app with status tracking and AI-triggered implementation |
+| AgentSkill | Reusable agent skill instruction pack with detection rules and automatic activation |
 
 ## Spec-Driven Development Pipeline
 

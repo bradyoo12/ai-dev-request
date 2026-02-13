@@ -1285,3 +1285,20 @@ SonarQube-style AI-powered code analysis with multi-language support and automat
 - **Frontend**: `CodeLintPage` in Settings with 4 sub-tabs (Analyze, Issues, Rules, Stats). Analyze tab runs analysis on projects with language selection. Issues tab shows filterable list with autofix/dismiss/delete. Rules tab shows category reference. Stats tab shows total/resolved/autofixed/critical metrics and breakdowns
 - **Entity**: `CodeLintResult` with Language (typescript/csharp/python/go/rust), Severity (info/warning/error/critical), Category, RuleId, Message, FilePath, LineNumber, Snippet, SuggestedFix, AutofixStatus (pending/applied/dismissed/pr-created)
 - **Ticket**: #437 — `AI-powered code linting with SonarQube-style autofix`
+
+### Hybrid Vector Search (Multi-Modal Search for Organizational Memory)
+
+Hybrid search combining vector similarity, keyword matching, and fusion algorithms for enhanced organizational memory retrieval:
+- **Backend**: `VectorSearchConfig` entity with provider, search mode, fusion algorithm, weight tuning, and query stats. `VectorSearchController` with CRUD, query simulation, stats, and provider endpoints
+- **Endpoints**:
+  - `GET /api/vector-search` — list configs (50 limit)
+  - `GET /api/vector-search/{id}` — get config
+  - `POST /api/vector-search` — create config (20 per user limit)
+  - `POST /api/vector-search/query` — run simulated hybrid search with fused/vector/keyword scores
+  - `DELETE /api/vector-search/{id}` — delete config
+  - `GET /api/vector-search/stats` — search statistics (by provider, by mode)
+  - `GET /api/vector-search/providers` — list 4 providers: Qdrant, Pinecone, Weaviate, pgvector (anonymous)
+- **Providers**: Qdrant (#DC382C), Pinecone (#000000), Weaviate (#00A98E), pgvector (#336791)
+- **Frontend**: `VectorSearchPage` in Settings with 4 sub-tabs (Search, Indexes, Configure, Stats). Search tab runs queries with mode selector showing fused/vector/keyword scores. Indexes tab lists configs with mode badges. Configure tab has index name, provider, search mode (hybrid/vector/keyword), fusion algorithm (RRF/linear/weighted), vector/keyword weight sliders, top-K, checkboxes. Stats tab shows aggregate metrics and breakdowns
+- **Entity**: `VectorSearchConfig` with Provider (qdrant/pinecone/weaviate/pgvector), SearchMode (hybrid/vector-only/keyword-only), FusionAlgorithm (rrf/linear/weighted), VectorWeight, KeywordWeight, TopK, SimilarityThreshold, QueryExpansion, MetadataFiltering, VectorDimension, TotalVectors, AvgQueryLatencyMs, TotalQueries, Status
+- **Ticket**: #438 — `Hybrid vector search for organizational memory (enhance #425)`

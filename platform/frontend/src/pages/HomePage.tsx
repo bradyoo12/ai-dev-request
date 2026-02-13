@@ -437,8 +437,16 @@ export default function HomePage() {
                         setRequest(tpl.promptTemplate)
                         if (tpl.framework) setFramework(tpl.framework)
                       }}
-                      className="text-left p-4 glass-card rounded-xl transition-all group">
-                      <div className="font-medium text-sm group-hover:text-accent-blue transition-colors">{tpl.name}</div>
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setRequest(tpl.promptTemplate)
+                          if (tpl.framework) setFramework(tpl.framework)
+                        }
+                      }}
+                      aria-label={`Select template: ${tpl.name}`}
+                      className="text-left p-4 glass-card rounded-xl transition-all group hover:ring-2 hover:ring-accent-blue/50 focus-visible:ring-2 focus-visible:ring-accent-blue focus-visible:outline-none">
+                      <div className="font-medium text-sm group-hover:text-accent-blue group-focus-visible:text-accent-blue transition-colors">{tpl.name}</div>
                       <div className="text-xs text-warm-500 mt-1 line-clamp-2">{tpl.description}</div>
                       <div className="flex flex-wrap gap-1 mt-2">
                         <span className="px-1.5 py-0.5 bg-accent-blue/20 text-accent-blue rounded text-[10px]">{tpl.framework}</span>

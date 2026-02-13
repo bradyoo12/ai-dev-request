@@ -1366,3 +1366,20 @@ Backend performance benchmarking and optimization with .NET 9 features (JSON, HT
 - **Frontend**: `DotnetPerfPage` in Settings with 4 sub-tabs (Benchmark, History, Categories, Stats). Benchmark tab runs performance tests showing improvement %, memory saved %, throughput, latency comparison, and detailed breakdown. History tab lists past benchmarks. Categories tab shows optimization categories and key features. Stats tab shows aggregate metrics
 - **Entity**: `PerformanceOptimization` with Category (json/http/startup/aot/gc), BaselineLatencyMs, OptimizedLatencyMs, ImprovementPercent, MemoryBeforeMb, MemoryAfterMb, MemorySavedPercent, BenchmarkRuns, ThroughputRps, Status
 - **Ticket**: #444 — `Leverage .NET 9 performance optimizations (AOT, JSON, HTTP/3)`
+
+### Multi-Model AI Routing (Dual Model Strategy)
+
+Intelligent routing between AI models (Claude Opus, Claude Sonnet, GPT-Codex, GPT-4o) for optimal cost, speed, and quality:
+- **Backend**: `ModelRoutingRule` entity with task-based routing, primary/fallback models, strategy selection, and performance metrics. `MultiModelRoutingController` with simulate, create, list, delete, stats, and models endpoints
+- **Endpoints**:
+  - `GET /api/multi-model-routing` — list routing rules (50 limit)
+  - `POST /api/multi-model-routing` — create routing rule (max 20 per user)
+  - `POST /api/multi-model-routing/simulate` — simulate routing decision with model comparison
+  - `DELETE /api/multi-model-routing/{id}` — delete routing rule
+  - `GET /api/multi-model-routing/stats` — routing statistics (by task, by model, by strategy)
+  - `GET /api/multi-model-routing/models` — list 4 models with specs (anonymous)
+- **Models**: Claude Opus (quality-first, 3200ms, $0.075), Claude Sonnet (balanced, 1800ms, $0.015), GPT-Codex (code-optimized, 2100ms, $0.030), GPT-4o (speed-first, 1200ms, $0.025)
+- **Strategies**: Quality First, Speed First, Cost Optimized, Balanced
+- **Frontend**: `MultiModelRoutingPage` in Settings with 4 sub-tabs (Simulate, Rules, Models, Stats). Simulate tab routes tasks to best model showing comparison cards. Rules tab creates and manages routing rules. Models tab shows AI model specs and routing strategies. Stats tab shows aggregate metrics
+- **Entity**: `ModelRoutingRule` with TaskType (code-generation/reasoning/refactoring/testing/review), PrimaryModel, FallbackModel, RoutingStrategy, CostThreshold, LatencyThresholdMs, TotalRequests, PrimaryHits, FallbackHits, AvgPrimaryLatencyMs, AvgFallbackLatencyMs, AccuracyScore, Status
+- **Ticket**: #454 — `Multi-model AI routing with GPT-5.3-Codex + Claude Opus 4.6`

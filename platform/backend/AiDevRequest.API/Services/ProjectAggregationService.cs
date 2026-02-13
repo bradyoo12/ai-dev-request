@@ -104,8 +104,10 @@ public class ProjectAggregationService : IProjectAggregationService
         }
 
         // Get container config
-        var containerConfig = await _context.ContainerConfigs
-            .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
+        // TODO: ContainerConfig doesn't have DevRequestId field yet
+        ContainerConfig? containerConfig = null;
+        // var containerConfig = await _context.ContainerConfigs
+        //     .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
 
         // Calculate cost breakdown
         ProjectCostBreakdown? costBreakdown = null;
@@ -144,8 +146,9 @@ public class ProjectAggregationService : IProjectAggregationService
             PlanBandwidthGb = hostingPlan?.BandwidthGb,
 
             // Container info
-            ContainerVcpu = containerConfig?.Vcpu,
-            ContainerMemoryGb = containerConfig?.MemoryGb,
+            // TODO: ContainerConfig schema needs Vcpu and MemoryGb fields
+            ContainerVcpu = null, // containerConfig?.Vcpu,
+            ContainerMemoryGb = null, // containerConfig?.MemoryGb,
 
             // Cost breakdown
             CostBreakdown = costBreakdown

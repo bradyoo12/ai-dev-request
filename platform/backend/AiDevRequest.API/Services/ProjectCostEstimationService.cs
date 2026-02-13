@@ -53,8 +53,10 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
         }
 
         // Get container config
-        var containerConfig = await _context.ContainerConfigs
-            .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
+        // TODO: ContainerConfig schema needs DevRequestId and Vcpu fields
+        ContainerConfig? containerConfig = null;
+        // var containerConfig = await _context.ContainerConfigs
+        //     .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
 
         // Calculate costs
         decimal hostingCostPerDay = 0m;
@@ -64,26 +66,27 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
         }
 
         // Calculate AI usage cost (average from last 30 days)
-        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
-        var aiUsage = await _context.UsageMeters
-            .Where(u => u.UserId == project.UserId
-                     && u.DevRequestId == project.DevRequestId
-                     && u.MeterType == "ai_compute"
-                     && u.RecordedAt >= thirtyDaysAgo)
-            .SumAsync(u => u.Units);
-
-        var avgDailyAiUnits = aiUsage / 30m;
-        var aiCostPerDay = avgDailyAiUnits * AI_TOKEN_COST_PER_1K;
+        // TODO: UsageMeter schema needs RecordedAt field
+        decimal aiCostPerDay = 0m;
+        // var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+        // var aiUsage = await _context.UsageMeters
+        //     .Where(u => u.UserId == project.UserId
+        //              && u.DevRequestId == project.DevRequestId
+        //              && u.MeterType == "ai_compute"
+        //              && u.RecordedAt >= thirtyDaysAgo)
+        //     .SumAsync(u => u.Units);
+        // var avgDailyAiUnits = aiUsage / 30m;
+        // var aiCostPerDay = avgDailyAiUnits * AI_TOKEN_COST_PER_1K;
 
         // Container costs
         decimal containerCostPerDay = 0m;
-        if (containerConfig != null && !string.IsNullOrEmpty(containerConfig.Vcpu))
-        {
-            if (decimal.TryParse(containerConfig.Vcpu, out var vcpu))
-            {
-                containerCostPerDay = vcpu * CONTAINER_COST_PER_VCPU_DAY;
-            }
-        }
+        // if (containerConfig != null && !string.IsNullOrEmpty(containerConfig.Vcpu))
+        // {
+        //     if (decimal.TryParse(containerConfig.Vcpu, out var vcpu))
+        //     {
+        //         containerCostPerDay = vcpu * CONTAINER_COST_PER_VCPU_DAY;
+        //     }
+        // }
 
         // Storage costs
         decimal storageCostPerDay = 0m;
@@ -127,31 +130,34 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
         }
 
         // Get container config
-        var containerConfig = await _context.ContainerConfigs
-            .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
+        // TODO: ContainerConfig schema needs DevRequestId and Vcpu fields
+        ContainerConfig? containerConfig = null;
+        // var containerConfig = await _context.ContainerConfigs
+        //     .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
 
         // Calculate individual cost components
         decimal hostingCost = hostingPlan != null ? hostingPlan.MonthlyCostUsd / 30m : 0m;
 
-        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
-        var aiUsage = await _context.UsageMeters
-            .Where(u => u.UserId == project.UserId
-                     && u.DevRequestId == project.DevRequestId
-                     && u.MeterType == "ai_compute"
-                     && u.RecordedAt >= thirtyDaysAgo)
-            .SumAsync(u => u.Units);
-
-        var avgDailyAiUnits = aiUsage / 30m;
-        var aiCost = avgDailyAiUnits * AI_TOKEN_COST_PER_1K;
+        // TODO: UsageMeter schema needs RecordedAt field
+        decimal aiCost = 0m;
+        // var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+        // var aiUsage = await _context.UsageMeters
+        //     .Where(u => u.UserId == project.UserId
+        //              && u.DevRequestId == project.DevRequestId
+        //              && u.MeterType == "ai_compute"
+        //              && u.RecordedAt >= thirtyDaysAgo)
+        //     .SumAsync(u => u.Units);
+        // var avgDailyAiUnits = aiUsage / 30m;
+        // var aiCost = avgDailyAiUnits * AI_TOKEN_COST_PER_1K;
 
         decimal containerCost = 0m;
-        if (containerConfig != null && !string.IsNullOrEmpty(containerConfig.Vcpu))
-        {
-            if (decimal.TryParse(containerConfig.Vcpu, out var vcpu))
-            {
-                containerCost = vcpu * CONTAINER_COST_PER_VCPU_DAY;
-            }
-        }
+        // if (containerConfig != null && !string.IsNullOrEmpty(containerConfig.Vcpu))
+        // {
+        //     if (decimal.TryParse(containerConfig.Vcpu, out var vcpu))
+        //     {
+        //         containerCost = vcpu * CONTAINER_COST_PER_VCPU_DAY;
+        //     }
+        // }
 
         decimal storageCost = hostingPlan != null ? hostingPlan.StorageGb * STORAGE_COST_PER_GB_DAY : 0m;
 

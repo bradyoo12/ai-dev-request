@@ -1233,3 +1233,20 @@ Cursor-style background agents that run tasks asynchronously without blocking th
 - **Frontend**: `BackgroundAgentPage` in Settings with 4 sub-tabs (Dashboard, Agents, Spawn, Logs). Dashboard shows stats cards and agent types. Agents tab has status filter, progress bars, and detail panel. Spawn tab has form with project ID, agent name, task, type, priority. Logs tab shows timestamped entries
 - **Entity**: `BackgroundAgent` with AgentName, TaskDescription, Status, BranchName, AgentType, Priority, TotalSteps/CompletedSteps/ProgressPercent, Files/Tests metrics, CPU/Memory/Tokens/Cost, PullRequest tracking, LogEntries/Steps/InstalledPackages JSON
 - **Ticket**: #434 — `Background agents for async testing and monitoring`
+
+### Agent Rules (AI Agent Configuration System)
+
+.cursorrules-style AI agent configuration with project/user/org scoping and 6 rule categories:
+- **Backend**: `AiAgentRule` entity with scope, category, priority-based ordering, and toggle/applied tracking. `AiAgentRuleController` with CRUD, toggle, stats, and categories endpoints
+- **Endpoints**:
+  - `GET /api/agent-rules` — list rules (filterable by scope/category), max 100 per query
+  - `GET /api/agent-rules/{id}` — get single rule
+  - `POST /api/agent-rules` — create rule (200 per user limit)
+  - `PATCH /api/agent-rules/{id}/toggle` — toggle active/inactive
+  - `DELETE /api/agent-rules/{id}` — delete rule
+  - `GET /api/agent-rules/stats` — rule statistics (by scope, by category, total applied)
+  - `GET /api/agent-rules/categories` — list 6 categories with descriptions and colors (anonymous)
+- **Categories**: architecture (#3B82F6), coding-standards (#10B981), tech-stack (#8B5CF6), security (#EF4444), testing (#F59E0B), deployment (#6366F1)
+- **Frontend**: `AgentRulesPage` in Settings with 3 sub-tabs (Create, Rules, Stats). Create tab has form with title, content, scope selector, category dropdown, project name, priority slider (0-100). Rules tab shows filterable list with scope badges, toggle/delete actions. Stats tab shows total/active/applied metrics and breakdowns by scope and category
+- **Entity**: `AiAgentRule` with Scope (project/user/org), Category, Title, Content, ProjectName, IsActive, Priority (0-100), TimesApplied
+- **Ticket**: #435 — `.cursorrules-style AI agent configuration system`

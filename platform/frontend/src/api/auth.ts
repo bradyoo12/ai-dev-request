@@ -173,7 +173,8 @@ export async function getAuthUrl(provider: SocialProvider, redirectUri: string):
   )
 
   if (!response.ok) {
-    throw new Error(`Failed to get auth URL for ${provider}`)
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || `Failed to get auth URL for ${provider}`)
   }
 
   const data = await response.json()

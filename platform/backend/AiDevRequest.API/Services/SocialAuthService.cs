@@ -433,13 +433,15 @@ public class SocialAuthService : ISocialAuthService
 
     private string BuildGoogleAuthUrl(string redirectUri, string state)
     {
-        var clientId = _configuration["OAuth:Google:ClientId"] ?? "";
+        var clientId = _configuration["OAuth:Google:ClientId"]
+            ?? throw new InvalidOperationException("Google ClientId not configured");
         return $"https://accounts.google.com/o/oauth2/v2/auth?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString("openid email profile")}&state={Uri.EscapeDataString(state)}&access_type=offline&prompt=consent";
     }
 
     private string BuildKakaoAuthUrl(string redirectUri, string state)
     {
-        var clientId = _configuration["OAuth:Kakao:ClientId"] ?? "";
+        var clientId = _configuration["OAuth:Kakao:ClientId"]
+            ?? throw new InvalidOperationException("Kakao ClientId not configured");
         // Kakao requires comma-separated scopes (not space-separated like OAuth2 standard)
         var scope = "profile_nickname,profile_image,account_email";
         return $"https://kauth.kakao.com/oauth/authorize?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString(scope)}&state={Uri.EscapeDataString(state)}";
@@ -447,13 +449,15 @@ public class SocialAuthService : ISocialAuthService
 
     private string BuildLineAuthUrl(string redirectUri, string state)
     {
-        var channelId = _configuration["OAuth:Line:ChannelId"] ?? "";
+        var channelId = _configuration["OAuth:Line:ChannelId"]
+            ?? throw new InvalidOperationException("LINE ChannelId not configured");
         return $"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={Uri.EscapeDataString(channelId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&state={Uri.EscapeDataString(state)}&scope={Uri.EscapeDataString("profile openid email")}";
     }
 
     private string BuildAppleAuthUrl(string redirectUri, string state)
     {
-        var clientId = _configuration["OAuth:Apple:ClientId"] ?? "";
+        var clientId = _configuration["OAuth:Apple:ClientId"]
+            ?? throw new InvalidOperationException("Apple ClientId not configured");
         return $"https://appleid.apple.com/auth/authorize?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString("name email")}&response_mode=query&state={Uri.EscapeDataString(state)}";
     }
 

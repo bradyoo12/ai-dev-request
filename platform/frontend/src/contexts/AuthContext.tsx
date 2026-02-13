@@ -76,14 +76,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = match[1] as SocialProvider
     const params = new URLSearchParams(window.location.search)
     const code = params.get('code')
+    const error = params.get('error')
     const state = params.get('state')
     const savedState = localStorage.getItem('oauth-state')
 
     // Clean up URL immediately
     window.history.replaceState({}, '', '/')
 
+    // Handle OAuth error (e.g. user denied consent)
+    if (error) {
+      const errorDesc = params.get('error_description') || error
+      console.error(`OAuth callback error for ${provider}:`, errorDesc)
+      setShowLogin(true)
+      return
+    }
+
     if (!code) return
-    if (state && savedState && state !== savedState) return
+    if (state && savedState && state !== savedState) {
+      console.error('OAuth state mismatch — possible CSRF or stale callback')
+      setShowLogin(true)
+      return
+    }
 
     localStorage.removeItem('oauth-state')
     localStorage.removeItem('oauth-provider')

@@ -1202,3 +1202,19 @@ v0.dev-style sandboxes with auto-imported environment variables from cloud provi
 - **Providers**: Azure (App Service, SQL, Storage, Key Vault), AWS (RDS, S3, Lambda, CloudWatch), Vercel (Postgres, Blob, Edge Functions, KV)
 - **Entity**: `ProductionSandbox` with SandboxName, Provider, Status, EnvVarsJson, EnvVarCount, ServicesJson, ServiceCount, Region, OAuthConnected, UptimeMinutes, CostUsd
 - **Ticket**: #424 — `Production-connected sandboxes with environment variable import`
+
+### Org Memory (Persistent Organizational Memory)
+
+Factory.ai-style persistent organizational memory with vector DB for cross-session knowledge retention:
+- **Backend**: `OrgMemory` entity with scope (user/org), 5 categories (preference, decision, pattern, standard, runbook), embedding status, and usage tracking. `OrgMemoryController` with CRUD, search, stats, and categories endpoints
+- **Endpoints**:
+  - `GET /api/org-memories` — list memories (filterable by scope/category)
+  - `GET /api/org-memories/{id}` — get memory details
+  - `POST /api/org-memories` — create memory (500 limit per user)
+  - `DELETE /api/org-memories/{id}` — delete memory
+  - `POST /api/org-memories/search` — search memories with usage tracking
+  - `GET /api/org-memories/stats` — memory statistics (by scope, embedding status, category)
+  - `GET /api/org-memories/categories` — list categories with descriptions and colors (anonymous)
+- **Frontend**: `OrgMemoryPage` in Settings with 4 sub-tabs (Create, Browse, Search, Stats). Create tab has form with title, content, scope, category, source project fields and shows available categories. Browse tab lists all memories with scope badges and delete action. Search tab has query input with scope filter. Stats tab shows aggregate metrics and by-category breakdown
+- **Entity**: `OrgMemory` with Scope, Category, Title, Content, SourceProject, Relevance, UsageCount, TagsJson, EmbeddingStatus (pending/indexed/failed)
+- **Ticket**: #425 — `Persistent organizational memory across sessions with vector DB`

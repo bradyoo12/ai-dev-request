@@ -435,64 +435,88 @@ For each failed run:
    **Code/config failure** (build error, test failure, lint error, deployment config issue):
    - Proceed to Step 4b-3
 
-#### Step 4b-3: Fix Code/Config Failures
+#### Step 4b-3: Classify and Fix Code/Config Failures
 
-1. Create a fix branch (worktree-safe):
-   ```bash
-   git fetch origin
-   git checkout -b fix/ci-<run_id> origin/main
-   ```
+1. Analyze the error logs and classify the failure type:
 
-2. Analyze the error logs and identify the root cause:
-   - Build failures: missing dependencies, type errors, compilation errors
-   - Test failures: broken tests, missing test fixtures, environment issues
-   - Lint/format failures: code style violations
-   - Deployment failures: misconfigured workflows, wrong secrets references
+   **Quick Fix (fix immediately):**
+   - Lint/format violations (prettier, eslint)
+   - Simple type errors (missing imports, typos)
+   - Outdated snapshots
+   - Missing semicolons or trivial syntax issues
+   - Wrong file paths in configs
+   - Clear one-line fixes
 
-3. Fix the issue in the worktree
+   **Needs Investigation (create ticket):**
+   - Test failures with unclear root cause
+   - Complex build errors affecting multiple files
+   - Race conditions or flaky tests
+   - Deployment/infrastructure issues
+   - Database migration failures
+   - Environment-specific bugs
+   - Anything requiring >15 minutes of analysis
 
-4. Run the relevant checks locally to verify the fix:
-   - Build: `cd platform/frontend && npm run build`
-   - Tests: `cd platform/frontend && npm test`
-   - Backend: `cd platform/backend/AiDevRequest.API && dotnet build`
+2. **If QUICK FIX:**
 
-5. Commit and push:
-   ```bash
-   git add -A
-   git commit -m "fix: resolve CI failure from Actions run #<run_id>"
-   git push origin fix/ci-<run_id>
-   ```
+   a. Create a fix branch (worktree-safe):
+      ```bash
+      git fetch origin
+      git checkout -b fix/ci-<run_id> origin/main
+      ```
 
-6. Create a PR:
-   ```bash
-   gh pr create --repo bradyoo12/ai-dev-request --title "[CI Fix] <short description of failure>" --body "Fixes CI failure from GitHub Actions run #<run_id>.\n\n**Root cause:** <description>\n**Fix:** <what was changed>"
-   ```
+   b. Fix the issue in the worktree
 
-7. Create a tracking ticket (REST):
-   ```bash
-   gh api --method POST "repos/bradyoo12/ai-dev-request/issues" \
-     -f title="[CI Fix] <short description>" \
-     -f body="GitHub Actions run #<run_id> failed on \`main\` branch.\n\n**Error:** <error summary>\n**Root cause:** <description>\n**Fix PR:** #<pr_number>" \
-     -f "labels[]=bug"
-   ```
+   c. Run the relevant checks locally to verify the fix:
+      - Build: `cd platform/frontend && npm run build`
+      - Tests: `cd platform/frontend && npm test`
+      - Backend: `cd platform/backend/AiDevRequest.API && dotnet build`
 
-8. Add the ticket to the project and set to **In Progress**:
-   ```bash
-   ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url <issue_url> --format json --jq '.id')
-   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
-   gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
-   ```
+   d. Commit and push:
+      ```bash
+      git add -A
+      git commit -m "fix: resolve CI failure from Actions run #<run_id>
 
-9. Process this fix through b-progress (Step 4) to merge immediately — CI fixes are high priority.
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+      git push origin fix/ci-<run_id>
+      ```
 
-10. After the fix PR is merged, verify the Actions run passes:
-    ```bash
-    # Wait briefly for the new run to start
-    sleep 30
-    gh run list --repo bradyoo12/ai-dev-request --branch main --limit 3 --json databaseId,status,conclusion,name
-    ```
-    - If still failing, retry the fix (up to 3 attempts total)
-    - If still failing after 3 attempts, add `on hold` label to the ticket and proceed to Step 5
+   e. Create a PR and merge immediately:
+      ```bash
+      gh pr create --repo bradyoo12/ai-dev-request --title "[CI Fix] <short description of failure>" --body "Fixes CI failure from GitHub Actions run #<run_id>.\n\n**Root cause:** <description>\n**Fix:** <what was changed>"
+      # Wait for PR number
+      gh pr merge <pr_number> --merge --delete-branch
+      ```
+
+   f. Return to worktree main and verify:
+      ```bash
+      git fetch origin && git checkout --detach origin/main
+      sleep 30
+      gh run list --repo bradyoo12/ai-dev-request --branch main --limit 3 --json databaseId,status,conclusion,name
+      ```
+
+   g. Log: "Fixed CI failure #<run_id> immediately"
+
+3. **If NEEDS INVESTIGATION:**
+
+   a. Create a detailed investigation ticket (REST):
+      ```bash
+      gh api --method POST "repos/bradyoo12/ai-dev-request/issues" \
+        -f title="[CI] Investigate failure in <workflow_name>" \
+        -f body="GitHub Actions run #<run_id> failed on \`main\` branch.\n\n**Workflow:** <workflow_name>\n**Branch:** <branch>\n**Error Summary:**\n\`\`\`\n<error_log_excerpt>\n\`\`\`\n\n**Reproduction:** Logs available at https://github.com/bradyoo12/ai-dev-request/actions/runs/<run_id>\n\n**Classification:** Needs investigation due to <reason>\n\n**Next Steps:**\n1. Analyze root cause\n2. Determine fix approach\n3. Implement and test fix\n4. Verify CI passes" \
+        -f "labels[]=bug" \
+        -f "labels[]=ci"
+      ```
+
+   b. Add the ticket to the project and set to **Ready**:
+      ```bash
+      ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url <issue_url> --format json --jq '.id')
+      gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
+      gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
+      ```
+
+   c. Log: "Created investigation ticket for CI failure #<run_id> - ticket #<issue_number>"
+
+   d. Proceed to Step 5 (this ticket will be picked up in the next cycle)
 
 ### Step 5: b-review — Verify with Agent Team
 

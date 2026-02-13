@@ -993,6 +993,16 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **Frontend**: `AiModelPage` in Settings with "AI Model" tab — 3 sub-tabs (Models with model selector cards showing capabilities/pricing, Configure with extended thinking toggle + budget slider + streaming toggle, Stats with usage metrics)
 - **Flow**: Open AI Model tab → select model (Opus 4.6 for complex tasks, Sonnet 4.5 for speed) → enable extended thinking with budget → configure streaming → view per-model usage stats
 
+### #384 — Multi-Provider AI Model Selection (Claude + Gemini)
+- **Backend**: Provider abstraction via `IModelProviderService` interface with `ClaudeProviderService` and `GeminiProviderService` implementations
+- **Endpoints**:
+  - `GET /api/ai-model/providers` — list available providers (Claude, Gemini) with model counts and capabilities
+  - `GET /api/ai-model/models?provider={provider}` — list models for a specific provider with pricing and tier mapping
+- **Entity**: `AiModelConfig` extended with `PreferredProvider` (string), `GeminiSafetyLevel` (BLOCK_NONE to BLOCK_MOST), `GeminiTemperature` (0.0-1.0)
+- **Services**: All AI services (`AnalysisService`, `ProposalService`, `ProductionService`) updated with tier-based provider routing via `ModelRouterService`
+- **Frontend**: `AiModelPage` extended with provider selector dropdown, Gemini-specific settings panel (safety level + temperature), per-provider stats breakdown
+- **Flow**: Select provider → if Gemini, configure safety/temperature → system routes using tier-based model selection (Haiku/Flash for speed, Sonnet/Pro for balance, Opus for complex) → view per-provider usage stats
+
 ### #357 — Purchasable Credit System with Multi-Currency Support (PR #369)
 - **Backend**: `ExchangeRateService` manages exchange rate caching (IMemoryCache, 24h TTL) and dynamic credit calculation; `CreditController` provides credit-specific API
 - **Endpoints**:

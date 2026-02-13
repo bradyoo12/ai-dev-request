@@ -152,6 +152,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<BuildToolchainResult> BuildToolchainResults => Set<BuildToolchainResult>();
     public DbSet<VisionToCodeResult> VisionToCodeResults => Set<VisionToCodeResult>();
     public DbSet<DotnetUpgradeResult> DotnetUpgradeResults => Set<DotnetUpgradeResult>();
+    public DbSet<ParallelAgentRun> ParallelAgentRuns => Set<ParallelAgentRun>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

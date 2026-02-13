@@ -26,7 +26,7 @@ const CompliancePage = lazy(() => import('./pages/CompliancePage'))
 const InfrastructurePage = lazy(() => import('./pages/InfrastructurePage'))
 const BuyCreditsPage = lazy(() => import('./pages/BuyCreditsPage'))
 const SupportBoardPage = lazy(() => import('./pages/SupportBoardPage'))
-const SubagentOrchestrationPage = lazy(() => import('./pages/SubagentOrchestrationPage'))
+// const SubagentOrchestrationPage = lazy(() => import('./pages/SubagentOrchestrationPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {

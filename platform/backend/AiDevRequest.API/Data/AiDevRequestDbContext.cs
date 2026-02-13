@@ -146,6 +146,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AgentTerminalSession> AgentTerminalSessions => Set<AgentTerminalSession>();
     public DbSet<ComposerPlan> ComposerPlans => Set<ComposerPlan>();
     public DbSet<PerformanceOptimization> PerformanceOptimizations => Set<PerformanceOptimization>();
+    public DbSet<ModelRoutingRule> ModelRoutingRules => Set<ModelRoutingRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

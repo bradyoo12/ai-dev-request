@@ -31,6 +31,7 @@ export interface CreateDevRequestDto {
   screenshotMediaType?: string;
   framework?: string;
   powerLevel?: string;
+  preferredModel?: string;
 }
 
 export interface DevRequestResponse {

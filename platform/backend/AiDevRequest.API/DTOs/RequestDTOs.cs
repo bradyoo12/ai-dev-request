@@ -29,6 +29,11 @@ public record CreateDevRequestDto
     /// AI power level: standard, extended, high_power (default: standard)
     /// </summary>
     public string? PowerLevel { get; init; }
+
+    /// <summary>
+    /// Preferred AI model: claude:claude-opus-4-6, claude:claude-sonnet-4-5-20250929, claude:claude-haiku-4-5-20251001 (default: user config)
+    /// </summary>
+    public string? PreferredModel { get; init; }
 }
 
 public record DevRequestResponseDto
@@ -109,7 +114,8 @@ public static class DevRequestMappings
             ScreenshotBase64 = dto.ScreenshotBase64,
             ScreenshotMediaType = dto.ScreenshotMediaType,
             Framework = dto.Framework,
-            PowerLevel = powerLevel
+            PowerLevel = powerLevel,
+            PreferredModel = dto.PreferredModel
         };
     }
 }

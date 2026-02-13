@@ -1664,3 +1664,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: Green/yellow/red confidence levels with score percentages, complexity/ambiguity/feasibility ratings, refinement suggestions for low-confidence requests, estimated effort, accuracy tracking
 - **Frontend**: `ConfidenceScorePage` in Settings at `/settings/confidence-scoring` with 4 sub-tabs (Evaluate, History, Levels, Stats)
 - **Ticket**: #503 — `AI task confidence scoring with batch issue triage`
+
+### AI Model Marketplace
+- **Backend**: `AiModelIntegration` entity + `AiModelIntegrationController` (`api/ai-model-integrations`)
+- **Endpoints**: POST integrate (generates SDK code snippets per provider/model), GET list, DELETE {id}, GET stats (by provider), GET providers (anonymous, 5 providers with model catalogs)
+- **Providers**: Anthropic (Claude Opus 4.6/Sonnet 4.5/Haiku 4.5), OpenAI (GPT-4o/DALL-E 3/Whisper), Google AI (Gemini 2.5 Pro/Flash), Hugging Face (Llama 3.1/SDXL), OpenRouter (Auto Router)
+- **Features**: Integration code generation per provider SDK, secure credential management via environment variables, capability-based model selection (chat/image-gen/embeddings/speech/classification), cost estimation per request, browseable provider catalog with quality/speed/cost ratings
+- **Frontend**: `AiModelMarketplacePage` in Settings at `/settings/ai-marketplace` with 4 sub-tabs (Integrate, History, Providers, Stats)
+- **Ticket**: #504 — `Integrated AI model marketplace for generated apps`

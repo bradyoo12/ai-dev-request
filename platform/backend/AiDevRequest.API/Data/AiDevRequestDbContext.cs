@@ -135,6 +135,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<LangGraphWorkflow> LangGraphWorkflows => Set<LangGraphWorkflow>();
     public DbSet<HybridCacheEntry> HybridCacheEntries => Set<HybridCacheEntry>();
     public DbSet<PlaywrightHealingResult> PlaywrightHealingResults => Set<PlaywrightHealingResult>();
+    public DbSet<SelfHealingRun> SelfHealingRuns => Set<SelfHealingRun>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

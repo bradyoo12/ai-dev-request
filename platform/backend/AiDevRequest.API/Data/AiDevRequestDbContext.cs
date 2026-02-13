@@ -139,6 +139,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ProductionSandbox> ProductionSandboxes => Set<ProductionSandbox>();
     public DbSet<OrgMemory> OrgMemories => Set<OrgMemory>();
     public DbSet<AiAgentRule> AiAgentRules => Set<AiAgentRule>();
+    public DbSet<ServerComponentConfig> ServerComponentConfigs => Set<ServerComponentConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

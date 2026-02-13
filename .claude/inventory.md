@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 101 Controllers | 86 Services | 111 Entities | 96 Pages | 90 API modules | 32 Components
+**Counts**: 102 Controllers | 89 Services | 113 Entities | 98 Pages | 91 API modules | 33 Components
 
 ---
 
@@ -149,6 +149,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 
 | Controller | Route | Purpose |
 |---|---|---|
+| ProjectsController | /api/projects | Project list, detail, cost estimation, real-time logs |
 | ProjectVersionController | /api/projects/{id}/versions | Version history & diff |
 | OnboardingController | /api/onboarding | User onboarding wizard |
 | PipelinesController | /api/pipelines | Dev pipeline builder |
@@ -270,6 +271,14 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | SecureConfigService | Secure configuration management |
 | OAuthComplianceService | OAuth compliance checking |
 
+### Project Management
+
+| Service | Purpose |
+|---|---|
+| ProjectAggregationService | Aggregate project data from deployments, requests, usage |
+| ProjectCostEstimationService | Calculate daily project cloud costs |
+| LogStreamService | SSE streaming for real-time project logs |
+
 ### Infrastructure & Deployment
 
 | Service | Purpose |
@@ -347,6 +356,8 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 |---|---|
 | DevRequest | Development request (main entity) |
 | User | User account |
+| Project | Deployed project with URL, cost, and logs |
+| ProjectLog | Real-time project logs (debug, info, warning, error) |
 | DevRequestBranch | Branch per dev request |
 | ProjectTemplate | Reusable project template |
 | ProjectVersion | Version snapshot of a project |
@@ -550,6 +561,8 @@ All under `platform/frontend/src/pages/`. 96 pages total.
 |---|---|---|
 | SitesPage | /sites | User sites list |
 | MySitesPage | /sites (alt) | My sites dashboard |
+| ProjectsPage | /projects | Projects list with cost, plan, and URLs |
+| ProjectDetailPage | /projects/:id | Project detail with logs, cost, and metrics |
 | PreviewPage | /preview | Project preview |
 | PreviewDeploymentPage | /settings/preview-deployment | Edge preview deploys |
 | ProjectVersionPage | /settings/version-history | Version history & diff |
@@ -764,6 +777,12 @@ All under `platform/frontend/src/components/`.
 | WorkflowGraphView | Visual workflow DAG viewer |
 | WorkflowExecutionTimeline | Workflow execution timeline |
 
+### Monitoring & Logs
+
+| Component | Purpose |
+|---|---|
+| RealTimeLogViewer | SSE real-time log streaming viewer with filters |
+
 ### Visual Editor (`components/visual-editor/`)
 
 | Component | Purpose |
@@ -796,6 +815,7 @@ All under `platform/frontend/src/api/`. 90 modules total.
 | settings.ts | SettingsController | App settings |
 | apikeys.ts | ApiKeysController | API key management |
 | sites.ts | SitesController | Site management |
+| projects.ts | ProjectsController | Projects list, detail, cost, logs |
 | hosting.ts | HostingController | Hosting plans |
 | domains.ts | DomainsController | Domain management |
 

@@ -146,7 +146,7 @@ These items can be decided autonomously without adding `on hold`:
 ```
 ai-dev-request/
 ├── platform/           # SaaS platform code
-│   ├── backend/        # .NET 9 API server (prepared for .NET 10 upgrade)
+│   ├── backend/        # .NET 10 LTS API server
 │   ├── frontend/       # React + Vite web app
 │   └── ai-engine/      # Claude API integration
 ├── projects/           # Generated customer projects

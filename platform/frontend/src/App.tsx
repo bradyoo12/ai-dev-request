@@ -27,6 +27,7 @@ const InfrastructurePage = lazy(() => import('./pages/InfrastructurePage'))
 const BuyCreditsPage = lazy(() => import('./pages/BuyCreditsPage'))
 const SupportBoardPage = lazy(() => import('./pages/SupportBoardPage'))
 // const SubagentOrchestrationPage = lazy(() => import('./pages/SubagentOrchestrationPage'))
+const IterativeRefinementPage = lazy(() => import('./pages/IterativeRefinementPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {
@@ -89,6 +90,7 @@ function App() {
             <Route path="/infrastructure" element={<Suspense fallback={LazyFallback}><InfrastructurePage /></Suspense>} />
             <Route path="/buy-credits" element={<Suspense fallback={LazyFallback}><BuyCreditsPage /></Suspense>} />
             <Route path="/support" element={<Suspense fallback={LazyFallback}><SupportBoardPage /></Suspense>} />
+            <Route path="/requests/:id/refine" element={<Suspense fallback={LazyFallback}><IterativeRefinementPage /></Suspense>} />
             <Route path="/settings/orchestration" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/langgraph" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/hybrid-cache" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />

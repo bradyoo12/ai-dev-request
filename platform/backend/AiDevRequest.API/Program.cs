@@ -25,6 +25,9 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IModelRouterService, ModelRouterService>();
 builder.Services.AddSingleton<ICostTrackingService, CostTrackingService>();
 
+// Add adaptive thinking service (scoped: per-request, uses DbContext)
+builder.Services.AddScoped<IAdaptiveThinkingService, AdaptiveThinkingService>();
+
 // Add AI Services (singleton: reads API key once at startup; config changes require restart)
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();
@@ -50,6 +53,7 @@ builder.Services.AddScoped<IMultiAgentReviewService, MultiAgentReviewService>();
 builder.Services.AddScoped<ICiCdService, CiCdService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();
+builder.Services.AddScoped<IIterationService, IterationService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 builder.Services.AddScoped<IDatabaseSchemaService, DatabaseSchemaService>();
 builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();

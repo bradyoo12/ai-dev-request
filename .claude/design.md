@@ -1415,3 +1415,18 @@ Semantic codebase analysis with dependency mapping, ripple effect analysis, and 
 - **Frontend**: `DeepWikiPage` in Settings with 4 sub-tabs (Analyze, Impact, History, Stats). Analyze tab maps codebase graph with node breakdown, architecture health, and high-impact files. Impact tab analyzes ripple effects of file changes with affected files list. History tab lists past analyses. Stats tab shows aggregate metrics
 - **Entity**: `CodebaseGraph` with TotalNodes, TotalEdges, Components, Pages, Services, Utilities, MaxDepth, AvgConnections, CircularDeps, CouplingScore, CohesionScore, ComplexityScore, AnalysisMode, Status
 - **Ticket**: #457 — `DeepWiki codebase awareness with semantic dependency mapping`
+
+### Build Toolchain Benchmarks (Vite 8 Rolldown)
+
+Simulated build toolchain benchmark comparing Rolldown (Vite 8) vs esbuild+Rollup (Vite 7):
+- **Backend**: `BuildToolchainResult` entity with dev/HMR/build/bundle metrics and speedup factor. `BuildToolchainController` with benchmark, list, delete, stats, and bundlers endpoints
+- **Endpoints**:
+  - `GET /api/build-toolchain` — list benchmarks (50 limit)
+  - `POST /api/build-toolchain/benchmark` — run simulated benchmark with Rolldown vs esbuild+Rollup comparison (max 50 per user)
+  - `DELETE /api/build-toolchain/{id}` — delete benchmark
+  - `GET /api/build-toolchain/stats` — benchmark statistics (by bundler, by status)
+  - `GET /api/build-toolchain/bundlers` — list 2 bundlers: Rolldown Vite 8 and esbuild+Rollup Vite 7 (anonymous)
+- **Metrics**: Dev Startup (ms), HMR Latency (ms), Build Duration (ms), Bundle Size (KB), Chunks Generated, Tree-Shaking (%), Code-Split Savings (%)
+- **Frontend**: `BuildToolchainPage` in Settings with 4 sub-tabs (Benchmark, History, Bundlers, Stats). Benchmark tab runs simulated comparison with side-by-side metric cards. Bundlers tab shows bundler cards and Vite 8 key features. History/Stats tabs show historical data and aggregates
+- **Entity**: `BuildToolchainResult` with Bundler, TotalModules, DevStartupMs, HmrLatencyMs, BuildDurationMs, BundleSizeKb, ChunksGenerated, TreeShakingPercent, CodeSplitSavingsPercent, SpeedupFactor, FullBundleMode, Status
+- **Ticket**: #461 — `Vite 8 Rolldown build toolchain benchmarks`

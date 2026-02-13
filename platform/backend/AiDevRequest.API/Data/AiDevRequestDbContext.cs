@@ -1925,7 +1925,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             entity.Property(e => e.RewardCredit).HasColumnType("decimal(18,2)");
             entity.Property(e => e.RewardedByUserId).HasMaxLength(100);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed foreign key constraint to prevent 500 errors when User records are missing
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);

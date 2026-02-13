@@ -2,6 +2,7 @@ using System.Text;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using Microsoft.EntityFrameworkCore;
+using LogLevel = AiDevRequest.API.Entities.LogLevel;
 
 namespace AiDevRequest.API.Services;
 

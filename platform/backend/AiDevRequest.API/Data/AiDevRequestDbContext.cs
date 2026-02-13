@@ -154,6 +154,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DotnetUpgradeResult> DotnetUpgradeResults => Set<DotnetUpgradeResult>();
     public DbSet<ParallelAgentRun> ParallelAgentRuns => Set<ParallelAgentRun>();
     public DbSet<WebMcpSession> WebMcpSessions => Set<WebMcpSession>();
+    public DbSet<AgentSdkSession> AgentSdkSessions => Set<AgentSdkSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

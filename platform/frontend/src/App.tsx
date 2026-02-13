@@ -113,6 +113,7 @@ function App() {
             <Route path="/settings/dotnet10-upgrade" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/parallel-agents" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/settings/webmcp" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/settings/agent-sdk" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
             <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" /></div>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />
           </Route>

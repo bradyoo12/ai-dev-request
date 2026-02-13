@@ -132,6 +132,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ParallelOrchestration> ParallelOrchestrations => Set<ParallelOrchestration>();
     public DbSet<CodeReviewAgent> CodeReviewAgents => Set<CodeReviewAgent>();
     public DbSet<MultiAgentReview> MultiAgentReviews => Set<MultiAgentReview>();
+    public DbSet<LangGraphWorkflow> LangGraphWorkflows => Set<LangGraphWorkflow>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1115,3 +1115,22 @@ Monitors deployed projects for uptime, errors, and performance degradation, with
 - **E2E Test Coverage**: Agent automatically creates Playwright tests for new pages, forms, user workflows, API integrations, accessibility features, and i18n
 - **Test Patterns**: E2E tests follow existing patterns in `platform/frontend/e2e/` (accessibility.spec.ts, homepage.spec.ts, i18n.spec.ts, navigation.spec.ts, form.spec.ts)
 - **Documentation**: Updated `.claude/commands/b-start.md` and `.claude/agents/b-ready.md` with E2E test creation guidance
+
+## LangGraph Multi-Agent Orchestration
+
+DAG-based multi-agent workflow orchestration for code generation pipelines:
+- **Backend**: `LangGraphWorkflow` entity tracks workflow state (nodes, edges, execution state, cache hits, stampede protection). `LangGraphController` provides 8 endpoints for CRUD, execution, templates, and stats
+- **Endpoints**:
+  - `GET /api/langgraph/workflows` — list user workflows
+  - `POST /api/langgraph/workflows` — create workflow with selected node types
+  - `GET /api/langgraph/workflows/{id}` — get workflow details
+  - `POST /api/langgraph/workflows/{id}/execute` — execute workflow (simulated)
+  - `POST /api/langgraph/workflows/{id}/pause` — toggle pause/resume
+  - `GET /api/langgraph/node-types` — list available agent node types (anonymous)
+  - `GET /api/langgraph/templates` — list workflow templates (anonymous)
+  - `GET /api/langgraph/stats` — workflow statistics
+- **Frontend**: `LangGraphPage` in Settings with 4 sub-tabs (Create, Workflows, Templates, Stats). Create tab has node type selector with pipeline visualization. Workflows tab shows status, execution controls, and node progress. Templates tab offers pre-built pipelines. Stats tab shows aggregated metrics
+- **Node Types**: Analyzer, Code Generator, Code Reviewer, Test Generator, Deployer, Custom Agent
+- **Templates**: Code Review Pipeline, Full-Stack Generator, Test Automation
+- **Entity**: `LangGraphWorkflow` with NodesJson, EdgesJson, ExecutionStateJson, TotalNodes, CompletedNodes, FailedNodes, StampedeProtectionEnabled, CacheHitsCount, TotalExecutions, AvgExecutionTimeMs
+- **Ticket**: #420 — `LangGraph multi-agent orchestration for code generation workflow`

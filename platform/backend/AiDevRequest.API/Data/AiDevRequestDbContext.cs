@@ -134,6 +134,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<MultiAgentReview> MultiAgentReviews => Set<MultiAgentReview>();
     public DbSet<LangGraphWorkflow> LangGraphWorkflows => Set<LangGraphWorkflow>();
     public DbSet<HybridCacheEntry> HybridCacheEntries => Set<HybridCacheEntry>();
+    public DbSet<PlaywrightHealingResult> PlaywrightHealingResults => Set<PlaywrightHealingResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

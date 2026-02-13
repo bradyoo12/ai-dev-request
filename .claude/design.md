@@ -1398,3 +1398,20 @@ Rust-based all-in-one linting and formatting replacing ESLint + Prettier with 4x
 - **Frontend**: `BiomeLintPage` in Settings with 4 sub-tabs (Run, History, Presets, Stats). Run tab compares Biome vs ESLint+Prettier speed with detailed breakdown. History tab lists past runs. Presets tab shows config presets and key features. Stats tab shows aggregate metrics
 - **Entity**: `BiomeLintResult` with Toolchain (biome/eslint-prettier), LintDurationMs, FormatDurationMs, TotalDurationMs, SpeedupFactor, TypeAwareEnabled, TypeAwareIssues, ConfigPreset, Errors, Warnings, AutoFixed, Status
 - **Ticket**: #456 — `Biome toolchain integration for 4x faster linting and formatting`
+
+### DeepWiki Codebase Awareness (Semantic Dependency Mapping)
+
+Semantic codebase analysis with dependency mapping, ripple effect analysis, and architecture health scoring:
+- **Backend**: `CodebaseGraph` entity with node/edge counts, architecture metrics, and health scores. `CodebaseGraphController` with analyze, impact, list, delete, stats, and modes endpoints
+- **Endpoints**:
+  - `GET /api/codebase-graph` — list analyses (50 limit)
+  - `POST /api/codebase-graph/analyze` — analyze codebase structure with node types, health metrics, and high-impact files (max 50 per user)
+  - `POST /api/codebase-graph/impact` — ripple effect analysis for file changes (direct/indirect impact, risk level, affected files)
+  - `DELETE /api/codebase-graph/{id}` — delete analysis
+  - `GET /api/codebase-graph/stats` — analysis statistics (by mode, by status)
+  - `GET /api/codebase-graph/modes` — list 3 modes: full/dependencies-only/impact-only (anonymous)
+- **Node Types**: Component (#3B82F6), Page (#10B981), Service (#F59E0B), Utility (#8B5CF6)
+- **Health Metrics**: Coupling Score, Cohesion Score, Complexity, Circular Dependencies
+- **Frontend**: `DeepWikiPage` in Settings with 4 sub-tabs (Analyze, Impact, History, Stats). Analyze tab maps codebase graph with node breakdown, architecture health, and high-impact files. Impact tab analyzes ripple effects of file changes with affected files list. History tab lists past analyses. Stats tab shows aggregate metrics
+- **Entity**: `CodebaseGraph` with TotalNodes, TotalEdges, Components, Pages, Services, Utilities, MaxDepth, AvgConnections, CircularDeps, CouplingScore, CohesionScore, ComplexityScore, AnalysisMode, Status
+- **Ticket**: #457 — `DeepWiki codebase awareness with semantic dependency mapping`

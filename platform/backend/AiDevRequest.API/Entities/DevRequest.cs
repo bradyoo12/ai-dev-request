@@ -28,6 +28,9 @@ public class DevRequest
     // AI power level for dynamic intelligence
     public PowerLevel PowerLevel { get; set; } = PowerLevel.Standard;
 
+    // Preferred AI model (provider-qualified format: "claude:claude-sonnet-4-5-20250929")
+    public string? PreferredModel { get; set; }
+
     // Request classification
     public RequestCategory Category { get; set; } = RequestCategory.Unknown;
 

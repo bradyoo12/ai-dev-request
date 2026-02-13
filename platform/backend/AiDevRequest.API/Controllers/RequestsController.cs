@@ -190,7 +190,7 @@ public class RequestsController : ControllerBase
         {
             // Call AI analysis service (with optional screenshot for multimodal analysis)
             var analysisResult = await _analysisService.AnalyzeRequestAsync(
-                entity.Description, entity.ScreenshotBase64, entity.ScreenshotMediaType);
+                entity.Description, entity.ScreenshotBase64, entity.ScreenshotMediaType, entity.PreferredModel);
 
             // Update entity with analysis results
             entity.AnalysisResultJson = JsonSerializer.Serialize(analysisResult);

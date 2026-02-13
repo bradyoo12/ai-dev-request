@@ -8,7 +8,7 @@ namespace AiDevRequest.API.Services;
 
 public interface IAnalysisService
 {
-    Task<AnalysisResult> AnalyzeRequestAsync(string description, string? screenshotBase64 = null, string? screenshotMediaType = null);
+    Task<AnalysisResult> AnalyzeRequestAsync(string description, string? screenshotBase64 = null, string? screenshotMediaType = null, string? preferredModel = null);
 }
 
 public class AnalysisService : IAnalysisService
@@ -34,7 +34,7 @@ public class AnalysisService : IAnalysisService
         _logger = logger;
     }
 
-    public async Task<AnalysisResult> AnalyzeRequestAsync(string description, string? screenshotBase64 = null, string? screenshotMediaType = null)
+    public async Task<AnalysisResult> AnalyzeRequestAsync(string description, string? screenshotBase64 = null, string? screenshotMediaType = null, string? preferredModel = null)
     {
         var screenshotInstruction = !string.IsNullOrEmpty(screenshotBase64)
             ? "\n\n사용자가 디자인 스크린샷/이미지를 첨부했습니다. 이 이미지의 UI/UX 디자인을 분석하여 요청 내용과 함께 고려해주세요. 이미지에서 보이는 레이아웃, 컴포넌트, 색상 등을 요구사항에 반영하세요.\n"
@@ -108,9 +108,19 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
             // Text-only analysis: Use provider abstraction with tier-based routing
             else
             {
-                var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.Analysis);
-                var qualifiedModelId = _modelRouter.GetModelId(recommendedTier);
-                _logger.LogInformation("Analysis task: tier={Tier}, model={Model}", recommendedTier, qualifiedModelId);
+                // Use provided model or fall back to router recommendation
+                string qualifiedModelId;
+                if (!string.IsNullOrEmpty(preferredModel))
+                {
+                    qualifiedModelId = preferredModel;
+                    _logger.LogInformation("Analysis task: using preferred model={Model}", qualifiedModelId);
+                }
+                else
+                {
+                    var recommendedTier = _modelRouter.GetRecommendedTier(TaskCategory.Analysis);
+                    qualifiedModelId = _modelRouter.GetModelId(recommendedTier);
+                    _logger.LogInformation("Analysis task: tier={Tier}, model={Model}", recommendedTier, qualifiedModelId);
+                }
 
                 // Parse provider:model format
                 var (providerName, modelId) = ParseModelId(qualifiedModelId);

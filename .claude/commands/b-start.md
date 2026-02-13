@@ -126,12 +126,17 @@ This pattern works in both regular repos and worktrees, so all agents and comman
 **CRITICAL AUTONOMOUS OPERATION RULES:**
 - ✅ **ALWAYS** proceed to the next cycle automatically after completing a cycle
 - ✅ **ALWAYS** continue looping until the user presses Ctrl+C
+- ✅ **When presenting "Next Steps", IMMEDIATELY execute the first step without asking**
 - ❌ **NEVER** ask "Would you like me to continue?" or any variation
 - ❌ **NEVER** ask "What would you prefer?" or offer options to stop/continue
+- ❌ **NEVER** ask "Do you want me to continue? Or did you have a specific question?"
 - ❌ **NEVER** wait for user confirmation to proceed to the next ticket
 - ❌ **NEVER** say "Stop here" or suggest stopping
 
 **The pipeline runs autonomously in an infinite loop. It does not require or request user permission to continue.**
+
+**"Next Steps" Protocol:**
+When you produce a "Next Steps" list (numbered or bulleted), you MUST immediately proceed with executing the first item. Do NOT present the list and then ask the user what to do. The "Next Steps" list is informational only - showing the user what you're about to do, not asking for permission.
 
 Execute this workflow in sequence, then loop:
 
@@ -798,10 +803,13 @@ Log the current status of the project board:
 - ❌ "What would you prefer?"
 - ❌ "Stop here - You've seen how the pipeline works"
 - ❌ "Should I process the next ticket?"
+- ❌ "Do you want me to continue? Or did you have a specific question about the pipeline?"
+- ❌ Presenting "Next Steps" followed by asking what to do
 
 **What to do instead:**
 - ✅ Just log "Starting Cycle #N..." and go to Step 1
 - ✅ Continue autonomously until Ctrl+C
+- ✅ When showing "Next Steps", immediately execute the first step without asking
 
 ## Ticket Flow Summary
 

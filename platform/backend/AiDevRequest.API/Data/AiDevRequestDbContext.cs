@@ -137,6 +137,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HybridCacheEntry> HybridCacheEntries => Set<HybridCacheEntry>();
     public DbSet<PlaywrightHealingResult> PlaywrightHealingResults => Set<PlaywrightHealingResult>();
     public DbSet<SelfHealingRun> SelfHealingRuns => Set<SelfHealingRun>();
+    public DbSet<OrganizationalMemory> OrganizationalMemories => Set<OrganizationalMemory>();
     public DbSet<ProductionSandbox> ProductionSandboxes => Set<ProductionSandbox>();
     public DbSet<OrgMemory> OrgMemories => Set<OrgMemory>();
     public DbSet<AiAgentRule> AiAgentRules => Set<AiAgentRule>();
@@ -161,6 +162,11 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WorkersAiDeployment> WorkersAiDeployments => Set<WorkersAiDeployment>();
     public DbSet<ReactUseHookDemo> ReactUseHookDemos => Set<ReactUseHookDemo>();
     public DbSet<EditPrediction> EditPredictions => Set<EditPrediction>();
+    public DbSet<AdaptiveThinkingConfig> AdaptiveThinkingConfigs => Set<AdaptiveThinkingConfig>();
+    public DbSet<MultiAgentTestSession> MultiAgentTestSessions => Set<MultiAgentTestSession>();
+    public DbSet<TestPersona> TestPersonas => Set<TestPersona>();
+    public DbSet<AgentTestExecution> AgentTestExecutions => Set<AgentTestExecution>();
+    public DbSet<ConcurrencyIssue> ConcurrencyIssues => Set<ConcurrencyIssue>();
     public DbSet<BrowserIdeSession> BrowserIdeSessions => Set<BrowserIdeSession>();
     public DbSet<GovernanceAction> GovernanceActions => Set<GovernanceAction>();
     public DbSet<InferenceCostRecord> InferenceCostRecords => Set<InferenceCostRecord>();

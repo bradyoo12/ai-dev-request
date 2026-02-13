@@ -25,6 +25,9 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IModelRouterService, ModelRouterService>();
 builder.Services.AddSingleton<ICostTrackingService, CostTrackingService>();
 
+// Add adaptive thinking service (scoped: per-request, uses DbContext)
+builder.Services.AddScoped<IAdaptiveThinkingService, AdaptiveThinkingService>();
+
 // Add AI Services (singleton: reads API key once at startup; config changes require restart)
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<IProposalService, ProposalService>();
@@ -50,10 +53,12 @@ builder.Services.AddScoped<IMultiAgentReviewService, MultiAgentReviewService>();
 builder.Services.AddScoped<ICiCdService, CiCdService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IRefinementService, RefinementService>();
+builder.Services.AddScoped<IIterationService, IterationService>();
 builder.Services.AddScoped<IDomainService, CloudflareDomainService>();
 builder.Services.AddScoped<IDatabaseSchemaService, DatabaseSchemaService>();
 builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
+builder.Services.AddScoped<IFigmaImportService, FigmaImportService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ITechTrendService, TechTrendService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
@@ -93,6 +98,9 @@ builder.Services.AddScoped<IPerformanceProfileService, PerformanceProfileService
 builder.Services.AddScoped<ISchemaDesignerService, SchemaDesignerService>();
 builder.Services.AddScoped<ISelfHealingTestService, SelfHealingTestService>();
 builder.Services.AddScoped<IDatabaseBranchService, DatabaseBranchService>();
+builder.Services.AddScoped<IMultiAgentTestService, MultiAgentTestService>();
+builder.Services.AddScoped<IPersonaSimulationService, PersonaSimulationService>();
+builder.Services.AddScoped<IConcurrencyDetectionService, ConcurrencyDetectionService>();
 builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 builder.Services.AddScoped<IUsageMeteringService, UsageMeteringService>();
 builder.Services.AddScoped<IAgentInboxService, AgentInboxService>();

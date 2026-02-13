@@ -6,10 +6,10 @@ namespace AiDevRequest.API.Services;
 
 public interface IIterationService
 {
-    Task<IterationResult> IterateAsync(Guid devRequestId, string message, string userId);
+    Task<RefinementIterationResult> IterateAsync(Guid devRequestId, string message, string userId);
 }
 
-public class IterationResult
+public class RefinementIterationResult
 {
     public string AssistantMessage { get; set; } = "";
     public List<string> ChangedFiles { get; set; } = new();
@@ -36,7 +36,7 @@ public class IterationService : IIterationService
         _logger = logger;
     }
 
-    public async Task<IterationResult> IterateAsync(Guid devRequestId, string message, string userId)
+    public async Task<RefinementIterationResult> IterateAsync(Guid devRequestId, string message, string userId)
     {
         _logger.LogInformation("Starting iteration for DevRequest {RequestId}", devRequestId);
 
@@ -78,7 +78,7 @@ public class IterationService : IIterationService
             devRequestId,
             applyResult.TotalChanges);
 
-        return new IterationResult
+        return new RefinementIterationResult
         {
             AssistantMessage = assistantMessage.Content,
             ChangedFiles = applyResult.ModifiedFiles.Concat(applyResult.CreatedFiles).ToList(),

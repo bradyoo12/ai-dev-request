@@ -35,7 +35,7 @@ public class IterationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IterationResponse>> Iterate(Guid id, [FromBody] IterateRequest request)
+    public async Task<ActionResult<IterationResponse>> Iterate(Guid id, [FromBody] IterationRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Message))
             throw new ArgumentException("Message is required");
@@ -63,7 +63,7 @@ public class IterationController : ControllerBase
     }
 }
 
-public class IterateRequest
+public class IterationRequest
 {
     public string Message { get; set; } = "";
 }

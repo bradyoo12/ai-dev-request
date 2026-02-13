@@ -89,7 +89,7 @@ export default function IterativeRefinementPage() {
     return langMap[ext || ''] || 'plaintext'
   }
 
-  const handleTokensUsed = (tokensUsed: number, newBalance: number) => {
+  const handleTokensUsed = (_tokensUsed: number, newBalance: number) => {
     setTokenBalance(newBalance)
   }
 

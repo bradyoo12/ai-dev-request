@@ -1250,3 +1250,20 @@ Cursor-style background agents that run tasks asynchronously without blocking th
 - **Frontend**: `AgentRulesPage` in Settings with 3 sub-tabs (Create, Rules, Stats). Create tab has form with title, content, scope selector, category dropdown, project name, priority slider (0-100). Rules tab shows filterable list with scope badges, toggle/delete actions. Stats tab shows total/active/applied metrics and breakdowns by scope and category
 - **Entity**: `AiAgentRule` with Scope (project/user/org), Category, Title, Content, ProjectName, IsActive, Priority (0-100), TimesApplied
 - **Ticket**: #435 — `.cursorrules-style AI agent configuration system`
+
+### React Server Components (RSC Configuration)
+
+React 19 Server Components configuration for generated projects with framework selection and performance analysis:
+- **Backend**: `ServerComponentConfig` entity with framework, render strategy, streaming/metadata/DB access options, and performance metrics. `ServerComponentController` with CRUD, analyze, stats, frameworks, and patterns endpoints
+- **Endpoints**:
+  - `GET /api/server-components` — list configs (filterable by framework)
+  - `GET /api/server-components/{id}` — get config
+  - `POST /api/server-components` — create config (50 per user limit)
+  - `POST /api/server-components/{id}/analyze` — run simulated performance analysis
+  - `DELETE /api/server-components/{id}` — delete config
+  - `GET /api/server-components/stats` — project statistics (by framework, by strategy)
+  - `GET /api/server-components/frameworks` — list frameworks (Next.js, Remix, Vite+RSC) with descriptions (anonymous)
+  - `GET /api/server-components/patterns` — list RSC code patterns (data fetching, streaming, metadata, client boundary) (anonymous)
+- **Frontend**: `ServerComponentsPage` in Settings with 4 sub-tabs (Configure, Projects, Patterns, Stats). Configure tab has project name, framework selector, render strategy, data fetching pattern, and checkboxes for streaming/metadata/DB. Projects tab shows configured projects with analysis metrics. Patterns tab displays RSC code examples. Stats tab shows aggregate metrics and breakdowns
+- **Entity**: `ServerComponentConfig` with Framework (nextjs/remix/vite-rsc), RenderStrategy (hybrid/ssr/ssc/client-only), StreamingEnabled, MetadataHoisting, DirectDbAccess, DataFetchingPattern, ServerComponentCount, ClientComponentCount, BundleSizeReductionPercent, InitialLoadMs, Status
+- **Ticket**: #436 — `React 19 Server Components for generated projects`

@@ -161,6 +161,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ReactUseHookDemo> ReactUseHookDemos => Set<ReactUseHookDemo>();
     public DbSet<EditPrediction> EditPredictions => Set<EditPrediction>();
     public DbSet<BrowserIdeSession> BrowserIdeSessions => Set<BrowserIdeSession>();
+    public DbSet<GovernanceAction> GovernanceActions => Set<GovernanceAction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

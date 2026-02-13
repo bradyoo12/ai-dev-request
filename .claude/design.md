@@ -1527,3 +1527,19 @@ Configurable terminal execution with policy-based safety controls, allowlist/den
 - **Frontend**: `TerminalExecutionPage` in Settings at `/settings/auto-terminal` with 4 sub-tabs (Execute, History, Policies, Stats)
 - **Entity**: `TerminalExecution` with ProjectName, Command, Category, AutoApproved, Blocked, BlockReason, ExitCode, OutputLines, DurationMs, SecurityLevel, Status
 - **Ticket**: #471 — `Autonomous terminal execution with configurable safety controls`
+
+### Turso Edge Database (Edge-Native SQLite)
+
+Edge-native SQLite database provisioning with global replication, vector search, and schema branching:
+- **Backend**: `TursoDatabase` entity tracking provisioned databases. `TursoDatabaseController` with provision, list, delete, stats, and regions endpoints
+- **Endpoints**:
+  - `GET /api/turso-database` — list databases (50 limit)
+  - `POST /api/turso-database/provision` — provision with configurable features: vector search, schema branching, embedded replica, global replication, sync mode
+  - `DELETE /api/turso-database/{id}` — delete database
+  - `GET /api/turso-database/stats` — database statistics (by region)
+  - `GET /api/turso-database/regions` — list 6 global regions with latency (anonymous)
+- **Features**: Vector search (cosine similarity, configurable dimensions), schema branching (git-like branches), embedded replicas (offline-capable), global replication (multi-region)
+- **Regions**: us-east-1, us-west-2, eu-west-1, eu-central-1, ap-southeast-1, ap-northeast-1
+- **Frontend**: `TursoDatabasePage` in Settings at `/settings/turso-database` with 4 sub-tabs (Provision, History, Regions, Stats)
+- **Entity**: `TursoDatabase` with ProjectName, DatabaseName, Region, ReplicaCount, ReplicaRegions, SizeBytes, TableCount, VectorSearchEnabled, VectorDimensions, SchemaBranchingEnabled, ActiveBranches, EmbeddedReplicaEnabled, ReadLatencyMs, WriteLatencyMs, SyncMode, Status
+- **Ticket**: #472 — `Turso embedded SQLite for edge-native project databases`

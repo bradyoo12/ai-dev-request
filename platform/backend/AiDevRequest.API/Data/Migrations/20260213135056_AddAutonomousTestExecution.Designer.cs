@@ -3,6 +3,7 @@ using System;
 using AiDevRequest.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiDevRequest.API.Data.Migrations
 {
     [DbContext(typeof(AiDevRequestDbContext))]
-    partial class AiDevRequestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260213135056_AddAutonomousTestExecution")]
+    partial class AddAutonomousTestExecution
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -717,6 +720,58 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("AgentTerminalSessions");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.AgentTestExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ActionsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ActionsJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<int>("IssuesCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IssuesJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LogsJson")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PersonaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("StackTrace")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AgentTestExecutions");
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.AgentTrace", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1039,9 +1094,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("EffortLevelConfigJson")
-                        .HasColumnType("text");
-
                     b.Property<decimal>("EstimatedCost")
                         .HasColumnType("numeric");
 
@@ -1061,9 +1113,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<bool>("StreamThinkingEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("StructuredOutputsEnabled")
                         .HasColumnType("boolean");
 
                     b.Property<int>("ThinkingBudgetTokens")
@@ -1481,6 +1530,54 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("auto_topup_configs", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.AutonomousTestExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CodeRegenerationAttempts")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CurrentIteration")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FinalTestResult")
+                        .HasColumnType("text");
+
+                    b.Property<int>("MaxIterations")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PreviewDeploymentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TestExecutionIds")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TestsPassed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AutonomousTestExecutions");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.BackgroundAgent", b =>
@@ -2598,6 +2695,63 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ComposerPlans");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.ConcurrencyIssue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AffectedPersonasJson")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ConfidenceScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConflictingOperations")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DetectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IssueType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResourcePath")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("StackTrace")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("SuggestedFixJson")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConcurrencyIssues");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.ConfidenceScore", b =>
@@ -5711,6 +5865,69 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("MultiAgentReviews");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.MultiAgentTestSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ConcurrencyLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConfigJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("FailedActions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IssuesDetected")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("OverallScore")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("PersonaCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ResultsJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScenarioType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("SuccessfulActions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalActions")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MultiAgentTestSessions");
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.NlSchema", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6195,6 +6412,38 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("OrgMemories");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.OrganizationalMemory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmbeddingVectorJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrganizationalMemories");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.ParallelAgentRun", b =>
@@ -6806,12 +7055,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ContainerGroupName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContainerName")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -6824,15 +7067,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Fqdn")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ImageUri")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Port")
-                        .HasColumnType("integer");
-
                     b.Property<string>("PreviewUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -6841,12 +7075,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Region")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ResourceGroupName")
-                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -7463,10 +7691,17 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<Guid>("DevRequestId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("FileChangesJson")
+                        .HasColumnType("text");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("TokensUsed")
                         .HasColumnType("integer");
@@ -8806,6 +9041,59 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("test_generation_records", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.TestPersona", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ActionsFailed")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ActionsPerformed")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ActionsSucceeded")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("AgentId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BehaviorJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PersonaName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PersonaType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TestPersonas");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.TokenBalance", b =>

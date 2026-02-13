@@ -127,16 +127,26 @@ This pattern works in both regular repos and worktrees, so all agents and comman
 - ✅ **ALWAYS** proceed to the next cycle automatically after completing a cycle
 - ✅ **ALWAYS** continue looping until the user presses Ctrl+C
 - ✅ **When presenting "Next Steps", IMMEDIATELY execute the first step without asking**
+- ✅ **When agents are working**, AUTOMATICALLY continue waiting for them to complete
 - ❌ **NEVER** ask "Would you like me to continue?" or any variation
 - ❌ **NEVER** ask "What would you prefer?" or offer options to stop/continue
 - ❌ **NEVER** ask "Do you want me to continue? Or did you have a specific question?"
 - ❌ **NEVER** wait for user confirmation to proceed to the next ticket
 - ❌ **NEVER** say "Stop here" or suggest stopping
+- ❌ **NEVER** ask what to do while waiting for agents (always choose option 1: continue waiting)
 
 **The pipeline runs autonomously in an infinite loop. It does not require or request user permission to continue.**
 
 **"Next Steps" Protocol:**
 When you produce a "Next Steps" list (numbered or bulleted), you MUST immediately proceed with executing the first item. Do NOT present the list and then ask the user what to do. The "Next Steps" list is informational only - showing the user what you're about to do, not asking for permission.
+
+**Agent Waiting Protocol:**
+When agents are spawned and working on tasks:
+- ✅ **AUTOMATICALLY** wait for agents to complete their work
+- ✅ **AUTOMATICALLY** select option 1 (continue waiting) if any choice appears
+- ❌ **NEVER** interrupt agent work to ask the user what to do
+- ❌ **NEVER** offer options like "pause", "show output", or "stop" while agents are working
+- The pipeline is fully autonomous - agents work until completion without user intervention
 
 Execute this workflow in sequence, then loop:
 
@@ -171,13 +181,29 @@ Read and internalize the project guidelines. These are living documents that get
    - Understand CI/CD pipeline
    - Know required environment variables
 
+### Step 1.5: Fetch Project Board State (Once Per Cycle)
+
+**CRITICAL RATE LIMIT OPTIMIZATION:** Fetch the project board state ONCE per cycle and reuse throughout Steps 2-8. This reduces GraphQL API calls from ~4-5 per cycle to ~1-2 per cycle.
+
+1. Fetch all project items and store in a variable:
+   ```bash
+   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
+   ```
+
+2. Use `echo "$PROJECT_ITEMS" | jq '...'` throughout the cycle instead of re-fetching.
+
+3. Only re-fetch when necessary:
+   - After claiming a ticket in Step 3a (to verify the claim succeeded)
+   - After merging in Step 4 (to get updated state for Step 5)
+
 ### Step 2: Audit All Tickets for Alignment
 
 Check all tickets in the project to ensure they align with policy and design:
 
-1. Get all items from the project:
+1. Use the cached project items from Step 1.5:
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   # Use $PROJECT_ITEMS instead of re-fetching
+   echo "$PROJECT_ITEMS" | jq '...'
    ```
 
 2. For each ticket in the project (filter by `type: "Issue"`):
@@ -210,9 +236,10 @@ Implement and locally test ONE Ready ticket using an Agent Team.
 
 **CRITICAL: Multiple b-start instances may run on different machines. The status change MUST happen BEFORE any other work on the ticket to prevent duplicate processing.**
 
-1. Fetch the project board:
+1. Use the cached project board from Step 1.5:
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   # Use $PROJECT_ITEMS instead of re-fetching
+   echo "$PROJECT_ITEMS" | jq '...'
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
 3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
@@ -221,9 +248,9 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-5. **Verify the claim succeeded** — re-fetch the project item and confirm it is now "In Progress":
+5. **Verify the claim succeeded** — re-fetch the project board to confirm (this is one of the rare re-fetches):
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
    ```
    - If the ticket is already "In Progress" (claimed by another instance between your fetch and your edit), **skip this ticket** and go back to step 1 to find the next Ready ticket.
 6. Log: "Claimed ticket #<number> — moved to In Progress"
@@ -360,7 +387,9 @@ Merge PRs to main. This is a simple operation — no team needed.
 1. Log "Starting b-progress..."
 2. Find "In Progress" tickets with open PRs (no `on hold` label):
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   # Use cached $PROJECT_ITEMS for project board state
+   echo "$PROJECT_ITEMS" | jq '...'
+   # Only fetch PRs from REST API (separate rate limit)
    gh api "repos/bradyoo12/ai-dev-request/pulls?state=open&per_page=100" --jq '[.[] | {number, headRefName: .head.ref, url: .html_url}]'
    ```
 3. Verify PR is mergeable (REST):
@@ -500,8 +529,15 @@ Verify changes on staging using parallel agents.
 
 #### Step 5a: Find Eligible Ticket
 
-1. Get "In Review" tickets without `on hold` label
-2. If none found, skip to Step 6
+1. Re-fetch the project board (Step 4 made changes, so we need fresh data):
+   ```bash
+   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
+   ```
+2. Filter for "In Review" tickets without `on hold` label:
+   ```bash
+   echo "$PROJECT_ITEMS" | jq '...'
+   ```
+3. If none found, skip to Step 6
 
 #### Step 5b: Create Review Team
 
@@ -777,12 +813,17 @@ Shut down all agents, delete the team.
 
 Log the current status of the project board:
 
-1. Get counts for each status:
+1. Re-fetch the project board one final time (Steps 5-7 may have made changes):
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
    ```
 
-2. Report:
+2. Calculate counts for each status:
+   ```bash
+   echo "$PROJECT_ITEMS" | jq '...'
+   ```
+
+3. Report:
    - Ready count (excluding `on hold`)
    - In Progress count (with and without open PRs)
    - In Review count (with and without `on hold`)
@@ -847,6 +888,11 @@ Log the current status of the project board:
 
 ## Important Notes
 
+- **Rate Limit Optimization** — The project board is fetched in Step 1.5 and cached in `$PROJECT_ITEMS` for reuse throughout the cycle. Only re-fetch when necessary:
+  - After claiming a ticket in Step 3a (to verify the claim)
+  - Before Step 5a (after Step 4 made changes)
+  - Before Step 8 (to get final state for reporting)
+  This reduces GraphQL API calls from ~4-5 per cycle to ~2-3 per cycle, preventing rate limit exhaustion.
 - **Move to top on status change** — After every `gh project item-edit` that changes a ticket's status, immediately move the item to the top of the column so it's visible on the board:
   ```bash
   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
@@ -859,7 +905,7 @@ Log the current status of the project board:
 - **Multi-instance safe** - Multiple b-start instances can run on the same machine (via git worktrees — see Step 0) or on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.
 - **Worktree required** - Every b-start instance MUST run Step 0 to acquire a dedicated worktree. Never run directly in the main repository checkout. Never check out the `main` branch — always use `git fetch origin && git checkout --detach origin/main`.
 - Teams are created and destroyed per-step — no long-lived teams
-- 5-second delay between full cycles to avoid API rate limiting
+- 5-second delay between full cycles (can be increased to 10-30s if rate limiting still occurs)
 - Always check policy.md and design.md at the start of each cycle
 - Tickets out of alignment get `on hold` label automatically
 - Human removes `on hold` label to signal approval/readiness

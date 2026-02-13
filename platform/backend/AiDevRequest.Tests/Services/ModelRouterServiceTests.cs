@@ -9,8 +9,8 @@ public class ModelRouterServiceTests
     private ModelRouterService CreateService()
     {
         var logger = new Mock<ILogger<ModelRouterService>>();
-        var providers = new List<IModelProviderService>();
-        return new ModelRouterService(logger.Object, providers);
+        var mockProvider = new Mock<IModelProviderService>();
+        return new ModelRouterService(logger.Object, new[] { mockProvider.Object });
     }
 
     // --- GetRecommendedTier tests ---

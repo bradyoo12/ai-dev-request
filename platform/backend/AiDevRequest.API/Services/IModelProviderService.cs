@@ -1,3 +1,5 @@
+using AiDevRequest.API.DTOs;
+
 namespace AiDevRequest.API.Services;
 
 /// <summary>
@@ -16,9 +18,16 @@ public interface IModelProviderService
     /// </summary>
     /// <param name="prompt">The input prompt text</param>
     /// <param name="modelId">The model identifier (e.g., "claude-opus-4-6", "gemini-1.5-pro")</param>
+    /// <param name="effortLevel">Optional adaptive thinking effort level (Low, Medium, High)</param>
+    /// <param name="outputSchema">Optional JSON schema for structured outputs</param>
     /// <param name="ct">Cancellation token</param>
     /// <returns>Generated text response</returns>
-    Task<string> GenerateAsync(string prompt, string modelId, CancellationToken ct = default);
+    Task<string> GenerateAsync(
+        string prompt,
+        string modelId,
+        ThinkingEffortLevel? effortLevel = null,
+        string? outputSchema = null,
+        CancellationToken ct = default);
 
     /// <summary>
     /// Check if this provider supports the specified model.

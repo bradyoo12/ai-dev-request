@@ -7,8 +7,19 @@ namespace AiDevRequest.Tests.Services;
 
 public class ProductionServiceTests
 {
-    private static IModelRouterService CreateModelRouter() =>
-        new ModelRouterService(new Mock<ILogger<ModelRouterService>>().Object, new List<IModelProviderService>());
+    private static IModelRouterService CreateModelRouter()
+    {
+        var mockProvider = new Mock<IModelProviderService>();
+        return new ModelRouterService(
+            new Mock<ILogger<ModelRouterService>>().Object,
+            new[] { mockProvider.Object });
+    }
+
+    private static IEnumerable<IModelProviderService> CreateProviders()
+    {
+        var mockProvider = new Mock<IModelProviderService>();
+        return new[] { mockProvider.Object };
+    }
 
     [Fact]
     public void Constructor_ThrowsWhenNoApiKey()
@@ -22,7 +33,7 @@ public class ProductionServiceTests
         try
         {
             Environment.SetEnvironmentVariable("ANTHROPIC_API_KEY", null);
-            Assert.Throws<InvalidOperationException>(() => new ProductionService(config, CreateModelRouter(), new List<IModelProviderService>(), logger.Object));
+            Assert.Throws<InvalidOperationException>(() => new ProductionService(config, CreateModelRouter(), CreateProviders(), logger.Object));
         }
         finally
         {
@@ -41,7 +52,7 @@ public class ProductionServiceTests
             .Build();
         var logger = new Mock<ILogger<ProductionService>>();
 
-        var service = new ProductionService(config, CreateModelRouter(), new List<IModelProviderService>(), logger.Object);
+        var service = new ProductionService(config, CreateModelRouter(), CreateProviders(), logger.Object);
 
         Assert.NotNull(service);
     }
@@ -56,7 +67,7 @@ public class ProductionServiceTests
             })
             .Build();
         var logger = new Mock<ILogger<ProductionService>>();
-        var service = new ProductionService(config, CreateModelRouter(), new List<IModelProviderService>(), logger.Object);
+        var service = new ProductionService(config, CreateModelRouter(), CreateProviders(), logger.Object);
 
         var status = await service.GetBuildStatusAsync("non-existent-project");
 

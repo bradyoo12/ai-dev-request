@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AiDevRequest.API.DTOs;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
 
@@ -124,7 +125,8 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
             if (provider == null)
                 throw new InvalidOperationException("No AI provider available");
 
-            var content = await provider.GenerateAsync(prompt, modelId);
+            // Use MEDIUM effort level for proposal generation
+            var content = await provider.GenerateAsync(prompt, modelId, ThinkingEffortLevel.Medium);
 
             var result = StructuredOutputHelper.DeserializeResponse<ProposalResult>(content);
 

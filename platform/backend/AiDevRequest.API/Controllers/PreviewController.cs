@@ -8,10 +8,14 @@ namespace AiDevRequest.API.Controllers;
 public class PreviewController : ControllerBase
 {
     private readonly IPreviewDeploymentService _previewService;
+    private readonly IPromoteToProductionService _promoteService;
 
-    public PreviewController(IPreviewDeploymentService previewService)
+    public PreviewController(
+        IPreviewDeploymentService previewService,
+        IPromoteToProductionService promoteService)
     {
         _previewService = previewService;
+        _promoteService = promoteService;
     }
 
     [HttpPost("preview/deploy")]
@@ -85,6 +89,40 @@ public class PreviewController : ControllerBase
         }
     }
 
+    [HttpPost("preview/{previewId}/promote")]
+    [ProducesResponseType(typeof(PromotionResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PromotionResultDto>> PromoteToProduction(Guid projectId, Guid previewId)
+    {
+        try
+        {
+            var deployment = await _promoteService.PromotePreviewAsync(previewId);
+            return Ok(new PromotionResultDto
+            {
+                DeploymentId = deployment.Id,
+                Status = deployment.Status.ToString(),
+                ProductionUrl = deployment.PreviewUrl,
+                Message = "Preview successfully promoted to production"
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpGet("preview/{previewId}/can-promote")]
+    [ProducesResponseType(typeof(CanPromoteDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<CanPromoteDto>> CanPromote(Guid projectId, Guid previewId)
+    {
+        var (isValid, errorMessage) = await _promoteService.ValidatePreviewAsync(previewId);
+        return Ok(new CanPromoteDto
+        {
+            CanPromote = isValid,
+            Reason = errorMessage
+        });
+    }
     private static PreviewDeploymentDto ToDto(Entities.PreviewDeployment p) => new()
     {
         Id = p.Id,
@@ -126,4 +164,18 @@ public record PreviewUrlDto
 public record ContainerLogsDto
 {
     public string Logs { get; init; } = "";
+}
+
+public record PromotionResultDto
+{
+    public Guid DeploymentId { get; init; }
+    public string Status { get; init; } = "";
+    public string? ProductionUrl { get; init; }
+    public string Message { get; init; } = "";
+}
+
+public record CanPromoteDto
+{
+    public bool CanPromote { get; init; }
+    public string? Reason { get; init; }
 }

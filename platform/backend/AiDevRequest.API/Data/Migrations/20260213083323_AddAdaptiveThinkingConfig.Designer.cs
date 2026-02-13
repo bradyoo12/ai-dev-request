@@ -3,6 +3,7 @@ using System;
 using AiDevRequest.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiDevRequest.API.Data.Migrations
 {
     [DbContext(typeof(AiDevRequestDbContext))]
-    partial class AiDevRequestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260213083323_AddAdaptiveThinkingConfig")]
+    partial class AddAdaptiveThinkingConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,38 +221,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("a2a_tasks", (string)null);
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AdaptiveThinkingConfig", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ConfigJson")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ModelName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AdaptiveThinkingConfigs");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.AgentAutomationConfig", b =>
@@ -6806,12 +6777,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ContainerGroupName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ContainerName")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -6824,15 +6789,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Fqdn")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ImageUri")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Port")
-                        .HasColumnType("integer");
-
                     b.Property<string>("PreviewUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -6841,12 +6797,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Region")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ResourceGroupName")
-                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()

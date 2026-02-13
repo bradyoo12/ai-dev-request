@@ -147,6 +147,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ComposerPlan> ComposerPlans => Set<ComposerPlan>();
     public DbSet<PerformanceOptimization> PerformanceOptimizations => Set<PerformanceOptimization>();
     public DbSet<ModelRoutingRule> ModelRoutingRules => Set<ModelRoutingRule>();
+    public DbSet<BiomeLintResult> BiomeLintResults => Set<BiomeLintResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

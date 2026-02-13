@@ -157,9 +157,15 @@ public class SocialAuthService : ISocialAuthService
         var clientId = _configuration["OAuth:Kakao:ClientId"] ?? throw new InvalidOperationException("Kakao ClientId not configured");
         var clientSecret = _configuration["OAuth:Kakao:ClientSecret"];
 
+        if (string.IsNullOrEmpty(clientSecret))
+        {
+            _logger.LogWarning("Kakao ClientSecret is not configured. Kakao requires client_secret by default — token exchange may fail.");
+        }
+
         var client = _httpClientFactory.CreateClient();
 
         // Exchange code for tokens
+        // Kakao requires Content-Type: application/x-www-form-urlencoded;charset=utf-8
         var tokenParams = new Dictionary<string, string>
         {
             ["grant_type"] = "authorization_code",
@@ -173,8 +179,9 @@ public class SocialAuthService : ISocialAuthService
         _logger.LogInformation("Kakao OAuth token exchange - RedirectUri: {RedirectUri}, ClientId: {ClientId}, HasClientSecret: {HasClientSecret}",
             redirectUri, clientId, !string.IsNullOrEmpty(clientSecret));
 
-        var tokenResponse = await client.PostAsync("https://kauth.kakao.com/oauth/token",
-            new FormUrlEncodedContent(tokenParams));
+        var tokenContent = new FormUrlEncodedContent(tokenParams);
+        tokenContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-www-form-urlencoded") { CharSet = "utf-8" };
+        var tokenResponse = await client.PostAsync("https://kauth.kakao.com/oauth/token", tokenContent);
 
         var tokenJson = await tokenResponse.Content.ReadAsStringAsync();
         if (!tokenResponse.IsSuccessStatusCode)
@@ -205,9 +212,15 @@ public class SocialAuthService : ISocialAuthService
         var userInfo = JsonSerializer.Deserialize<JsonElement>(userInfoJson);
 
         var kakaoId = userInfo.GetProperty("id").GetInt64().ToString();
-        var account = userInfo.GetProperty("kakao_account");
-        var email = account.TryGetProperty("email", out var emailProp) ? emailProp.GetString() : null;
-        var profile = account.TryGetProperty("profile", out var profileProp) ? profileProp : (JsonElement?)null;
+
+        // kakao_account may be absent if consent scopes were not granted
+        string? email = null;
+        JsonElement? profile = null;
+        if (userInfo.TryGetProperty("kakao_account", out var account))
+        {
+            email = account.TryGetProperty("email", out var emailProp) ? emailProp.GetString() : null;
+            profile = account.TryGetProperty("profile", out var profileProp) ? profileProp : null;
+        }
 
         return new SocialUserInfo
         {
@@ -427,7 +440,8 @@ public class SocialAuthService : ISocialAuthService
     private string BuildKakaoAuthUrl(string redirectUri, string state)
     {
         var clientId = _configuration["OAuth:Kakao:ClientId"] ?? "";
-        return $"https://kauth.kakao.com/oauth/authorize?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&state={Uri.EscapeDataString(state)}";
+        var scope = "profile_nickname profile_image account_email";
+        return $"https://kauth.kakao.com/oauth/authorize?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString(scope)}&state={Uri.EscapeDataString(state)}";
     }
 
     private string BuildLineAuthUrl(string redirectUri, string state)

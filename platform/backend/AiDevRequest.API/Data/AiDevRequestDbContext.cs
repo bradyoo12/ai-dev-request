@@ -160,6 +160,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WorkersAiDeployment> WorkersAiDeployments => Set<WorkersAiDeployment>();
     public DbSet<ReactUseHookDemo> ReactUseHookDemos => Set<ReactUseHookDemo>();
     public DbSet<EditPrediction> EditPredictions => Set<EditPrediction>();
+    public DbSet<BrowserIdeSession> BrowserIdeSessions => Set<BrowserIdeSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

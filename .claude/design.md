@@ -1614,3 +1614,12 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Optimization Strategies**: Smart Routing (60-98%), Prompt Caching (50-90%), Request Batching (30-70%), Response Reuse (80-95%)
 - **Frontend**: `InferenceCostPage` in Settings at `/settings/inference-cost` with 4 sub-tabs (Analyze, History, Strategies, Stats)
 - **Ticket**: #478 — `AI inference cost optimization (60-80% savings)`
+
+### Language Expansion (Multi-language Support)
+- **Backend**: `LanguageExpansion` entity + `LanguageExpansionController` (`api/language-expansion`)
+- **Endpoints**: POST translate (AI translation with coverage/quality scoring), GET list, DELETE {id}, GET stats (by language), GET languages (anonymous, 10 languages)
+- **Supported Languages**: ja, zh, es, fr, de, pt, ar (RTL), hi, vi, th
+- **Translation Features**: Coverage tracking (keys translated vs total), quality scoring, machine vs human review tracking, pluralization rules, RTL support detection
+- **Analysis Output**: Sample translations, missing key detection, recommendations for quality improvement
+- **Frontend**: `LanguageExpansionPage` in Settings at `/settings/language-expansion` with 4 sub-tabs (Translate, History, Languages, Stats)
+- **Ticket**: #479 — `Expand language support beyond en/ko`

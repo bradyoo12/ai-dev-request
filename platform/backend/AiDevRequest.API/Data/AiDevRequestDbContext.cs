@@ -144,6 +144,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VectorSearchConfig> VectorSearchConfigs => Set<VectorSearchConfig>();
     public DbSet<ReplTestSession> ReplTestSessions => Set<ReplTestSession>();
     public DbSet<AgentTerminalSession> AgentTerminalSessions => Set<AgentTerminalSession>();
+    public DbSet<ComposerPlan> ComposerPlans => Set<ComposerPlan>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

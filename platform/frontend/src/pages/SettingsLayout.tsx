@@ -224,7 +224,8 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/ai-marketplace' ? 'ai-marketplace' as SettingsTab
     : location.pathname === '/settings/agent-inbox' ? 'agent-inbox' as SettingsTab
     : location.pathname === '/settings/agent-skills' ? 'agent-skills' as SettingsTab
-    : location.pathname === '/settings/observability' ? 'observability' as SettingsTab : null
+    : location.pathname === '/settings/observability' ? 'observability' as SettingsTab
+    : location.pathname === '/settings/compiler-validation' ? 'compiler' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 

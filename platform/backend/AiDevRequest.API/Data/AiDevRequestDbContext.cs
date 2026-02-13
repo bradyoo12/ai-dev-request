@@ -165,6 +165,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<InferenceCostRecord> InferenceCostRecords => Set<InferenceCostRecord>();
     public DbSet<LanguageExpansion> LanguageExpansions => Set<LanguageExpansion>();
     public DbSet<HybridValidation> HybridValidations => Set<HybridValidation>();
+    public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

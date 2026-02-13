@@ -35,16 +35,32 @@ public class DatabaseBranchController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ListBranches(Guid id)
     {
-        var branches = await _branchService.ListBranches(id);
-        return Ok(branches.Select(MapDto));
+        try
+        {
+            var branches = await _branchService.ListBranches(id);
+            return Ok(branches.Select(MapDto));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error listing branches for project {ProjectId}", id);
+            return Ok(Array.Empty<DatabaseBranchDto>());
+        }
     }
 
     [HttpGet("{branchId:guid}")]
     public async Task<IActionResult> GetBranch(Guid id, Guid branchId)
     {
-        var branch = await _branchService.GetBranch(branchId);
-        if (branch == null) return NotFound();
-        return Ok(MapDto(branch));
+        try
+        {
+            var branch = await _branchService.GetBranch(branchId);
+            if (branch == null) return NotFound();
+            return Ok(MapDto(branch));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting branch {BranchId} for project {ProjectId}", branchId, id);
+            return NotFound();
+        }
     }
 
     [HttpPost("{branchId:guid}/merge")]

@@ -122,6 +122,16 @@ This pattern works in both regular repos and worktrees, so all agents and comman
 
 ## Main Loop
 
+**CRITICAL AUTONOMOUS OPERATION RULES:**
+- ✅ **ALWAYS** proceed to the next cycle automatically after completing a cycle
+- ✅ **ALWAYS** continue looping until the user presses Ctrl+C
+- ❌ **NEVER** ask "Would you like me to continue?" or any variation
+- ❌ **NEVER** ask "What would you prefer?" or offer options to stop/continue
+- ❌ **NEVER** wait for user confirmation to proceed to the next ticket
+- ❌ **NEVER** say "Stop here" or suggest stopping
+
+**The pipeline runs autonomously in an infinite loop. It does not require or request user permission to continue.**
+
 Execute this workflow in sequence, then loop:
 
 ### Step 1: Load Policy and Design Documents
@@ -745,10 +755,23 @@ Log the current status of the project board:
    - Tickets with `on hold` label
    - Backlog tickets awaiting triage
 
-### Step 9: Loop
-1. Log "Waiting 5 seconds before next cycle..."
+### Step 9: Loop (Automatic - Never Ask User)
+
+**CRITICAL: Do NOT ask the user for permission to continue. Just loop automatically.**
+
+1. Log "Cycle complete. Starting next cycle in 5 seconds..."
 2. Wait 5 seconds
-3. Go back to Step 1
+3. **Automatically** go back to Step 1 (do not ask user, do not wait for confirmation, just loop)
+
+**Examples of what NOT to say:**
+- ❌ "Would you like me to continue?"
+- ❌ "What would you prefer?"
+- ❌ "Stop here - You've seen how the pipeline works"
+- ❌ "Should I process the next ticket?"
+
+**What to do instead:**
+- ✅ Just log "Starting Cycle #N..." and go to Step 1
+- ✅ Continue autonomously until Ctrl+C
 
 ## Ticket Flow Summary
 
@@ -792,7 +815,7 @@ Log the current status of the project board:
   ```
   Omitting `afterId` places the item at the top of the list.
 - **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
-- **NEVER ask the user for permission to continue** - always proceed to the next cycle automatically. Do NOT say "Would you like me to continue?" or any variation. The loop is autonomous.
+- **NEVER ask the user for permission to continue** - always proceed to the next cycle automatically. Do NOT say "Would you like me to continue?", "What would you prefer?", "Stop here", or any variation. The loop is 100% autonomous and requires zero user interaction to continue. Just keep looping.
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
 - **ONE ticket at a time** - teams parallelize WITHIN a ticket, not across tickets
 - **Multi-instance safe** - Multiple b-start instances can run on the same machine (via git worktrees — see Step 0) or on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.

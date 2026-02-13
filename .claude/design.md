@@ -1589,3 +1589,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Analysis**: Dependency graph (nodes/edges/depth/hotspots), affected files, predicted edits with confidence, test impact
 - **Frontend**: `EditPredictionPage` in Settings at `/settings/edit-predictions` with 4 sub-tabs (Analyze, History, Change Types, Stats)
 - **Ticket**: #475 — `Next Edit Predictions with ripple effect analysis`
+
+### Browser IDE (Instant Code Execution)
+- **Backend**: `BrowserIdeSession` entity + `BrowserIdeController` (`api/browser-ide`)
+- **Endpoints**: POST execute (code execution with console output, error detection, live preview URL), GET list, DELETE {id}, GET stats (by runtime), GET runtimes (anonymous, 4 runtimes)
+- **Runtimes**: React 19, Node.js 22, Vanilla JS, TypeScript 5.7
+- **Features**: Live preview for React/Vanilla, console output capture, error highlighting, memory usage tracking, share & fork
+- **Frontend**: `BrowserIdePage` in Settings at `/settings/browser-ide` with 4 sub-tabs (Execute, History, Runtimes, Stats)
+- **Ticket**: #476 — `Browser IDE for instant code execution (PlayCode-style)`

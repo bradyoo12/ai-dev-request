@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
 import HomePage from './pages/HomePage'
+import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
 
 const LazyFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" /></div>
@@ -44,36 +45,36 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/settings" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/specifications" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/github-sync" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/code-review" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/streaming-generation" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/billing" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/mcp-integration" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/analytics" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/marketplace" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/containerization" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/test-generation" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/collaborative-editing" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/onboarding" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/version-history" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/component-preview" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/variant-comparison" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/arena" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/performance" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/schema-designer" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/ai-elements" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/review-pipeline" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/oauth-connectors" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/observability" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/self-healing-test" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/multi-agent-test" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/database-branching" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/sandbox" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-automation" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/usage-dashboard" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/ai-model" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/settings" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/specifications" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/github-sync" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/code-review" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/streaming-generation" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/billing" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/mcp-integration" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/analytics" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/marketplace" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/containerization" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/test-generation" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/collaborative-editing" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/onboarding" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/version-history" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/component-preview" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/variant-comparison" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/arena" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/performance" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/schema-designer" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/ai-elements" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/review-pipeline" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/oauth-connectors" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/observability" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/self-healing-test" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/multi-agent-test" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/database-branching" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/sandbox" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-automation" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/usage-dashboard" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/ai-model" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />
@@ -92,47 +93,47 @@ function App() {
             <Route path="/buy-credits" element={<Suspense fallback={LazyFallback}><BuyCreditsPage /></Suspense>} />
             <Route path="/support" element={<Suspense fallback={LazyFallback}><SupportBoardPage /></Suspense>} />
             <Route path="/requests/:id/refine" element={<Suspense fallback={LazyFallback}><IterativeRefinementPage /></Suspense>} />
-            <Route path="/settings/orchestration" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/langgraph" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/hybrid-cache" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/playwright-healing" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/self-healing-code" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/production-sandboxes" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/org-memory" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/background-agents" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-rules" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/server-components" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/code-lint" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/vector-search" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/repl-test" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-terminal" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/composer" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/dotnet-perf" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/multi-model" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/biome-lint" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/deepwiki" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/build-toolchain" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/vision-to-code" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/dotnet10-upgrade" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/parallel-agents" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/webmcp" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-sdk" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/auto-terminal" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/turso-database" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/workers-ai" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/react-use-hook" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/edit-predictions" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/browser-ide" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/governance" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/inference-cost" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/language-expansion" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/hybrid-validation" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-messages" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agentic-workflows" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-trace" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/confidence-scoring" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/ai-marketplace" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
-            <Route path="/settings/agent-skills" element={<Suspense fallback={LazyFallback}><SettingsLayout /></Suspense>} />
+            <Route path="/settings/orchestration" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/langgraph" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/hybrid-cache" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/playwright-healing" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/self-healing-code" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/production-sandboxes" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/org-memory" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/background-agents" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-rules" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/server-components" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/code-lint" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/vector-search" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/repl-test" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-terminal" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/composer" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/dotnet-perf" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/multi-model" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/biome-lint" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/deepwiki" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/build-toolchain" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/vision-to-code" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/dotnet10-upgrade" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/parallel-agents" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/webmcp" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-sdk" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/auto-terminal" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/turso-database" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/workers-ai" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/react-use-hook" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/edit-predictions" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/browser-ide" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/governance" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/inference-cost" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/language-expansion" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/hybrid-validation" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-messages" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agentic-workflows" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-trace" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/confidence-scoring" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/ai-marketplace" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-skills" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" /></div>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />
           </Route>

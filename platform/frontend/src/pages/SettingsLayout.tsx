@@ -123,7 +123,7 @@ export default function SettingsLayout() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const location = useLocation()
-  const { setTokenBalance } = useAuth()
+  const { setTokenBalance, requireAuth } = useAuth()
   const tabParam = searchParams.get('tab') as SettingsTab | null
   const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab
     : location.pathname === '/settings/github-sync' ? 'github-sync' as SettingsTab
@@ -233,6 +233,13 @@ export default function SettingsLayout() {
       setSettingsTab(tabParam)
     }
   }, [tabParam, settingsTab])
+
+  // Defensive auth check - this is a fallback in case route guard fails
+  useEffect(() => {
+    if (!requireAuth()) {
+      navigate('/')
+    }
+  }, [requireAuth, navigate])
 
   return (
     <section>

@@ -162,6 +162,11 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WorkersAiDeployment> WorkersAiDeployments => Set<WorkersAiDeployment>();
     public DbSet<ReactUseHookDemo> ReactUseHookDemos => Set<ReactUseHookDemo>();
     public DbSet<EditPrediction> EditPredictions => Set<EditPrediction>();
+    public DbSet<AdaptiveThinkingConfig> AdaptiveThinkingConfigs => Set<AdaptiveThinkingConfig>();
+    public DbSet<MultiAgentTestSession> MultiAgentTestSessions => Set<MultiAgentTestSession>();
+    public DbSet<TestPersona> TestPersonas => Set<TestPersona>();
+    public DbSet<AgentTestExecution> AgentTestExecutions => Set<AgentTestExecution>();
+    public DbSet<ConcurrencyIssue> ConcurrencyIssues => Set<ConcurrencyIssue>();
     public DbSet<BrowserIdeSession> BrowserIdeSessions => Set<BrowserIdeSession>();
     public DbSet<GovernanceAction> GovernanceActions => Set<GovernanceAction>();
     public DbSet<InferenceCostRecord> InferenceCostRecords => Set<InferenceCostRecord>();

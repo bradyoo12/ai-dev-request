@@ -157,6 +157,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AgentSdkSession> AgentSdkSessions => Set<AgentSdkSession>();
     public DbSet<TerminalExecution> TerminalExecutions => Set<TerminalExecution>();
     public DbSet<TursoDatabase> TursoDatabases => Set<TursoDatabase>();
+    public DbSet<WorkersAiDeployment> WorkersAiDeployments => Set<WorkersAiDeployment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

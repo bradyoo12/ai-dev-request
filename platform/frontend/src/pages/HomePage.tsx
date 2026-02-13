@@ -69,9 +69,31 @@ export default function HomePage() {
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    getPricingPlans().then(setPricingPlans).catch(() => {})
-    setLoadingTemplates(true)
-    getTemplates().then(setTemplates).catch(() => {}).finally(() => setLoadingTemplates(false))
+    const loadPricingPlans = async () => {
+      try {
+        const plans = await getPricingPlans()
+        setPricingPlans(plans)
+      } catch {
+        // Use empty array; PricingSection has built-in fallback plans
+        setPricingPlans([])
+      }
+    }
+
+    const loadTemplates = async () => {
+      setLoadingTemplates(true)
+      try {
+        const data = await getTemplates()
+        setTemplates(data)
+      } catch {
+        // Use empty array; template section is hidden when empty
+        setTemplates([])
+      } finally {
+        setLoadingTemplates(false)
+      }
+    }
+
+    loadPricingPlans()
+    loadTemplates()
   }, [])
 
   const handleScreenshotSelect = useCallback((file: File) => {

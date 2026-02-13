@@ -166,6 +166,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<LanguageExpansion> LanguageExpansions => Set<LanguageExpansion>();
     public DbSet<HybridValidation> HybridValidations => Set<HybridValidation>();
     public DbSet<AgentMessage> AgentMessages => Set<AgentMessage>();
+    public DbSet<AgenticWorkflow> AgenticWorkflows => Set<AgenticWorkflow>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

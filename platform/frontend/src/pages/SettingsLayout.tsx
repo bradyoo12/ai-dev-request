@@ -76,11 +76,12 @@ import HybridCachePage from './HybridCachePage'
 import PlaywrightHealingPage from './PlaywrightHealingPage'
 import SelfHealingPage from './SelfHealingPage'
 import ProductionSandboxPage from './ProductionSandboxPage'
+import OrgMemoryPage from './OrgMemoryPage'
 import { useAuth } from '../contexts/AuthContext'
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing' | 'context-index' | 'deployment-health' | 'generative-ui' | 'mobile-app' | 'background-agents' | 'platform-upgrade' | 'visual-prompt' | 'multi-framework' | 'view-transitions' | 'nl-schema' | 'query-config' | 'agentic-planning' | 'visual-regression' | 'mcp-gateway' | 'codebase-memory' | 'figma-import' | 'arena' | 'visual-overlay' | 'semantic-search' | 'planning-mode' | 'project-docs' | 'ai-elements' | 'review-pipeline' | 'oauth-connectors' | 'mcp-tools' | 'ai-model' | 'bidir-sync' | 'self-healing-test' | 'database-branching' | 'sandbox' | 'dynamic-intelligence' | 'agent-automation' | 'usage-dashboard' | 'orchestration' | 'langgraph' | 'hybrid-cache' | 'playwright-healing' | 'self-healing-code' | 'production-sandboxes'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing' | 'context-index' | 'deployment-health' | 'generative-ui' | 'mobile-app' | 'background-agents' | 'platform-upgrade' | 'visual-prompt' | 'multi-framework' | 'view-transitions' | 'nl-schema' | 'query-config' | 'agentic-planning' | 'visual-regression' | 'mcp-gateway' | 'codebase-memory' | 'figma-import' | 'arena' | 'visual-overlay' | 'semantic-search' | 'planning-mode' | 'project-docs' | 'ai-elements' | 'review-pipeline' | 'oauth-connectors' | 'mcp-tools' | 'ai-model' | 'bidir-sync' | 'self-healing-test' | 'database-branching' | 'sandbox' | 'dynamic-intelligence' | 'agent-automation' | 'usage-dashboard' | 'orchestration' | 'langgraph' | 'hybrid-cache' | 'playwright-healing' | 'self-healing-code' | 'production-sandboxes' | 'org-memory'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index', 'deployment-health', 'generative-ui', 'mobile-app', 'background-agents', 'platform-upgrade', 'visual-prompt', 'multi-framework', 'view-transitions', 'nl-schema', 'query-config', 'agentic-planning', 'visual-regression', 'mcp-gateway', 'codebase-memory', 'figma-import', 'arena', 'visual-overlay', 'semantic-search', 'planning-mode', 'project-docs', 'ai-elements', 'review-pipeline', 'oauth-connectors', 'mcp-tools', 'ai-model', 'bidir-sync', 'self-healing-test', 'database-branching', 'sandbox', 'dynamic-intelligence', 'agent-automation', 'usage-dashboard', 'orchestration', 'langgraph', 'hybrid-cache', 'playwright-healing', 'self-healing-code', 'production-sandboxes']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index', 'deployment-health', 'generative-ui', 'mobile-app', 'background-agents', 'platform-upgrade', 'visual-prompt', 'multi-framework', 'view-transitions', 'nl-schema', 'query-config', 'agentic-planning', 'visual-regression', 'mcp-gateway', 'codebase-memory', 'figma-import', 'arena', 'visual-overlay', 'semantic-search', 'planning-mode', 'project-docs', 'ai-elements', 'review-pipeline', 'oauth-connectors', 'mcp-tools', 'ai-model', 'bidir-sync', 'self-healing-test', 'database-branching', 'sandbox', 'dynamic-intelligence', 'agent-automation', 'usage-dashboard', 'orchestration', 'langgraph', 'hybrid-cache', 'playwright-healing', 'self-healing-code', 'production-sandboxes', 'org-memory']
 
 export default function SettingsLayout() {
   const { t } = useTranslation()
@@ -151,6 +152,7 @@ export default function SettingsLayout() {
     : location.pathname === '/settings/playwright-healing' ? 'playwright-healing' as SettingsTab
     : location.pathname === '/settings/self-healing-code' ? 'self-healing-code' as SettingsTab
     : location.pathname === '/settings/production-sandboxes' ? 'production-sandboxes' as SettingsTab
+    : location.pathname === '/settings/org-memory' ? 'org-memory' as SettingsTab
     : location.pathname === '/settings/observability' ? 'observability' as SettingsTab : null
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
@@ -951,6 +953,17 @@ export default function SettingsLayout() {
             {t('settings.tabs.productionSandboxes', 'Sandboxes')}
           </span>
         </button>
+        <button
+          onClick={() => setSettingsTab('org-memory')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            settingsTab === 'org-memory' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
+          }`}
+        >
+          <span className="flex items-center gap-1 justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            {t('settings.tabs.orgMemory', 'Org Memory')}
+          </span>
+        </button>
       </div>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
@@ -1027,6 +1040,7 @@ export default function SettingsLayout() {
       {settingsTab === 'playwright-healing' && <PlaywrightHealingPage />}
       {settingsTab === 'self-healing-code' && <SelfHealingPage />}
       {settingsTab === 'production-sandboxes' && <ProductionSandboxPage />}
+      {settingsTab === 'org-memory' && <OrgMemoryPage />}
     </section>
   )
 }

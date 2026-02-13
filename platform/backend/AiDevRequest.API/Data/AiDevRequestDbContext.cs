@@ -145,6 +145,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ReplTestSession> ReplTestSessions => Set<ReplTestSession>();
     public DbSet<AgentTerminalSession> AgentTerminalSessions => Set<AgentTerminalSession>();
     public DbSet<ComposerPlan> ComposerPlans => Set<ComposerPlan>();
+    public DbSet<PerformanceOptimization> PerformanceOptimizations => Set<PerformanceOptimization>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

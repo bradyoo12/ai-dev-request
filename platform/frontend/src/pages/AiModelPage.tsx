@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getAiModelConfig, updateAiModelConfig, getAvailableModels, getAiModelStats, getAvailableProviders } from '../api/aiModel'
-import type { AiModelConfig, AvailableModel, AiModelStats, Provider } from '../api/aiModel'
+import { getAiModelConfig, updateAiModelConfig, getAvailableModels, getAiModelStats, getAvailableProviders, getEffortLevels, updateEffortLevels } from '../api/aiModel'
+import type { AiModelConfig, AvailableModel, AiModelStats, Provider, EffortLevelsResponse } from '../api/aiModel'
 
 type SubTab = 'models' | 'configure' | 'stats'
 
@@ -15,6 +15,7 @@ export default function AiModelPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [subTab, setSubTab] = useState<SubTab>('models')
+  const [effortLevels, setEffortLevels] = useState<EffortLevelsResponse | null>(null)
 
   useEffect(() => {
     loadData()
@@ -23,16 +24,18 @@ export default function AiModelPage() {
   async function loadData() {
     try {
       setLoading(true)
-      const [configRes, modelsRes, statsRes, providersRes] = await Promise.all([
+      const [configRes, modelsRes, statsRes, providersRes, effortLevelsRes] = await Promise.all([
         getAiModelConfig(),
         getAvailableModels(),
         getAiModelStats(),
         getAvailableProviders().catch(() => []), // Fallback for backward compatibility
+        getEffortLevels().catch(() => null), // Fallback for backward compatibility
       ])
       setConfig(configRes)
       setModels(modelsRes)
       setStats(statsRes)
       setProviders(providersRes)
+      setEffortLevels(effortLevelsRes)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('aiModel.errorLoading', 'Failed to load AI model settings'))
     } finally {
@@ -44,6 +47,35 @@ export default function AiModelPage() {
     try {
       const updated = await updateAiModelConfig(updates)
       setConfig(updated)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('aiModel.errorSaving', 'Failed to save settings'))
+    }
+  }
+
+  async function handleEffortLevelChange(taskType: string, newEffortLevel: string) {
+    if (!effortLevels) return
+    try {
+      const updatedConfigs = effortLevels.taskConfigs.map(tc =>
+        tc.taskType === taskType ? { ...tc, effortLevel: newEffortLevel } : tc
+      )
+      const updated = await updateEffortLevels({
+        taskConfigs: updatedConfigs,
+        structuredOutputsEnabled: effortLevels.structuredOutputsEnabled
+      })
+      setEffortLevels(updated)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('aiModel.errorSaving', 'Failed to save settings'))
+    }
+  }
+
+  async function handleStructuredOutputsToggle() {
+    if (!effortLevels) return
+    try {
+      const updated = await updateEffortLevels({
+        taskConfigs: effortLevels.taskConfigs,
+        structuredOutputsEnabled: !effortLevels.structuredOutputsEnabled
+      })
+      setEffortLevels(updated)
     } catch (err) {
       setError(err instanceof Error ? err.message : t('aiModel.errorSaving', 'Failed to save settings'))
     }
@@ -320,6 +352,61 @@ export default function AiModelPage() {
               </div>
             </div>
           </div>
+
+          {/* Adaptive Thinking Configuration */}
+          {effortLevels && (
+            <div className="bg-warm-800 rounded-lg p-6">
+              <h4 className="font-medium text-white mb-4">{t('aiModel.adaptiveThinking.title', 'Adaptive Thinking')}</h4>
+              <p className="text-xs text-warm-500 mb-4">{t('aiModel.adaptiveThinking.description', 'Configure effort levels for different task types to optimize cost vs quality')}</p>
+              <div className="space-y-3">
+                {effortLevels.taskConfigs.map(taskConfig => (
+                  <div key={taskConfig.taskType} className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <label className="text-sm text-warm-300">{t(`aiModel.taskType.${taskConfig.taskType}`, taskConfig.taskType)}</label>
+                      <p className="text-xs text-warm-500">{taskConfig.description}</p>
+                    </div>
+                    <select
+                      value={taskConfig.effortLevel}
+                      onChange={(e) => handleEffortLevelChange(taskConfig.taskType, e.target.value)}
+                      className="bg-warm-700 border border-warm-600 rounded px-3 py-1.5 text-sm text-white min-w-[120px]"
+                    >
+                      <option value="Low">{t('aiModel.effortLevel.low', 'Low')}</option>
+                      <option value="Medium">{t('aiModel.effortLevel.medium', 'Medium')}</option>
+                      <option value="High">{t('aiModel.effortLevel.high', 'High')}</option>
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p className="text-xs text-blue-400">
+                  <strong>{t('aiModel.costEstimate.title', 'Cost Estimate')}:</strong> Using Low effort levels can reduce costs by up to 5x while maintaining good quality for simpler tasks.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Structured Outputs */}
+          {effortLevels && (
+            <div className="bg-warm-800 rounded-lg p-6">
+              <h4 className="font-medium text-white mb-4">{t('aiModel.structuredOutputs.title', 'Structured Outputs')}</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm text-warm-300">{t('aiModel.structuredOutputs.enabled', 'Enable Structured Outputs')}</label>
+                  <p className="text-xs text-warm-500">{t('aiModel.structuredOutputs.description', 'Use structured outputs to eliminate JSON parsing failures')}</p>
+                </div>
+                <button
+                  onClick={handleStructuredOutputsToggle}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${
+                    effortLevels.structuredOutputsEnabled ? 'bg-green-500' : 'bg-warm-600'
+                  }`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    effortLevels.structuredOutputsEnabled ? 'translate-x-5' : ''
+                  }`} />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Gemini-Specific Settings */}
           {selectedProvider === 'gemini' && (

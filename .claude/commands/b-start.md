@@ -66,6 +66,57 @@ Teams are used within a single ticket to parallelize independent work:
 
 **Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
 
+### How to Wait for Agents (CRITICAL)
+
+**When spawning agents, you MUST actually wait for results. Saying "waiting..." in text is NOT enough.**
+
+**Method 1: Synchronous Spawning (RECOMMENDED)**
+- Use Task tool WITHOUT `run_in_background` parameter
+- The Task call blocks until the agent completes
+- Results come back immediately as tool results
+- Example:
+  ```
+  Task(subagent_type: "general-purpose", team_name: "ready-123", name: "planner", prompt: "...")
+  <blocks here - no other work happens>
+  <tool result appears with agent output>
+  <now you can continue>
+  ```
+
+**Method 2: Parallel Synchronous Spawning**
+- Spawn multiple agents in a SINGLE message with multiple Task calls
+- All agents run simultaneously, but the message blocks until ALL complete
+- Results come back as separate tool results
+- Example:
+  ```
+  <single message with two Task calls>
+  Task(name: "test-runner", ...)
+  Task(name: "ai-verifier", ...)
+  <blocks here until BOTH agents finish>
+  <two tool results appear>
+  <now you can continue>
+  ```
+
+**Method 3: Background Tasks (ONLY if you have other work to do)**
+- Spawn with `run_in_background: true`
+- Continue with other work
+- Later, use `TaskOutput(task_id: <id>, block: true)` to retrieve results
+- Example:
+  ```
+  Task(run_in_background: true, ...)
+  <tool result has task_id and output_file>
+  <do other work>
+  TaskOutput(task_id: "...", block: true)
+  <blocks here>
+  <results appear>
+  ```
+
+**CRITICAL RULES:**
+- ✅ **DO** use Task tool and wait for tool results before continuing
+- ✅ **DO** spawn multiple agents in parallel when they can work independently
+- ❌ **NEVER** say "waiting for agents..." and then continue in the same turn
+- ❌ **NEVER** assume agents will "send messages when done" without blocking on Task or TaskOutput
+- ❌ **NEVER** move to the next step until you have agent results in hand
+
 ## Step 0: Worktree Setup (Multi-Instance Safe)
 
 Each b-start instance MUST operate in its own dedicated git worktree so that multiple instances can run in parallel without conflicting on the same working directory.
@@ -127,16 +178,26 @@ This pattern works in both regular repos and worktrees, so all agents and comman
 - ✅ **ALWAYS** proceed to the next cycle automatically after completing a cycle
 - ✅ **ALWAYS** continue looping until the user presses Ctrl+C
 - ✅ **When presenting "Next Steps", IMMEDIATELY execute the first step without asking**
+- ✅ **When agents are working**, AUTOMATICALLY continue waiting for them to complete
 - ❌ **NEVER** ask "Would you like me to continue?" or any variation
 - ❌ **NEVER** ask "What would you prefer?" or offer options to stop/continue
 - ❌ **NEVER** ask "Do you want me to continue? Or did you have a specific question?"
 - ❌ **NEVER** wait for user confirmation to proceed to the next ticket
 - ❌ **NEVER** say "Stop here" or suggest stopping
+- ❌ **NEVER** ask what to do while waiting for agents (always choose option 1: continue waiting)
 
 **The pipeline runs autonomously in an infinite loop. It does not require or request user permission to continue.**
 
 **"Next Steps" Protocol:**
 When you produce a "Next Steps" list (numbered or bulleted), you MUST immediately proceed with executing the first item. Do NOT present the list and then ask the user what to do. The "Next Steps" list is informational only - showing the user what you're about to do, not asking for permission.
+
+**Agent Waiting Protocol:**
+When agents are spawned and working on tasks:
+- ✅ **AUTOMATICALLY** wait for agents to complete their work
+- ✅ **AUTOMATICALLY** select option 1 (continue waiting) if any choice appears
+- ❌ **NEVER** interrupt agent work to ask the user what to do
+- ❌ **NEVER** offer options like "pause", "show output", or "stop" while agents are working
+- The pipeline is fully autonomous - agents work until completion without user intervention
 
 Execute this workflow in sequence, then loop:
 
@@ -171,13 +232,35 @@ Read and internalize the project guidelines. These are living documents that get
    - Understand CI/CD pipeline
    - Know required environment variables
 
+### Step 1.5: Fetch Project Board State (Once Per Cycle)
+
+**CRITICAL RATE LIMIT OPTIMIZATION:** Use the project board cache to minimize GraphQL API calls. The cache stores project data for 5 minutes, reducing API calls from ~6 per cycle to ~0-1 per cycle.
+
+1. **Check cache status and fetch project items** (uses cache if < 5 min old, otherwise fetches fresh):
+   ```bash
+   echo "=== Cache Status ==="
+   bash .claude/scripts/gh-project-cache.sh status
+
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
+
+   echo "=== GraphQL Rate Limit ==="
+   gh api rate_limit --jq '.resources.graphql | "Used: \(.used)/\(.limit) | Remaining: \(.remaining)"'
+   ```
+
+2. Use `echo "$PROJECT_ITEMS" | jq '...'` throughout the cycle instead of re-fetching.
+
+3. Only force-refresh when necessary:
+   - After claiming a ticket in Step 3a (to verify the claim succeeded)
+   - Cache is automatically invalidated in Step 4 after status changes
+
 ### Step 2: Audit All Tickets for Alignment
 
 Check all tickets in the project to ensure they align with policy and design:
 
-1. Get all items from the project:
+1. Use the cached project items from Step 1.5:
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   # Use $PROJECT_ITEMS instead of re-fetching
+   echo "$PROJECT_ITEMS" | jq '...'
    ```
 
 2. For each ticket in the project (filter by `type: "Issue"`):
@@ -210,9 +293,10 @@ Implement and locally test ONE Ready ticket using an Agent Team.
 
 **CRITICAL: Multiple b-start instances may run on different machines. The status change MUST happen BEFORE any other work on the ticket to prevent duplicate processing.**
 
-1. Fetch the project board:
+1. Use the cached project board from Step 1.5:
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   # Use $PROJECT_ITEMS instead of re-fetching
+   echo "$PROJECT_ITEMS" | jq '...'
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
 3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
@@ -221,9 +305,9 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-5. **Verify the claim succeeded** — re-fetch the project item and confirm it is now "In Progress":
+5. **Verify the claim succeeded** — force-refresh the cache to get the latest state:
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get true)
    ```
    - If the ticket is already "In Progress" (claimed by another instance between your fetch and your edit), **skip this ticket** and go back to step 1 to find the next Ready ticket.
 6. Log: "Claimed ticket #<number> — moved to In Progress"
@@ -259,25 +343,22 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Task: "Run full test suite"
    - Task: "Commit, push, and create PR"
 
-3. Spawn the **planner** agent (general-purpose, team_name: ready-<ticket_number>):
+3. **Spawn planner and wait** (use synchronous Task - see "How to Wait for Agents" above):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "planner", prompt: "...")
+   ```
    - Reads the ticket, policy.md, and design.md
    - Creates a detailed implementation plan
    - Posts the plan as a comment on the issue
    - Creates the feature branch: `<ticket_number>-<slug>`
-   - Assigns frontend and backend tasks to the respective agents
-   - Sends message to frontend-dev and backend-dev with their assignments
+   - Implements ALL changes directly (frontend AND backend)
+   - Commits all work
+   - **WAIT**: Task tool blocks here until planner completes and returns results
 
-4. Spawn **frontend-dev** agent (general-purpose, team_name: ready-<ticket_number>):
-   - Waits for assignment from planner
-   - Implements frontend changes following the plan
-   - Reports completion to planner
-
-5. Spawn **backend-dev** agent (general-purpose, team_name: ready-<ticket_number>):
-   - Waits for assignment from planner
-   - Implements backend changes following the plan
-   - Reports completion to planner
-
-6. After frontend-dev and backend-dev complete, spawn **unit-test-analyst** agent (general-purpose, team_name: ready-<ticket_number>):
+4. **After planner completes, spawn unit-test-analyst and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "unit-test-analyst", prompt: "...")
+   ```
    - Identifies all files added or modified by the current ticket (diff against main)
    - For each modified/new file, checks if corresponding unit test files exist:
      - Frontend: `*.test.ts` / `*.test.tsx` alongside or in `__tests__/` directories
@@ -295,9 +376,13 @@ Implement and locally test ONE Ready ticket using an Agent Team.
      - Frontend: `npx vitest run` (or `npm test -- --watchAll=false`)
      - Backend: `dotnet test`
    - If new tests fail, fixes them (up to 3 attempts)
-   - Reports results to planner: how many tests added, coverage summary
+   - Reports results: how many tests added, coverage summary
+   - **WAIT**: Task tool blocks here until unit-test-analyst completes and returns results
 
-7. After unit-test-analyst completes, spawn **e2e-test-analyst** agent (general-purpose, team_name: ready-<ticket_number>):
+5. **After unit-test-analyst completes, spawn e2e-test-analyst and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "e2e-test-analyst", prompt: "...")
+   ```
    - Identifies new user-facing features added by the current ticket:
      - New pages and routes
      - New forms with submission workflows
@@ -315,32 +400,45 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Creates or updates Playwright tests following existing patterns in `platform/frontend/e2e/`
    - Runs E2E tests to verify they pass: `npm test` in platform/frontend
    - If new tests fail, fixes them (up to 3 attempts)
-   - Reports results to planner: how many tests added/updated
+   - Reports results: how many tests added/updated
+   - **WAIT**: Task tool blocks here until e2e-test-analyst completes and returns results
 
-8. After e2e-test-analyst completes, spawn **tester** agent (general-purpose, team_name: ready-<ticket_number>):
+6. **After e2e-test-analyst completes, spawn tester and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "tester", prompt: "...")
+   ```
    - Runs `npm run build` in platform/frontend
    - Runs full Playwright E2E suite: `npm test` in platform/frontend
-   - Reports results to planner
+   - Reports results
    - If tests fail: attempt fixes (up to 3 attempts), then report
+   - **WAIT**: Task tool blocks here until tester completes and returns results
 
-9. Planner handles final steps:
+7. **After tester completes, spawn final-committer and wait** (use synchronous Task):
+   ```
+   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "final-committer", prompt: "...")
+   ```
    - Commits all changes (including new unit tests and E2E tests) with "Refs #<ticket_number>"
    - Pushes branch and creates PR
    - Reports success/failure
+   - **WAIT**: Task tool blocks here until final-committer completes and returns results
 
-10. Shut down all agents and delete the team:
+8. **After final-committer completes, shut down all agents and delete the team:**
    ```
-   SendMessage: shutdown_request to each agent
+   SendMessage: shutdown_request to each agent (wait for shutdown_response from each)
    TeamDelete
    ```
 
 **For single-scope or simple tickets — use single Task agent:**
 
 Spawn a single general-purpose agent via Task tool (no team needed):
+```
+Task(subagent_type: "general-purpose", name: "implementer", prompt: "Implement ticket #<number>...")
+```
 - Read ticket, create plan, create branch
 - Implement changes
 - Run tests
 - Commit, push, create PR
+- **WAIT**: Task tool blocks here until the agent completes and returns results
 - This follows the same workflow as `.claude/agents/b-ready.md`
 
 #### Step 3d: Handle Failures
@@ -360,7 +458,9 @@ Merge PRs to main. This is a simple operation — no team needed.
 1. Log "Starting b-progress..."
 2. Find "In Progress" tickets with open PRs (no `on hold` label):
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   # Use cached $PROJECT_ITEMS for project board state
+   echo "$PROJECT_ITEMS" | jq '...'
+   # Only fetch PRs from REST API (separate rate limit)
    gh api "repos/bradyoo12/ai-dev-request/pulls?state=open&per_page=100" --jq '[.[] | {number, headRefName: .head.ref, url: .html_url}]'
    ```
 3. Verify PR is mergeable (REST):
@@ -377,12 +477,16 @@ Merge PRs to main. This is a simple operation — no team needed.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-6. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
-7. Cleanup (worktree-safe — never checks out `main` branch):
+6. **Invalidate the cache** so Step 5 gets fresh data:
+   ```bash
+   bash .claude/scripts/gh-project-cache.sh invalidate
+   ```
+7. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
+8. Cleanup (worktree-safe — never checks out `main` branch):
    ```bash
    git fetch origin && git checkout --detach origin/main
    ```
-8. **Delete stale branches** (local and remote) that have been fully merged:
+9. **Delete stale branches** (local and remote) that have been fully merged:
    ```bash
    # Delete merged local branches (never delete main/master)
    git branch --merged origin/main | grep -vE '^\*|main|master' | xargs -r git branch -d
@@ -524,8 +628,15 @@ Verify changes on staging using parallel agents.
 
 #### Step 5a: Find Eligible Ticket
 
-1. Get "In Review" tickets without `on hold` label
-2. If none found, skip to Step 6
+1. Fetch the project board (cache was invalidated in Step 4, so this will get fresh data):
+   ```bash
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
+   ```
+2. Filter for "In Review" tickets without `on hold` label:
+   ```bash
+   echo "$PROJECT_ITEMS" | jq '...'
+   ```
+3. If none found, skip to Step 6
 
 #### Step 5b: Create Review Team
 
@@ -540,12 +651,20 @@ Verify changes on staging using parallel agents.
    cd platform/frontend && npm install
    ```
 
-3. Spawn **test-runner** agent (general-purpose, team_name: review-<ticket_number>):
+3. **Spawn BOTH agents in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
+
+   In a SINGLE message, spawn both agents with two Task calls:
+   ```
+   Task(subagent_type: "general-purpose", team_name: "review-<ticket_number>", name: "test-runner", prompt: "...")
+   Task(subagent_type: "general-purpose", team_name: "review-<ticket_number>", name: "ai-verifier", prompt: "...")
+   ```
+
+   **test-runner** agent:
    - Installs Playwright: `npx playwright install chromium`
    - Runs FULL Playwright E2E suite against staging: `npm run test:staging`
    - Reports pass/fail results with details
 
-4. Spawn **ai-verifier** agent (general-purpose, team_name: review-<ticket_number>) IN PARALLEL:
+   **ai-verifier** agent:
    - Reads the ticket requirements
    - Reads the "How to Test" comment
    - Uses WebFetch to verify staging URL is accessible
@@ -553,7 +672,7 @@ Verify changes on staging using parallel agents.
    - Checks for console errors, performance, visual correctness
    - Reports verification results
 
-5. Wait for both agents to complete and collect results
+   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
 #### Step 5c: Handle Results
 
@@ -562,6 +681,10 @@ Verify changes on staging using parallel agents.
   ```bash
   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 98236657
   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
+  ```
+- Invalidate cache after status change:
+  ```bash
+  bash .claude/scripts/gh-project-cache.sh invalidate
   ```
 - Close the issue (REST):
   ```bash
@@ -572,7 +695,14 @@ Verify changes on staging using parallel agents.
 
 **If EITHER fails:**
 - Add failure comment with details from both agents
-- Add `on hold` label
+- Add `on hold` label (REST):
+  ```bash
+  gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/labels" -f "labels[]=on hold"
+  ```
+- Invalidate cache after label change:
+  ```bash
+  bash .claude/scripts/gh-project-cache.sh invalidate
+  ```
 
 #### Step 5d: Cleanup
 
@@ -676,6 +806,10 @@ Before researching new technologies, use Playwright to test all links and button
      gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
      gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
      ```
+   - Invalidate cache after adding tickets:
+     ```bash
+     bash .claude/scripts/gh-project-cache.sh invalidate
+     ```
 
 4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
 
@@ -694,17 +828,25 @@ Before researching new technologies, use Playwright to test all links and button
    TeamCreate: modernize
    ```
 
-2. Spawn **tech-scout** agent (general-purpose, team_name: modernize):
+2. **Spawn BOTH scouts in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
+
+   In a SINGLE message, spawn both agents with two Task calls:
+   ```
+   Task(subagent_type: "general-purpose", team_name: "modernize", name: "tech-scout", prompt: "...")
+   Task(subagent_type: "general-purpose", team_name: "modernize", name: "competitor-scout", prompt: "...")
+   ```
+
+   **tech-scout** agent:
    - Searches for recent technologies: AI code generation, agent frameworks, .NET innovations, React ecosystem, DevOps tools
    - Evaluates relevance, effort, and impact scores
    - Reports top findings with scores
 
-3. Spawn **competitor-scout** agent (general-purpose, team_name: modernize) IN PARALLEL:
+   **competitor-scout** agent:
    - Researches competitor features: Replit, Base44, Bolt.new, v0.dev, Cursor
    - Evaluates differentiation, user value, feasibility
    - Reports top findings with scores
 
-4. Wait for both scouts to complete
+   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
 #### Step 6d: Create Tickets
 
@@ -720,6 +862,10 @@ After collecting findings from both scouts:
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
    gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
+   ```
+5. Invalidate cache after adding tickets:
+   ```bash
+   bash .claude/scripts/gh-project-cache.sh invalidate
    ```
 
 #### Step 6e: Cleanup
@@ -745,7 +891,15 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
    TeamCreate: site-audit
    ```
 
-2. Spawn **error-checker** agent (general-purpose, team_name: site-audit):
+2. **Spawn BOTH agents in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
+
+   In a SINGLE message, spawn both agents with two Task calls:
+   ```
+   Task(subagent_type: "general-purpose", team_name: "site-audit", name: "error-checker", prompt: "...")
+   Task(subagent_type: "general-purpose", team_name: "site-audit", name: "ux-reviewer", prompt: "...")
+   ```
+
+   **error-checker** agent:
    - Use WebFetch to visit `https://icy-desert-07c08ba00.2.azurestaticapps.net/`
    - Check for:
      - HTTP errors (4xx, 5xx responses)
@@ -757,7 +911,7 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
    - Navigate to all discoverable pages/routes from the main page
    - Report all errors found with severity (critical/major/minor)
 
-3. Spawn **ux-reviewer** agent (general-purpose, team_name: site-audit) IN PARALLEL:
+   **ux-reviewer** agent:
    - Use WebFetch to visit `https://icy-desert-07c08ba00.2.azurestaticapps.net/`
    - Read `.claude/design.md` to understand the intended UX
    - Evaluate:
@@ -770,7 +924,7 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
      - **Missing features**: Compare against design.md — what's described but not implemented?
    - Report all findings with impact score (1-5) and suggested improvement
 
-4. Wait for both agents to complete and collect results
+   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
 #### Step 7c: Create Tickets
 
@@ -792,6 +946,10 @@ After collecting findings from both agents:
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
    gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
    ```
+5. Invalidate cache after adding tickets:
+   ```bash
+   bash .claude/scripts/gh-project-cache.sh invalidate
+   ```
 
 #### Step 7d: Cleanup
 
@@ -801,12 +959,17 @@ Shut down all agents, delete the team.
 
 Log the current status of the project board:
 
-1. Get counts for each status:
+1. Fetch the project board (uses cache if still valid from Step 5a, otherwise refreshes):
    ```bash
-   gh project item-list 26 --owner bradyoo12 --format json --limit 200
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
    ```
 
-2. Report:
+2. Calculate counts for each status:
+   ```bash
+   echo "$PROJECT_ITEMS" | jq '...'
+   ```
+
+3. Report:
    - Ready count (excluding `on hold`)
    - In Progress count (with and without open PRs)
    - In Review count (with and without `on hold`)
@@ -871,6 +1034,11 @@ Log the current status of the project board:
 
 ## Important Notes
 
+- **Rate Limit Optimization** — The project board is fetched in Step 1.5 and cached in `$PROJECT_ITEMS` for reuse throughout the cycle. Only re-fetch when necessary:
+  - After claiming a ticket in Step 3a (to verify the claim)
+  - Before Step 5a (after Step 4 made changes)
+  - Before Step 8 (to get final state for reporting)
+  This reduces GraphQL API calls from ~4-5 per cycle to ~2-3 per cycle, preventing rate limit exhaustion.
 - **Move to top on status change** — After every `gh project item-edit` that changes a ticket's status, immediately move the item to the top of the column so it's visible on the board:
   ```bash
   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
@@ -883,7 +1051,7 @@ Log the current status of the project board:
 - **Multi-instance safe** - Multiple b-start instances can run on the same machine (via git worktrees — see Step 0) or on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.
 - **Worktree required** - Every b-start instance MUST run Step 0 to acquire a dedicated worktree. Never run directly in the main repository checkout. Never check out the `main` branch — always use `git fetch origin && git checkout --detach origin/main`.
 - Teams are created and destroyed per-step — no long-lived teams
-- 5-second delay between full cycles to avoid API rate limiting
+- 5-second delay between full cycles (can be increased to 10-30s if rate limiting still occurs)
 - Always check policy.md and design.md at the start of each cycle
 - Tickets out of alignment get `on hold` label automatically
 - Human removes `on hold` label to signal approval/readiness

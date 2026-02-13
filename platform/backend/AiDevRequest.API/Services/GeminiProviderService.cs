@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AiDevRequest.API.DTOs;
 
 namespace AiDevRequest.API.Services;
 
@@ -47,7 +48,12 @@ public class GeminiProviderService : IModelProviderService
 
     public string ProviderName => "gemini";
 
-    public async Task<string> GenerateAsync(string prompt, string modelId, CancellationToken ct = default)
+    public async Task<string> GenerateAsync(
+        string prompt,
+        string modelId,
+        ThinkingEffortLevel? effortLevel = null,
+        string? outputSchema = null,
+        CancellationToken ct = default)
     {
         if (!SupportsModel(modelId))
         {
@@ -56,7 +62,20 @@ public class GeminiProviderService : IModelProviderService
 
         try
         {
-            _logger.LogInformation("Gemini API call: model={Model}", modelId);
+            _logger.LogInformation("Gemini API call: model={Model}, effortLevel={EffortLevel}, hasSchema={HasSchema}",
+                modelId, effortLevel, outputSchema != null);
+
+            // Note: Gemini may have different parameters for thinking and structured outputs
+            // These parameters would be added to the request as needed
+            if (effortLevel.HasValue)
+            {
+                _logger.LogInformation("Gemini: Effort level specified but not yet implemented in Gemini provider");
+            }
+
+            if (!string.IsNullOrWhiteSpace(outputSchema))
+            {
+                _logger.LogInformation("Gemini: Output schema specified but not yet implemented in Gemini provider");
+            }
 
             var requestBody = new GeminiGenerateContentRequest
             {

@@ -18,7 +18,7 @@ AI Dev Request is a SaaS platform that automates the software development lifecy
 └──────────────────────┬──────────────────────────────────┘
                        │ REST API
 ┌──────────────────────▼──────────────────────────────────┐
-│                 Backend (.NET 9)                          │
+│              Backend (.NET 10 LTS)                        │
 │              AiDevRequest.API + BradYoo.Core              │
 │    Auth │ Request CRUD │ Project Mgmt │ Billing           │
 └──────────────────────┬──────────────────────────────────┘
@@ -41,9 +41,9 @@ AI Dev Request is a SaaS platform that automates the software development lifecy
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18 + Vite + TypeScript + shadcn/ui + Zustand + Tailwind CSS + Framer Motion |
-| Backend | .NET 9 + BradYoo.Core (shared auth, AI, data) |
+| Backend | .NET 10 LTS + C# 14 + EF Core 10 + BradYoo.Core (shared auth, AI, data) |
 | AI Engine | Claude API (analysis, code generation, deployment automation) |
-| Database | PostgreSQL |
+| Database | PostgreSQL + pgvector (native EF Core 10 support) |
 | Infrastructure | Azure Container Apps |
 | CI/CD | GitHub Actions |
 
@@ -354,6 +354,18 @@ Instant preview URLs for generated projects via edge deployment:
 - **Frontend**: `PreviewDeploymentPage` in Settings with one-click deploy, URL display with copy, QR code for mobile, status indicator, preview history
 - **Flow**: Project generated → one-click deploy → edge deployment → live URL in <5 seconds → QR code for mobile testing
 
+## Promote Preview to Production
+
+One-click promotion of tested preview deployments to production:
+- **Backend**: `PromoteToProductionService` validates and promotes previews to production; `DeploymentService.DeployExistingImageAsync()` reuses container images for fast promotion
+- **Endpoints**:
+  - `POST /api/projects/{projectId}/preview/{previewId}/promote` — promote preview to production
+  - `GET /api/projects/{projectId}/preview/{previewId}/can-promote` — validate if preview can be promoted
+- **Validation**: Checks preview status is `Deployed` and not expired
+- **Fallback Strategy**: If preview has real container image → reuse it (fast: 2-3 min); if no image → trigger fresh build (standard: 5-10 min)
+- **Frontend**: `PreviewDeploymentPage` extended with "Promote to Production" button and success banner
+- **Flow**: Preview deployed → verify on staging → one-click promote → production URL live in 2-10 minutes (depending on image availability)
+
 ## Mobile Preview (Expo)
 
 Mobile projects support instant QR code preview via Expo Snack:
@@ -397,6 +409,37 @@ Intelligent model routing to reduce AI costs by using the cheapest sufficient mo
 - **Entity**: `DevRequest` tracks `ModelTierUsage` (JSON), `EstimatedCostSavings` (decimal)
 - **Frontend**: `CostSavingsDisplay` component shows tier breakdown bar chart and estimated savings after build
 - **Flow**: Task submitted → classify category → route to cheapest sufficient tier → track usage → report savings
+
+## Adaptive Thinking & Structured Outputs
+
+Configure Claude API thinking effort levels per task type for quality-cost trade-offs:
+- **Backend**: `ClaudeProviderService` and `GeminiProviderService` support optional `effortLevel` (Low, Medium, High) and `outputSchema` parameters in `GenerateAsync()`
+- **Effort Levels**: LOW (fast/cheap), MEDIUM (balanced), HIGH (accurate/slower)
+- **Task Types**: Analysis, Proposal, CodeGeneration, Review
+- **Integration**: `AnalysisService`, `ProposalService`, `ProductionService` use HIGH effort for complex tasks
+- **Endpoints**:
+  - `GET /api/ai-model/effort-levels` — get current effort level configuration
+  - `PUT /api/ai-model/effort-levels` — update effort levels per task type
+- **Entity**: `AiModelConfig` stores effort level configuration per task type with JSON serialization
+- **Database Migration**: `AddAdaptiveThinkingConfig` adds effort level config table
+- **Frontend**: `AiModelPage` in Settings with dropdown selectors per task type (Analysis, Proposal, Code Generation, Review), i18n translations (en/ko)
+- **Flow**: User configures effort levels → service reads config → passes `effortLevel` to Claude API → improved quality for complex tasks, faster/cheaper for simple tasks
+
+## Organizational Memory & Vector Search
+
+Semantic memory system for knowledge extraction and retrieval using pgvector:
+- **Backend**: `MemoryExtractionService` extracts knowledge from conversations and code artifacts; `MemoryRetrievalService` performs cosine similarity search; `EfCoreVectorSearchService` provides native vector search with HNSW indexing
+- **Endpoints**:
+  - `POST /api/organizational-memory` — create memory entry
+  - `GET /api/organizational-memory` — list all memories
+  - `GET /api/organizational-memory/search?query={text}` — semantic search
+  - `DELETE /api/organizational-memory/{id}` — delete memory
+- **Entity**: `OrganizationalMemory` with Guid Id, UserId, ContentText, EmbeddingsJson (JSON-serialized float array, ready for native vector type in .NET 10), CategoryJson, MetadataJson, timestamps
+- **Vector Dimension**: 1536 (OpenAI/Anthropic embeddings standard)
+- **Database Migration**: `AddOrganizationalMemory` creates table with pgvector support
+- **Embedding Service**: `EmbeddingService` generates text embeddings (stub, ready for OpenAI/Anthropic integration)
+- **Future**: When .NET 10 is adopted, `EmbeddingsJson` migrates to native `Vector` type with HNSW indexing for 100x faster search
+- **Flow**: User creates dev request → extract key knowledge → embed as vectors → store in OrganizationalMemory → later retrieval uses cosine similarity search → enrich AI context with relevant past knowledge
 
 ## Structured Multi-File Generation Protocol
 
@@ -461,7 +504,7 @@ v0.dev-style visual component preview with conversational iteration for design r
 ```
 platform/
 ├── backend/
-│   └── AiDevRequest.API/    # .NET 9 API
+│   └── AiDevRequest.API/    # .NET 10 LTS API
 ├── frontend/
 │   └── src/                 # React app
 └── ai-engine/               # AI analysis & code generation

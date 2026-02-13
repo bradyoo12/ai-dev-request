@@ -278,6 +278,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | DeploymentService | Azure deployment |
 | ContainerizationService | Docker containerization |
 | PreviewDeploymentService | Edge preview deployments |
+| PromoteToProductionService | Promote preview to production |
 | ExpoPreviewService | Expo mobile preview |
 | SandboxExecutionService | Sandboxed code execution |
 | DatabaseBranchService | Database branching |
@@ -515,6 +516,17 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | TechTrend | Technology trend record |
 | Language | Supported language |
 | Translation | i18n translation string |
+
+---
+
+## Backend DTOs
+
+Data Transfer Objects under `platform/backend/AiDevRequest.API/DTOs/`.
+
+| DTO File | Purpose |
+|---|---|
+| RequestDTOs.cs | Shared request/response DTOs (CreateDevRequestDto, UpdateDevRequestDto, etc.) |
+| AdaptiveThinkingDtos.cs | Adaptive thinking configuration (ThinkingEffortLevel enum, EffortLevelConfigDto) |
 
 ---
 
@@ -845,6 +857,7 @@ All under `platform/frontend/src/api/`. 90 modules total.
 | sandbox-execution.ts | SandboxExecutionController | Sandbox execution |
 | database-branch.ts | DatabaseBranchController | Database branching |
 | preview.ts | PreviewController | Preview deployment |
+| promotion.ts | PreviewController | Promote preview to production |
 
 ### Billing & Payments
 

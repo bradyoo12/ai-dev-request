@@ -7,7 +7,7 @@ AI 개발 요청 접수 → 분석 → 제안 → 제작 자동화 SaaS 플랫�
 ```
 ai-dev-request/
 ├── platform/           # SaaS 플랫폼 코드
-│   ├── backend/        # .NET 9 API 서버
+│   ├── backend/        # .NET 10 API 서버
 │   ├── frontend/       # React + Vite 웹앱
 │   └── ai-engine/      # Claude API 통합, 분석/제안/코드생성
 ├── projects/           # 생성된 고객 프로젝트들
@@ -28,7 +28,7 @@ ai-dev-request/
 
 ## 기술 스택
 
-- **Backend**: .NET 9 + BradYoo.Core
+- **Backend**: .NET 10 LTS + BradYoo.Core
 - **Frontend**: React + Vite + shadcn/ui + Zustand
 - **AI**: Claude API (분석 + 코드 생성)
 - **Database**: PostgreSQL

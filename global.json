@@ -1,8 +1,7 @@
 {
   "sdk": {
     "version": "9.0.300",
-    "rollForward": "latestMajor",
-    "allowPrerelease": true
-  },
-  "comment": "Will be upgraded to 10.0.100 when .NET 10 SDK is released"
+    "rollForward": "latestMinor",
+    "allowPrerelease": false
+  }
 }

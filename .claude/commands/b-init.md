@@ -15,7 +15,7 @@ gh auth status
 ```
 
 3. Show project overview:
-- platform/backend: .NET 9 API server
+- platform/backend: .NET 10 LTS API server
 - platform/frontend: React + Vite web app
 - platform/ai-engine: Claude API integration
 

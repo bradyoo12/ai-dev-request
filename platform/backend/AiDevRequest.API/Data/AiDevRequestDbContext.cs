@@ -163,6 +163,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<BrowserIdeSession> BrowserIdeSessions => Set<BrowserIdeSession>();
     public DbSet<GovernanceAction> GovernanceActions => Set<GovernanceAction>();
     public DbSet<InferenceCostRecord> InferenceCostRecords => Set<InferenceCostRecord>();
+    public DbSet<LanguageExpansion> LanguageExpansions => Set<LanguageExpansion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

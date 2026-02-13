@@ -18,7 +18,7 @@ AI Dev Request is a SaaS platform that automates the software development lifecy
 └──────────────────────┬──────────────────────────────────┘
                        │ REST API
 ┌──────────────────────▼──────────────────────────────────┐
-│                 Backend (.NET 9)                          │
+│              Backend (.NET 10 LTS)                        │
 │              AiDevRequest.API + BradYoo.Core              │
 │    Auth │ Request CRUD │ Project Mgmt │ Billing           │
 └──────────────────────┬──────────────────────────────────┘
@@ -41,7 +41,7 @@ AI Dev Request is a SaaS platform that automates the software development lifecy
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18 + Vite + TypeScript + shadcn/ui + Zustand + Tailwind CSS + Framer Motion |
-| Backend | .NET 9 (with .NET 10 LTS preparation) + BradYoo.Core (shared auth, AI, data) |
+| Backend | .NET 10 LTS + C# 14 + EF Core 10 + BradYoo.Core (shared auth, AI, data) |
 | AI Engine | Claude API (analysis, code generation, deployment automation) |
 | Database | PostgreSQL + pgvector (native EF Core 10 support) |
 | Infrastructure | Azure Container Apps |
@@ -504,7 +504,7 @@ v0.dev-style visual component preview with conversational iteration for design r
 ```
 platform/
 ├── backend/
-│   └── AiDevRequest.API/    # .NET 9 API
+│   └── AiDevRequest.API/    # .NET 10 LTS API
 ├── frontend/
 │   └── src/                 # React app
 └── ai-engine/               # AI analysis & code generation

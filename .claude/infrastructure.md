@@ -37,7 +37,7 @@
 
 #### 1. build-and-deploy-api
 - Runner: `ubuntu-latest`
-- Steps: Checkout → Setup .NET 9.0.x → Restore → Build (Release) → Publish → Deploy to Azure Web App
+- Steps: Checkout → Setup .NET 10.0.x → Restore → Build (Release) → Publish → Deploy to Azure Web App
 - Deployment: `azure/webapps-deploy@v3` with publish profile from secrets
 - Working dir: `platform/backend/AiDevRequest.API`
 
@@ -50,7 +50,7 @@
 
 ### Workflow Environment Variables
 ```yaml
-DOTNET_VERSION: 9.0.x
+DOTNET_VERSION: 10.0.x
 NODE_VERSION: 20
 AZURE_WEBAPP_NAME_API: ai-dev-request-api
 AZURE_WEBAPP_NAME_WEB: ai-dev-request-web
@@ -60,7 +60,7 @@ AZURE_WEBAPP_NAME_WEB: ai-dev-request-web
 
 | Resource | Type | Details |
 |----------|------|---------|
-| API Server | Azure Web App | ai-dev-request-api, B1 tier (min), .NET 9 |
+| API Server | Azure Web App | ai-dev-request-api, B1 tier (min), .NET 10 LTS |
 | Frontend | Azure Static Web Apps | Auto-deployed from GitHub Actions |
 | Database | PostgreSQL Flexible Server | db-bradyoo-staging, database: ai_dev_request |
 | Storage | Azure Blob Storage | Generated project artifacts |

@@ -1334,3 +1334,20 @@ Terminal and browser access for AI agents with sandboxed execution, security con
 - **Frontend**: `AgentTerminalPage` in Settings with 4 sub-tabs (Execute, Sessions, Sandboxes, Stats). Execute tab runs agent tasks with mode/sandbox selection showing command log and browser action results. Sessions tab lists past sessions. Sandboxes tab shows environments and security controls (CPU/memory/timeout/network/filesystem). Stats tab shows aggregate metrics
 - **Entity**: `AgentTerminalSession` with AccessMode (terminal/browser/both), SandboxType (docker/firecracker/gvisor/deno), CommandsExecuted, BrowserActions, SubagentsDelegated, FilesModified, CpuLimitPercent, MemoryLimitMb, TimeoutMinutes, NetworkEgressAllowed, SessionDurationMs, Status, OutputLog
 - **Ticket**: #441 — `Agent terminal and browser access (Cursor Agent Mode pattern)`
+
+### Multi-File Composer with Plan Mode (Cursor Composer Pattern)
+
+Multi-file editing with plan-first workflow, model tier selection, and diff preview:
+- **Backend**: `ComposerPlan` entity with plan mode, model tier, step tracking, and approval workflow. `ComposerController` with plan creation, approval, list, delete, stats, and modes endpoints
+- **Endpoints**:
+  - `GET /api/composer` — list plans (50 limit)
+  - `POST /api/composer/plan` — create plan with simulated steps (max 20 per user)
+  - `POST /api/composer/{id}/approve` — approve or reject plan
+  - `DELETE /api/composer/{id}` — delete plan
+  - `GET /api/composer/stats` — plan statistics (by mode, by model, approval rate)
+  - `GET /api/composer/modes` — list 3 composer modes (anonymous)
+- **Modes**: Plan First (#3B82F6), Direct Edit (#10B981), Interactive (#8B5CF6)
+- **Models**: Haiku (fast/2x), Sonnet (balanced/1x), Opus (most capable/0.5x)
+- **Frontend**: `ComposerPage` in Settings with 4 sub-tabs (Compose, Plans, Modes, Stats). Compose tab creates plans with mode/model selection, shows plan overview with step/file/line counts and approve/reject buttons, plus diff preview. Plans tab lists all plans with status badges. Modes tab shows composer modes and model tiers. Stats tab shows aggregate metrics and breakdowns
+- **Entity**: `ComposerPlan` with PlanMode (plan-first/direct/interactive), ModelTier (haiku/sonnet/opus), TotalSteps, CompletedSteps, FilesChanged, LinesAdded, LinesRemoved, EstimatedTokens, ActualTokens, DiffPreviewShown, PlanApproved, Status, PlanSummary
+- **Ticket**: #442 — `Multi-file Composer with Plan Mode (Cursor pattern)`

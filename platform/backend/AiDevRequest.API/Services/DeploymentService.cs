@@ -16,6 +16,7 @@ public interface IDeploymentService
     Task<Deployment?> GetDeploymentAsync(Guid deploymentId);
     Task<List<Deployment>> GetUserDeploymentsAsync(string userId);
     Task<Deployment> DeployAsync(Guid deploymentId);
+    Task<Deployment> DeployExistingImageAsync(Guid deploymentId, string containerImageTag);
     Task<Deployment> RedeployAsync(Guid deploymentId);
     Task DeleteDeploymentAsync(Guid deploymentId);
     Task<List<DeploymentLogEntry>> GetLogsAsync(Guid deploymentId);
@@ -216,6 +217,137 @@ public class AzureDeploymentService : IDeploymentService
         }
     }
 
+    public async Task<Deployment> DeployExistingImageAsync(Guid deploymentId, string containerImageTag)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AiDevRequestDbContext>();
+        var deployment = await context.Deployments.FindAsync(deploymentId)
+            ?? throw new InvalidOperationException($"Deployment {deploymentId} not found");
+
+        var logs = new List<DeploymentLogEntry>();
+
+        try
+        {
+            _logger.LogInformation("Promoting preview image: {Tag}", containerImageTag);
+            AddLog(logs, $"Promoting preview image: {containerImageTag}");
+            AddLog(logs, "Skipping build phase (reusing tested image)");
+
+            deployment.Status = DeploymentStatus.Deploying;
+            deployment.UpdatedAt = DateTime.UtcNow;
+            deployment.DeploymentLogJson = JsonSerializer.Serialize(logs);
+            await context.SaveChangesAsync();
+
+            var subscriptionId = _configuration["Azure:SubscriptionId"];
+            if (string.IsNullOrEmpty(subscriptionId))
+            {
+                // Simulation mode when Azure is not configured
+                _logger.LogWarning("Azure SubscriptionId not configured. Running in simulation mode.");
+                return await SimulatePromotionAsync(context, deployment, logs, containerImageTag);
+            }
+
+            var credential = new DefaultAzureCredential();
+            var armClient = new ArmClient(credential);
+            var subscription = armClient.GetSubscriptionResource(new Azure.Core.ResourceIdentifier($"/subscriptions/{subscriptionId}"));
+
+            // Get or create resource group
+            AddLog(logs, "Getting resource group: " + deployment.ResourceGroupName);
+            var rgId = ResourceGroupResource.CreateResourceIdentifier(subscriptionId, deployment.ResourceGroupName!);
+            var resourceGroup = armClient.GetResourceGroupResource(rgId);
+
+            try
+            {
+                await resourceGroup.GetAsync();
+                AddLog(logs, "Resource group found");
+            }
+            catch
+            {
+                // Create resource group if it doesn't exist
+                var rgData = new Azure.ResourceManager.Resources.ResourceGroupData(new Azure.Core.AzureLocation(deployment.Region));
+                rgData.Tags.Add("project", deployment.DevRequestId.ToString());
+                rgData.Tags.Add("user", deployment.UserId);
+                rgData.Tags.Add("created-by", "ai-dev-request");
+                var rgOperation = await subscription.GetResourceGroups().CreateOrUpdateAsync(Azure.WaitUntil.Completed, deployment.ResourceGroupName!, rgData);
+                resourceGroup = rgOperation.Value;
+                AddLog(logs, "Resource group created");
+            }
+
+            deployment.DeploymentLogJson = JsonSerializer.Serialize(logs);
+            await context.SaveChangesAsync();
+            AddLog(logs, "Creating Container App with existing image...");
+
+            // Create Container Apps managed environment
+            var envName = $"env-{deployment.SiteName}";
+            var envData = new ContainerAppManagedEnvironmentData(new Azure.Core.AzureLocation(deployment.Region));
+            var envOperation = await resourceGroup.GetContainerAppManagedEnvironments()
+                .CreateOrUpdateAsync(Azure.WaitUntil.Completed, envName, envData);
+            var environment = envOperation.Value;
+            AddLog(logs, "Container Apps environment created");
+
+            // Create Container App with the existing container image
+            var containerAppName = deployment.ContainerAppName!;
+            var containerAppData = new ContainerAppData(new Azure.Core.AzureLocation(deployment.Region))
+            {
+                ManagedEnvironmentId = environment.Id,
+                Configuration = new ContainerAppConfiguration
+                {
+                    Ingress = new ContainerAppIngressConfiguration
+                    {
+                        External = true,
+                        TargetPort = GetTargetPort(deployment.ProjectType),
+                        Transport = ContainerAppIngressTransportMethod.Auto
+                    }
+                },
+                Template = new ContainerAppTemplate()
+            };
+
+            containerAppData.Template.Containers.Add(new ContainerAppContainer
+            {
+                Name = containerAppName,
+                Image = containerImageTag, // Use the provided container image tag
+                Resources = new AppContainerResources
+                {
+                    Cpu = 0.25,
+                    Memory = "0.5Gi"
+                }
+            });
+
+            var appOperation = await resourceGroup.GetContainerApps()
+                .CreateOrUpdateAsync(Azure.WaitUntil.Completed, containerAppName, containerAppData);
+            var containerApp = appOperation.Value;
+
+            // Get the FQDN
+            var fqdn = containerApp.Data.Configuration?.Ingress?.Fqdn;
+            var previewUrl = fqdn != null ? $"https://{fqdn}" : null;
+
+            AddLog(logs, $"Container App created. URL: {previewUrl}");
+            AddLog(logs, "Deployment complete");
+
+            // Step 4: Running (skip Provisioning and Building)
+            deployment.Status = DeploymentStatus.Running;
+            deployment.PreviewUrl = previewUrl;
+            deployment.ContainerImageTag = containerImageTag;
+            deployment.DeployedAt = DateTime.UtcNow;
+            deployment.UpdatedAt = DateTime.UtcNow;
+            deployment.DeploymentLogJson = JsonSerializer.Serialize(logs);
+            await context.SaveChangesAsync();
+
+            _logger.LogInformation("Deployment {DeploymentId} completed with existing image. URL: {PreviewUrl}", deploymentId, previewUrl);
+            return deployment;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Deployment {DeploymentId} failed", deploymentId);
+            AddLog(logs, $"Deployment failed: {ex.Message}", "error");
+
+            deployment.Status = DeploymentStatus.Failed;
+            deployment.UpdatedAt = DateTime.UtcNow;
+            deployment.DeploymentLogJson = JsonSerializer.Serialize(logs);
+            await context.SaveChangesAsync();
+
+            return deployment;
+        }
+    }
+
     public async Task<Deployment> RedeployAsync(Guid deploymentId)
     {
         using var scope = _scopeFactory.CreateScope();
@@ -308,6 +440,28 @@ public class AzureDeploymentService : IDeploymentService
         await context.SaveChangesAsync();
 
         _logger.LogInformation("[SIMULATION] Deployment {DeploymentId} completed. URL: {PreviewUrl}", deployment.Id, previewUrl);
+        return deployment;
+    }
+
+    private async Task<Deployment> SimulatePromotionAsync(AiDevRequestDbContext context, Deployment deployment, List<DeploymentLogEntry> logs, string containerImageTag)
+    {
+        AddLog(logs, "[SIMULATION] Deploying with existing image: " + containerImageTag);
+
+        await Task.Delay(500);
+        var simulatedFqdn = $"{deployment.SiteName}-{Guid.NewGuid().ToString()[..8]}.azurecontainerapps.io";
+        var previewUrl = $"https://{simulatedFqdn}";
+        AddLog(logs, $"[SIMULATION] Container App created. URL: {previewUrl}");
+        AddLog(logs, "[SIMULATION] Deployment complete");
+
+        deployment.Status = DeploymentStatus.Running;
+        deployment.PreviewUrl = previewUrl;
+        deployment.ContainerImageTag = containerImageTag;
+        deployment.DeployedAt = DateTime.UtcNow;
+        deployment.UpdatedAt = DateTime.UtcNow;
+        deployment.DeploymentLogJson = JsonSerializer.Serialize(logs);
+        await context.SaveChangesAsync();
+
+        _logger.LogInformation("[SIMULATION] Deployment {DeploymentId} completed with existing image. URL: {PreviewUrl}", deployment.Id, previewUrl);
         return deployment;
     }
 

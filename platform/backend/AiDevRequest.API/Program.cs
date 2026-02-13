@@ -73,6 +73,7 @@ builder.Services.AddScoped<IInfrastructureService, InfrastructureService>();
 builder.Services.AddScoped<ISecretDetectionService, SecretDetectionService>();
 builder.Services.AddScoped<ISecureConfigService, SecureConfigService>();
 builder.Services.AddScoped<IPreviewDeploymentService, PreviewDeploymentService>();
+builder.Services.AddScoped<IPromoteToProductionService, PromoteToProductionService>();
 builder.Services.AddScoped<IFileGenerationService, FileGenerationService>();
 builder.Services.AddScoped<IOAuthComplianceService, OAuthComplianceService>();
 builder.Services.AddScoped<ICompilerValidationService, CompilerValidationService>();

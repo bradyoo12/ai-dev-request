@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { listWorkflows, getWorkflowMetrics, retryWorkflowStep, cancelWorkflow } from '../api/workflows'
 import type { WorkflowExecution, WorkflowStep, WorkflowMetrics } from '../api/workflows'
+import { getStatusColors } from '../components/StatusBadge'
 
 export default function WorkflowPage() {
   const { t } = useTranslation()
@@ -59,16 +60,7 @@ export default function WorkflowPage() {
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed': return 'bg-green-900/50 text-green-400'
-      case 'running': return 'bg-blue-900/50 text-blue-400'
-      case 'pending': return 'bg-yellow-900/50 text-yellow-400'
-      case 'failed': return 'bg-red-900/50 text-red-400'
-      case 'cancelled': return 'bg-warm-700 text-warm-400'
-      default: return 'bg-warm-700 text-warm-400'
-    }
-  }
+  // Status colors now managed by centralized StatusBadge component
 
   const getStepIcon = (status: string) => {
     switch (status) {
@@ -148,7 +140,7 @@ export default function WorkflowPage() {
                         <span className="text-xs text-warm-500">Request #{wf.devRequestId}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(wf.status)}`}>
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColors(wf.status)}`}>
                           {wf.status}
                         </span>
                         {wf.retryCount > 0 && (
@@ -163,7 +155,7 @@ export default function WorkflowPage() {
                     <div className="flex items-center gap-1 overflow-x-auto pb-1">
                       {steps.map((step, idx) => (
                         <div key={step.name} className="flex items-center">
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium ${getStatusColor(step.status)}`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium ${getStatusColors(step.status)}`}>
                             <span className="font-mono">{getStepIcon(step.status)}</span>
                             <span>{step.name}</span>
                           </div>
@@ -197,7 +189,7 @@ export default function WorkflowPage() {
                           <div key={step.name} className="bg-warm-900 rounded-lg p-3">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(step.status)}`}>
+                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColors(step.status)}`}>
                                   {step.status}
                                 </span>
                                 <span className="text-sm font-medium">{step.name}</span>

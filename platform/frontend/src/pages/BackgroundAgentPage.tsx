@@ -12,6 +12,7 @@ import {
   type AgentStats,
   type AgentType,
 } from '../api/backgroundagent'
+import { getStatusColors } from '../components/StatusBadge'
 
 export default function BackgroundAgentPage() {
   const { t } = useTranslation()
@@ -91,16 +92,7 @@ export default function BackgroundAgentPage() {
     } catch { /* ignore */ }
   }
 
-  const statusColor = (status: string) => {
-    switch (status) {
-      case 'running': return 'bg-green-600 text-white'
-      case 'starting': return 'bg-blue-600 text-white'
-      case 'completed': return 'bg-warm-600 text-white'
-      case 'failed': return 'bg-red-600 text-white'
-      case 'stopped': return 'bg-yellow-700 text-yellow-200'
-      default: return 'bg-warm-700 text-warm-400'
-    }
-  }
+  // Status colors now managed by centralized StatusBadge component
 
   const priorityColor = (priority: string) => {
     switch (priority) {
@@ -232,7 +224,7 @@ export default function BackgroundAgentPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-white font-medium">{agent.agentName}</span>
-                      <span className={`px-2 py-0.5 rounded text-xs ${statusColor(agent.status)}`}>
+                      <span className={`px-2 py-0.5 rounded text-xs ${getStatusColors(agent.status)}`}>
                         {agent.status}
                       </span>
                       <span className={`text-xs ${priorityColor(agent.priority)}`}>{agent.priority}</span>

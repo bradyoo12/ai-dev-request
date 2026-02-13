@@ -173,6 +173,40 @@ const res = await authFetch(`${API_URL}/api/foo`);
 ```
 Auto-handles JWT headers and 401 → login redirect.
 
+## Design System
+
+### Status Badge Colors
+
+**Centralized component**: `src/components/StatusBadge.tsx`
+
+Use the `StatusBadge` component or `getStatusColors()` helper for consistent status badge colors across the app.
+
+**Color Mapping**:
+- **Success/Completed**: `green` (bg-green-900/50, text-green-400)
+- **In Progress/Running**: `blue` (bg-blue-900/50, text-blue-400)
+- **Failed/Error**: `red` (bg-red-900/50, text-red-400)
+- **Pending/Waiting**: `yellow` (bg-yellow-900/50, text-yellow-400)
+- **Cancelled/Stopped**: `gray/warm` (bg-warm-700, text-warm-400)
+
+**Usage**:
+```tsx
+import { StatusBadge, getStatusColors } from '@/components/StatusBadge';
+
+// Use component directly
+<StatusBadge status="completed" />
+<StatusBadge status="running" animate />
+
+// Or use helper for custom implementations
+<span className={getStatusColors(status)}>{status}</span>
+```
+
+**Supported Status Values**:
+- Success: `completed`, `success`
+- Active: `running`, `in-progress`, `in_progress`, `starting`
+- Error: `failed`, `error`
+- Waiting: `pending`, `waiting`
+- Inactive: `cancelled`, `stopped`, `idle`
+
 ## Testing Patterns
 
 ### Backend (xUnit + Moq)

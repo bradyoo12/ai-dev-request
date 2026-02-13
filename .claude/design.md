@@ -1574,3 +1574,18 @@ Performance benchmarking comparing React 19's use() hook vs traditional useEffec
 - **Metrics**: Render time, data fetch time, re-render count, boilerplate lines, performance score
 - **Frontend**: `ReactUseHookPage` in Settings at `/settings/react-use-hook` with 4 sub-tabs (Benchmark, History, Patterns, Stats). Benchmark shows side-by-side comparison and code before/after
 - **Ticket**: #474 — `React 19 use() hook for async data loading`
+
+### Next Edit Predictions (Ripple Effect Analysis)
+
+Predict ripple effects of code changes with AST analysis, dependency graphs, and suggested edits:
+- **Backend**: `EditPrediction` entity tracking analysis results. `EditPredictionController` with analyze, list, delete, stats, and change-types endpoints
+- **Endpoints**:
+  - `GET /api/edit-prediction` — list predictions (50 limit)
+  - `POST /api/edit-prediction/analyze` — analyze ripple effects with file predictions, dependency graph, confidence scores
+  - `DELETE /api/edit-prediction/{id}` — delete prediction
+  - `GET /api/edit-prediction/stats` — analysis statistics (by change type)
+  - `GET /api/edit-prediction/change-types` — list 6 change types with impact levels (anonymous)
+- **Change Types**: rename, delete, modify-signature, add-parameter, change-type, move
+- **Analysis**: Dependency graph (nodes/edges/depth/hotspots), affected files, predicted edits with confidence, test impact
+- **Frontend**: `EditPredictionPage` in Settings at `/settings/edit-predictions` with 4 sub-tabs (Analyze, History, Change Types, Stats)
+- **Ticket**: #475 — `Next Edit Predictions with ripple effect analysis`

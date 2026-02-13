@@ -140,6 +140,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<OrgMemory> OrgMemories => Set<OrgMemory>();
     public DbSet<AiAgentRule> AiAgentRules => Set<AiAgentRule>();
     public DbSet<ServerComponentConfig> ServerComponentConfigs => Set<ServerComponentConfig>();
+    public DbSet<CodeLintResult> CodeLintResults => Set<CodeLintResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

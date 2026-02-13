@@ -171,6 +171,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ConfidenceScore> ConfidenceScores => Set<ConfidenceScore>();
     public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
     public DbSet<AgentInboxItem> AgentInboxItems => Set<AgentInboxItem>();
+    public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

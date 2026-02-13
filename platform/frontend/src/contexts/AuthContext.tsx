@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import { getStoredUser, logout as apiLogout, socialLogin, isAuthenticated, AUTH_EXPIRED_EVENT } from '../api/auth'
 import type { AuthUser, SocialProvider } from '../api/auth'
 import { getTokenOverview } from '../api/settings'
+import { apiCache } from '../utils/apiCache'
 
 interface AuthContextType {
   authUser: AuthUser | null
@@ -25,7 +26,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadTokenBalance = useCallback(async () => {
     if (!isAuthenticated()) return
     try {
-      const overview = await getTokenOverview()
+      // Use stale-while-revalidate to return cached data immediately
+      // This prevents blocking page loads while fetching token balance
+      const overview = await apiCache.get(
+        'token-balance',
+        () => getTokenOverview(),
+        60000, // Cache for 60 seconds
+        true // Use stale-while-revalidate for instant response
+      )
       setTokenBalance(overview.balance)
     } catch {
       // Auth expiry is handled by authFetch via AUTH_EXPIRED_EVENT
@@ -42,6 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     apiLogout()
     setAuthUser(null)
     setTokenBalance(null)
+    // Clear all caches on logout
+    apiCache.clear()
   }, [])
 
   const requireAuth = useCallback(() => {

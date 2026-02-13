@@ -41,7 +41,7 @@ is_cache_valid() {
 # Function: Fetch fresh data from GitHub
 fetch_fresh() {
     echo "[Cache] Fetching fresh project board data from GitHub GraphQL API..." >&2
-    gh project item-list 26 --owner bradyoo12 --format json --limit 200 > "$CACHE_FILE"
+    gh project item-list 26 --owner "@me" --format json --limit 200 > "$CACHE_FILE"
     get_timestamp > "$TIMESTAMP_FILE"
     echo "[Cache] Fresh data cached (expires in ${CACHE_TTL_SECONDS}s)" >&2
 }

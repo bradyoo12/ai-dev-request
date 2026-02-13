@@ -1,4 +1,5 @@
 import { getAuthHeaders } from './auth'
+import { apiCache } from '../utils/apiCache'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 const API_TIMEOUT = 10000 // 10 seconds
@@ -41,29 +42,46 @@ export async function getSupportPosts(
   const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), sort })
   if (category && category !== 'all') params.set('category', category)
 
-  try {
-    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support?${params}`)
-    if (!res.ok) throw new Error('Failed to load support posts')
-    return res.json()
-  } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw new Error('Request timed out. Please try again.')
-    }
-    throw err
-  }
+  const cacheKey = `support-posts:${params.toString()}`
+
+  return apiCache.get(
+    cacheKey,
+    async () => {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/api/support?${params}`)
+        if (!res.ok) throw new Error('Failed to load support posts')
+        return res.json()
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          throw new Error('Request timed out. Please try again.')
+        }
+        throw err
+      }
+    },
+    10000, // Cache for 10 seconds
+    true // Use stale-while-revalidate for instant response
+  )
 }
 
 export async function getSupportPost(id: string): Promise<SupportPost> {
-  try {
-    const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/${id}`)
-    if (!res.ok) throw new Error('Failed to load support post')
-    return res.json()
-  } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') {
-      throw new Error('Request timed out. Please try again.')
-    }
-    throw err
-  }
+  const cacheKey = `support-post:${id}`
+
+  return apiCache.get(
+    cacheKey,
+    async () => {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/${id}`)
+        if (!res.ok) throw new Error('Failed to load support post')
+        return res.json()
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          throw new Error('Request timed out. Please try again.')
+        }
+        throw err
+      }
+    },
+    30000 // Cache individual posts for 30 seconds
+  )
 }
 
 export async function createSupportPost(
@@ -78,7 +96,12 @@ export async function createSupportPost(
       body: JSON.stringify({ title, content, category }),
     })
     if (!res.ok) throw new Error('Failed to create support post')
-    return res.json()
+    const data = await res.json()
+
+    // Invalidate support posts cache
+    apiCache.invalidatePattern(/^support-posts:/)
+
+    return data
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
       throw new Error('Request timed out. Please try again.')
@@ -98,7 +121,13 @@ export async function setRewardCredit(
       body: JSON.stringify({ rewardCredit }),
     })
     if (!res.ok) throw new Error('Failed to set reward credit')
-    return res.json()
+    const data = await res.json()
+
+    // Invalidate related caches
+    apiCache.invalidate(`support-post:${id}`)
+    apiCache.invalidatePattern(/^support-posts:/)
+
+    return data
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
       throw new Error('Request timed out. Please try again.')
@@ -118,7 +147,13 @@ export async function updateSupportStatus(
       body: JSON.stringify({ status }),
     })
     if (!res.ok) throw new Error('Failed to update status')
-    return res.json()
+    const data = await res.json()
+
+    // Invalidate related caches
+    apiCache.invalidate(`support-post:${id}`)
+    apiCache.invalidatePattern(/^support-posts:/)
+
+    return data
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
       throw new Error('Request timed out. Please try again.')

@@ -159,6 +159,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<TursoDatabase> TursoDatabases => Set<TursoDatabase>();
     public DbSet<WorkersAiDeployment> WorkersAiDeployments => Set<WorkersAiDeployment>();
     public DbSet<ReactUseHookDemo> ReactUseHookDemos => Set<ReactUseHookDemo>();
+    public DbSet<EditPrediction> EditPredictions => Set<EditPrediction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

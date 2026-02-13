@@ -183,18 +183,24 @@ Read and internalize the project guidelines. These are living documents that get
 
 ### Step 1.5: Fetch Project Board State (Once Per Cycle)
 
-**CRITICAL RATE LIMIT OPTIMIZATION:** Fetch the project board state ONCE per cycle and reuse throughout Steps 2-8. This reduces GraphQL API calls from ~4-5 per cycle to ~1-2 per cycle.
+**CRITICAL RATE LIMIT OPTIMIZATION:** Use the project board cache to minimize GraphQL API calls. The cache stores project data for 5 minutes, reducing API calls from ~6 per cycle to ~0-1 per cycle.
 
-1. Fetch all project items and store in a variable:
+1. **Check cache status and fetch project items** (uses cache if < 5 min old, otherwise fetches fresh):
    ```bash
-   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
+   echo "=== Cache Status ==="
+   bash .claude/scripts/gh-project-cache.sh status
+
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
+
+   echo "=== GraphQL Rate Limit ==="
+   gh api rate_limit --jq '.resources.graphql | "Used: \(.used)/\(.limit) | Remaining: \(.remaining)"'
    ```
 
 2. Use `echo "$PROJECT_ITEMS" | jq '...'` throughout the cycle instead of re-fetching.
 
-3. Only re-fetch when necessary:
+3. Only force-refresh when necessary:
    - After claiming a ticket in Step 3a (to verify the claim succeeded)
-   - After merging in Step 4 (to get updated state for Step 5)
+   - Cache is automatically invalidated in Step 4 after status changes
 
 ### Step 2: Audit All Tickets for Alignment
 
@@ -248,9 +254,9 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-5. **Verify the claim succeeded** — re-fetch the project board to confirm (this is one of the rare re-fetches):
+5. **Verify the claim succeeded** — force-refresh the cache to get the latest state:
    ```bash
-   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get true)
    ```
    - If the ticket is already "In Progress" (claimed by another instance between your fetch and your edit), **skip this ticket** and go back to step 1 to find the next Ready ticket.
 6. Log: "Claimed ticket #<number> — moved to In Progress"
@@ -406,12 +412,16 @@ Merge PRs to main. This is a simple operation — no team needed.
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id df73e18b
    gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
    ```
-6. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
-7. Cleanup (worktree-safe — never checks out `main` branch):
+6. **Invalidate the cache** so Step 5 gets fresh data:
+   ```bash
+   bash .claude/scripts/gh-project-cache.sh invalidate
+   ```
+7. **Add a detailed "How to Test" comment** with staging URL and step-by-step instructions
+8. Cleanup (worktree-safe — never checks out `main` branch):
    ```bash
    git fetch origin && git checkout --detach origin/main
    ```
-8. **Delete stale branches** (local and remote) that have been fully merged:
+9. **Delete stale branches** (local and remote) that have been fully merged:
    ```bash
    # Delete merged local branches (never delete main/master)
    git branch --merged origin/main | grep -vE '^\*|main|master' | xargs -r git branch -d
@@ -529,9 +539,9 @@ Verify changes on staging using parallel agents.
 
 #### Step 5a: Find Eligible Ticket
 
-1. Re-fetch the project board (Step 4 made changes, so we need fresh data):
+1. Fetch the project board (cache was invalidated in Step 4, so this will get fresh data):
    ```bash
-   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
    ```
 2. Filter for "In Review" tickets without `on hold` label:
    ```bash
@@ -575,6 +585,10 @@ Verify changes on staging using parallel agents.
   gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 98236657
   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
   ```
+- Invalidate cache after status change:
+  ```bash
+  bash .claude/scripts/gh-project-cache.sh invalidate
+  ```
 - Close the issue (REST):
   ```bash
   gh api --method PATCH "repos/bradyoo12/ai-dev-request/issues/<issue_number>" -f state=closed -f state_reason=completed
@@ -584,7 +598,14 @@ Verify changes on staging using parallel agents.
 
 **If EITHER fails:**
 - Add failure comment with details from both agents
-- Add `on hold` label
+- Add `on hold` label (REST):
+  ```bash
+  gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/labels" -f "labels[]=on hold"
+  ```
+- Invalidate cache after label change:
+  ```bash
+  bash .claude/scripts/gh-project-cache.sh invalidate
+  ```
 
 #### Step 5d: Cleanup
 
@@ -688,6 +709,10 @@ Before researching new technologies, use Playwright to test all links and button
      gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
      gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
      ```
+   - Invalidate cache after adding tickets:
+     ```bash
+     bash .claude/scripts/gh-project-cache.sh invalidate
+     ```
 
 4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
 
@@ -732,6 +757,10 @@ After collecting findings from both scouts:
    ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
    gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
+   ```
+5. Invalidate cache after adding tickets:
+   ```bash
+   bash .claude/scripts/gh-project-cache.sh invalidate
    ```
 
 #### Step 6e: Cleanup
@@ -804,6 +833,10 @@ After collecting findings from both agents:
    gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
    gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }"
    ```
+5. Invalidate cache after adding tickets:
+   ```bash
+   bash .claude/scripts/gh-project-cache.sh invalidate
+   ```
 
 #### Step 7d: Cleanup
 
@@ -813,9 +846,9 @@ Shut down all agents, delete the team.
 
 Log the current status of the project board:
 
-1. Re-fetch the project board one final time (Steps 5-7 may have made changes):
+1. Fetch the project board (uses cache if still valid from Step 5a, otherwise refreshes):
    ```bash
-   PROJECT_ITEMS=$(gh project item-list 26 --owner bradyoo12 --format json --limit 200)
+   PROJECT_ITEMS=$(bash .claude/scripts/gh-project-cache.sh get)
    ```
 
 2. Calculate counts for each status:

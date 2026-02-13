@@ -127,6 +127,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<UsageMeter> UsageMeters => Set<UsageMeter>();
     public DbSet<AgentTask> AgentTasks => Set<AgentTask>();
     public DbSet<AgentAutomationConfig> AgentAutomationConfigs => Set<AgentAutomationConfig>();
+    public DbSet<SubagentTask> SubagentTasks => Set<SubagentTask>();
+    public DbSet<ParallelOrchestration> ParallelOrchestrations => Set<ParallelOrchestration>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1134,7 +1136,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.EstimatedFiles).HasColumnType("jsonb");
             entity.Property(e => e.TraceabilityLinks).HasColumnType("jsonb");
             entity.Property(e => e.RejectionFeedback).HasMaxLength(5000);
-            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            // entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);  // Removed due to FK type mismatch (int vs Guid)
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Phase);
             entity.HasIndex(e => e.Status);
@@ -1154,7 +1156,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ConflictDetails).HasColumnType("jsonb");
             entity.Property(e => e.WebhookId).HasMaxLength(100);
             entity.Property(e => e.WebhookSecret).HasMaxLength(200);
-            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            // entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);  // Removed due to FK type mismatch (int vs Guid)
             entity.HasIndex(e => e.ProjectId).IsUnique();
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -1168,7 +1170,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.OverallScore).HasColumnType("double precision");
             entity.Property(e => e.Findings).HasColumnType("jsonb");
             entity.Property(e => e.AppliedFixes).HasColumnType("jsonb");
-            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            // entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);  // Removed due to FK type mismatch (int vs Guid)
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -1183,7 +1185,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ProgressPercent).HasColumnType("double precision");
             entity.Property(e => e.GeneratedFiles).HasColumnType("jsonb");
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
-            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
+            // entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);  // Removed due to FK type mismatch (int vs Guid)
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -1270,7 +1272,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.TestFramework).HasMaxLength(100);
             entity.Property(e => e.Summary).HasMaxLength(5000);
             entity.Property(e => e.TestFilesJson).HasColumnType("jsonb");
-            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            // entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);  // Removed due to FK type mismatch (int vs Guid)
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -1290,7 +1292,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.BuildStatus).IsRequired().HasMaxLength(20);
             entity.Property(e => e.BuildLogs).HasColumnType("jsonb");
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
-            entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);
+            // entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.ProjectId).OnDelete(DeleteBehavior.Cascade);  // Removed due to FK type mismatch (int vs Guid)
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.BuildStatus);
             entity.HasIndex(e => e.CreatedAt);
@@ -1876,6 +1878,34 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<SubagentTask>(entity =>
+        {
+            entity.ToTable("subagent_tasks");
+            entity.HasKey(e => e.Id);
+            // DevRequest navigation removed due to FK type mismatch
+            entity.HasOne(e => e.ParentOrchestration)
+                .WithMany(o => o.Tasks)
+                .HasForeignKey(e => e.ParentOrchestrationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.ParentOrchestrationId);
+            entity.HasIndex(e => e.Status);
+            entity.Property(e => e.TaskType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<ParallelOrchestration>(entity =>
+        {
+            entity.ToTable("parallel_orchestrations");
+            entity.HasKey(e => e.Id);
+            // DevRequest navigation removed due to FK type mismatch
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.Status);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
         });
     }
 }

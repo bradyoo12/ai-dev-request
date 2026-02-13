@@ -1318,3 +1318,19 @@ REPL-based test execution that's 3x faster and 10x cheaper than browser automati
 - **Frontend**: `ReplTestPage` in Settings with 4 sub-tabs (Run, Sessions, Compare, Stats). Run tab executes tests with mode/runtime selection showing results with Potemkin/DB Verified tags. Sessions tab shows past test runs. Compare tab shows REPL vs Browser performance comparison table. Stats tab shows sessions/tests/pass rate/speedup/cost reduction metrics
 - **Entity**: `ReplTestSession` with TestMode (repl/browser/hybrid), Runtime (node/deno/bun/python), TotalTests, PassedTests, FailedTests, PotemkinDetections, DbStateChecks, LogsCaptured, AvgLatencyMs, SpeedupFactor, CostReduction, Status, ResultSummary
 - **Ticket**: #440 — `REPL-based testing for 3x faster verification (enhance #423)`
+
+### Agent Terminal & Browser Access (Cursor Agent Mode)
+
+Terminal and browser access for AI agents with sandboxed execution, security controls, and subagent delegation:
+- **Backend**: `AgentTerminalSession` entity with access mode, sandbox type, command/browser/subagent counts, resource limits, and session metrics. `AgentTerminalController` with execute, list sessions, delete, stats, and sandbox types endpoints
+- **Endpoints**:
+  - `GET /api/agent-terminal` — list sessions (50 limit)
+  - `GET /api/agent-terminal/{id}` — get session
+  - `POST /api/agent-terminal/execute` — execute agent task with command results and browser action results
+  - `DELETE /api/agent-terminal/{id}` — delete session
+  - `GET /api/agent-terminal/stats` — session statistics (by mode, by sandbox)
+  - `GET /api/agent-terminal/sandboxes` — list 4 sandbox types: Docker, Firecracker, gVisor, Deno (anonymous)
+- **Sandboxes**: Docker (#2496ED), Firecracker (#FF9900), gVisor (#4285F4), Deno (#000000)
+- **Frontend**: `AgentTerminalPage` in Settings with 4 sub-tabs (Execute, Sessions, Sandboxes, Stats). Execute tab runs agent tasks with mode/sandbox selection showing command log and browser action results. Sessions tab lists past sessions. Sandboxes tab shows environments and security controls (CPU/memory/timeout/network/filesystem). Stats tab shows aggregate metrics
+- **Entity**: `AgentTerminalSession` with AccessMode (terminal/browser/both), SandboxType (docker/firecracker/gvisor/deno), CommandsExecuted, BrowserActions, SubagentsDelegated, FilesModified, CpuLimitPercent, MemoryLimitMb, TimeoutMinutes, NetworkEgressAllowed, SessionDurationMs, Status, OutputLog
+- **Ticket**: #441 — `Agent terminal and browser access (Cursor Agent Mode pattern)`

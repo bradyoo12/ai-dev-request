@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -74,10 +74,15 @@ export default function SupportBoardPage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  const loadPosts = useCallback(async () => {
+  // Use ref to store latest filter values to avoid useCallback dependency issues
+  const filterRef = useRef({ page, category, sort })
+  filterRef.current = { page, category, sort }
+
+  const loadPosts = async () => {
     setLoading(true)
     try {
-      const data = await getSupportPosts(page, PAGE_SIZE, category, sort)
+      const { page: p, category: c, sort: s } = filterRef.current
+      const data = await getSupportPosts(p, PAGE_SIZE, c, s)
       setPosts(data.items)
       setTotal(data.total)
     } catch (err) {
@@ -85,11 +90,12 @@ export default function SupportBoardPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, category, sort])
+  }
 
   useEffect(() => {
     loadPosts()
-  }, [loadPosts])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, category, sort])
 
   const handleViewPost = async (id: string) => {
     setDetailLoading(true)

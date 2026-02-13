@@ -1267,3 +1267,21 @@ React 19 Server Components configuration for generated projects with framework s
 - **Frontend**: `ServerComponentsPage` in Settings with 4 sub-tabs (Configure, Projects, Patterns, Stats). Configure tab has project name, framework selector, render strategy, data fetching pattern, and checkboxes for streaming/metadata/DB. Projects tab shows configured projects with analysis metrics. Patterns tab displays RSC code examples. Stats tab shows aggregate metrics and breakdowns
 - **Entity**: `ServerComponentConfig` with Framework (nextjs/remix/vite-rsc), RenderStrategy (hybrid/ssr/ssc/client-only), StreamingEnabled, MetadataHoisting, DirectDbAccess, DataFetchingPattern, ServerComponentCount, ClientComponentCount, BundleSizeReductionPercent, InitialLoadMs, Status
 - **Ticket**: #436 — `React 19 Server Components for generated projects`
+
+### Code Linting (AI-Powered Analysis with Autofix)
+
+SonarQube-style AI-powered code analysis with multi-language support and automatic fix generation:
+- **Backend**: `CodeLintResult` entity with severity, category, language, code snippet, autofix status, and PR tracking. `CodeLintController` with list, analyze, autofix, dismiss, delete, stats, and rules endpoints
+- **Endpoints**:
+  - `GET /api/code-lint` — list results (filterable by severity/category/language)
+  - `GET /api/code-lint/{id}` — get single result
+  - `POST /api/code-lint/analyze` — run AI analysis (returns issues with snippets)
+  - `POST /api/code-lint/{id}/autofix` — apply AI-generated fix
+  - `POST /api/code-lint/{id}/dismiss` — dismiss issue
+  - `DELETE /api/code-lint/{id}` — delete result
+  - `GET /api/code-lint/stats` — analysis statistics (by severity, category, language)
+  - `GET /api/code-lint/rules` — list 6 issue categories with colors (anonymous)
+- **Categories**: bug (#EF4444), vulnerability (#F97316), code-smell (#EAB308), security (#DC2626), performance (#3B82F6), maintainability (#8B5CF6)
+- **Frontend**: `CodeLintPage` in Settings with 4 sub-tabs (Analyze, Issues, Rules, Stats). Analyze tab runs analysis on projects with language selection. Issues tab shows filterable list with autofix/dismiss/delete. Rules tab shows category reference. Stats tab shows total/resolved/autofixed/critical metrics and breakdowns
+- **Entity**: `CodeLintResult` with Language (typescript/csharp/python/go/rust), Severity (info/warning/error/critical), Category, RuleId, Message, FilePath, LineNumber, Snippet, SuggestedFix, AutofixStatus (pending/applied/dismissed/pr-created)
+- **Ticket**: #437 — `AI-powered code linting with SonarQube-style autofix`

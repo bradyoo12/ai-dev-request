@@ -110,12 +110,50 @@ Teams are used within a single ticket to parallelize independent work:
   <results appear>
   ```
 
+**Method 4: Background + Polling with Timeout (RECOMMENDED for long-running tasks)**
+- Use this for agents that might take 10+ minutes (planner, implementer, e2e-test-analyst)
+- Spawn in background, then poll with non-blocking TaskOutput every 30-60 seconds
+- Show progress updates to user so they know it's working
+- Handle timeouts gracefully (mark ticket "on hold" and continue)
+- Example:
+  ```
+  # Spawn in background
+  Task(run_in_background: true, subagent_type: "general-purpose", name: "planner", prompt: "...")
+  <tool result: task_id="abc-123", output_file="/path/to/output.txt">
+
+  # Poll for completion with timeout
+  max_wait = 20 minutes (1200 seconds)
+  elapsed = 0
+  poll_interval = 60 seconds
+
+  while elapsed < max_wait:
+    sleep 60
+    TaskOutput(task_id: "abc-123", block: false, timeout: 5000)
+
+    If task completed: break and process results
+    If task still running:
+      - Read last 10 lines from output_file with: tail -10 /path/to/output.txt
+      - Log progress update to user: "Planner still working... (5 min elapsed)"
+      - Continue polling
+
+    elapsed += 60
+
+  If timeout exceeded after 20 min:
+    TaskStop(task_id: "abc-123")
+    Mark ticket "on hold" with comment: "Planner timed out after 20 minutes"
+    Continue to next ticket
+  ```
+
 **CRITICAL RULES:**
 - ✅ **DO** use Task tool and wait for tool results before continuing
 - ✅ **DO** spawn multiple agents in parallel when they can work independently
+- ✅ **DO** use Method 4 (polling) for any agent that might take >5 minutes
+- ✅ **DO** show progress updates every 60 seconds so the user knows it's working
+- ✅ **DO** handle timeouts gracefully - don't wait forever
 - ❌ **NEVER** say "waiting for agents..." and then continue in the same turn
 - ❌ **NEVER** assume agents will "send messages when done" without blocking on Task or TaskOutput
 - ❌ **NEVER** move to the next step until you have agent results in hand
+- ❌ **NEVER** wait more than 20 minutes for a single agent - timeout and mark "on hold"
 
 ## Step 0: Worktree Setup (Multi-Instance Safe)
 
@@ -343,17 +381,63 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Task: "Run full test suite"
    - Task: "Commit, push, and create PR"
 
-3. **Spawn planner and wait** (use synchronous Task - see "How to Wait for Agents" above):
+3. **Spawn planner with timeout polling** (use Method 4 - Background + Polling):
+
+   a. Spawn in background:
+   ```bash
+   Task(run_in_background: true, subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "planner", prompt: "Work in directory: <WORKTREE_DIR>. Read ticket #<number>, policy.md, design.md. Create implementation plan, post as comment, create branch, implement ALL changes (frontend + backend), commit all work.")
    ```
-   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "planner", prompt: "...")
+   - The Task tool returns immediately with task_id and output_file
+
+   b. Poll for completion with progress updates (max 20 minutes):
+   ```bash
+   # Track elapsed time
+   START_TIME=$(date +%s)
+   MAX_WAIT=1200  # 20 minutes in seconds
+   POLL_INTERVAL=60  # Check every 60 seconds
+
+   while true; do
+     ELAPSED=$(($(date +%s) - START_TIME))
+
+     # Check if timed out
+     if [ $ELAPSED -ge $MAX_WAIT ]; then
+       echo "⏱️ Planner timed out after 20 minutes - marking ticket on hold"
+       TaskStop(task_id: <task_id>)
+       # Add "on hold" label and comment
+       gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/labels" -f "labels[]=on hold"
+       gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/comments" -f body="Planner agent timed out after 20 minutes. Needs investigation."
+       break
+     fi
+
+     # Poll for completion (non-blocking)
+     RESULT=$(TaskOutput(task_id: <task_id>, block: false, timeout: 5000))
+
+     if [ task completed ]; then
+       echo "✅ Planner completed successfully after $(($ELAPSED / 60)) minutes"
+       # Process results and continue to step 4
+       break
+     else
+       # Show progress update
+       MINUTES=$(($ELAPSED / 60))
+       echo "⏳ Planner still working... ($MINUTES min elapsed)"
+
+       # Show last few lines of output for visibility
+       tail -10 <output_file>
+
+       # Wait before next poll
+       sleep $POLL_INTERVAL
+     fi
+   done
    ```
+
+   c. What planner does (if it completes):
    - Reads the ticket, policy.md, and design.md
    - Creates a detailed implementation plan
    - Posts the plan as a comment on the issue
    - Creates the feature branch: `<ticket_number>-<slug>`
    - Implements ALL changes directly (frontend AND backend)
    - Commits all work
-   - **WAIT**: Task tool blocks here until planner completes and returns results
+   - Reports completion with summary
 
 4. **After planner completes, spawn unit-test-analyst and wait** (use synchronous Task):
    ```
@@ -379,10 +463,41 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Reports results: how many tests added, coverage summary
    - **WAIT**: Task tool blocks here until unit-test-analyst completes and returns results
 
-5. **After unit-test-analyst completes, spawn e2e-test-analyst and wait** (use synchronous Task):
+5. **After unit-test-analyst completes, spawn e2e-test-analyst with timeout polling** (use Method 4):
+
+   a. Spawn in background (E2E test creation can take 10+ minutes):
+   ```bash
+   Task(run_in_background: true, subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "e2e-test-analyst", prompt: "Analyze new user-facing features, create/update Playwright E2E tests, run tests, fix failures up to 3 attempts.")
    ```
-   Task(subagent_type: "general-purpose", team_name: "ready-<ticket_number>", name: "e2e-test-analyst", prompt: "...")
+
+   b. Poll for completion with progress updates (max 15 minutes):
+   ```bash
+   # Similar polling pattern as planner
+   START_TIME=$(date +%s)
+   MAX_WAIT=900  # 15 minutes
+
+   while true; do
+     ELAPSED=$(($(date +%s) - START_TIME))
+     if [ $ELAPSED -ge $MAX_WAIT ]; then
+       echo "⏱️ E2E test analyst timed out - continuing without E2E tests"
+       TaskStop(task_id: <task_id>)
+       echo "⚠️ WARNING: No E2E tests created for this ticket (timeout)"
+       break
+     fi
+
+     RESULT=$(TaskOutput(task_id: <task_id>, block: false, timeout: 5000))
+     if [ task completed ]; then
+       echo "✅ E2E test analyst completed"
+       break
+     fi
+
+     echo "⏳ Creating E2E tests... ($(($ELAPSED / 60)) min)"
+     tail -5 <output_file>
+     sleep 60
+   done
    ```
+
+   c. What e2e-test-analyst does (if it completes):
    - Identifies new user-facing features added by the current ticket:
      - New pages and routes
      - New forms with submission workflows
@@ -401,7 +516,6 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    - Runs E2E tests to verify they pass: `npm test` in platform/frontend
    - If new tests fail, fixes them (up to 3 attempts)
    - Reports results: how many tests added/updated
-   - **WAIT**: Task tool blocks here until e2e-test-analyst completes and returns results
 
 6. **After e2e-test-analyst completes, spawn tester and wait** (use synchronous Task):
    ```
@@ -428,17 +542,48 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    TeamDelete
    ```
 
-**For single-scope or simple tickets — use single Task agent:**
+**For single-scope or simple tickets — use single Task agent with polling:**
 
 Spawn a single general-purpose agent via Task tool (no team needed):
+
+a. Spawn in background:
+```bash
+Task(run_in_background: true, subagent_type: "general-purpose", name: "implementer", prompt: "Work in directory: <WORKTREE_DIR>. Implement ticket #<number>: read ticket, create plan, create branch, implement changes, run tests, commit, push, create PR.")
 ```
-Task(subagent_type: "general-purpose", name: "implementer", prompt: "Implement ticket #<number>...")
+
+b. Poll for completion (max 20 minutes):
+```bash
+START_TIME=$(date +%s)
+MAX_WAIT=1200
+
+while true; do
+  ELAPSED=$(($(date +%s) - START_TIME))
+  if [ $ELAPSED -ge $MAX_WAIT ]; then
+    echo "⏱️ Implementer timed out after 20 minutes - marking ticket on hold"
+    TaskStop(task_id: <task_id>)
+    # Add "on hold" label
+    gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/labels" -f "labels[]=on hold"
+    gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<issue_number>/comments" -f body="Implementation timed out after 20 minutes."
+    break
+  fi
+
+  RESULT=$(TaskOutput(task_id: <task_id>, block: false, timeout: 5000))
+  if [ task completed ]; then
+    echo "✅ Implementer completed successfully"
+    break
+  fi
+
+  echo "⏳ Implementing... ($(($ELAPSED / 60)) min)"
+  tail -5 <output_file>
+  sleep 60
+done
 ```
+
+c. What implementer does:
 - Read ticket, create plan, create branch
 - Implement changes
 - Run tests
 - Commit, push, create PR
-- **WAIT**: Task tool blocks here until the agent completes and returns results
 - This follows the same workflow as `.claude/agents/b-ready.md`
 
 #### Step 3d: Handle Failures

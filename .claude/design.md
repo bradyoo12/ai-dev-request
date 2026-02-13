@@ -1559,3 +1559,18 @@ Edge-deployed AI inference with serverless GPU, zero cold starts, and 180+ globa
 - **Frontend**: `WorkersAiPage` in Settings at `/settings/workers-ai` with 4 sub-tabs (Deploy, History, Models, Stats)
 - **Entity**: `WorkersAiDeployment` with ProjectName, ModelId, ModelCategory, EdgeRegion, EdgeLocations, InferenceLatencyMs, TotalInferences, TokensProcessed, CostUsd, CustomModel, CustomModelSource, ZeroColdStart, SuccessRate, Status
 - **Ticket**: #473 — `Cloudflare Workers AI for edge-deployed inference and model serving`
+
+### React 19 use() Hook (Async Data Loading)
+
+Performance benchmarking comparing React 19's use() hook vs traditional useEffect patterns:
+- **Backend**: `ReactUseHookDemo` entity tracking benchmark results. `ReactUseHookController` with benchmark, list, delete, stats, and patterns endpoints
+- **Endpoints**:
+  - `GET /api/react-use-hook` — list benchmark demos (50 limit)
+  - `POST /api/react-use-hook/benchmark` — run use() vs useEffect benchmark with metrics comparison, code snippets, and improvement calculations
+  - `DELETE /api/react-use-hook/{id}` — delete demo
+  - `GET /api/react-use-hook/stats` — benchmark statistics (by data source)
+  - `GET /api/react-use-hook/patterns` — list 4 data fetching patterns (anonymous)
+- **Patterns**: use-hook (recommended), use-effect, SWR, TanStack Query
+- **Metrics**: Render time, data fetch time, re-render count, boilerplate lines, performance score
+- **Frontend**: `ReactUseHookPage` in Settings at `/settings/react-use-hook` with 4 sub-tabs (Benchmark, History, Patterns, Stats). Benchmark shows side-by-side comparison and code before/after
+- **Ticket**: #474 — `React 19 use() hook for async data loading`

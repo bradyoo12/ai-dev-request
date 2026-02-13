@@ -220,6 +220,14 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | MemoryRetrievalService | Semantic memory retrieval |
 | MemoryService | User memory CRUD |
 
+### Project Management
+
+| Service | Purpose |
+|---|---|
+| ProjectAggregationService | Aggregate project data from multiple sources |
+| ProjectCostEstimationService | Calculate daily/monthly cloud costs |
+| LogStreamService | SSE streaming for real-time logs |
+
 ### Auth & User
 
 | Service | Purpose |
@@ -543,7 +551,7 @@ Data Transfer Objects under `platform/backend/AiDevRequest.API/DTOs/`.
 
 ## Frontend Pages
 
-All under `platform/frontend/src/pages/`. 96 pages total.
+All under `platform/frontend/src/pages/`. 98 pages total.
 
 ### Home & Navigation
 
@@ -559,10 +567,10 @@ All under `platform/frontend/src/pages/`. 96 pages total.
 
 | Page | Route | Purpose |
 |---|---|---|
+| ProjectsPage | /projects | User projects list with URLs, costs, plans |
+| ProjectDetailPage | /projects/:id | Project detail with Overview/Cost/Plan/Logs tabs |
 | SitesPage | /sites | User sites list |
 | MySitesPage | /sites (alt) | My sites dashboard |
-| ProjectsPage | /projects | Projects list with cost, plan, and URLs |
-| ProjectDetailPage | /projects/:id | Project detail with logs, cost, and metrics |
 | PreviewPage | /preview | Project preview |
 | PreviewDeploymentPage | /settings/preview-deployment | Edge preview deploys |
 | ProjectVersionPage | /settings/version-history | Version history & diff |
@@ -746,6 +754,7 @@ All under `platform/frontend/src/components/`.
 | CodePreview | Syntax-highlighted code viewer |
 | LivePreview | Live rendered preview iframe |
 | MobilePreview | Mobile device frame preview |
+| RealTimeLogViewer | SSE real-time log streaming with filtering |
 
 ### Generation & Refinement
 
@@ -804,7 +813,7 @@ All under `platform/frontend/src/components/`.
 
 ## Frontend API Modules
 
-All under `platform/frontend/src/api/`. 90 modules total.
+All under `platform/frontend/src/api/`. 91 modules total.
 
 ### Core
 
@@ -814,8 +823,8 @@ All under `platform/frontend/src/api/`. 90 modules total.
 | auth.ts | AuthController | Login, register, social auth |
 | settings.ts | SettingsController | App settings |
 | apikeys.ts | ApiKeysController | API key management |
+| projects.ts | ProjectsController | Project dashboard, cost estimation, logs |
 | sites.ts | SitesController | Site management |
-| projects.ts | ProjectsController | Projects list, detail, cost, logs |
 | hosting.ts | HostingController | Hosting plans |
 | domains.ts | DomainsController | Domain management |
 

@@ -155,6 +155,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ParallelAgentRun> ParallelAgentRuns => Set<ParallelAgentRun>();
     public DbSet<WebMcpSession> WebMcpSessions => Set<WebMcpSession>();
     public DbSet<AgentSdkSession> AgentSdkSessions => Set<AgentSdkSession>();
+    public DbSet<TerminalExecution> TerminalExecutions => Set<TerminalExecution>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

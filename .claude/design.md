@@ -1430,3 +1430,19 @@ Simulated build toolchain benchmark comparing Rolldown (Vite 8) vs esbuild+Rollu
 - **Frontend**: `BuildToolchainPage` in Settings with 4 sub-tabs (Benchmark, History, Bundlers, Stats). Benchmark tab runs simulated comparison with side-by-side metric cards. Bundlers tab shows bundler cards and Vite 8 key features. History/Stats tabs show historical data and aggregates
 - **Entity**: `BuildToolchainResult` with Bundler, TotalModules, DevStartupMs, HmrLatencyMs, BuildDurationMs, BundleSizeKb, ChunksGenerated, TreeShakingPercent, CodeSplitSavingsPercent, SpeedupFactor, FullBundleMode, Status
 - **Ticket**: #461 — `Vite 8 Rolldown build toolchain benchmarks`
+
+### Vision-to-Code (Image-to-UI Generation)
+
+Simulated image-to-code generation converting screenshots, mockups, and sketches into React components:
+- **Backend**: `VisionToCodeResult` entity with style matching scores and component metrics. `VisionToCodeController` with generate, list, delete, stats, and image-types endpoints
+- **Endpoints**:
+  - `GET /api/vision-to-code` — list generations (50 limit)
+  - `POST /api/vision-to-code/generate` — generate components from image with style analysis, component hierarchy, and accuracy breakdown (max 50 per user)
+  - `DELETE /api/vision-to-code/{id}` — delete generation
+  - `GET /api/vision-to-code/stats` — generation statistics (by image type, by framework)
+  - `GET /api/vision-to-code/image-types` — list 4 types: screenshot/mockup/sketch/wireframe (anonymous)
+- **Image Types**: Screenshot (#3B82F6), Mockup/Figma (#10B981), Hand-drawn Sketch (#F59E0B), Wireframe (#8B5CF6)
+- **Generated Output**: Component hierarchy (layout/component/primitive), style analysis (colors, font, spacing), accuracy breakdown (layout, color, typography, spacing, overall)
+- **Frontend**: `VisionToCodePage` in Settings with 4 sub-tabs (Generate, History, Image Types, Stats). Generate tab creates components from images with style analysis and accuracy metrics. Image Types tab shows supported formats and vision features
+- **Entity**: `VisionToCodeResult` with ImageName, ImageType, ComponentsGenerated, LinesOfCode, Framework, StylingEngine, StyleMatchScore, LayoutAccuracy, ColorAccuracy, TypographyAccuracy, ProcessingMs, Refinements, Status
+- **Ticket**: #462 — `Vision-to-code: generate UI from screenshots and mockups`

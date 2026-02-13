@@ -151,6 +151,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<CodebaseGraph> CodebaseGraphs => Set<CodebaseGraph>();
     public DbSet<BuildToolchainResult> BuildToolchainResults => Set<BuildToolchainResult>();
     public DbSet<VisionToCodeResult> VisionToCodeResults => Set<VisionToCodeResult>();
+    public DbSet<DotnetUpgradeResult> DotnetUpgradeResults => Set<DotnetUpgradeResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

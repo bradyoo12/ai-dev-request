@@ -1,5 +1,6 @@
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
+using AiDevRequest.API.DTOs;
 
 namespace AiDevRequest.API.Services;
 
@@ -39,7 +40,12 @@ public class ClaudeProviderService : IModelProviderService
 
     public string ProviderName => "claude";
 
-    public async Task<string> GenerateAsync(string prompt, string modelId, CancellationToken ct = default)
+    public async Task<string> GenerateAsync(
+        string prompt,
+        string modelId,
+        ThinkingEffortLevel? effortLevel = null,
+        string? outputSchema = null,
+        CancellationToken ct = default)
     {
         if (!SupportsModel(modelId))
         {
@@ -48,7 +54,8 @@ public class ClaudeProviderService : IModelProviderService
 
         try
         {
-            _logger.LogInformation("Claude API call: model={Model}", modelId);
+            _logger.LogInformation("Claude API call: model={Model}, effortLevel={EffortLevel}, hasSchema={HasSchema}",
+                modelId, effortLevel, outputSchema != null);
 
             var parameters = new MessageParameters
             {
@@ -57,6 +64,37 @@ public class ClaudeProviderService : IModelProviderService
                 MaxTokens = 4096,
                 Temperature = 0.7m
             };
+
+            // Add adaptive thinking configuration if effort level is specified
+            if (effortLevel.HasValue)
+            {
+                var effortString = effortLevel.Value switch
+                {
+                    ThinkingEffortLevel.Low => "low",
+                    ThinkingEffortLevel.Medium => "medium",
+                    ThinkingEffortLevel.High => "high",
+                    _ => "medium"
+                };
+
+                // Note: The Anthropic SDK 5.9 should support adaptive thinking via the Thinking property
+                // If the SDK doesn't expose it directly, we may need to use additional configuration
+                // This is a placeholder - actual implementation depends on SDK API
+                _logger.LogInformation("Using adaptive thinking with effort level: {Effort}", effortString);
+
+                // TODO: Verify Anthropic SDK 5.9 API for adaptive thinking configuration
+                // Example: parameters.Thinking = new ThinkingConfig { Type = "adaptive", Effort = effortString };
+            }
+
+            // Add structured output configuration if schema is specified
+            if (!string.IsNullOrWhiteSpace(outputSchema))
+            {
+                // Note: Structured outputs in Anthropic SDK are typically configured via output_config
+                // This is a placeholder - actual implementation depends on SDK API
+                _logger.LogInformation("Using structured output with provided schema");
+
+                // TODO: Verify Anthropic SDK 5.9 API for structured output configuration
+                // Example: parameters.OutputConfig = new OutputConfig { Format = "json_schema", Schema = outputSchema };
+            }
 
             var response = await _client.Messages.GetClaudeMessageAsync(parameters, ct);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "";

@@ -1,10 +1,12 @@
 using AiDevRequest.API.Data;
+using AiDevRequest.API.DTOs;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace AiDevRequest.API.Controllers;
 
@@ -171,6 +173,87 @@ public class AiModelController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Get effort level configuration for different task types
+    /// </summary>
+    [HttpGet("effort-levels")]
+    public async Task<ActionResult<EffortLevelConfigDto>> GetEffortLevels()
+    {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var config = await _db.AiModelConfigs.FirstOrDefaultAsync(c => c.UserId == userId);
+        if (config == null)
+        {
+            // Return default configuration
+            return Ok(GetDefaultEffortLevelConfig());
+        }
+
+        // Deserialize from JSON or return defaults
+        var taskConfigs = string.IsNullOrWhiteSpace(config.EffortLevelConfigJson)
+            ? GetDefaultTaskConfigs()
+            : JsonSerializer.Deserialize<List<TaskTypeEffortConfig>>(config.EffortLevelConfigJson) ?? GetDefaultTaskConfigs();
+
+        return Ok(new EffortLevelConfigDto
+        {
+            TaskConfigs = taskConfigs,
+            StructuredOutputsEnabled = config.StructuredOutputsEnabled,
+            UpdatedAt = config.UpdatedAt
+        });
+    }
+
+    /// <summary>
+    /// Update effort level configuration for different task types
+    /// </summary>
+    [HttpPut("effort-levels")]
+    public async Task<ActionResult<EffortLevelConfigDto>> UpdateEffortLevels([FromBody] UpdateEffortLevelConfigDto dto)
+    {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        var config = await _db.AiModelConfigs.FirstOrDefaultAsync(c => c.UserId == userId);
+        if (config == null)
+        {
+            config = new AiModelConfig { UserId = userId };
+            _db.AiModelConfigs.Add(config);
+        }
+
+        // Update effort level configuration
+        config.EffortLevelConfigJson = JsonSerializer.Serialize(dto.TaskConfigs);
+
+        // Update structured outputs setting if provided
+        if (dto.StructuredOutputsEnabled.HasValue)
+        {
+            config.StructuredOutputsEnabled = dto.StructuredOutputsEnabled.Value;
+        }
+
+        config.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return Ok(new EffortLevelConfigDto
+        {
+            TaskConfigs = dto.TaskConfigs,
+            StructuredOutputsEnabled = config.StructuredOutputsEnabled,
+            UpdatedAt = config.UpdatedAt
+        });
+    }
+
+    private static EffortLevelConfigDto GetDefaultEffortLevelConfig() => new()
+    {
+        TaskConfigs = GetDefaultTaskConfigs(),
+        StructuredOutputsEnabled = true,
+        UpdatedAt = DateTime.UtcNow
+    };
+
+    private static List<TaskTypeEffortConfig> GetDefaultTaskConfigs() => new()
+    {
+        new() { TaskType = "analysis", EffortLevel = ThinkingEffortLevel.High, Description = "Complex reasoning for requirement analysis" },
+        new() { TaskType = "proposal", EffortLevel = ThinkingEffortLevel.Medium, Description = "Moderate effort for solution proposals" },
+        new() { TaskType = "production", EffortLevel = ThinkingEffortLevel.Low, Description = "Quick code generation for scaffolding" },
+        new() { TaskType = "code_review", EffortLevel = ThinkingEffortLevel.High, Description = "Thorough analysis for code review" },
+        new() { TaskType = "test_generation", EffortLevel = ThinkingEffortLevel.Low, Description = "Simple test case generation" }
+    };
+
     private static AiModelConfigDto ToDto(AiModelConfig config) => new()
     {
         Id = config.Id,
@@ -186,6 +269,8 @@ public class AiModelController : ControllerBase
         TotalOutputTokens = config.TotalOutputTokens,
         EstimatedCost = config.EstimatedCost,
         ModelHistoryJson = config.ModelHistoryJson,
+        EffortLevelConfigJson = config.EffortLevelConfigJson,
+        StructuredOutputsEnabled = config.StructuredOutputsEnabled,
         CreatedAt = config.CreatedAt,
         UpdatedAt = config.UpdatedAt,
     };
@@ -220,6 +305,8 @@ public class AiModelConfigDto
     public long TotalOutputTokens { get; set; }
     public decimal EstimatedCost { get; set; }
     public string? ModelHistoryJson { get; set; }
+    public string? EffortLevelConfigJson { get; set; }
+    public bool StructuredOutputsEnabled { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

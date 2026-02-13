@@ -109,6 +109,8 @@ builder.Services.AddScoped<IAgentSkillService, AgentSkillService>();
 builder.Services.AddScoped<IAutonomousTestingService, AutonomousTestingService>();
 builder.Services.AddScoped<ILogStreamService, LogStreamService>();
 builder.Services.AddScoped<GitBranchService>();
+builder.Services.AddScoped<IProjectCostEstimationService, ProjectCostEstimationService>();
+builder.Services.AddScoped<IProjectAggregationService, ProjectAggregationService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

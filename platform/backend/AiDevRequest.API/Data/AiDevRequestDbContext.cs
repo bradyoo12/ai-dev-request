@@ -147,6 +147,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<VectorSearchConfig> VectorSearchConfigs => Set<VectorSearchConfig>();
     public DbSet<ReplTestSession> ReplTestSessions => Set<ReplTestSession>();
     public DbSet<AgentTerminalSession> AgentTerminalSessions => Set<AgentTerminalSession>();
+    public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectLog> ProjectLogs => Set<ProjectLog>();
     public DbSet<ComposerPlan> ComposerPlans => Set<ComposerPlan>();
     public DbSet<PerformanceOptimization> PerformanceOptimizations => Set<PerformanceOptimization>();
     public DbSet<ModelRoutingRule> ModelRoutingRules => Set<ModelRoutingRule>();

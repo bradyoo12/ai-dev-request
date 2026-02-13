@@ -1606,3 +1606,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: Pre-execution hooks, approval workflows, audit logging, rollback capability
 - **Frontend**: `GovernancePage` in Settings at `/settings/governance` with 4 sub-tabs (Evaluate, History, Rules, Stats)
 - **Ticket**: #477 — `Agentic governance and guardrails for safe AI deployment`
+
+### AI Inference Cost Optimization (60-80% Savings)
+- **Backend**: `InferenceCostRecord` entity + `InferenceCostController` (`api/inference-cost`)
+- **Endpoints**: POST analyze (cost analysis with model routing + optimizations), GET list, DELETE {id}, GET stats (by strategy), GET strategies (anonymous, 4 strategies)
+- **Model Routing**: Simple → Haiku ($0.01), Complex → Sonnet ($0.15), Critical → Opus ($0.50)
+- **Optimization Strategies**: Smart Routing (60-98%), Prompt Caching (50-90%), Request Batching (30-70%), Response Reuse (80-95%)
+- **Frontend**: `InferenceCostPage` in Settings at `/settings/inference-cost` with 4 sub-tabs (Analyze, History, Strategies, Stats)
+- **Ticket**: #478 — `AI inference cost optimization (60-80% savings)`

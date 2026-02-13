@@ -94,6 +94,8 @@ public class SocialAuthServiceTests
 
         Assert.NotEmpty(url);
         Assert.Contains("kauth.kakao.com", url);
+        // Kakao requires comma-separated scopes, not space-separated
+        Assert.Contains("scope=profile_nickname%2Cprofile_image%2Caccount_email", url);
     }
 
     [Fact]

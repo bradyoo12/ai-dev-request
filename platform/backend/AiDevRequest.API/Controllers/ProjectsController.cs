@@ -118,10 +118,10 @@ public class ProjectsController : ControllerBase
         [FromQuery] DateTime? to = null,
         [FromQuery] int limit = 100)
     {
-        LogLevel? logLevel = null;
+        Entities.LogLevel? logLevel = null;
         if (!string.IsNullOrEmpty(level))
         {
-            if (Enum.TryParse<LogLevel>(level, true, out var parsedLevel))
+            if (Enum.TryParse<Entities.LogLevel>(level, true, out var parsedLevel))
             {
                 logLevel = parsedLevel;
             }

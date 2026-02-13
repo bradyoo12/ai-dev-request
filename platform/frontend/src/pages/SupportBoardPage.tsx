@@ -55,6 +55,7 @@ export default function SupportBoardPage() {
   const [category, setCategory] = useState<string>('all')
   const [sort, setSort] = useState<string>('newest')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Detail state
   const [selectedPost, setSelectedPost] = useState<SupportPost | null>(null)
@@ -80,6 +81,7 @@ export default function SupportBoardPage() {
 
   const loadPosts = async () => {
     setLoading(true)
+    setError(null)
     try {
       const { page: p, category: c, sort: s } = filterRef.current
       const data = await getSupportPosts(p, PAGE_SIZE, c, s)
@@ -87,6 +89,9 @@ export default function SupportBoardPage() {
       setTotal(data.total)
     } catch (err) {
       console.error('Failed to load support posts:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load support posts. Please try again.')
+      setPosts([])
+      setTotal(0)
     } finally {
       setLoading(false)
     }
@@ -410,6 +415,16 @@ export default function SupportBoardPage() {
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" />
+        </div>
+      ) : error ? (
+        <div className="glass-card rounded-2xl p-6 text-center">
+          <p className="text-red-400 mb-3">{error}</p>
+          <button
+            onClick={() => loadPosts()}
+            className="px-4 py-2 bg-accent-blue/20 text-accent-blue border border-accent-blue/30 rounded-lg text-sm hover:bg-accent-blue/30 transition-all"
+          >
+            Retry
+          </button>
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-12 text-warm-500">{t('support.noPosts')}</div>

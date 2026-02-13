@@ -9,7 +9,7 @@ public class CostTrackingServiceTests
     private (CostTrackingService service, ModelRouterService router) CreateService()
     {
         var routerLogger = new Mock<ILogger<ModelRouterService>>();
-        var router = new ModelRouterService(routerLogger.Object);
+        var router = new ModelRouterService(routerLogger.Object, new List<IModelProviderService>());
         var logger = new Mock<ILogger<CostTrackingService>>();
         var service = new CostTrackingService(router, logger.Object);
         return (service, router);

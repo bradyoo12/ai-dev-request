@@ -11,12 +11,19 @@ function authHeaders(): Record<string, string> {
 export interface PreviewDeployment {
   id: string
   devRequestId: string
-  status: 'Pending' | 'Deploying' | 'Deployed' | 'Expired' | 'Failed'
+  status: 'Pending' | 'Deploying' | 'Deployed' | 'Expired' | 'Failed' | 'BuildingImage' | 'PushingImage' | 'CreatingContainer'
   previewUrl?: string
   provider: string
   deployedAt?: string
   expiresAt?: string
   createdAt: string
+  containerGroupName?: string
+  containerName?: string
+  region?: string
+  resourceGroupName?: string
+  port?: number
+  imageUri?: string
+  fqdn?: string
 }
 
 export interface PreviewUrl {
@@ -83,4 +90,18 @@ export async function listPreviews(projectId: string): Promise<PreviewDeployment
   }
 
   return response.json()
+}
+
+export async function getPreviewLogs(projectId: string): Promise<string> {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/preview/logs`, {
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || 'Failed to fetch logs')
+  }
+
+  const data = await response.json()
+  return data.logs || ''
 }

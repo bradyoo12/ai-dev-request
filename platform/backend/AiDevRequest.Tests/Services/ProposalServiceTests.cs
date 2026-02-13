@@ -8,7 +8,7 @@ namespace AiDevRequest.Tests.Services;
 public class ProposalServiceTests
 {
     private static IModelRouterService CreateModelRouter() =>
-        new ModelRouterService(new Mock<ILogger<ModelRouterService>>().Object);
+        new ModelRouterService(new Mock<ILogger<ModelRouterService>>().Object, new List<IModelProviderService>());
 
     [Fact]
     public void Constructor_ThrowsWhenNoApiKey()
@@ -22,7 +22,7 @@ public class ProposalServiceTests
         try
         {
             Environment.SetEnvironmentVariable("ANTHROPIC_API_KEY", null);
-            Assert.Throws<InvalidOperationException>(() => new ProposalService(config, CreateModelRouter(), logger.Object));
+            Assert.Throws<InvalidOperationException>(() => new ProposalService(config, CreateModelRouter(), new List<IModelProviderService>(), logger.Object));
         }
         finally
         {
@@ -41,7 +41,7 @@ public class ProposalServiceTests
             .Build();
         var logger = new Mock<ILogger<ProposalService>>();
 
-        var service = new ProposalService(config, CreateModelRouter(), logger.Object);
+        var service = new ProposalService(config, CreateModelRouter(), new List<IModelProviderService>(), logger.Object);
 
         Assert.NotNull(service);
     }

@@ -162,6 +162,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<EditPrediction> EditPredictions => Set<EditPrediction>();
     public DbSet<BrowserIdeSession> BrowserIdeSessions => Set<BrowserIdeSession>();
     public DbSet<GovernanceAction> GovernanceActions => Set<GovernanceAction>();
+    public DbSet<InferenceCostRecord> InferenceCostRecords => Set<InferenceCostRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

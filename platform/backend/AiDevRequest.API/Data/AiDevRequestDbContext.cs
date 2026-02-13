@@ -169,6 +169,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AgenticWorkflow> AgenticWorkflows => Set<AgenticWorkflow>();
     public DbSet<AgentTrace> AgentTraces => Set<AgentTrace>();
     public DbSet<ConfidenceScore> ConfidenceScores => Set<ConfidenceScore>();
+    public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

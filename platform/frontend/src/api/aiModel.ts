@@ -82,6 +82,23 @@ export interface ProviderStats {
   estimatedCost: number
 }
 
+export interface TaskEffortConfig {
+  taskType: string
+  effortLevel: string
+  description: string
+}
+
+export interface EffortLevelsResponse {
+  taskConfigs: TaskEffortConfig[]
+  structuredOutputsEnabled: boolean
+  updatedAt: string
+}
+
+export interface UpdateEffortLevelsRequest {
+  taskConfigs: TaskEffortConfig[]
+  structuredOutputsEnabled?: boolean
+}
+
 export async function getAiModelConfig(): Promise<AiModelConfig> {
   const response = await authFetch(`${API_BASE_URL}/api/ai-model/config`)
   if (!response.ok) {
@@ -156,4 +173,72 @@ export async function getModelsForProvider(provider: string): Promise<Model[]> {
     throw new Error(error.error || t('api.error.aiModelModelsLoad'))
   }
   return response.json()
+}
+
+// Conversion helpers for effort level format (API uses numbers, UI uses strings)
+export const effortLevelToNumber = (level: string): number => {
+  switch (level) {
+    case 'Low': return 0
+    case 'Medium': return 1
+    case 'High': return 2
+    default: return 1 // default to Medium
+  }
+}
+
+export const effortLevelToString = (level: number): string => {
+  switch (level) {
+    case 0: return 'Low'
+    case 1: return 'Medium'
+    case 2: return 'High'
+    default: return 'Medium'
+  }
+}
+
+export async function getEffortLevels(): Promise<EffortLevelsResponse> {
+  const response = await authFetch(`${API_BASE_URL}/api/ai-model/effort-levels`)
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.effortLevelsLoad'))
+  }
+  const data = await response.json()
+
+  // Convert backend numbers to frontend strings
+  return {
+    ...data,
+    taskConfigs: data.taskConfigs.map((config: any) => ({
+      ...config,
+      effortLevel: effortLevelToString(config.effortLevel)
+    }))
+  }
+}
+
+export async function updateEffortLevels(data: UpdateEffortLevelsRequest): Promise<EffortLevelsResponse> {
+  // Convert frontend strings to backend numbers
+  const backendRequest = {
+    ...data,
+    taskConfigs: data.taskConfigs.map(config => ({
+      ...config,
+      effortLevel: effortLevelToNumber(config.effortLevel)
+    }))
+  }
+
+  const response = await authFetch(`${API_BASE_URL}/api/ai-model/effort-levels`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(backendRequest),
+  })
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.effortLevelsUpdate'))
+  }
+  const responseData = await response.json()
+
+  // Convert response back to strings for frontend
+  return {
+    ...responseData,
+    taskConfigs: responseData.taskConfigs.map((config: any) => ({
+      ...config,
+      effortLevel: effortLevelToString(config.effortLevel)
+    }))
+  }
 }

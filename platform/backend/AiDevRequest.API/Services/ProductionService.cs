@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AiDevRequest.API.DTOs;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
 
@@ -213,7 +214,10 @@ JSON만 응답하세요.";
                 if (provider == null)
                     throw new InvalidOperationException("No AI provider available");
 
-                content = await provider.GenerateAsync(prompt, modelId);
+                // Use LOW effort level for scaffolding/simple code generation
+                // For complex production tasks, consider using MEDIUM
+                var effortLevel = complexity?.ToLower() == "high" ? ThinkingEffortLevel.Medium : ThinkingEffortLevel.Low;
+                content = await provider.GenerateAsync(prompt, modelId, effortLevel);
             }
 
             var generatedProject = StructuredOutputHelper.DeserializeResponse<GeneratedProject>(content);

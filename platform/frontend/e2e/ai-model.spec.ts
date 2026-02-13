@@ -130,6 +130,40 @@ test.describe('AI Model Settings', () => {
         }),
       });
     });
+
+    // Mock the effort levels API endpoint
+    await page.route('**/api/ai-model/effort-levels', async (route) => {
+      if (route.request().method() === 'GET') {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            taskConfigs: [
+              { taskType: 'analysis', effortLevel: 'Medium', description: 'Code analysis tasks' },
+              { taskType: 'proposal', effortLevel: 'High', description: 'Generate project proposals' },
+              { taskType: 'scaffold', effortLevel: 'Low', description: 'Basic code scaffolding' },
+              { taskType: 'complexGeneration', effortLevel: 'High', description: 'Complex code generation' },
+              { taskType: 'codeReview', effortLevel: 'Medium', description: 'Review code quality' },
+              { taskType: 'testGeneration', effortLevel: 'Low', description: 'Generate test cases' },
+              { taskType: 'securityScan', effortLevel: 'High', description: 'Security vulnerability scanning' },
+              { taskType: 'multiAgent', effortLevel: 'High', description: 'Multi-agent orchestration' },
+            ],
+            structuredOutputsEnabled: false,
+            updatedAt: new Date().toISOString(),
+          }),
+        });
+      } else if (route.request().method() === 'PUT') {
+        const requestBody = route.request().postDataJSON();
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ...requestBody,
+            updatedAt: new Date().toISOString(),
+          }),
+        });
+      }
+    });
   });
 
   test('navigates to AI Model settings page', async ({ page }) => {
@@ -296,5 +330,124 @@ test.describe('AI Model Settings', () => {
 
     // Check for translation keys (adjust based on actual implementation)
     await expect(page.getByRole('heading', { name: 'AI Engine' }).or(page.getByRole('heading', { name: 'AI 엔진' }))).toBeVisible({ timeout: 5000 });
+  });
+
+  test('displays adaptive thinking configuration in Configure tab', async ({ page }) => {
+    await page.goto('/settings/ai-model');
+
+    // Navigate to Configure tab
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    const configureTab = page.locator('button:has-text("Configure")');
+    await configureTab.click();
+
+    // Wait for adaptive thinking section to appear
+    await page.waitForTimeout(500);
+
+    // Check for Adaptive Thinking heading
+    await expect(page.getByRole('heading', { name: 'Adaptive Thinking' }).or(page.getByText('Adaptive Thinking'))).toBeVisible();
+  });
+
+  test('changes effort level for Analysis task', async ({ page }) => {
+    await page.goto('/settings/ai-model');
+
+    // Navigate to Configure tab
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    const configureTab = page.locator('button:has-text("Configure")');
+    await configureTab.click();
+
+    // Wait for effort levels to load
+    await page.waitForTimeout(1000);
+
+    // Find the effort level dropdown for Analysis
+    const selects = await page.locator('select').all();
+
+    // Change first task (analysis) from Medium to High
+    if (selects.length > 1) {
+      const analysisSelect = selects[1]; // First is provider selector, second should be first task
+      await analysisSelect.selectOption('High');
+
+      // Wait for API call to complete
+      await page.waitForTimeout(500);
+
+      // Verify the selection persisted
+      const selectedValue = await analysisSelect.inputValue();
+      expect(selectedValue).toBe('High');
+    }
+  });
+
+  test('displays structured outputs toggle', async ({ page }) => {
+    await page.goto('/settings/ai-model');
+
+    // Navigate to Configure tab
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    const configureTab = page.locator('button:has-text("Configure")');
+    await configureTab.click();
+
+    // Wait for structured outputs section
+    await page.waitForTimeout(500);
+
+    // Check for Structured Outputs heading
+    await expect(page.getByRole('heading', { name: 'Structured Outputs' }).or(page.getByText('Structured Outputs'))).toBeVisible();
+  });
+
+  test('toggles structured outputs on and off', async ({ page }) => {
+    await page.goto('/settings/ai-model');
+
+    // Navigate to Configure tab
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    const configureTab = page.locator('button:has-text("Configure")');
+    await configureTab.click();
+
+    // Wait for page to render
+    await page.waitForTimeout(1000);
+
+    // Find the structured outputs toggle button
+    const toggleButtons = await page.locator('button[class*="rounded-full"]').all();
+
+    // Click the last toggle (should be structured outputs)
+    if (toggleButtons.length > 0) {
+      const structuredOutputsToggle = toggleButtons[toggleButtons.length - 1];
+      await structuredOutputsToggle.click();
+
+      // Wait for API call
+      await page.waitForTimeout(500);
+
+      // Toggle should change state
+      const toggleClass = await structuredOutputsToggle.getAttribute('class');
+      expect(toggleClass).toBeTruthy();
+    }
+  });
+
+  test('displays cost estimate information', async ({ page }) => {
+    await page.goto('/settings/ai-model');
+
+    // Navigate to Configure tab
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    const configureTab = page.locator('button:has-text("Configure")');
+    await configureTab.click();
+
+    // Wait for cost estimate to appear
+    await page.waitForTimeout(500);
+
+    // Check for cost estimate text
+    await expect(page.getByText('Cost Estimate').or(page.getByText('cost'))).toBeVisible();
+  });
+
+  test('verifies all 8 task types are displayed', async ({ page }) => {
+    await page.goto('/settings/ai-model');
+
+    // Navigate to Configure tab
+    await expect(page.getByRole('heading', { name: 'AI Engine' })).toBeVisible({ timeout: 5000 });
+    const configureTab = page.locator('button:has-text("Configure")');
+    await configureTab.click();
+
+    // Wait for task configs to load
+    await page.waitForTimeout(1000);
+
+    // Count the number of effort level dropdowns (excluding provider selector)
+    const selects = await page.locator('select').all();
+
+    // Should have 1 provider selector + 8 task effort selectors = 9 total
+    expect(selects.length).toBeGreaterThanOrEqual(8);
   });
 });

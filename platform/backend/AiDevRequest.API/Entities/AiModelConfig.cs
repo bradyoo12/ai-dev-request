@@ -73,6 +73,17 @@ public class AiModelConfig
     /// </summary>
     public string? ModelHistoryJson { get; set; }
 
+    /// <summary>
+    /// JSON array of task type effort level configurations
+    /// Format: [{"TaskType":"analysis","EffortLevel":2,"Description":"..."},...]
+    /// </summary>
+    public string? EffortLevelConfigJson { get; set; }
+
+    /// <summary>
+    /// Whether structured outputs are enabled for AI model responses
+    /// </summary>
+    public bool StructuredOutputsEnabled { get; set; } = true;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

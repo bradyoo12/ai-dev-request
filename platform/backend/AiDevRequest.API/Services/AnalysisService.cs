@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AiDevRequest.API.DTOs;
 using AiDevRequest.API.Entities;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
@@ -119,7 +120,8 @@ JSON만 응답하세요. 다른 텍스트는 포함하지 마세요.";
                 if (provider == null)
                     throw new InvalidOperationException("No AI provider available");
 
-                content = await provider.GenerateAsync(prompt, modelId);
+                // Use HIGH effort level for complex analysis tasks
+                content = await provider.GenerateAsync(prompt, modelId, ThinkingEffortLevel.High);
             }
 
             var result = StructuredOutputHelper.DeserializeResponse<AnalysisResult>(content);

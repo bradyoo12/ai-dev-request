@@ -136,6 +136,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<HybridCacheEntry> HybridCacheEntries => Set<HybridCacheEntry>();
     public DbSet<PlaywrightHealingResult> PlaywrightHealingResults => Set<PlaywrightHealingResult>();
     public DbSet<SelfHealingRun> SelfHealingRuns => Set<SelfHealingRun>();
+    public DbSet<ProductionSandbox> ProductionSandboxes => Set<ProductionSandbox>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

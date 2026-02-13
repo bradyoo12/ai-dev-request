@@ -6,11 +6,12 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     react({
-      babel: {
-        plugins: [
-          ['babel-plugin-react-compiler', {}],
-        ],
-      },
+      // Temporarily disable React Compiler for debugging
+      // babel: {
+      //   plugins: [
+      //     ['babel-plugin-react-compiler', {}],
+      //   ],
+      // },
     }),
   ],
   resolve: {

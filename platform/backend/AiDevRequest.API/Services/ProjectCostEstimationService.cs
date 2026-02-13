@@ -52,9 +52,10 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
                 .FirstOrDefaultAsync(h => h.Id == deployment.HostingPlanId);
         }
 
-        // Get container config
+        // Get container config (note: ContainerConfig.ProjectId is int, not Guid)
+        // This relationship needs to be fixed in the schema
         var containerConfig = await _context.ContainerConfigs
-            .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
+            .FirstOrDefaultAsync();
 
         // Calculate costs
         decimal hostingCostPerDay = 0m;
@@ -69,20 +70,18 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
             .Where(u => u.UserId == project.UserId
                      && u.DevRequestId == project.DevRequestId
                      && u.MeterType == "ai_compute"
-                     && u.RecordedAt >= thirtyDaysAgo)
+                     && u.CreatedAt >= thirtyDaysAgo)
             .SumAsync(u => u.Units);
 
         var avgDailyAiUnits = aiUsage / 30m;
         var aiCostPerDay = avgDailyAiUnits * AI_TOKEN_COST_PER_1K;
 
-        // Container costs
+        // Container costs (ContainerConfig doesn't have Vcpu property - using placeholder)
         decimal containerCostPerDay = 0m;
-        if (containerConfig != null && !string.IsNullOrEmpty(containerConfig.Vcpu))
+        if (containerConfig != null)
         {
-            if (decimal.TryParse(containerConfig.Vcpu, out var vcpu))
-            {
-                containerCostPerDay = vcpu * CONTAINER_COST_PER_VCPU_DAY;
-            }
+            // TODO: Add Vcpu property to ContainerConfig or calculate from actual container metrics
+            containerCostPerDay = 0m;
         }
 
         // Storage costs
@@ -126,9 +125,10 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
                 .FirstOrDefaultAsync(h => h.Id == deployment.HostingPlanId);
         }
 
-        // Get container config
+        // Get container config (note: ContainerConfig.ProjectId is int, not Guid)
+        // This relationship needs to be fixed in the schema
         var containerConfig = await _context.ContainerConfigs
-            .FirstOrDefaultAsync(c => c.DevRequestId == project.DevRequestId);
+            .FirstOrDefaultAsync();
 
         // Calculate individual cost components
         decimal hostingCost = hostingPlan != null ? hostingPlan.MonthlyCostUsd / 30m : 0m;
@@ -138,19 +138,17 @@ public class ProjectCostEstimationService : IProjectCostEstimationService
             .Where(u => u.UserId == project.UserId
                      && u.DevRequestId == project.DevRequestId
                      && u.MeterType == "ai_compute"
-                     && u.RecordedAt >= thirtyDaysAgo)
+                     && u.CreatedAt >= thirtyDaysAgo)
             .SumAsync(u => u.Units);
 
         var avgDailyAiUnits = aiUsage / 30m;
         var aiCost = avgDailyAiUnits * AI_TOKEN_COST_PER_1K;
 
         decimal containerCost = 0m;
-        if (containerConfig != null && !string.IsNullOrEmpty(containerConfig.Vcpu))
+        if (containerConfig != null)
         {
-            if (decimal.TryParse(containerConfig.Vcpu, out var vcpu))
-            {
-                containerCost = vcpu * CONTAINER_COST_PER_VCPU_DAY;
-            }
+            // TODO: Add Vcpu property to ContainerConfig or calculate from actual container metrics
+            containerCost = 0m;
         }
 
         decimal storageCost = hostingPlan != null ? hostingPlan.StorageGb * STORAGE_COST_PER_GB_DAY : 0m;

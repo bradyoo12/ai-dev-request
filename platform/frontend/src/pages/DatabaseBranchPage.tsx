@@ -41,8 +41,11 @@ export default function DatabaseBranchPage() {
     try {
       const data = await listDatabaseBranches(projectId)
       setBranches(data)
-    } catch {
-      setError(t('dbBranch.error.loadFailed', 'Failed to load database branches'))
+    } catch (err) {
+      // Gracefully handle errors - just show empty state
+      // This allows the page to work even if the project doesn't exist yet
+      console.debug('Failed to load branches for project', projectId, err)
+      setBranches([])
     } finally {
       setLoading(false)
     }
@@ -314,7 +317,8 @@ export default function DatabaseBranchPage() {
               <circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/>
             </svg>
           </div>
-          <p className="text-warm-400">{t('dbBranch.empty', 'No database branches yet. Create a branch to get started with schema isolation.')}</p>
+          <p className="text-warm-400 mb-2">{t('dbBranch.empty', 'No database branches yet. Create a branch to get started with schema isolation.')}</p>
+          <p className="text-warm-500 text-sm">{t('dbBranch.emptyHint', 'Tip: Make sure to enter a valid Project ID above before creating branches.')}</p>
         </div>
       )}
     </div>

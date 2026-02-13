@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 99 Controllers | 84 Services | 109 Entities | 94 Pages | 88 API modules | 32 Components
+**Counts**: 100 Controllers | 85 Services | 110 Entities | 95 Pages | 89 API modules | 32 Components
 
 ---
 
@@ -142,6 +142,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | TeamController | /api/teams | Team workspaces |
 | SupportController | /api/support | Support posts |
 | SuggestionsController | /api/suggestions | Feature suggestions |
+| AgentInboxController | /api/agent-inbox | Agent inbox end-user feedback |
 
 ### Project Management
 
@@ -329,12 +330,13 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | TechTrendService | Tech trend tracking |
 | MicroserviceService | Microservice architecture |
 | WhiteLabelService | White-label tenancy |
+| AgentInboxService | Agent inbox feedback management |
 
 ---
 
 ## Backend Entities
 
-All under `platform/backend/AiDevRequest.API/Entities/`. 109 entities total.
+All under `platform/backend/AiDevRequest.API/Entities/`. 110 entities total.
 
 ### Core Domain
 
@@ -482,6 +484,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 109 entities total.
 | PlanningSession | Planning/discussion session |
 | ArenaComparison | Model arena comparison |
 | MarketplaceTemplate | Marketplace template listing |
+| AgentInboxItem | End-user feedback item |
 
 ### Analytics & Content
 
@@ -514,7 +517,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 109 entities total.
 
 ## Frontend Pages
 
-All under `platform/frontend/src/pages/`. 94 pages total.
+All under `platform/frontend/src/pages/`. 95 pages total.
 
 ### Home & Navigation
 
@@ -663,6 +666,7 @@ All under `platform/frontend/src/pages/`. 94 pages total.
 | MemoryPage | /settings/memories | User memories |
 | PreferencePage | /settings/preferences | User preferences |
 | RecommendationsPage | /recommendations | App recommendations |
+| AgentInboxPage | /settings/agent-inbox | Agent inbox |
 
 ### Config & Misc
 
@@ -765,7 +769,7 @@ All under `platform/frontend/src/components/`.
 
 ## Frontend API Modules
 
-All under `platform/frontend/src/api/`. 88 modules total.
+All under `platform/frontend/src/api/`. 89 modules total.
 
 ### Core
 
@@ -900,6 +904,7 @@ All under `platform/frontend/src/api/`. 88 modules total.
 | preferences.ts | PreferenceController | Preferences |
 | recommendations.ts | RecommendationController | Recommendations |
 | trends.ts | TechTrendController | Tech trends |
+| agent-inbox.ts | AgentInboxController | Agent inbox |
 
 ### Config & Misc
 

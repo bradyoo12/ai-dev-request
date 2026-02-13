@@ -102,6 +102,7 @@ User Request (natural language)
 | SelfHealingTestResult | Self-healing test automation result with healed/failed test details and confidence scores |
 | DatabaseBranch | Git-like database branch for preview environments with schema versioning and merge/discard |
 | SandboxExecution | Sandboxed code execution record with isolation level, resource usage, and security violation tracking |
+| AgentInboxItem | End-user feedback item from deployed app with status tracking and AI-triggered implementation |
 
 ## Spec-Driven Development Pipeline
 

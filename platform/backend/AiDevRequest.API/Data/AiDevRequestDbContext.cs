@@ -138,6 +138,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<SelfHealingRun> SelfHealingRuns => Set<SelfHealingRun>();
     public DbSet<ProductionSandbox> ProductionSandboxes => Set<ProductionSandbox>();
     public DbSet<OrgMemory> OrgMemories => Set<OrgMemory>();
+    public DbSet<AiAgentRule> AiAgentRules => Set<AiAgentRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

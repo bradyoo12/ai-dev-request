@@ -4227,5 +4227,12 @@
   "settings.groups.integrations": "통합",
   "settings.groups.analyticsGrowth": "분석 및 성장",
   "settings.groups.other": "기타",
-  "settings.toggleNav": "탐색 전환"
+  "settings.groups.core": "핵심",
+  "settings.groups.billingUsage": "결제 및 사용량",
+  "settings.groups.collaboration": "협업",
+  "settings.groups.analyticsAdmin": "분석 및 관리",
+  "settings.toggleNav": "탐색 전환",
+  "settings.searchTabs": "설정 검색...",
+  "settings.clearSearch": "검색 초기화",
+  "settings.noResults": "설정을 찾을 수 없습니다"
 }

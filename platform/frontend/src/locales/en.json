@@ -4227,5 +4227,12 @@
   "settings.groups.integrations": "Integrations",
   "settings.groups.analyticsGrowth": "Analytics & Growth",
   "settings.groups.other": "Other",
-  "settings.toggleNav": "Toggle navigation"
+  "settings.groups.core": "Core",
+  "settings.groups.billingUsage": "Billing & Usage",
+  "settings.groups.collaboration": "Collaboration",
+  "settings.groups.analyticsAdmin": "Analytics & Admin",
+  "settings.toggleNav": "Toggle navigation",
+  "settings.searchTabs": "Search settings...",
+  "settings.clearSearch": "Clear search",
+  "settings.noResults": "No settings found"
 }

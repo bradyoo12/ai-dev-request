@@ -12,6 +12,7 @@ public interface IStreamingGenerationService
     Task<GenerationStream> CancelStreamAsync(int devRequestId);
     Task<List<GenerationStream>> GetStreamHistoryAsync(int devRequestId);
     IAsyncEnumerable<StreamEvent> StreamGenerationAsync(int devRequestId, CancellationToken cancellationToken);
+    IAsyncEnumerable<StreamEvent> LiveStreamGenerationAsync(int devRequestId, CancellationToken cancellationToken);
 }
 
 public class StreamingGenerationService : IStreamingGenerationService
@@ -250,6 +251,212 @@ public class StreamingGenerationService : IStreamingGenerationService
                 totalTokens = totalStreamedTokens,
                 totalFiles = completedFiles,
                 durationMs = (stream.CompletedAt!.Value - stream.StartedAt!.Value).TotalMilliseconds,
+            })
+        };
+    }
+
+    /// <summary>
+    /// Live streaming generation with structured events:
+    /// file_created, file_updated, build_progress, preview_ready
+    /// </summary>
+    public async IAsyncEnumerable<StreamEvent> LiveStreamGenerationAsync(
+        int devRequestId,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var stream = await _context.GenerationStreams
+            .Where(s => s.DevRequestId == devRequestId && s.Status == "idle")
+            .OrderByDescending(s => s.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (stream == null)
+        {
+            yield return new StreamEvent { Type = "error", Data = "No idle stream found. Start a new generation first." };
+            yield break;
+        }
+
+        // Mark as streaming
+        stream.Status = "streaming";
+        stream.StartedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var files = GetSimulatedFiles(devRequestId);
+        stream.TotalFiles = files.Count;
+        stream.TotalTokens = files.Sum(f => f.Content.Length / 4);
+        stream.GeneratedFiles = JsonSerializer.Serialize(
+            files.Select(f => new { path = f.Path, status = "pending", tokenCount = 0 }));
+        await _context.SaveChangesAsync(cancellationToken);
+
+        // Emit stream_start
+        yield return new StreamEvent
+        {
+            Type = "stream_start",
+            Data = JsonSerializer.Serialize(new
+            {
+                streamId = stream.Id,
+                totalFiles = stream.TotalFiles,
+                totalTokens = stream.TotalTokens,
+                timestamp = DateTime.UtcNow,
+            })
+        };
+
+        var totalStreamedTokens = 0;
+        var completedFileCount = 0;
+        var fileProgresses = new List<GeneratedFileProgress>();
+
+        for (var fileIdx = 0; fileIdx < files.Count; fileIdx++)
+        {
+            var file = files[fileIdx];
+            if (cancellationToken.IsCancellationRequested)
+            {
+                stream.Status = "cancelled";
+                await _context.SaveChangesAsync(CancellationToken.None);
+                yield return new StreamEvent { Type = "error", Data = "Stream cancelled by client." };
+                yield break;
+            }
+
+            // Reload to check for cancellation from another request
+            await _context.Entry(stream).ReloadAsync(cancellationToken);
+            if (stream.Status == "cancelled")
+            {
+                yield return new StreamEvent { Type = "error", Data = "Stream cancelled." };
+                yield break;
+            }
+
+            stream.CurrentFile = file.Path;
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Emit file_created event
+            yield return new StreamEvent
+            {
+                Type = "file_created",
+                Data = JsonSerializer.Serialize(new
+                {
+                    filename = file.Path,
+                    fileIndex = fileIdx,
+                    totalFiles = files.Count,
+                    timestamp = DateTime.UtcNow,
+                })
+            };
+
+            // Stream the file content chunk by chunk with file_updated events
+            var fileTokens = 0;
+            var chunkSize = 20;
+            for (var i = 0; i < file.Content.Length; i += chunkSize)
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                var chunk = file.Content.Substring(i, Math.Min(chunkSize, file.Content.Length - i));
+                var chunkTokens = Math.Max(1, chunk.Length / 4);
+                fileTokens += chunkTokens;
+                totalStreamedTokens += chunkTokens;
+
+                // Emit file_updated event with content chunk
+                yield return new StreamEvent
+                {
+                    Type = "file_updated",
+                    Data = JsonSerializer.Serialize(new
+                    {
+                        filename = file.Path,
+                        content = chunk,
+                        tokens = chunkTokens,
+                        progress = stream.TotalTokens > 0
+                            ? Math.Round((double)totalStreamedTokens / stream.TotalTokens * 100, 1)
+                            : 0,
+                        timestamp = DateTime.UtcNow,
+                    })
+                };
+
+                // Update DB progress
+                stream.StreamedTokens = totalStreamedTokens;
+                stream.ProgressPercent = stream.TotalTokens > 0
+                    ? Math.Round((double)totalStreamedTokens / stream.TotalTokens * 100, 1)
+                    : 0;
+
+                // Simulate streaming delay (30-80ms per chunk)
+                await Task.Delay(Random.Shared.Next(30, 80), cancellationToken);
+
+                // Emit build_progress every 5 chunks
+                if ((i / chunkSize) % 5 == 0)
+                {
+                    yield return new StreamEvent
+                    {
+                        Type = "build_progress",
+                        Data = JsonSerializer.Serialize(new
+                        {
+                            progress = stream.ProgressPercent,
+                            streamedTokens = totalStreamedTokens,
+                            totalTokens = stream.TotalTokens,
+                            currentFile = file.Path,
+                            completedFiles = completedFileCount,
+                            totalFiles = files.Count,
+                            timestamp = DateTime.UtcNow,
+                        })
+                    };
+                }
+            }
+
+            completedFileCount++;
+            stream.CompletedFiles = completedFileCount;
+            fileProgresses.Add(new GeneratedFileProgress
+            {
+                Path = file.Path,
+                Status = "completed",
+                TokenCount = fileTokens,
+            });
+
+            stream.GeneratedFiles = JsonSerializer.Serialize(
+                fileProgresses.Select(fp => new { path = fp.Path, status = fp.Status, tokenCount = fp.TokenCount }));
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Emit build_progress for file completion
+            yield return new StreamEvent
+            {
+                Type = "build_progress",
+                Data = JsonSerializer.Serialize(new
+                {
+                    progress = stream.ProgressPercent,
+                    streamedTokens = totalStreamedTokens,
+                    totalTokens = stream.TotalTokens,
+                    currentFile = file.Path,
+                    completedFiles = completedFileCount,
+                    totalFiles = files.Count,
+                    timestamp = DateTime.UtcNow,
+                })
+            };
+        }
+
+        // Mark as completed
+        stream.Status = "completed";
+        stream.CompletedAt = DateTime.UtcNow;
+        stream.ProgressPercent = 100;
+        await _context.SaveChangesAsync(CancellationToken.None);
+
+        // Emit preview_ready
+        yield return new StreamEvent
+        {
+            Type = "preview_ready",
+            Data = JsonSerializer.Serialize(new
+            {
+                streamId = stream.Id,
+                files = fileProgresses.Select(fp => fp.Path).ToList(),
+                totalTokens = totalStreamedTokens,
+                totalFiles = completedFileCount,
+                durationMs = (stream.CompletedAt!.Value - stream.StartedAt!.Value).TotalMilliseconds,
+                timestamp = DateTime.UtcNow,
+            })
+        };
+
+        // Emit stream_complete
+        yield return new StreamEvent
+        {
+            Type = "stream_complete",
+            Data = JsonSerializer.Serialize(new
+            {
+                streamId = stream.Id,
+                totalTokens = totalStreamedTokens,
+                totalFiles = completedFileCount,
+                durationMs = (stream.CompletedAt!.Value - stream.StartedAt!.Value).TotalMilliseconds,
+                timestamp = DateTime.UtcNow,
             })
         };
     }

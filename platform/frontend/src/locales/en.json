@@ -256,6 +256,7 @@
   "sites.loading": "Loading your sites...",
   "sites.empty.title": "No Sites Deployed Yet",
   "sites.empty.description": "Complete a project build and deploy it to see your sites here.",
+  "sites.empty.cta": "Create Your First Project",
   "sites.created": "Created",
   "sites.resourceGroup": "Resource Group",
   "sites.region": "Region",

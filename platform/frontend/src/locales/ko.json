@@ -4412,7 +4412,6 @@
   "subtasks.error.deleteFailed": "하위 작업 삭제에 실패했습니다.",
   "subtasks.error.approveAllFailed": "전체 승인에 실패했습니다.",
 
-<<<<<<< HEAD
   "testGeneration.tabs.generate": "테스트 생성",
   "testGeneration.tabs.nlGenerate": "자연어 입력",
   "testGeneration.tabs.mcpConfig": "MCP 설정",

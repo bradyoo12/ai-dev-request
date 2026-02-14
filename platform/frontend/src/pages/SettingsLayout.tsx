@@ -601,7 +601,6 @@ export default function SettingsLayout() {
       {settingsTab === 'agent-messages' && <AgentMessagesPage />}
       {settingsTab === 'agent-trace' && <AgentTracePage />}
       {settingsTab === 'agentic-workflows' && <AgenticWorkflowsPage />}
-      {settingsTab === 'agent-trace' && <AgentTracePage />}
       {settingsTab === 'confidence-scoring' && <ConfidenceScorePage />}
       {settingsTab === 'ai-marketplace' && <AiModelMarketplacePage />}
       {settingsTab === 'agent-inbox' && <AgentInboxPage />}

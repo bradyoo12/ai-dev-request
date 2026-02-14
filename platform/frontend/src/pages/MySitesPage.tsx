@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { getSites, getSiteDetail, deleteSite, redeploySite } from '../api/sites'
 import type { SiteResponse, SiteDetailResponse } from '../api/sites'
 import { searchDomains, getSiteDomain, purchaseDomain, removeSiteDomain } from '../api/domains'
@@ -7,6 +8,7 @@ import type { DomainSearchResult, DomainResponse } from '../api/domains'
 
 export default function MySitesPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [sites, setSites] = useState<SiteResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -202,7 +204,13 @@ export default function MySitesPage() {
         <div className="text-center py-16 bg-warm-800 rounded-2xl">
           <div className="text-6xl mb-4">🌐</div>
           <h3 className="text-xl font-bold mb-2">{t('sites.empty.title')}</h3>
-          <p className="text-warm-400">{t('sites.empty.description')}</p>
+          <p className="text-warm-400 mb-6">{t('sites.empty.description')}</p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 bg-gradient-to-r from-accent-blue to-accent-purple rounded-xl font-medium transition-all hover:shadow-glow-blue hover:scale-[1.02]"
+          >
+            {t('sites.empty.cta')}
+          </button>
         </div>
       ) : (
         <div className="space-y-4">

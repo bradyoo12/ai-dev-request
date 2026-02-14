@@ -256,6 +256,7 @@
   "sites.loading": "사이트를 불러오는 중...",
   "sites.empty.title": "배포된 사이트가 없습니다",
   "sites.empty.description": "프로젝트 빌드를 완료하고 배포하면 여기에 사이트가 표시됩니다.",
+  "sites.empty.cta": "첫 번째 프로젝트 만들기",
   "sites.created": "생성일",
   "sites.resourceGroup": "리소스 그룹",
   "sites.region": "리전",

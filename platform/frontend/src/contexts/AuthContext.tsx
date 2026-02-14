@@ -1,8 +1,11 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getStoredUser, logout as apiLogout, socialLogin, isAuthenticated, AUTH_EXPIRED_EVENT } from '../api/auth'
 import type { AuthUser, SocialProvider } from '../api/auth'
 import { getTokenOverview } from '../api/settings'
 import { apiCache } from '../utils/apiCache'
+
+const RETURN_URL_KEY = 'auth-return-url'
 
 interface AuthContextType {
   authUser: AuthUser | null
@@ -19,6 +22,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate()
   const [authUser, setAuthUser] = useState<AuthUser | null>(getStoredUser())
   const [showLogin, setShowLogin] = useState(false)
   const [tokenBalance, setTokenBalance] = useState<number | null>(null)
@@ -44,7 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthUser(user)
     setShowLogin(false)
     loadTokenBalance()
-  }, [loadTokenBalance])
+
+    // Redirect to the saved return URL (set by ProtectedRoute) if available
+    const returnUrl = sessionStorage.getItem(RETURN_URL_KEY)
+    if (returnUrl) {
+      sessionStorage.removeItem(RETURN_URL_KEY)
+      navigate(returnUrl, { replace: true })
+    }
+  }, [loadTokenBalance, navigate])
 
   const handleLogout = useCallback(() => {
     apiLogout()

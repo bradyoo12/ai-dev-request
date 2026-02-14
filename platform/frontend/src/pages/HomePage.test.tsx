@@ -69,6 +69,10 @@ vi.mock('../components/PricingSection', () => ({
   default: () => <div data-testid="pricing">PricingSection</div>,
 }))
 
+vi.mock('../components/TemplatesSection', () => ({
+  default: () => <div data-testid="templates-section">TemplatesSection</div>,
+}))
+
 vi.mock('../components/StepIndicator', () => ({
   default: () => <div data-testid="step-indicator">StepIndicator</div>,
 }))

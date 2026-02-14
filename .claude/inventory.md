@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 108 Controllers | 95 Services | 119 Entities | 105 Pages | 97 API modules | 33 Components
+**Counts**: 109 Controllers | 96 Services | 120 Entities | 106 Pages | 98 API modules | 33 Components
 
 ---
 
@@ -92,6 +92,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | SandboxExecutionController | /api/sandbox | Sandboxed code execution |
 | DatabaseBranchController | /api/database-branch | Git-like database branching |
 | LocalModelController | /api/local-models | Local AI model CRUD, health check, test inference |
+| ManagedBackendController | /api/managed-backend | Auto-provisioned managed backend (DB, auth, storage, preview URL) for generated projects |
 
 ### Billing & Payments
 
@@ -241,6 +242,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | ProjectAggregationService | Aggregate project data from multiple sources |
 | ProjectCostEstimationService | Calculate daily/monthly cloud costs |
 | LogStreamService | SSE streaming for real-time logs |
+| ManagedBackendService | Auto-provision and manage backend infrastructure (database, auth, storage, preview URL) for generated projects |
 
 ### Auth & User
 
@@ -494,6 +496,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 | SandboxExecution | Sandbox execution record |
 | DatabaseBranch | Database branch |
 | LocalModelConfig | Local AI model configuration (GPU type, endpoint, cost) |
+| ManagedBackend | Auto-provisioned managed backend (database connection, auth config, storage URL, preview URL) |
 
 ### Agents & Orchestration
 
@@ -673,6 +676,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | PlatformUpgradePage | /settings/platform-upgrade | .NET 10 upgrade |
 | SandboxExecutionPage | /settings/sandbox | Sandbox execution |
 | DatabaseBranchPage | /settings/database-branching | Database branching |
+| ManagedBackendPage | /settings/managed-backend | Auto-provisioned managed backend with 4-tab interface (backends, provision, health, stats) |
 
 ### Billing & Payments
 
@@ -937,6 +941,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | database-branch.ts | DatabaseBranchController | Database branching |
 | preview.ts | PreviewController | Preview deployment |
 | promotion.ts | PreviewController | Promote preview to production |
+| managed-backend.ts | ManagedBackendController | Auto-provisioned managed backend (create, list, health, delete) |
 
 ### Billing & Payments
 

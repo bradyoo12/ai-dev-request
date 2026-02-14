@@ -405,6 +405,25 @@ Automated Bicep/IaC template generation for every AI-generated project:
 - **Templates**: Azure Container Apps, PostgreSQL Flexible Server, Blob Storage, Application Insights, Static Web Apps
 - **Flow**: Project generated → analyze requirements → suggest infrastructure → user configures → generate Bicep → deploy with `azd up`
 
+## Auto-Provisioned Managed Backend
+
+Automatically provision and manage backend infrastructure (database, authentication, storage, hosting) for AI-generated projects:
+- **Backend**: `ManagedBackendService` provisions PostgreSQL database, JWT auth config, Azure Blob Storage, and generates preview URLs
+- **Endpoints**:
+  - `POST /api/managed-backend` — create new managed backend for a project
+  - `GET /api/managed-backend` — list all managed backends for current user
+  - `GET /api/managed-backend/{id}` — get managed backend details
+  - `GET /api/managed-backend/{id}/health` — check backend health status
+  - `DELETE /api/managed-backend/{id}` — delete managed backend and cleanup resources
+- **Entity**: `ManagedBackend` with ProjectId, DatabaseConnectionString, AuthConfig (JWT secrets), StorageUrl, PreviewUrl, Status (Provisioning, Active, Failed, Deleted), Health (Healthy, Degraded, Unhealthy), ResourceGroup, CreatedAt, UpdatedAt
+- **Frontend**: `ManagedBackendPage` at `/settings/managed-backend` with 4-tab interface:
+  - **Backends tab**: List of all provisioned backends with project name, status badges, health indicators
+  - **Provision tab**: Form to create new managed backend with project selection, resource configuration
+  - **Health tab**: Real-time health monitoring for database, auth, storage endpoints
+  - **Stats tab**: Usage statistics (storage size, database connections, API calls)
+- **Integration**: When `ProductionService` generates a project, can optionally provision managed backend and inject connection strings into generated code
+- **Flow**: User generates project → optionally provision managed backend → service creates Azure resources → inject config into generated code → provide preview URL
+
 ## Heterogeneous Model Architecture (Cost Optimization)
 
 Intelligent model routing to reduce AI costs by using the cheapest sufficient model tier per task:

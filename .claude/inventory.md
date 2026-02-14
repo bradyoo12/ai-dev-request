@@ -141,7 +141,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 |---|---|---|
 | CollaborativeEditingController | /api/projects/{id}/collab | CRDT collaborative editing |
 | TeamController | /api/teams | Team workspaces |
-| SupportController | /api/support | Support posts |
+| SupportController | /api/support | Support posts, feedback presets, credit rewards |
 | SuggestionsController | /api/suggestions | Feature suggestions |
 | AgentInboxController | /api/agent-inbox | Agent inbox end-user feedback |
 
@@ -503,7 +503,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | TeamWorkspace | Team workspace |
 | CollaborativeSession | CRDT collaborative session |
 | Suggestion | Feature suggestion |
-| SupportPost | Support board post |
+| SupportPost | Support board post (with FeedbackType, RewardMessage) |
 | PlanningSession | Planning/discussion session |
 | ArenaComparison | Model arena comparison |
 | MarketplaceTemplate | Marketplace template listing |
@@ -946,7 +946,7 @@ All under `platform/frontend/src/api/`. 91 modules total.
 | collaborative-editing.ts | CollaborativeEditingController | Collab editing |
 | teams.ts | TeamController | Teams |
 | suggestions.ts | SuggestionsController | Suggestions |
-| support.ts | SupportController | Support |
+| support.ts | SupportController | Support, feedback presets, credit rewards |
 | memories.ts | MemoryController | Memories |
 | preferences.ts | PreferenceController | Preferences |
 | recommendations.ts | RecommendationController | Recommendations |

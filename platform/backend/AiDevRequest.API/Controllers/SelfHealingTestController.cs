@@ -47,6 +47,27 @@ public class SelfHealingTestController : ControllerBase
         return Ok(history.Select(MapDto));
     }
 
+    [HttpPost("repair-locators")]
+    public async Task<IActionResult> RepairLocators(Guid id, [FromBody] RepairLocatorsRequest request)
+    {
+        try
+        {
+            var result = await _selfHealingService.RepairLocatorsAsync(id, request.BrokenLocators);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpGet("timeline")]
+    public async Task<IActionResult> GetHealingTimeline(Guid id)
+    {
+        var timeline = await _selfHealingService.GetHealingTimelineAsync(id);
+        return Ok(timeline);
+    }
+
     private static SelfHealingTestResultDto MapDto(Entities.SelfHealingTestResult r) => new()
     {
         Id = r.Id,
@@ -80,4 +101,50 @@ public record SelfHealingTestResultDto
     public int AnalysisVersion { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
+}
+
+public record RepairLocatorsRequest
+{
+    public List<BrokenLocatorInput> BrokenLocators { get; init; } = new();
+}
+
+public record BrokenLocatorInput
+{
+    public string TestFile { get; init; } = "";
+    public string TestName { get; init; } = "";
+    public string OriginalLocator { get; init; } = "";
+    public string? ErrorMessage { get; init; }
+}
+
+public record LocatorRepairResult
+{
+    public List<RepairedLocator> RepairedLocators { get; init; } = new();
+    public int TotalRepaired { get; init; }
+    public int TotalFailed { get; init; }
+    public decimal OverallConfidence { get; init; }
+    public string Summary { get; init; } = "";
+}
+
+public record RepairedLocator
+{
+    public string TestFile { get; init; } = "";
+    public string TestName { get; init; } = "";
+    public string OriginalLocator { get; init; } = "";
+    public string RepairedLocatorValue { get; init; } = "";
+    public string Strategy { get; init; } = "";
+    public int Confidence { get; init; }
+    public string Reason { get; init; } = "";
+}
+
+public record HealingTimelineEntry
+{
+    public Guid Id { get; init; }
+    public DateTime Timestamp { get; init; }
+    public string Action { get; init; } = ""; // healed, failed, skipped
+    public string TestName { get; init; } = "";
+    public string? OriginalLocator { get; init; }
+    public string? HealedLocator { get; init; }
+    public int Confidence { get; init; }
+    public string? Reason { get; init; }
+    public int AnalysisVersion { get; init; }
 }

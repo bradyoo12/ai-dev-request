@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 102 Controllers | 89 Services | 113 Entities | 98 Pages | 91 API modules | 33 Components
+**Counts**: 102 Controllers | 89 Services | 113 Entities | 99 Pages | 92 API modules | 33 Components
 
 ---
 
@@ -576,6 +576,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | ProjectVersionPage | /settings/version-history | Version history & diff |
 | ProjectDocsPage | /settings/project-docs | Auto-generated documentation |
 | ProjectHealthPage | /project-health | Project health overview |
+| TicketProgressPage | /tickets | User ticket progress tracking with search, status filters, detail view |
 | CodebaseMemoryPage | /settings/codebase-memory | Persistent codebase memory |
 | ContextIndexPage | /settings/context-index | Semantic project index |
 
@@ -824,6 +825,7 @@ All under `platform/frontend/src/api/`. 91 modules total.
 | Module | Backend Controller | Purpose |
 |---|---|---|
 | requests.ts | RequestsController | Dev request CRUD & pipeline |
+| ticket-progress.ts | RequestsController | User ticket progress tracking |
 | auth.ts | AuthController | Login, register, social auth |
 | settings.ts | SettingsController | App settings |
 | apikeys.ts | ApiKeysController | API key management |

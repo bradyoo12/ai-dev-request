@@ -25,6 +25,7 @@ import QualityConfidenceBadge from '../components/QualityConfidenceBadge'
 import PowerLevelSelector from '../components/PowerLevelSelector'
 import type { PowerLevel } from '../components/PowerLevelSelector'
 import ModelQuickSelector from '../components/ModelQuickSelector'
+import CreditEstimateCard from '../components/CreditEstimateCard'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -651,6 +652,12 @@ export default function HomePage() {
               </div>
             )}
 
+            <CreditEstimateCard
+              complexity={analysisResult.complexity}
+              analysisTokensUsed={analysisResult.tokensUsed}
+              completedSteps={['analysis']}
+            />
+
             <div className="flex gap-4">
               <button onClick={handleReset}
                 className="flex-1 py-3 bg-warm-800 hover:bg-warm-700 rounded-xl font-medium transition-colors">
@@ -706,6 +713,15 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+
+            {analysisResult && (
+              <CreditEstimateCard
+                complexity={analysisResult.complexity}
+                analysisTokensUsed={analysisResult.tokensUsed}
+                proposalTokensUsed={proposalResult.tokensUsed}
+                completedSteps={['analysis', 'proposal']}
+              />
+            )}
 
             <div className="bg-warm-900 rounded-xl p-4 mb-4">
               <h4 className="font-bold mb-3">{t('proposal.timelineTotal', { days: proposalResult.proposal.timeline.totalDays })}</h4>

@@ -110,7 +110,7 @@ export default function LoginPage({ onLogin, onSkip }: LoginPageProps) {
               <div className="w-full border-t border-warm-700/50"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-transparent text-warm-500">{t('auth.orContinueWith')}</span>
+              <span className="px-4 bg-[oklch(0.18_0.008_75/0.7)] text-warm-500">{t('auth.orContinueWith')}</span>
             </div>
           </div>
 

@@ -342,13 +342,11 @@ app.UseExceptionHandler(errorApp =>
             }
             else
             {
-                // In staging/production, never drop the database — require manual intervention
-                logger.LogCritical(
-                    "Database in partial state — manual intervention required. Missing tables: {Missing}",
-                    string.Join(", ", missingTables));
-                throw new InvalidOperationException(
-                    $"Database schema mismatch detected in {app.Environment.EnvironmentName}. " +
-                    $"Missing tables: {string.Join(", ", missingTables)}. Manual intervention required.");
+                // In staging/production, log the partial state but still attempt MigrateAsync.
+                // Missing tables are often just pending migrations that haven't been applied yet.
+                logger.LogWarning(
+                    "Partial database detected — {Missing} tables missing. Attempting MigrateAsync to apply pending migrations. Missing: {MissingList}",
+                    missingTables.Count, string.Join(", ", missingTables));
             }
         }
         else if (existingTables.Count == allTables.Length)

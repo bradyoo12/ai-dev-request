@@ -30,11 +30,14 @@ export default function FooterSection() {
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Support & Legal */}
           <div>
             <h4 className="font-semibold mb-3 text-warm-200">{t('footer.support')}</h4>
             <ul className="space-y-2 text-sm text-warm-500">
               <li><a href="mailto:support@aidevrequest.com" className="hover:text-white transition-colors">{t('footer.link.contact')}</a></li>
+              <li><Link to="/faq" className="hover:text-white transition-colors">{t('footer.link.faq')}</Link></li>
+              <li><Link to="/terms" className="hover:text-white transition-colors">{t('footer.link.terms')}</Link></li>
+              <li><Link to="/privacy" className="hover:text-white transition-colors">{t('footer.link.privacy')}</Link></li>
             </ul>
           </div>
         </div>

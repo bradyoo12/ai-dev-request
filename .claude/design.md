@@ -223,6 +223,12 @@ Token-by-token streaming output for AI code generation via Server-Sent Events:
 - **Frontend**: `StreamingGenerationPage` in Settings with live code display, blinking cursor, file tabs with completion indicators, progress bar, token counter, cancel button, stream history
 - **Flow**: Start generation → SSE connection opened → tokens stream in real-time → file tabs update → progress bar fills → stream completes
 
+### Live Generation Preview (#527)
+- **Endpoint**: `GET /api/requests/{id}/generate/live-stream` — enhanced SSE with structured events: `file_created`, `file_updated`, `build_progress`, `preview_ready`
+- **Frontend**: `LiveGenerationPage` at `/live-generation/:requestId` with real-time code editor (line numbers, syntax tabs), file tree panel, progress bar (percentage, file count, token count, ETA), preview-ready notification
+- **API module**: `live-generation.ts` — `startLiveGeneration`, `cancelLiveGeneration`, `getLiveStreamStatus`, `connectToLiveStream`
+- **Flow**: Navigate to live generation → start → SSE events stream file creation/updates → code appears in editor → file tree builds up → progress bar advances → preview ready banner
+
 ## Usage-Based Billing
 
 Hybrid pricing infrastructure with subscription + metered AI usage and Stripe integration:

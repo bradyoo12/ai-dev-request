@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 106 Controllers | 93 Services | 117 Entities | 103 Pages | 95 API modules | 33 Components
+**Counts**: 106 Controllers | 93 Services | 117 Entities | 104 Pages | 96 API modules | 33 Components
 
 ---
 
@@ -34,7 +34,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 
 | Controller | Route | Purpose |
 |---|---|---|
-| StreamingGenerationController | /api/requests/{id}/generate | Real-time SSE code generation |
+| StreamingGenerationController | /api/requests/{id}/generate | Real-time SSE code generation (stream, live-stream, start, cancel, status, history) |
 | CompilerController | /api/projects/{id}/compiler | Compiler-in-the-loop validation |
 | SpecificationController | /api/requests/{id}/specs | Spec-driven development pipeline |
 | GenerativeUiController | /api/generative-ui | Generative UI chat interface |
@@ -615,6 +615,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | Page | Route | Purpose |
 |---|---|---|
 | StreamingGenerationPage | /settings/streaming-generation | SSE code generation config |
+| LiveGenerationPage | /live-generation/:requestId | Real-time code gen visualization with file tree, editor, progress |
 | CompilerValidationPage | /settings/compiler-validation | Compiler validation settings |
 | SpecificationPage | /settings/specifications | Spec-driven development |
 | GenerativeUiPage | /settings/generative-ui | Generative UI chat |
@@ -875,6 +876,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | Module | Backend Controller | Purpose |
 |---|---|---|
 | streaming-generation.ts | StreamingGenerationController | SSE generation |
+| live-generation.ts | StreamingGenerationController | Live SSE code gen visualization (start, cancel, status, connect) |
 | compiler.ts | CompilerController | Compiler validation |
 | specifications.ts | SpecificationController | Spec pipeline |
 | generativeui.ts | GenerativeUiController | Generative UI |

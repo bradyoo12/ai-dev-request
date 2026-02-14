@@ -342,6 +342,7 @@ test.describe('Iterative Code Refinement', () => {
       // TODO: Implement after backend is ready
       // May require intercepting network requests
 
+      await page.route('**/api/dev-request/*/iterate/stream', route => route.abort())
       await page.route('**/api/dev-request/*/iterate', route => route.abort())
 
       await page.goto(REFINEMENT_URL)

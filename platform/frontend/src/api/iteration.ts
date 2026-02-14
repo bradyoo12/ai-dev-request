@@ -63,12 +63,14 @@ export async function sendIterationMessageStream(
   onToken: (token: string) => void,
   onFileChanges: (changes: FileChange[]) => void,
   onDone: (tokensUsed: number, newBalance: number) => void,
-  onError: (error: string) => void
+  onError: (error: string) => void,
+  signal?: AbortSignal
 ): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/api/dev-request/${requestId}/iterate/stream`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({ message }),
+    signal,
   })
 
   if (!res.ok) throw new Error('Failed to start iteration stream')

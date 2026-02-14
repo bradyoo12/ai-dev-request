@@ -65,6 +65,9 @@ export default function IterativeChat({ requestId, onTokensUsed, onFilesChanged 
     }
     setMessages(prev => [...prev, tempMsg])
 
+    const streamAbort = new AbortController()
+    const streamTimeout = setTimeout(() => streamAbort.abort(), 10000)
+
     try {
       // Try streaming
       let streamed = ''
@@ -81,6 +84,7 @@ export default function IterativeChat({ requestId, onTokensUsed, onFilesChanged 
           fileChanges = changes
         },
         (tokensUsed, newBalance) => {
+          clearTimeout(streamTimeout)
           const assistantMsg: MessageWithChanges = {
             id: Date.now() + 1,
             role: 'assistant',
@@ -104,6 +108,7 @@ export default function IterativeChat({ requestId, onTokensUsed, onFilesChanged 
           }
         },
         (errorMsg) => {
+          clearTimeout(streamTimeout)
           if (errorMsg === 'insufficient_tokens') {
             setError(t('iteration.insufficientTokens'))
           } else {
@@ -112,9 +117,11 @@ export default function IterativeChat({ requestId, onTokensUsed, onFilesChanged 
           setMessages(prev => prev.filter(m => m.id !== tempMsg.id))
           setStreamingContent('')
           setSending(false)
-        }
+        },
+        streamAbort.signal
       )
     } catch {
+      clearTimeout(streamTimeout)
       // Fallback to non-streaming
       setStreamingContent('')
       try {

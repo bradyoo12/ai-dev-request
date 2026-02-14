@@ -26,6 +26,7 @@ const routes = [
   '/settings/compiler-validation',
   '/settings/test-generation',
   '/settings/billing',
+  '/settings/agent-inbox',
 ];
 
 test.describe('Staging Site Smoke Test', () => {

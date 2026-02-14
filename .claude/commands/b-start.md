@@ -31,8 +31,8 @@ gh auth switch -u bradyoo12
 ```
 
 **Available GitHub Accounts for Rate Limit Rotation:**
-- `bradyoo12` (brad.yoo@xbert.io) - Primary account
-- `yoohoony` (yoohoony@gmail.com) - Secondary account for rate limit failover
+- `bradyoo12` (bradyoo12@outlook.com) - Primary account
+- `byooxbert` (brad.yoo@xbert.io) - Secondary account for rate limit failover
 
 ## Rate Limit Management and Account Switching
 
@@ -69,8 +69,8 @@ When any rate limit drops below 20% remaining OR hits 403/429 errors:
 2. **Switch to the alternate account:**
    ```bash
    if [ "$CURRENT_USER" = "bradyoo12" ]; then
-     echo "Switching to secondary account (yoohoony)..."
-     gh auth switch -u yoohoony
+     echo "Switching to secondary account (byooxbert)..."
+     gh auth switch -u byooxbert
    else
      echo "Switching to primary account (bradyoo12)..."
      gh auth switch -u bradyoo12
@@ -356,8 +356,8 @@ Read and internalize the project guidelines. These are living documents that get
    if [ $GRAPHQL_PERCENT -lt 20 ]; then
      CURRENT_USER=$(gh api user --jq '.login')
      if [ "$CURRENT_USER" = "bradyoo12" ]; then
-       echo "⚠️ Low rate limit ($GRAPHQL_PERCENT%) - switching to yoohoony account"
-       gh auth switch -u yoohoony
+       echo "⚠️ Low rate limit ($GRAPHQL_PERCENT%) - switching to byooxbert account"
+       gh auth switch -u byooxbert
      else
        echo "⚠️ Low rate limit ($GRAPHQL_PERCENT%) - switching to bradyoo12 account"
        gh auth switch -u bradyoo12
@@ -397,8 +397,8 @@ Check all tickets in the project to ensure they align with policy and design:
    if [ $REST_PERCENT -lt 20 ]; then
      CURRENT_USER=$(gh api user --jq '.login')
      if [ "$CURRENT_USER" = "bradyoo12" ]; then
-       echo "⚠️ Low REST API limit ($REST_PERCENT%) - switching to yoohoony"
-       gh auth switch -u yoohoony
+       echo "⚠️ Low REST API limit ($REST_PERCENT%) - switching to byooxbert"
+       gh auth switch -u byooxbert
      else
        echo "⚠️ Low REST API limit ($REST_PERCENT%) - switching to bradyoo12"
        gh auth switch -u bradyoo12
@@ -457,7 +457,7 @@ Implement and locally test ONE Ready ticket using an Agent Team.
 
    if [ $GRAPHQL_PERCENT -lt 20 ]; then
      CURRENT_USER=$(gh api user --jq '.login')
-     [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u yoohoony || gh auth switch -u bradyoo12
+     [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u byooxbert || gh auth switch -u bradyoo12
      echo "✓ Switched accounts before claiming ticket"
    fi
    ```
@@ -732,7 +732,7 @@ Merge PRs to main. This is a simple operation — no team needed.
 
    if [ $REST_PERCENT -lt 20 ] || [ $GRAPHQL_PERCENT -lt 20 ]; then
      CURRENT_USER=$(gh api user --jq '.login')
-     [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u yoohoony || gh auth switch -u bradyoo12
+     [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u byooxbert || gh auth switch -u bradyoo12
      echo "✓ Switched accounts for Step 4 (merge PR + status change)"
    fi
    ```
@@ -1317,8 +1317,8 @@ Log the current status of the project board:
 ## Important Notes
 
 - **Account Switching Strategy** — Two GitHub accounts are available to double the effective rate limit:
-  - Primary: `bradyoo12` (brad.yoo@xbert.io)
-  - Secondary: `yoohoony` (yoohoony@gmail.com)
+  - Primary: `bradyoo12` (bradyoo12@outlook.com)
+  - Secondary: `byooxbert` (brad.yoo@xbert.io)
   - Switch accounts when any rate limit drops below 20% remaining
   - Check rate limits before high-volume operations (Steps 1.5, 2, 3a, 4, 5c, 6d, 7c)
   - If both accounts are rate-limited, wait until the earliest reset time

@@ -11,6 +11,7 @@ vi.mock('react-i18next', () => ({
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/', hash: '', search: '', state: null, key: 'default' }),
 }))
 
 vi.mock('../contexts/AuthContext', () => ({

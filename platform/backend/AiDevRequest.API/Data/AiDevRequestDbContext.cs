@@ -186,6 +186,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PlaywrightMcpTestConfig> PlaywrightMcpTestConfigs => Set<PlaywrightMcpTestConfig>();
     public DbSet<TestHealingRecord> TestHealingRecords => Set<TestHealingRecord>();
     public DbSet<LocalModelConfig> LocalModelConfigs => Set<LocalModelConfig>();
+    public DbSet<WorkflowAutomation> WorkflowAutomations => Set<WorkflowAutomation>();
+    public DbSet<WorkflowAutomationRun> WorkflowAutomationRuns => Set<WorkflowAutomationRun>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

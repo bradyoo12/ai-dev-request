@@ -15,7 +15,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | Controller | Route | Purpose |
 |---|---|---|
 | RequestsController | /api/requests | CRUD for dev requests, analysis, proposals, builds |
-| SubTasksController | /api/requests/{id}/subtasks | Subtask CRUD, generate from proposal, approve/reject, approve-all |
+| SubtaskController | /api/subtasks | Subtask CRUD, batch create, generate AI subtasks, approve/reject plan, approve-all |
 | AuthController | /api/auth | Authentication (login, register, social auth, JWT) |
 | SettingsController | /api/settings | App settings, token management, pricing |
 | ApiKeysController | /api/apikeys | API key generation and management |
@@ -352,6 +352,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | MicroserviceService | Microservice architecture |
 | WhiteLabelService | White-label tenancy |
 | AgentInboxService | Agent inbox feedback management |
+| SubtaskService | Subtask CRUD, AI generation, plan approval |
 
 ---
 
@@ -373,6 +374,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | RefinementMessage | Chat message in refinement flow |
 | CodeSnapshot | Point-in-time code snapshot |
 | CodeRegenerationAttempt | Incremental code regen attempt |
+| Subtask | Subtask for dev requests (hierarchical, with status, priority, dependencies) |
 
 ### Auth & User
 
@@ -578,6 +580,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | ProjectDocsPage | /settings/project-docs | Auto-generated documentation |
 | ProjectHealthPage | /project-health | Project health overview |
 | TicketProgressPage | /tickets | User ticket progress tracking with search, status filters, detail view |
+| SubtasksPage | /projects/:projectId/subtasks | Subtask management with progress, inline editing, AI generation |
 | CodebaseMemoryPage | /settings/codebase-memory | Persistent codebase memory |
 | ContextIndexPage | /settings/context-index | Semantic project index |
 
@@ -773,6 +776,7 @@ All under `platform/frontend/src/components/`.
 | PlanSelectionDialog | Plan/subscription selection modal |
 | CreditEstimatePreview | Compact credit cost preview in request form |
 | CreditEstimateCard | Detailed credit usage summary with step breakdown |
+| SubtaskList | Embedded subtask list for ticket progress page |
 
 ### Code Quality
 
@@ -828,6 +832,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 |---|---|---|
 | requests.ts | RequestsController | Dev request CRUD & pipeline |
 | ticket-progress.ts | RequestsController | User ticket progress tracking |
+| subtasks.ts | SubtaskController | Subtask CRUD, batch, generate, approve/reject |
 | auth.ts | AuthController | Login, register, social auth |
 | settings.ts | SettingsController | App settings |
 | apikeys.ts | ApiKeysController | API key management |
@@ -991,6 +996,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | If you need... | Look in... |
 |---|---|
 | Dev request CRUD | RequestsController, requests.ts, DevRequest entity |
+| Subtask management | SubtaskController, subtasks.ts, Subtask entity, SubtasksPage, SubtaskList |
 | Auth/login | AuthController, auth.ts, AuthContext, User entity |
 | Payments | PaymentsController + BillingController, payments.ts + billing.ts |
 | Code generation | StreamingGenerationController, streaming-generation.ts |

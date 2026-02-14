@@ -4516,5 +4516,14 @@
   "playwrightMcp.running": "실행 중...",
   "api.error.playwrightMcpGenerateFailed": "Playwright 테스트 생성에 실패했습니다",
   "api.error.playwrightMcpHealFailed": "테스트 복구에 실패했습니다",
-  "api.error.playwrightMcpRunFailed": "테스트 실행에 실패했습니다"
+  "api.error.playwrightMcpRunFailed": "테스트 실행에 실패했습니다",
+  "ssr.title": "서버 사이드 렌더링",
+  "ssr.description": "성능 및 SEO 향상을 위한 사전 렌더링된 페이지",
+  "ssr.status.enabled": "SSR 활성화됨",
+  "ssr.status.disabled": "SSR 비활성화됨",
+  "ssr.prerendered": "사전 렌더링된 페이지",
+  "ssr.prerenderedCount": "{{count}}개 페이지 사전 렌더링됨",
+  "ssr.fallback": "로딩 중...",
+  "ssr.hydrating": "애플리케이션 하이드레이션 중...",
+  "ssr.error.renderFailed": "서버 렌더링에 실패했습니다"
 }

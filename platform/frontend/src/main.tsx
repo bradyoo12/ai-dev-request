@@ -1,5 +1,5 @@
 import { StrictMode, Suspense } from 'react'
-import { createRoot } from 'react-dom/client'
+import { hydrateRoot, createRoot } from 'react-dom/client'
 import '@fontsource-variable/inter/index.css'
 import '@fontsource-variable/jetbrains-mono/index.css'
 import './index.css'
@@ -12,13 +12,22 @@ try {
     throw new Error('Root element not found')
   }
 
-  createRoot(rootElement).render(
+  const app = (
     <StrictMode>
       <Suspense fallback={<div className="min-h-screen bg-warm-900 flex items-center justify-center text-white">Loading...</div>}>
         <App />
       </Suspense>
-    </StrictMode>,
+    </StrictMode>
   )
+
+  // If server-rendered content exists, hydrate; otherwise create fresh root.
+  // This keeps backward compatibility — the app still works as a pure SPA
+  // when served from Azure Static Web Apps without SSR.
+  if (rootElement.innerHTML.trim().length > 0) {
+    hydrateRoot(rootElement, app)
+  } else {
+    createRoot(rootElement).render(app)
+  }
 } catch (error) {
   console.error('Failed to initialize React application:', error)
   const rootElement = document.getElementById('root')

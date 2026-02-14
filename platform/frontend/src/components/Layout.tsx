@@ -71,6 +71,7 @@ export default function Layout() {
   const authPrimaryNav = (
     <>
       <button onClick={() => navigateProtected('/projects')} className={navLinkClass} aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}>{t('header.projects')}</button>
+      <button onClick={() => navigateProtected('/tickets')} className={navLinkClass} aria-current={currentPath === '/tickets' ? 'page' : undefined}>{t('header.myTickets')}</button>
       <Link to="/templates" onClick={() => setMobileMenuOpen(false)} className={navLinkClass} aria-current={currentPath === '/templates' ? 'page' : undefined}>{t('header.templates')}</Link>
       <button onClick={() => navigateProtected('/sites')} className={navLinkClass} aria-current={currentPath === '/sites' ? 'page' : undefined}>{t('header.mySites')}</button>
       <button onClick={() => navigateProtected('/suggestions')} className={navLinkClass} aria-current={currentPath === '/suggestions' ? 'page' : undefined}>{t('header.suggestions')}</button>

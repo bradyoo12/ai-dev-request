@@ -560,7 +560,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | HomePage | / | Landing page with hero, features, pricing |
 | LoginPage | (modal) | Login/register modal |
 | NotFoundPage | * | 404 page |
-| SettingsLayout | /settings/* | Settings page container with tabs |
+| SettingsLayout | /settings/* | Settings page with 12 collapsible tab groups, search filter, auto-expand active group |
 | OnboardingPage | /settings/onboarding | User onboarding wizard |
 
 ### Sites & Projects

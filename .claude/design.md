@@ -402,13 +402,16 @@ Automated Bicep/IaC template generation for every AI-generated project:
 ## Heterogeneous Model Architecture (Cost Optimization)
 
 Intelligent model routing to reduce AI costs by using the cheapest sufficient model tier per task:
-- **Backend**: `ModelRouterService` routes tasks to Haiku (simple), Sonnet (moderate), or Opus (complex) based on `TaskCategory`
+- **Backend**: `ModelRouterService` routes tasks to Haiku (simple), Sonnet (moderate), or Opus (complex) based on `TaskCategory`. Also supports local model routing via `ModelLocation` enum (ExternalAPI, AzureServerless, LocalGPU) with `GetRoutingDecision()` for cost-optimized model selection including locally-hosted models
 - **Backend**: `CostTrackingService` tracks per-request model tier usage and calculates savings vs all-Opus baseline
+- **Backend**: `LocalModelInferenceService` calls local model endpoints (OpenAI-compatible), supports health checks, timeout handling, and model availability checks
 - **Integration**: `AnalysisService`, `ProposalService`, `ProductionService` all use `IModelRouterService` to select model tier
 - **Endpoints**: `GET /api/requests/{id}/cost-report` — per-request cost breakdown with tier usage and estimated savings
+- **Endpoints (Local Models)**: `GET /api/local-models` (list), `POST /api/local-models` (create), `GET /api/local-models/{id}` (get), `PUT /api/local-models/{id}` (update), `DELETE /api/local-models/{id}` (delete), `GET /api/local-models/{id}/health` (health check), `POST /api/local-models/{id}/test` (test inference)
 - **Entity**: `DevRequest` tracks `ModelTierUsage` (JSON), `EstimatedCostSavings` (decimal)
+- **Entity**: `LocalModelConfig` with ModelName, Endpoint, DisplayName, ModelLocation, GpuType, GpuCount, IsActive, CostPerSecond, MaxTokens, CapabilitiesJson, HealthCheckUrl, timestamps
 - **Frontend**: `CostSavingsDisplay` component shows tier breakdown bar chart and estimated savings after build
-- **Flow**: Task submitted → classify category → route to cheapest sufficient tier → track usage → report savings
+- **Flow**: Task submitted → classify category → check local model availability → route to cheapest sufficient tier (local GPU preferred for simple tasks) → track usage → report savings
 
 ## Adaptive Thinking & Structured Outputs
 

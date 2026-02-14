@@ -84,6 +84,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | PlatformUpgradeController | /api/platform-upgrade | .NET 10 upgrade dashboard |
 | SandboxExecutionController | /api/sandbox | Sandboxed code execution |
 | DatabaseBranchController | /api/database-branch | Git-like database branching |
+| LocalModelController | /api/local-models | Local AI model CRUD, health check, test inference |
 
 ### Billing & Payments
 
@@ -193,7 +194,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | AnalysisService | Claude API requirement analysis |
 | ProposalService | Claude API implementation proposals |
 | ProductionService | Claude API code generation |
-| ModelRouterService | Intelligent model tier routing (Haiku/Sonnet/Opus) |
+| ModelRouterService | Intelligent model tier routing (Haiku/Sonnet/Opus) + local model routing with cost optimization |
 | CostTrackingService | Per-request cost tracking |
 | RefinementService | Conversational refinement flow |
 | StreamingGenerationService | SSE streaming code generation |
@@ -210,6 +211,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | IModelProviderService | Model provider interface |
 | ClaudeProviderService | Claude API provider |
 | GeminiProviderService | Gemini API provider |
+| ILocalModelInferenceService | Local model inference (health checks, generation) |
 
 ### Data & Memory
 
@@ -472,6 +474,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | PlatformUpgrade | Platform upgrade tracking |
 | SandboxExecution | Sandbox execution record |
 | DatabaseBranch | Database branch |
+| LocalModelConfig | Local AI model configuration (GPU type, endpoint, cost) |
 
 ### Agents & Orchestration
 

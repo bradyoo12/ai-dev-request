@@ -11,11 +11,19 @@ export interface SupportPost {
   content: string
   category: string
   status: string
+  feedbackType: string | null
   rewardCredit: number | null
   rewardedByUserId: string | null
+  rewardMessage: string | null
   rewardedAt: string | null
   createdAt: string
   updatedAt: string
+}
+
+export interface FeedbackPreset {
+  type: string
+  credits: number
+  label: string
 }
 
 export interface SupportPostListResponse {
@@ -110,15 +118,45 @@ export async function createSupportPost(
   }
 }
 
+export async function getFeedbackPresets(): Promise<FeedbackPreset[]> {
+  const cacheKey = 'support-feedback-presets'
+
+  return apiCache.get(
+    cacheKey,
+    async () => {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/feedback-presets`)
+        if (!res.ok) throw new Error('Failed to load feedback presets')
+        return res.json()
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          throw new Error('Request timed out. Please try again.')
+        }
+        throw err
+      }
+    },
+    300000 // Cache presets for 5 minutes
+  )
+}
+
 export async function setRewardCredit(
   id: string,
+  rewardCredit: number,
+  feedbackType?: string,
+  rewardMessage?: string
+): Promise<{
+  id: string
+  feedbackType: string | null
   rewardCredit: number
-): Promise<{ id: string; rewardCredit: number; rewardedByUserId: string; rewardedAt: string }> {
+  rewardedByUserId: string
+  rewardMessage: string | null
+  rewardedAt: string
+}> {
   try {
     const res = await fetchWithTimeout(`${API_BASE_URL}/api/support/${id}/reward`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ rewardCredit }),
+      body: JSON.stringify({ rewardCredit, feedbackType, rewardMessage }),
     })
     if (!res.ok) throw new Error('Failed to set reward credit')
     const data = await res.json()

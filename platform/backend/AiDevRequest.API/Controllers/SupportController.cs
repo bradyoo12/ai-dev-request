@@ -71,8 +71,10 @@ public class SupportController : ControllerBase
                 p.Content,
                 p.Category,
                 p.Status,
+                p.FeedbackType,
                 p.RewardCredit,
                 p.RewardedByUserId,
+                p.RewardMessage,
                 p.RewardedAt,
                 p.CreatedAt,
                 p.UpdatedAt
@@ -80,6 +82,21 @@ public class SupportController : ControllerBase
             .ToListAsync();
 
         return Ok(new { items, total, page, pageSize });
+    }
+
+    /// <summary>
+    /// Get preset credit values for feedback types
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("feedback-presets")]
+    public IActionResult GetFeedbackPresets()
+    {
+        return Ok(new[]
+        {
+            new { type = "bug_report", credits = 50, label = "Bug Report" },
+            new { type = "feature_suggestion", credits = 30, label = "Feature Suggestion" },
+            new { type = "general_inquiry", credits = 10, label = "General Inquiry" }
+        });
     }
 
     /// <summary>
@@ -99,8 +116,10 @@ public class SupportController : ControllerBase
                 p.Content,
                 p.Category,
                 p.Status,
+                p.FeedbackType,
                 p.RewardCredit,
                 p.RewardedByUserId,
+                p.RewardMessage,
                 p.RewardedAt,
                 p.CreatedAt,
                 p.UpdatedAt
@@ -147,8 +166,10 @@ public class SupportController : ControllerBase
             post.Content,
             post.Category,
             post.Status,
+            post.FeedbackType,
             post.RewardCredit,
             post.RewardedByUserId,
+            post.RewardMessage,
             post.RewardedAt,
             post.CreatedAt,
             post.UpdatedAt
@@ -156,7 +177,8 @@ public class SupportController : ControllerBase
     }
 
     /// <summary>
-    /// Set reward credit for a support post (admin only)
+    /// Set reward credit for a support post (admin only).
+    /// Classifies feedback type and awards credits accordingly.
     /// </summary>
     [Authorize]
     [HttpPatch("{id}/reward")]
@@ -168,10 +190,24 @@ public class SupportController : ControllerBase
         var post = await _db.SupportPosts.FindAsync(id);
         if (post == null) return NotFound();
 
+        // Validate feedback type if provided
+        var validFeedbackTypes = new[] { "bug_report", "feature_suggestion", "general_inquiry" };
+        if (!string.IsNullOrEmpty(body.FeedbackType) && !validFeedbackTypes.Contains(body.FeedbackType))
+            return BadRequest(new { error = "Invalid feedback type. Must be: bug_report, feature_suggestion, or general_inquiry" });
+
         var adminUserId = GetUserId();
         var newReward = body.RewardCredit;
         var existingReward = post.RewardCredit ?? 0m;
         var difference = newReward - existingReward;
+
+        // Build description with feedback type context
+        var feedbackLabel = body.FeedbackType switch
+        {
+            "bug_report" => "Bug Report",
+            "feature_suggestion" => "Feature Suggestion",
+            "general_inquiry" => "General Inquiry",
+            _ => "Feedback"
+        };
 
         // Credit or debit the post author based on the difference
         if (difference > 0)
@@ -181,7 +217,7 @@ public class SupportController : ControllerBase
                 (int)difference,
                 "support_reward",
                 post.Id.ToString(),
-                $"Support post reward: +{difference} credits");
+                $"Support reward ({feedbackLabel}): +{difference} credits");
         }
         else if (difference < 0)
         {
@@ -201,23 +237,31 @@ public class SupportController : ControllerBase
                 Amount = absAmount,
                 Action = "support_reward_adjustment",
                 ReferenceId = post.Id.ToString(),
-                Description = $"Support post reward adjustment: -{absAmount} credits",
+                Description = $"Support reward adjustment ({feedbackLabel}): -{absAmount} credits",
                 BalanceAfter = newBalance.Balance
             });
             await _db.SaveChangesAsync();
         }
 
+        post.FeedbackType = body.FeedbackType ?? post.FeedbackType;
         post.RewardCredit = newReward;
         post.RewardedByUserId = adminUserId;
+        post.RewardMessage = body.RewardMessage ?? post.RewardMessage;
         post.RewardedAt = DateTime.UtcNow;
         post.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
+        _logger.LogInformation(
+            "Admin {AdminId} awarded {Credits} credits to user {UserId} for support post {PostId} (type: {FeedbackType})",
+            adminUserId, newReward, post.UserId, post.Id, post.FeedbackType);
+
         return Ok(new
         {
             post.Id,
+            post.FeedbackType,
             post.RewardCredit,
             post.RewardedByUserId,
+            post.RewardMessage,
             post.RewardedAt
         });
     }
@@ -266,6 +310,8 @@ public class CreateSupportPostRequest
 public class SetRewardCreditRequest
 {
     public decimal RewardCredit { get; set; }
+    public string? FeedbackType { get; set; }
+    public string? RewardMessage { get; set; }
 }
 
 public class UpdateSupportStatusRequest

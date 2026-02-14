@@ -8,12 +8,22 @@ import {
   createSupportPost,
   setRewardCredit,
   updateSupportStatus,
+  getFeedbackPresets,
   type SupportPost,
+  type FeedbackPreset,
 } from '../api/support'
 
 const CATEGORIES = ['all', 'complaint', 'request', 'inquiry', 'other'] as const
 const STATUSES = ['open', 'in_review', 'resolved', 'closed'] as const
+const FEEDBACK_TYPES = ['bug_report', 'feature_suggestion', 'general_inquiry'] as const
 const PAGE_SIZE = 10
+
+// Default preset values used when API is unavailable
+const DEFAULT_PRESETS: Record<string, number> = {
+  bug_report: 50,
+  feature_suggestion: 30,
+  general_inquiry: 10,
+}
 
 function categoryBadgeClass(category: string): string {
   switch (category) {
@@ -38,6 +48,19 @@ function statusBadgeClass(status: string): string {
       return 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
     case 'closed':
       return 'bg-warm-700/30 text-warm-400 border border-warm-600/30'
+    default:
+      return 'bg-warm-700/30 text-warm-300 border border-warm-600/30'
+  }
+}
+
+function feedbackTypeBadgeClass(feedbackType: string): string {
+  switch (feedbackType) {
+    case 'bug_report':
+      return 'bg-red-500/20 text-red-300 border border-red-500/30'
+    case 'feature_suggestion':
+      return 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+    case 'general_inquiry':
+      return 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
     default:
       return 'bg-warm-700/30 text-warm-300 border border-warm-600/30'
   }
@@ -70,8 +93,12 @@ export default function SupportBoardPage() {
 
   // Admin reward state
   const [rewardInput, setRewardInput] = useState('')
+  const [feedbackTypeInput, setFeedbackTypeInput] = useState('')
+  const [rewardMessageInput, setRewardMessageInput] = useState('')
   const [rewardSubmitting, setRewardSubmitting] = useState(false)
+  const [rewardSuccess, setRewardSuccess] = useState(false)
   const [statusSubmitting, setStatusSubmitting] = useState(false)
+  const [presets, setPresets] = useState<FeedbackPreset[]>([])
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -102,12 +129,33 @@ export default function SupportBoardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, category, sort])
 
+  // Load feedback presets for admin
+  useEffect(() => {
+    if (authUser?.isAdmin) {
+      getFeedbackPresets()
+        .then(setPresets)
+        .catch(() => {
+          // Fallback to default presets
+          setPresets(
+            FEEDBACK_TYPES.map((type) => ({
+              type,
+              credits: DEFAULT_PRESETS[type],
+              label: type,
+            }))
+          )
+        })
+    }
+  }, [authUser?.isAdmin])
+
   const handleViewPost = async (id: string) => {
     setDetailLoading(true)
+    setRewardSuccess(false)
     try {
       const post = await getSupportPost(id)
       setSelectedPost(post)
       setRewardInput(post.rewardCredit != null ? String(post.rewardCredit) : '')
+      setFeedbackTypeInput(post.feedbackType ?? '')
+      setRewardMessageInput(post.rewardMessage ?? '')
     } catch (err) {
       console.error('Failed to load post:', err)
     } finally {
@@ -117,6 +165,7 @@ export default function SupportBoardPage() {
 
   const handleBackToList = () => {
     setSelectedPost(null)
+    setRewardSuccess(false)
   }
 
   const handleWritePost = () => {
@@ -142,17 +191,37 @@ export default function SupportBoardPage() {
     }
   }
 
+  const handleSelectFeedbackType = (type: string) => {
+    setFeedbackTypeInput(type)
+    // Auto-fill credit amount from presets
+    const preset = presets.find((p) => p.type === type)
+    if (preset) {
+      setRewardInput(String(preset.credits))
+    } else {
+      setRewardInput(String(DEFAULT_PRESETS[type] ?? 0))
+    }
+  }
+
   const handleSetReward = async () => {
     if (!selectedPost || rewardInput === '') return
     setRewardSubmitting(true)
+    setRewardSuccess(false)
     try {
-      const result = await setRewardCredit(selectedPost.id, parseFloat(rewardInput))
+      const result = await setRewardCredit(
+        selectedPost.id,
+        parseFloat(rewardInput),
+        feedbackTypeInput || undefined,
+        rewardMessageInput || undefined
+      )
       setSelectedPost({
         ...selectedPost,
+        feedbackType: result.feedbackType,
         rewardCredit: result.rewardCredit,
         rewardedByUserId: result.rewardedByUserId,
+        rewardMessage: result.rewardMessage,
         rewardedAt: result.rewardedAt,
       })
+      setRewardSuccess(true)
       await loadPosts()
     } catch (err) {
       console.error('Failed to set reward:', err)
@@ -204,13 +273,18 @@ export default function SupportBoardPage() {
           <div className="glass-card rounded-2xl p-6 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <h3 className="text-xl font-bold text-warm-50">{selectedPost.title}</h3>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                 <span className={`px-2 py-0.5 rounded-full text-xs ${categoryBadgeClass(selectedPost.category)}`}>
                   {t(`support.category.${selectedPost.category}`)}
                 </span>
                 <span className={`px-2 py-0.5 rounded-full text-xs ${statusBadgeClass(selectedPost.status)}`}>
                   {t(`support.status.${selectedPost.status}`)}
                 </span>
+                {selectedPost.feedbackType && (
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${feedbackTypeBadgeClass(selectedPost.feedbackType)}`}>
+                    {t(`support.feedbackType.${selectedPost.feedbackType}`)}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -218,12 +292,40 @@ export default function SupportBoardPage() {
 
             <div className="flex items-center gap-4 text-xs text-warm-500">
               <span>{new Date(selectedPost.createdAt).toLocaleDateString()}</span>
-              {selectedPost.rewardCredit != null && (
-                <span className="text-accent-amber font-medium">
-                  {t('support.reward')}: {selectedPost.rewardCredit} {t('support.credits')}
-                </span>
-              )}
             </div>
+
+            {/* Credit reward badge - visible to all users */}
+            {selectedPost.rewardCredit != null && selectedPost.rewardCredit > 0 && (
+              <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.5 7.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10 13a4.5 4.5 0 01-3.5-1.68.5.5 0 01.77-.64A3.5 3.5 0 0010 12a3.5 3.5 0 002.73-1.32.5.5 0 11.77.64A4.5 4.5 0 0110 13z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-amber-300 font-semibold text-sm">
+                      {t('support.creditAwarded')}: {selectedPost.rewardCredit} {t('support.credits')}
+                    </p>
+                    {selectedPost.feedbackType && (
+                      <p className="text-amber-400/70 text-xs mt-0.5">
+                        {t(`support.feedbackType.${selectedPost.feedbackType}`)}
+                      </p>
+                    )}
+                    {selectedPost.rewardMessage && (
+                      <p className="text-warm-300 text-sm mt-2 italic">
+                        &ldquo;{selectedPost.rewardMessage}&rdquo;
+                      </p>
+                    )}
+                    {selectedPost.rewardedAt && (
+                      <p className="text-warm-500 text-xs mt-1">
+                        {new Date(selectedPost.rewardedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Admin section */}
             {authUser?.isAdmin && (
@@ -249,24 +351,73 @@ export default function SupportBoardPage() {
                   ))}
                 </div>
 
-                {/* Reward credit */}
-                <div className="flex items-center gap-2">
+                {/* Feedback type classification */}
+                <div className="space-y-2">
+                  <span className="text-xs text-warm-400">{t('support.feedbackClassification')}:</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {FEEDBACK_TYPES.map((type) => {
+                      const preset = presets.find((p) => p.type === type)
+                      const credits = preset?.credits ?? DEFAULT_PRESETS[type]
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => handleSelectFeedbackType(type)}
+                          className={`px-3 py-1.5 rounded-lg text-xs transition-all flex items-center gap-1.5 ${
+                            feedbackTypeInput === type
+                              ? 'bg-accent-blue/30 text-accent-blue border border-accent-blue/30 ring-1 ring-accent-blue/50'
+                              : 'bg-warm-800/50 text-warm-300 border border-warm-700/30 hover:bg-warm-700/50 hover:text-white'
+                          }`}
+                        >
+                          <span>{t(`support.feedbackType.${type}`)}</span>
+                          <span className="text-accent-amber font-medium">({credits})</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Reward credit amount */}
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-warm-400">{t('support.rewardCredit')}:</span>
                   <input
                     type="number"
-                    step="0.01"
+                    step="1"
+                    min="0"
                     value={rewardInput}
                     onChange={(e) => setRewardInput(e.target.value)}
                     className="w-32 px-3 py-1.5 bg-warm-800/50 border border-warm-700/50 rounded-lg text-sm text-warm-100 focus:outline-none focus:ring-1 focus:ring-accent-blue"
-                    placeholder="0.00"
+                    placeholder="0"
                   />
+                  <span className="text-xs text-warm-500">{t('support.credits')}</span>
+                </div>
+
+                {/* Reward message */}
+                <div className="space-y-1">
+                  <label className="text-xs text-warm-400">{t('support.rewardMessageLabel')}:</label>
+                  <textarea
+                    value={rewardMessageInput}
+                    onChange={(e) => setRewardMessageInput(e.target.value)}
+                    rows={2}
+                    maxLength={1000}
+                    className="w-full px-3 py-2 bg-warm-800/50 border border-warm-700/50 rounded-lg text-sm text-warm-100 focus:outline-none focus:ring-1 focus:ring-accent-blue resize-y"
+                    placeholder={t('support.rewardMessagePlaceholder')}
+                  />
+                </div>
+
+                {/* Submit reward button */}
+                <div className="flex items-center gap-3">
                   <button
                     onClick={handleSetReward}
                     disabled={rewardSubmitting || rewardInput === ''}
-                    className="px-3 py-1.5 bg-accent-amber/20 text-accent-amber border border-accent-amber/30 rounded-lg text-xs font-medium hover:bg-accent-amber/30 transition-all disabled:opacity-50"
+                    className="px-4 py-2 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-sm font-medium hover:from-amber-500/30 hover:to-yellow-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {rewardSubmitting ? t('support.saving') : t('support.setReward')}
+                    {rewardSubmitting ? t('support.saving') : t('support.awardCredits')}
                   </button>
+                  {rewardSuccess && (
+                    <span className="text-green-400 text-xs font-medium animate-fade-in">
+                      {t('support.rewardSuccessMessage')}
+                    </span>
+                  )}
                 </div>
               </div>
             )}
@@ -471,9 +622,17 @@ export default function SupportBoardPage() {
               </div>
               <div className="flex items-center gap-3 mt-2 text-xs text-warm-500">
                 <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                {post.rewardCredit != null && (
-                  <span className="text-accent-amber">
+                {post.rewardCredit != null && post.rewardCredit > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM8.5 7.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10 13a4.5 4.5 0 01-3.5-1.68.5.5 0 01.77-.64A3.5 3.5 0 0010 12a3.5 3.5 0 002.73-1.32.5.5 0 11.77.64A4.5 4.5 0 0110 13z" />
+                    </svg>
                     {post.rewardCredit} {t('support.credits')}
+                  </span>
+                )}
+                {post.feedbackType && (
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${feedbackTypeBadgeClass(post.feedbackType)}`}>
+                    {t(`support.feedbackType.${post.feedbackType}`)}
                   </span>
                 )}
               </div>

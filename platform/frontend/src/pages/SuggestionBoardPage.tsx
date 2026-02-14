@@ -1,16 +1,20 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { getSuggestions, voteSuggestion } from '../api/suggestions'
+import { useAuth } from '../contexts/AuthContext'
+import { getSuggestions, createSuggestion, voteSuggestion } from '../api/suggestions'
 import type { Suggestion } from '../api/suggestions'
+
+const CATEGORIES = ['feature_request', 'bug_report', 'improvement', 'inquiry'] as const
 
 interface SuggestionBoardPageProps {
   onBalanceChange?: (balance: number) => void
 }
 
-export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange }: SuggestionBoardPageProps) {
+export default function SuggestionBoardPage({ onBalanceChange }: SuggestionBoardPageProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { authUser, requireAuth } = useAuth()
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -18,6 +22,13 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
   const [sort, setSort] = useState('newest')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  // Write form state
+  const [showWriteForm, setShowWriteForm] = useState(false)
+  const [formTitle, setFormTitle] = useState('')
+  const [formDescription, setFormDescription] = useState('')
+  const [formCategory, setFormCategory] = useState<string>('feature_request')
+  const [submitting, setSubmitting] = useState(false)
 
   const pageSize = 10
 
@@ -52,13 +63,39 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
     }
   }
 
+  const handleWriteSuggestion = () => {
+    if (!requireAuth()) return
+    setShowWriteForm(true)
+  }
+
+  const handleSubmitSuggestion = async () => {
+    if (!formTitle.trim() || !formDescription.trim()) return
+    setSubmitting(true)
+    try {
+      const result = await createSuggestion(formTitle, formDescription, formCategory)
+      if (result.newBalance !== undefined && onBalanceChange) {
+        onBalanceChange(result.newBalance)
+      }
+      setFormTitle('')
+      setFormDescription('')
+      setFormCategory('feature_request')
+      setShowWriteForm(false)
+      setPage(1)
+      await loadSuggestions()
+    } catch {
+      setError(t('suggestions.registerFailed'))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   const getCategoryIcon = (cat: string) => {
     switch (cat) {
-      case 'feature_request': return '💡'
-      case 'bug_report': return '🐛'
-      case 'improvement': return '⚡'
-      case 'inquiry': return '❓'
-      default: return '💡'
+      case 'feature_request': return '\u{1F4A1}'
+      case 'bug_report': return '\u{1F41B}'
+      case 'improvement': return '\u26A1'
+      case 'inquiry': return '\u2753'
+      default: return '\u{1F4A1}'
     }
   }
 
@@ -88,6 +125,88 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
 
   const totalPages = Math.ceil(total / pageSize)
 
+  // --- Write form view ---
+  if (showWriteForm) {
+    return (
+      <div>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-xl font-bold">{t('suggestions.boardTitle')}</h3>
+            <p className="text-warm-400 text-sm mt-1">{t('suggestions.boardDescription')}</p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowWriteForm(false)}
+          className="text-warm-400 hover:text-white transition-colors mb-4 text-sm"
+        >
+          &larr; {t('suggestions.backToList')}
+        </button>
+
+        <div className="bg-warm-800 rounded-2xl p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-warm-100">{t('suggestions.writeTitle')}</h3>
+
+          <div>
+            <label className="block text-sm text-warm-300 mb-1">{t('suggestions.form.category')}</label>
+            <select
+              value={formCategory}
+              onChange={(e) => setFormCategory(e.target.value)}
+              className="w-full px-3 py-2 bg-warm-800 border border-warm-700 rounded-lg text-sm text-warm-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {getCategoryLabel(c)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-warm-300 mb-1">{t('suggestions.form.title')}</label>
+            <input
+              type="text"
+              value={formTitle}
+              onChange={(e) => setFormTitle(e.target.value)}
+              maxLength={200}
+              className="w-full px-3 py-2 bg-warm-800 border border-warm-700 rounded-lg text-sm text-warm-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={t('suggestions.form.titlePlaceholder')}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-warm-300 mb-1">{t('suggestions.form.description')}</label>
+            <textarea
+              value={formDescription}
+              onChange={(e) => setFormDescription(e.target.value)}
+              rows={6}
+              maxLength={10000}
+              className="w-full px-3 py-2 bg-warm-800 border border-warm-700 rounded-lg text-sm text-warm-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              placeholder={t('suggestions.form.descriptionPlaceholder')}
+            />
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => setShowWriteForm(false)}
+              className="px-4 py-2 text-sm text-warm-400 hover:text-white transition-colors"
+            >
+              {t('suggestions.form.cancel')}
+            </button>
+            <button
+              onClick={handleSubmitSuggestion}
+              disabled={submitting || !formTitle.trim() || !formDescription.trim()}
+              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-sm font-medium transition-all hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? t('suggestions.form.submitting') : t('suggestions.form.submit')}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // --- List view ---
   return (
     <div>
       {/* Header */}
@@ -127,8 +246,18 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
           <option value="popular">{t('suggestions.sort.popular')}</option>
           <option value="oldest">{t('suggestions.sort.oldest')}</option>
         </select>
-        <div className="ml-auto text-sm text-warm-400">
-          {t('suggestions.totalCount', { count: total })}
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-sm text-warm-400">
+            {t('suggestions.totalCount', { count: total })}
+          </span>
+          {authUser && (
+            <button
+              onClick={handleWriteSuggestion}
+              className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-sm font-medium transition-all hover:shadow-lg hover:scale-[1.02]"
+            >
+              {t('suggestions.submitSuggestion')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -140,7 +269,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
         </div>
       ) : suggestions.length === 0 ? (
         <div className="text-center py-12 bg-warm-800 rounded-xl">
-          <div className="text-4xl mb-3">💡</div>
+          <div className="text-4xl mb-3">{'\u{1F4A1}'}</div>
           <p className="text-warm-400">{t('suggestions.empty')}</p>
         </div>
       ) : (
@@ -178,12 +307,12 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
                   <p className="text-warm-400 text-sm mt-1 line-clamp-2">{suggestion.description}</p>
                   <div className="flex items-center gap-3 mt-2 text-xs text-warm-500">
                     <span>{getCategoryLabel(suggestion.category)}</span>
-                    <span>·</span>
+                    <span>{'\u00B7'}</span>
                     <span>{new Date(suggestion.createdAt).toLocaleDateString()}</span>
                     {suggestion.tokenReward > 0 && (
                       <>
-                        <span>·</span>
-                        <span className="text-yellow-400">🎁 {suggestion.tokenReward} tokens</span>
+                        <span>{'\u00B7'}</span>
+                        <span className="text-yellow-400">{'\u{1F381}'} {suggestion.tokenReward} tokens</span>
                       </>
                     )}
                   </div>
@@ -202,7 +331,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
             disabled={page === 1}
             className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
           >
-            ←
+            {'\u2190'}
           </button>
           <span className="px-3 py-1.5 text-sm text-warm-400">
             {page} / {totalPages}
@@ -212,7 +341,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
             disabled={page === totalPages}
             className="px-3 py-1.5 bg-warm-800 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
           >
-            →
+            {'\u2192'}
           </button>
         </div>
       )}

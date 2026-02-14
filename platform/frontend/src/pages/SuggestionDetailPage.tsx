@@ -23,6 +23,8 @@ export default function SuggestionDetailPage() {
   const [newComment, setNewComment] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [voteError, setVoteError] = useState('')
+  const [commentError, setCommentError] = useState('')
 
   useEffect(() => {
     if (!id) return
@@ -47,7 +49,10 @@ export default function SuggestionDetailPage() {
     try {
       const result = await voteSuggestion(suggestion.id)
       setSuggestion(prev => prev ? { ...prev, upvoteCount: result.upvoteCount, userVoted: result.voted } : null)
-    } catch { /* silent */ }
+    } catch {
+      setVoteError(t('error.requestFailed'))
+      setTimeout(() => setVoteError(''), 3000)
+    }
   }
 
   const handleSendComment = async () => {
@@ -58,7 +63,10 @@ export default function SuggestionDetailPage() {
       setComments(prev => [...prev, comment])
       setSuggestion(prev => prev ? { ...prev, commentCount: prev.commentCount + 1 } : null)
       setNewComment('')
-    } catch { /* silent */ }
+    } catch {
+      setCommentError(t('error.requestFailed'))
+      setTimeout(() => setCommentError(''), 3000)
+    }
     setSending(false)
   }
 
@@ -153,6 +161,7 @@ export default function SuggestionDetailPage() {
                 <span className="text-yellow-400 text-sm">🎁 {suggestion.tokenReward} tokens</span>
               )}
             </div>
+            {voteError && <p className="text-red-400 text-sm mt-2">{voteError}</p>}
           </div>
 
           {/* Comments */}
@@ -193,6 +202,7 @@ export default function SuggestionDetailPage() {
                 {t('feedback.send')}
               </button>
             </div>
+            {commentError && <p className="text-red-400 text-sm mt-2">{commentError}</p>}
           </div>
         </div>
 

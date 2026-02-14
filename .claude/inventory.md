@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 103 Controllers | 90 Services | 115 Entities | 100 Pages | 93 API modules | 33 Components
+**Counts**: 104 Controllers | 91 Services | 115 Entities | 100 Pages | 93 API modules | 33 Components
 
 ---
 
@@ -72,6 +72,12 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | VisualRegressionController | /api/visual-regression | Visual regression testing |
 | SelfHealingTestController | /api/self-healing-test | Self-healing code generation |
 | PlaywrightMcpController | /api/playwright-mcp | AI-powered Playwright test generation & self-healing |
+
+### SSR & Performance
+
+| Controller | Route | Purpose |
+|---|---|---|
+| SsrController | /api/ssr | Server-side rendering and pre-rendered page delivery |
 
 ### Infrastructure & Deployment
 
@@ -291,6 +297,12 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | ProjectAggregationService | Aggregate project data from deployments, requests, usage |
 | ProjectCostEstimationService | Calculate daily project cloud costs |
 | LogStreamService | SSE streaming for real-time project logs |
+
+### SSR & Performance
+
+| Service | Purpose |
+|---|---|
+| SsrService | Server-side rendering with pre-rendered page delivery |
 
 ### Infrastructure & Deployment
 

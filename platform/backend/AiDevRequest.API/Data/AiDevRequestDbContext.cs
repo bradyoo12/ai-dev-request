@@ -184,6 +184,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<Subtask> Subtasks => Set<Subtask>();
     public DbSet<PlaywrightMcpTestConfig> PlaywrightMcpTestConfigs => Set<PlaywrightMcpTestConfig>();
     public DbSet<TestHealingRecord> TestHealingRecords => Set<TestHealingRecord>();
+    public DbSet<LocalModelConfig> LocalModelConfigs => Set<LocalModelConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

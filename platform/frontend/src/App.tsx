@@ -34,6 +34,7 @@ const IterativeRefinementPage = lazy(() => import('./pages/IterativeRefinementPa
 const TemplatesPage = lazy(() => import('./pages/TemplatesPage'))
 const TicketProgressPage = lazy(() => import('./pages/TicketProgressPage'))
 const SubtasksPage = lazy(() => import('./pages/SubtasksPage'))
+const PatentsPage = lazy(() => import('./pages/PatentsPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 /**
@@ -107,6 +108,7 @@ export function AppRoutes() {
             <Route path="/buy-credits" element={<Suspense fallback={LazyFallback}><BuyCreditsPage /></Suspense>} />
             <Route path="/templates" element={<Suspense fallback={LazyFallback}><TemplatesPage /></Suspense>} />
             <Route path="/support" element={<Suspense fallback={LazyFallback}><SupportBoardPage /></Suspense>} />
+            <Route path="/patents" element={<Suspense fallback={LazyFallback}><PatentsPage /></Suspense>} />
             <Route path="/requests/:id/refine" element={<Suspense fallback={LazyFallback}><IterativeRefinementPage /></Suspense>} />
             <Route path="/settings/orchestration" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/langgraph" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />

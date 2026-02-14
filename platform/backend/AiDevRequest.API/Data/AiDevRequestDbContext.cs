@@ -182,6 +182,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
     public DbSet<AgentInboxItem> AgentInboxItems => Set<AgentInboxItem>();
     public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
+    public DbSet<AgentDeployment> AgentDeployments => Set<AgentDeployment>();
     public DbSet<Subtask> Subtasks => Set<Subtask>();
     public DbSet<PlaywrightMcpTestConfig> PlaywrightMcpTestConfigs => Set<PlaywrightMcpTestConfig>();
     public DbSet<TestHealingRecord> TestHealingRecords => Set<TestHealingRecord>();

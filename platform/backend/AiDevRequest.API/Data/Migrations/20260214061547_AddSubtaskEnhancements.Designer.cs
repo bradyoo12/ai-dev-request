@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiDevRequest.API.Data.Migrations
 {
     [DbContext(typeof(AiDevRequestDbContext))]
-    [Migration("20260214061427_AddSubTaskEstimatedCreditsAndStatuses")]
-    partial class AddSubTaskEstimatedCreditsAndStatuses
+    [Migration("20260214061547_AddSubtaskEnhancements")]
+    partial class AddSubtaskEnhancements
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -8462,53 +8462,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("service_blueprints", (string)null);
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubTask", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DependsOnSubTaskId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)");
-
-                    b.Property<Guid>("DevRequestId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int?>("EstimatedCredits")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DependsOnSubTaskId");
-
-                    b.HasIndex("DevRequestId");
-
-                    b.ToTable("sub_tasks", (string)null);
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.SubagentTask", b =>
                 {
                     b.Property<int>("Id")
@@ -8673,6 +8626,68 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("subscription_records", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.Subtask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DependsOnSubtaskIdsJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("EstimatedHours")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentSubtaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevRequestId");
+
+                    b.HasIndex("ParentSubtaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("subtasks", (string)null);
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.Suggestion", b =>
@@ -11412,24 +11427,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubTask", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.SubTask", "DependsOnSubTask")
-                        .WithMany("DependentSubTasks")
-                        .HasForeignKey("DependsOnSubTaskId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.DevRequest", "DevRequest")
-                        .WithMany("SubTasks")
-                        .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DependsOnSubTask");
-
-                    b.Navigation("DevRequest");
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.SubagentTask", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.ParallelOrchestration", "ParentOrchestration")
@@ -11694,11 +11691,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.DevRequest", b =>
-                {
-                    b.Navigation("SubTasks");
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.ParallelOrchestration", b =>
                 {
                     b.Navigation("Tasks");
@@ -11707,11 +11699,6 @@ namespace AiDevRequest.API.Data.Migrations
             modelBuilder.Entity("AiDevRequest.API.Entities.Project", b =>
                 {
                     b.Navigation("Logs");
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubTask", b =>
-                {
-                    b.Navigation("DependentSubTasks");
                 });
 #pragma warning restore 612, 618
         }

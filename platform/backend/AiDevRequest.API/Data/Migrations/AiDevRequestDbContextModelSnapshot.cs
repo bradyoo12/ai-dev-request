@@ -8672,6 +8672,68 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("subscription_records", (string)null);
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.Subtask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DependsOnSubtaskIdsJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("EstimatedHours")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentSubtaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevRequestId");
+
+                    b.HasIndex("ParentSubtaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("subtasks", (string)null);
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.Suggestion", b =>
                 {
                     b.Property<int>("Id")

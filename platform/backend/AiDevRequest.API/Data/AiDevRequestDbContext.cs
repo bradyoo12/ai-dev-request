@@ -181,7 +181,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
     public DbSet<AgentInboxItem> AgentInboxItems => Set<AgentInboxItem>();
     public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
-    public DbSet<SubTask> SubTasks => Set<SubTask>();
+    public DbSet<Subtask> Subtasks => Set<Subtask>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1963,34 +1963,21 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
         });
 
-        modelBuilder.Entity<SubTask>(entity =>
+        modelBuilder.Entity<Subtask>(entity =>
         {
-            entity.ToTable("sub_tasks");
+            entity.ToTable("subtasks");
             entity.HasKey(e => e.Id);
-
-            entity.Property(e => e.Title)
-                .IsRequired()
-                .HasMaxLength(500);
-
-            entity.Property(e => e.Description)
-                .HasMaxLength(5000);
-
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.ParentSubtaskId);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Description).HasMaxLength(5000);
+            entity.Property(e => e.EstimatedHours).HasPrecision(10, 2);
             entity.Property(e => e.Status)
                 .HasConversion<string>()
                 .HasMaxLength(50);
-
-            entity.HasOne(e => e.DevRequest)
-                .WithMany(d => d.SubTasks)
-                .HasForeignKey(e => e.DevRequestId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(e => e.DependsOnSubTask)
-                .WithMany(e => e.DependentSubTasks)
-                .HasForeignKey(e => e.DependsOnSubTaskId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            entity.HasIndex(e => e.DevRequestId);
-            entity.HasIndex(e => e.DependsOnSubTaskId);
+            entity.Property(e => e.DependsOnSubtaskIdsJson).HasMaxLength(2000);
         });
     }
 }

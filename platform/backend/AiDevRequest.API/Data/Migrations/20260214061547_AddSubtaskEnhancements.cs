@@ -6,59 +6,55 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AiDevRequest.API.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSubTaskEstimatedCreditsAndStatuses : Migration
+    public partial class AddSubtaskEnhancements : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "sub_tasks",
+                name: "subtasks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DevRequestId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ParentSubtaskId = table.Column<Guid>(type: "uuid", nullable: true),
+                    UserId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    OrderIndex = table.Column<int>(type: "integer", nullable: false),
+                    Priority = table.Column<int>(type: "integer", nullable: false),
                     Title = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     Description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
+                    EstimatedHours = table.Column<decimal>(type: "numeric(10,2)", precision: 10, scale: 2, nullable: true),
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    EstimatedCredits = table.Column<int>(type: "integer", nullable: true),
-                    DependsOnSubTaskId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DependsOnSubtaskIdsJson = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_sub_tasks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_sub_tasks_dev_requests_DevRequestId",
-                        column: x => x.DevRequestId,
-                        principalTable: "dev_requests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_sub_tasks_sub_tasks_DependsOnSubTaskId",
-                        column: x => x.DependsOnSubTaskId,
-                        principalTable: "sub_tasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                    table.PrimaryKey("PK_subtasks", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_sub_tasks_DependsOnSubTaskId",
-                table: "sub_tasks",
-                column: "DependsOnSubTaskId");
+                name: "IX_subtasks_DevRequestId",
+                table: "subtasks",
+                column: "DevRequestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_sub_tasks_DevRequestId",
-                table: "sub_tasks",
-                column: "DevRequestId");
+                name: "IX_subtasks_ParentSubtaskId",
+                table: "subtasks",
+                column: "ParentSubtaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_subtasks_UserId",
+                table: "subtasks",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "sub_tasks");
+                name: "subtasks");
         }
     }
 }

@@ -3,92 +3,157 @@ import { getAuthHeaders } from './auth'
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 function authHeaders(): Record<string, string> {
-  return getAuthHeaders()
+  return {
+    ...getAuthHeaders(),
+    'Content-Type': 'application/json',
+  }
 }
 
-export interface SubTask {
+export interface SubtaskItem {
   id: string
   devRequestId: string
+  parentSubtaskId?: string
+  orderIndex: number
+  priority: number
   title: string
   description?: string
+  estimatedHours?: number
   status: string
-  order: number
-  estimatedCredits?: number
-  dependsOnSubTaskId?: string
+  dependencyIds: string[]
   createdAt: string
   updatedAt: string
 }
 
-export interface CreateSubTaskItem {
+export interface CreateSubtaskInput {
   title: string
   description?: string
-  order: number
-  estimatedCredits?: number
-  dependsOnSubTaskId?: string
+  estimatedHours?: number
+  orderIndex?: number
+  priority?: number
+  parentSubtaskId?: string
+  dependencyIds?: string[]
 }
 
-export interface UpdateSubTaskData {
-  title: string
+export interface UpdateSubtaskInput {
+  title?: string
   description?: string
-  status: string
-  order: number
-  dependsOnSubTaskId?: string
+  estimatedHours?: number
+  orderIndex?: number
+  priority?: number
+  status?: string
+  parentSubtaskId?: string
+  dependencyIds?: string[]
 }
 
-export async function fetchSubTasks(requestId: string): Promise<SubTask[]> {
+export async function getSubtasks(requestId: string): Promise<SubtaskItem[]> {
   const response = await fetch(
     `${API_BASE_URL}/api/requests/${requestId}/subtasks`,
-    { headers: authHeaders() }
+    { headers: getAuthHeaders() }
   )
 
-  if (!response.ok) return []
+  if (!response.ok) {
+    throw new Error('Failed to load subtasks')
+  }
+
   return response.json()
 }
 
-export async function createSubTasks(
+export async function getSubtask(
   requestId: string,
-  subTasks: CreateSubTaskItem[]
-): Promise<SubTask[]> {
+  subtaskId: string
+): Promise<SubtaskItem> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/requests/${requestId}/subtasks/${subtaskId}`,
+    { headers: getAuthHeaders() }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to load subtask')
+  }
+
+  return response.json()
+}
+
+export async function createSubtask(
+  requestId: string,
+  input: CreateSubtaskInput
+): Promise<SubtaskItem> {
   const response = await fetch(
     `${API_BASE_URL}/api/requests/${requestId}/subtasks`,
     {
       method: 'POST',
       headers: authHeaders(),
-      body: JSON.stringify({ subTasks }),
+      body: JSON.stringify(input),
     }
   )
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.error || 'Failed to create subtasks')
+    throw new Error('Failed to create subtask')
   }
 
   return response.json()
 }
 
-export async function updateSubTask(
+export async function createSubtasksBatch(
+  requestId: string,
+  inputs: CreateSubtaskInput[]
+): Promise<SubtaskItem[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/requests/${requestId}/subtasks/batch`,
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(inputs),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to create subtasks')
+  }
+
+  return response.json()
+}
+
+export async function updateSubtask(
   requestId: string,
   subtaskId: string,
-  data: UpdateSubTaskData
-): Promise<SubTask> {
+  input: UpdateSubtaskInput
+): Promise<SubtaskItem> {
   const response = await fetch(
     `${API_BASE_URL}/api/requests/${requestId}/subtasks/${subtaskId}`,
     {
-      method: 'PUT',
+      method: 'PATCH',
       headers: authHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(input),
     }
   )
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.error || 'Failed to update subtask')
+    throw new Error('Failed to update subtask')
   }
 
   return response.json()
 }
 
-export async function deleteSubTask(
+export async function generateSubtasks(
+  requestId: string
+): Promise<SubtaskItem[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/requests/${requestId}/subtasks/generate`,
+    {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to generate subtasks')
+  }
+
+  return response.json()
+}
+
+export async function deleteSubtask(
   requestId: string,
   subtaskId: string
 ): Promise<void> {
@@ -96,7 +161,7 @@ export async function deleteSubTask(
     `${API_BASE_URL}/api/requests/${requestId}/subtasks/${subtaskId}`,
     {
       method: 'DELETE',
-      headers: authHeaders(),
+      headers: getAuthHeaders(),
     }
   )
 
@@ -105,40 +170,55 @@ export async function deleteSubTask(
   }
 }
 
-export async function approveSubTask(
-  requestId: string,
-  subtaskId: string
-): Promise<SubTask> {
+export async function approveAllSubtasks(
+  requestId: string
+): Promise<{ message: string; approvedCount: number }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/requests/${requestId}/subtasks/${subtaskId}/approve`,
+    `${API_BASE_URL}/api/requests/${requestId}/subtasks/approve-all`,
     {
       method: 'POST',
-      headers: authHeaders(),
+      headers: getAuthHeaders(),
     }
   )
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.error || 'Failed to approve subtask')
+    throw new Error('Failed to approve subtasks')
   }
 
   return response.json()
 }
 
-export async function approveAllSubTasks(
+export async function approvePlan(
   requestId: string
-): Promise<SubTask[]> {
+): Promise<{ message: string; subtaskCount: number }> {
   const response = await fetch(
-    `${API_BASE_URL}/api/requests/${requestId}/subtasks/approve-all`,
+    `${API_BASE_URL}/api/requests/${requestId}/subtasks/approve-plan`,
     {
       method: 'POST',
-      headers: authHeaders(),
+      headers: getAuthHeaders(),
     }
   )
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}))
-    throw new Error(error.error || 'Failed to approve all subtasks')
+    throw new Error('Failed to approve plan')
+  }
+
+  return response.json()
+}
+
+export async function rejectPlan(
+  requestId: string
+): Promise<{ message: string; removedCount: number }> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/requests/${requestId}/subtasks/reject-plan`,
+    {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to reject plan')
   }
 
   return response.json()

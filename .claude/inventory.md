@@ -704,6 +704,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | PreferencePage | /settings/preferences | User preferences |
 | RecommendationsPage | /recommendations | App recommendations |
 | AgentInboxPage | /settings/agent-inbox | Agent inbox |
+| TemplatesPage | /templates | App/website templates gallery with category filtering |
 
 ### Config & Misc
 
@@ -744,6 +745,7 @@ All under `platform/frontend/src/components/`.
 | HeroSection | Landing page hero with CTA |
 | FeaturesSection | Feature showcase grid |
 | PricingSection | Pricing tier cards |
+| TemplatesSection | Featured templates on homepage (3 templates) |
 | StatsSection | Platform statistics |
 | FooterSection | Footer with links |
 

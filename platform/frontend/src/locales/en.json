@@ -4412,7 +4412,6 @@
   "subtasks.error.deleteFailed": "Failed to delete subtask.",
   "subtasks.error.approveAllFailed": "Failed to approve all subtasks.",
 
-<<<<<<< HEAD
   "testGeneration.tabs.generate": "Generate Tests",
   "testGeneration.tabs.nlGenerate": "Natural Language",
   "testGeneration.tabs.mcpConfig": "MCP Config",

@@ -189,6 +189,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WorkflowAutomation> WorkflowAutomations => Set<WorkflowAutomation>();
     public DbSet<WorkflowAutomationRun> WorkflowAutomationRuns => Set<WorkflowAutomationRun>();
     public DbSet<PatentInnovation> PatentInnovations => Set<PatentInnovation>();
+    public DbSet<StreamingCodeGenSession> StreamingCodeGenSessions => Set<StreamingCodeGenSession>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2027,6 +2028,23 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.RelatedFiles).HasColumnType("text");
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<StreamingCodeGenSession>(entity =>
+        {
+            entity.ToTable("streaming_code_gen_sessions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Prompt).HasMaxLength(200);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.CurrentFile).HasMaxLength(500);
+            entity.Property(e => e.GeneratedFilesJson).HasColumnType("jsonb");
+            entity.Property(e => e.BuildProgressJson).HasColumnType("jsonb");
+            entity.Property(e => e.PreviewUrl).HasMaxLength(500);
+            entity.Property(e => e.ErrorMessage).HasColumnType("text");
+            entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });

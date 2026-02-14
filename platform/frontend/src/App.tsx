@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider } from './contexts/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -81,6 +81,7 @@ function App() {
             <Route path="/projects" element={<Suspense fallback={LazyFallback}><ProjectsPage /></Suspense>} />
             <Route path="/projects/:id" element={<Suspense fallback={LazyFallback}><ProjectDetailPage /></Suspense>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
+            <Route path="/my-sites" element={<Navigate to="/sites" replace />} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />
             <Route path="/admin/churn" element={<Suspense fallback={LazyFallback}><AdminChurnPage /></Suspense>} />

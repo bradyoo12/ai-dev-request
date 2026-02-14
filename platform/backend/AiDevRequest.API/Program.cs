@@ -292,7 +292,9 @@ app.UseExceptionHandler(errorApp =>
             "generation_variants",
             "performance_profiles",
             "data_schemas",
-            "agent_skills" };
+            "agent_skills",
+            "support_posts",
+            "subtasks" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and

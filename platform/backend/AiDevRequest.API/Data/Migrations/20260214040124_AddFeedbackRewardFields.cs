@@ -10,19 +10,28 @@ namespace AiDevRequest.API.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "FeedbackType",
-                table: "support_posts",
-                type: "character varying(50)",
-                maxLength: 50,
-                nullable: true);
+            // Use IF NOT EXISTS to handle partial migration state
+            migrationBuilder.Sql("""
+                DO $$ BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_name = 'support_posts' AND column_name = 'FeedbackType'
+                    ) THEN
+                        ALTER TABLE support_posts ADD COLUMN "FeedbackType" character varying(50) NULL;
+                    END IF;
+                END $$;
+                """);
 
-            migrationBuilder.AddColumn<string>(
-                name: "RewardMessage",
-                table: "support_posts",
-                type: "character varying(1000)",
-                maxLength: 1000,
-                nullable: true);
+            migrationBuilder.Sql("""
+                DO $$ BEGIN
+                    IF NOT EXISTS (
+                        SELECT 1 FROM information_schema.columns
+                        WHERE table_name = 'support_posts' AND column_name = 'RewardMessage'
+                    ) THEN
+                        ALTER TABLE support_posts ADD COLUMN "RewardMessage" character varying(1000) NULL;
+                    END IF;
+                END $$;
+                """);
         }
 
         /// <inheritdoc />

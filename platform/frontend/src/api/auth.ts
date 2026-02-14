@@ -155,11 +155,11 @@ export async function socialLogin(
 export async function getProviders(): Promise<SocialProvider[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/api/auth/providers`)
-    if (!response.ok) return ['google', 'apple', 'kakao', 'line']
+    if (!response.ok) return ['google']
     const data = await response.json()
     return data.providers
   } catch {
-    return ['google', 'apple', 'kakao', 'line']
+    return ['google']
   }
 }
 

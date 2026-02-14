@@ -89,28 +89,60 @@ public class SocialAuthService : ISocialAuthService
 
     public string[] GetOrderedProviders(string? acceptLanguage)
     {
-        if (string.IsNullOrEmpty(acceptLanguage))
-            return DefaultOrder;
+        string[] candidates;
 
-        // Parse Accept-Language to detect country
-        // e.g., "ko-KR,ko;q=0.9,en-US;q=0.8" → KR
-        var parts = acceptLanguage.Split(',');
-        foreach (var part in parts)
+        if (string.IsNullOrEmpty(acceptLanguage))
         {
-            var lang = part.Split(';')[0].Trim();
-            if (lang.Contains('-'))
+            candidates = DefaultOrder;
+        }
+        else
+        {
+            candidates = DefaultOrder;
+
+            // Parse Accept-Language to detect country
+            // e.g., "ko-KR,ko;q=0.9,en-US;q=0.8" → KR
+            var parts = acceptLanguage.Split(',');
+            foreach (var part in parts)
             {
-                var country = lang.Split('-')[1].ToUpper();
-                if (ProviderOrderByCountry.TryGetValue(country, out var order))
-                    return order;
+                var lang = part.Split(';')[0].Trim();
+                if (lang.Contains('-'))
+                {
+                    var country = lang.Split('-')[1].ToUpper();
+                    if (ProviderOrderByCountry.TryGetValue(country, out var order))
+                    {
+                        candidates = order;
+                        break;
+                    }
+                }
+                // Map language-only codes
+                var langCode = lang.ToLower();
+                if (langCode == "ko" && ProviderOrderByCountry.TryGetValue("KR", out var krOrder)) { candidates = krOrder; break; }
+                if (langCode == "ja" && ProviderOrderByCountry.TryGetValue("JP", out var jpOrder)) { candidates = jpOrder; break; }
             }
-            // Map language-only codes
-            var langCode = lang.ToLower();
-            if (langCode == "ko" && ProviderOrderByCountry.TryGetValue("KR", out var krOrder)) return krOrder;
-            if (langCode == "ja" && ProviderOrderByCountry.TryGetValue("JP", out var jpOrder)) return jpOrder;
         }
 
-        return DefaultOrder;
+        // Filter out providers that don't have valid OAuth configuration
+        return candidates.Where(p => IsProviderConfigured(p)).ToArray();
+    }
+
+    private bool IsProviderConfigured(string provider)
+    {
+        var section = _configuration.GetSection($"OAuth:{provider switch
+        {
+            "google" => "Google",
+            "kakao" => "Kakao",
+            "line" => "Line",
+            "apple" => "Apple",
+            _ => provider
+        }}");
+
+        // Each provider uses different config key names
+        return provider switch
+        {
+            "line" => !string.IsNullOrWhiteSpace(section["ChannelId"]) && !string.IsNullOrWhiteSpace(section["ChannelSecret"]),
+            "apple" => !string.IsNullOrWhiteSpace(section["ClientId"]) && !string.IsNullOrWhiteSpace(section["TeamId"]) && !string.IsNullOrWhiteSpace(section["KeyId"]),
+            _ => !string.IsNullOrWhiteSpace(section["ClientId"]) && !string.IsNullOrWhiteSpace(section["ClientSecret"]),
+        };
     }
 
     private async Task<SocialUserInfo> ExchangeGoogleCodeAsync(string code, string redirectUri)

@@ -208,14 +208,14 @@ describe('auth api', () => {
       mockFetch.mockResolvedValueOnce({ ok: false })
 
       const result = await getProviders()
-      expect(result).toEqual(['google', 'apple', 'kakao', 'line'])
+      expect(result).toEqual(['google'])
     })
 
     it('returns default providers on network error', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
       const result = await getProviders()
-      expect(result).toEqual(['google', 'apple', 'kakao', 'line'])
+      expect(result).toEqual(['google'])
     })
   })
 

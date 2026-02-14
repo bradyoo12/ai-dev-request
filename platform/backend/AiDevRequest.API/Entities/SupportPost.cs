@@ -26,10 +26,22 @@ public class SupportPost
     [MaxLength(50)]
     public string Status { get; set; } = "open"; // open, in_review, resolved, closed
 
+    /// <summary>
+    /// Feedback classification for credit reward: bug_report, feature_suggestion, general_inquiry
+    /// </summary>
+    [MaxLength(50)]
+    public string? FeedbackType { get; set; }
+
     public decimal? RewardCredit { get; set; }
 
     [MaxLength(100)]
     public string? RewardedByUserId { get; set; }
+
+    /// <summary>
+    /// Admin message expressing gratitude for the feedback
+    /// </summary>
+    [MaxLength(1000)]
+    public string? RewardMessage { get; set; }
 
     public DateTime? RewardedAt { get; set; }
 

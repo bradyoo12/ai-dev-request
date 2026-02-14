@@ -191,6 +191,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PatentInnovation> PatentInnovations => Set<PatentInnovation>();
     public DbSet<StreamingCodeGenSession> StreamingCodeGenSessions => Set<StreamingCodeGenSession>();
     public DbSet<ManagedBackend> ManagedBackends => Set<ManagedBackend>();
+    public DbSet<AgentBlueprint> AgentBlueprints => Set<AgentBlueprint>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2077,6 +2078,58 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<AgentBlueprint>(entity =>
+        {
+            entity.ToTable("agent_blueprints");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(e => e.Description)
+                .IsRequired()
+                .HasColumnType("text");
+
+            entity.Property(e => e.AgentType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.CapabilitiesJson)
+                .HasColumnType("jsonb");
+
+            entity.Property(e => e.IntegrationsJson)
+                .HasColumnType("jsonb");
+
+            entity.Property(e => e.ConfigurationJson)
+                .HasColumnType("jsonb");
+
+            entity.Property(e => e.GeneratedCode)
+                .HasColumnType("text");
+
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.ErrorMessage)
+                .HasColumnType("text");
+
+            entity.HasOne(e => e.GeneratedSkill)
+                .WithMany()
+                .HasForeignKey(e => e.GeneratedSkillId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.AgentType);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

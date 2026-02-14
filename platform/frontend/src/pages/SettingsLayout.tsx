@@ -112,6 +112,7 @@ import ConfidenceScorePage from './ConfidenceScorePage'
 import AiModelMarketplacePage from './AiModelMarketplacePage'
 import AgentInboxPage from './AgentInboxPage'
 import AgentSkillsPage from './AgentSkillsPage'
+import AgentBuilderPage from './AgentBuilderPage'
 import PlaywrightMcpPage from './PlaywrightMcpPage'
 import VisualWorkflowPage from './VisualWorkflowPage'
 import PatentAgentPage from './PatentAgentPage'
@@ -620,6 +621,7 @@ export default function SettingsLayout() {
       {settingsTab === 'ai-marketplace' && <AiModelMarketplacePage />}
       {settingsTab === 'agent-inbox' && <AgentInboxPage />}
       {settingsTab === 'agent-skills' && <AgentSkillsPage />}
+      {settingsTab === 'agent-builder' && <AgentBuilderPage />}
       {settingsTab === 'playwright-mcp' && <PlaywrightMcpPage />}
       {settingsTab === 'visual-workflow' && <VisualWorkflowPage />}
       {settingsTab === 'patent-agent' && <PatentAgentPage />}

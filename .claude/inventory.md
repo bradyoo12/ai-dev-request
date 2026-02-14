@@ -834,7 +834,6 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | sites.ts | SitesController | Site management |
 | hosting.ts | HostingController | Hosting plans |
 | domains.ts | DomainsController | Domain management |
-| ticket-progress.ts | RequestsController | User ticket progress tracking |
 
 ### AI & Generation
 

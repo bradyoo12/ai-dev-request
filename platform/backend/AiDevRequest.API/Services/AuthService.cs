@@ -86,7 +86,10 @@ public class AuthService : IAuthService
 
     public async Task<User?> GetUserAsync(string userId)
     {
-        return await _context.Users.FindAsync(userId);
+        if (!Guid.TryParse(userId, out var guidUserId))
+            return null;
+
+        return await _context.Users.FindAsync(guidUserId);
     }
 
     public string GenerateJwt(User user)

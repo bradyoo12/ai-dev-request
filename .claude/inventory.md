@@ -15,6 +15,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | Controller | Route | Purpose |
 |---|---|---|
 | RequestsController | /api/requests | CRUD for dev requests, analysis, proposals, builds |
+| SubTasksController | /api/requests/{id}/subtasks | Subtask CRUD, generate from proposal, approve/reject, approve-all |
 | AuthController | /api/auth | Authentication (login, register, social auth, JWT) |
 | SettingsController | /api/settings | App settings, token management, pricing |
 | ApiKeysController | /api/apikeys | API key generation and management |
@@ -557,7 +558,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 
 | Page | Route | Purpose |
 |---|---|---|
-| HomePage | / | Landing page with hero, features, pricing |
+| HomePage | / | Landing page with hero, features, pricing, subtask generation/approval in proposal view |
 | LoginPage | (modal) | Login/register modal |
 | NotFoundPage | * | 404 page |
 | SettingsLayout | /settings/* | Settings page with 12 collapsible tab groups, search filter, auto-expand active group |

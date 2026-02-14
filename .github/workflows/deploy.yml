@@ -61,6 +61,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check for merge conflict markers
+        working-directory: .
+        run: |
+          if grep -rn "<<<<<<\|======\|>>>>>>" platform/frontend/src/locales/*.json; then
+            echo "Error: Merge conflict markers found in locale files"
+            exit 1
+          fi
+
       - name: Build
         run: npm run build
         env:

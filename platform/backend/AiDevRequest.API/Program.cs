@@ -1,9 +1,11 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
+using Docker.DotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -43,6 +45,20 @@ builder.Services.AddScoped<IPreferenceService, PreferenceService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISocialAuthService, SocialAuthService>();
 builder.Services.AddHttpClient();
+
+// Add Docker client for sandboxed execution
+builder.Services.AddSingleton<IDockerClient>(provider =>
+{
+    var dockerUri = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        ? "npipe://./pipe/docker_engine"
+        : "unix:///var/run/docker.sock";
+    return new DockerClientConfiguration(new Uri(dockerUri)).CreateClient();
+});
+
+// Add Docker execution services
+builder.Services.AddScoped<IDockerExecutionService, DockerExecutionService>();
+builder.Services.AddScoped<IContainerLogStreamService, ContainerLogStreamService>();
+
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IBuildVerificationService, BuildVerificationService>();
 builder.Services.AddScoped<IAccessibilityService, AccessibilityService>();

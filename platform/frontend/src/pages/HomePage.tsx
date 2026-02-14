@@ -75,6 +75,16 @@ export default function HomePage() {
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.slice(1)
+      const el = document.getElementById(id)
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
+      }
+    }
+  }, [location.hash])
+
+  useEffect(() => {
     const loadPricingPlans = async () => {
       try {
         const plans = await getPricingPlans()
@@ -102,18 +112,18 @@ export default function HomePage() {
     loadTemplates()
   }, [])
 
-  // Scroll to hash target (e.g. #pricing, #how-it-works) when navigating from another page
+  // Scroll to hash target (e.g., #pricing, #how-it-works) after navigation from other pages
   useEffect(() => {
     if (location.hash && viewState === 'form') {
       const id = location.hash.replace('#', '')
-      // Use setTimeout to ensure the target sections are rendered in the DOM
-      const timer = setTimeout(() => {
+      // Use requestAnimationFrame to wait for sections to render
+      requestAnimationFrame(() => {
         const element = document.getElementById(id)
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' })
         }
-      }, 100)
-      return () => clearTimeout(timer)
+      })
+
     }
   }, [location.hash, viewState])
 

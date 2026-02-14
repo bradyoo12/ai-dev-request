@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError, generateSubtasks, approveSubtask, rejectSubtask, approveAllSubtasks } from '../api/requests'
 import { createSite, getSiteDetail } from '../api/sites'
 import type { SiteResponse } from '../api/sites'
@@ -34,6 +34,7 @@ type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingP
 export default function HomePage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { setTokenBalance, requireAuth } = useAuth()
 
   const [request, setRequest] = useState('')
@@ -100,6 +101,21 @@ export default function HomePage() {
     loadPricingPlans()
     loadTemplates()
   }, [])
+
+  // Scroll to hash target (e.g. #pricing, #how-it-works) when navigating from another page
+  useEffect(() => {
+    if (location.hash && viewState === 'form') {
+      const id = location.hash.replace('#', '')
+      // Use setTimeout to ensure the target sections are rendered in the DOM
+      const timer = setTimeout(() => {
+        const element = document.getElementById(id)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [location.hash, viewState])
 
   const handleScreenshotSelect = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) return

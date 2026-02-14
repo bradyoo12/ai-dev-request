@@ -190,6 +190,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<WorkflowAutomationRun> WorkflowAutomationRuns => Set<WorkflowAutomationRun>();
     public DbSet<PatentInnovation> PatentInnovations => Set<PatentInnovation>();
     public DbSet<StreamingCodeGenSession> StreamingCodeGenSessions => Set<StreamingCodeGenSession>();
+    public DbSet<ManagedBackend> ManagedBackends => Set<ManagedBackend>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2047,6 +2048,35 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<ManagedBackend>(entity =>
+        {
+            entity.ToTable("managed_backends");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DatabaseType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.DatabaseConnectionString).HasMaxLength(1000);
+            entity.Property(e => e.AuthProvider).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.AuthConfigJson).HasColumnType("jsonb");
+            entity.Property(e => e.StorageProvider).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.StorageBucket).HasMaxLength(200);
+            entity.Property(e => e.StorageConnectionString).HasMaxLength(1000);
+            entity.Property(e => e.HostingProvider).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ContainerAppId).HasMaxLength(200);
+            entity.Property(e => e.ContainerAppUrl).HasMaxLength(500);
+            entity.Property(e => e.PreviewUrl).HasMaxLength(500);
+            entity.Property(e => e.CustomDomain).HasMaxLength(200);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Region).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Tier).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CpuCores).HasPrecision(5, 2);
+            entity.Property(e => e.MemoryGb).HasPrecision(5, 2);
+            entity.Property(e => e.MonthlyBudget).HasPrecision(10, 2);
+            entity.Property(e => e.CurrentMonthCost).HasPrecision(10, 2);
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
         });
     }
 }

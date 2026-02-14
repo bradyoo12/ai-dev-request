@@ -117,6 +117,7 @@ builder.Services.AddScoped<ILocalModelInferenceService, LocalModelInferenceServi
 builder.Services.AddScoped<IVisualWorkflowService, VisualWorkflowService>();
 builder.Services.AddScoped<IPatentAgentService, PatentAgentService>();
 builder.Services.AddScoped<IStreamingCodeGenService, StreamingCodeGenService>();
+builder.Services.AddScoped<IManagedBackendService, ManagedBackendService>();
 
 // Add SSR (Server-Side Rendering) service for pre-rendered page delivery
 builder.Services.AddSingleton<ISsrService, SsrService>();

@@ -245,70 +245,27 @@ body {
 }
 
 /* ============================================
-   Settings tab bar - mobile scroll
+   Settings sidebar navigation
    ============================================ */
 
-.settings-tab-bar {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+.settings-sidebar {
   scrollbar-width: thin;
   scrollbar-color: oklch(0.35 0.01 75 / 0.4) transparent;
 }
 
-.settings-tab-bar::-webkit-scrollbar {
-  height: 3px;
+.settings-sidebar::-webkit-scrollbar {
+  width: 3px;
 }
 
-.settings-tab-bar::-webkit-scrollbar-track {
+.settings-sidebar::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.settings-tab-bar::-webkit-scrollbar-thumb {
+.settings-sidebar::-webkit-scrollbar-thumb {
   background: oklch(0.35 0.01 75 / 0.4);
   border-radius: 3px;
 }
 
-/* On mobile, prevent tabs from flex-shrinking so they scroll */
-@media (max-width: 767px) {
-  .settings-tab-bar > button {
-    flex: none !important;
-  }
-}
-
-/* Scroll indicator wrapper */
-.settings-tab-wrapper {
-  position: relative;
-}
-
-.settings-tab-wrapper::before,
-.settings-tab-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 32px;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.settings-tab-wrapper::before {
-  left: 0;
-  background: linear-gradient(to right, var(--color-warm-800), transparent);
-  border-radius: 0.5rem 0 0 0.5rem;
-}
-
-.settings-tab-wrapper::after {
-  right: 0;
-  background: linear-gradient(to left, var(--color-warm-800), transparent);
-  border-radius: 0 0.5rem 0.5rem 0;
-}
-
-.settings-tab-wrapper[data-scroll-start="false"]::before {
-  opacity: 1;
-}
-
-.settings-tab-wrapper[data-scroll-end="false"]::after {
-  opacity: 1;
+.settings-sidebar-nav .settings-group + .settings-group {
+  margin-top: 0.25rem;
 }

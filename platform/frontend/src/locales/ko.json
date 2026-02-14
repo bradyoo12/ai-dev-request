@@ -4214,5 +4214,18 @@
   "api.error.projectListFailed": "프로젝트 목록을 불러오는데 실패했습니다",
   "api.error.projectLoadFailed": "프로젝트 상세 정보를 불러오는데 실패했습니다",
   "api.error.projectCostFailed": "비용 정보를 불러오는데 실패했습니다",
-  "api.error.projectLogsFailed": "프로젝트 로그를 불러오는데 실패했습니다"
+  "api.error.projectLogsFailed": "프로젝트 로그를 불러오는데 실패했습니다",
+  "settings.groups.account": "계정 및 결제",
+  "settings.groups.aiGeneration": "AI 및 생성",
+  "settings.groups.codeQuality": "코드 품질",
+  "settings.groups.infrastructure": "인프라 및 배포",
+  "settings.groups.security": "보안 및 규정 준수",
+  "settings.groups.agents": "에이전트 및 오케스트레이션",
+  "settings.groups.testing": "테스트",
+  "settings.groups.dataSearch": "데이터 및 검색",
+  "settings.groups.devTools": "개발 도구",
+  "settings.groups.integrations": "통합",
+  "settings.groups.analyticsGrowth": "분석 및 성장",
+  "settings.groups.other": "기타",
+  "settings.toggleNav": "탐색 전환"
 }

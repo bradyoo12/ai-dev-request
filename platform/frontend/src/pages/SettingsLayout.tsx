@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import SettingsPage from './SettingsPage'
@@ -118,6 +118,198 @@ type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'p
 
 const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index', 'deployment-health', 'generative-ui', 'mobile-app', 'background-agents', 'platform-upgrade', 'visual-prompt', 'multi-framework', 'view-transitions', 'nl-schema', 'query-config', 'agentic-planning', 'visual-regression', 'mcp-gateway', 'codebase-memory', 'figma-import', 'arena', 'visual-overlay', 'semantic-search', 'planning-mode', 'project-docs', 'ai-elements', 'review-pipeline', 'oauth-connectors', 'mcp-tools', 'ai-model', 'bidir-sync', 'self-healing-test', 'multi-agent-test', 'database-branching', 'sandbox', 'dynamic-intelligence', 'agent-automation', 'usage-dashboard', 'orchestration', 'langgraph', 'hybrid-cache', 'playwright-healing', 'self-healing-code', 'production-sandboxes', 'org-memory', 'agent-rules', 'server-components', 'code-lint', 'vector-search', 'repl-test', 'agent-terminal', 'composer', 'dotnet-perf', 'multi-model', 'biome-lint', 'deepwiki', 'build-toolchain', 'vision-to-code', 'dotnet10-upgrade', 'parallel-agents', 'webmcp', 'agent-sdk', 'auto-terminal', 'turso-database', 'workers-ai', 'react-use-hook', 'edit-predictions', 'browser-ide', 'governance', 'inference-cost', 'language-expansion', 'hybrid-validation', 'agent-messages', 'agentic-workflows', 'agent-trace', 'confidence-scoring', 'ai-marketplace', 'agent-inbox', 'agent-skills']
 
+type TabGroup = {
+  key: string
+  i18nKey: string
+  tabs: SettingsTab[]
+}
+
+const TAB_GROUPS: TabGroup[] = [
+  {
+    key: 'account',
+    i18nKey: 'settings.groups.account',
+    tabs: ['tokens', 'billing', 'payments', 'usage', 'usage-dashboard', 'preferences', 'memories'],
+  },
+  {
+    key: 'ai-generation',
+    i18nKey: 'settings.groups.aiGeneration',
+    tabs: ['ai-model', 'streaming-generation', 'generative-ui', 'visual-prompt', 'component-preview', 'variant-comparison', 'arena', 'ai-elements', 'multi-framework', 'multi-model', 'composer', 'model-routing', 'generation', 'ai-marketplace'],
+  },
+  {
+    key: 'code-quality',
+    i18nKey: 'settings.groups.codeQuality',
+    tabs: ['code-review', 'review-pipeline', 'multi-agent-test', 'code-lint', 'compiler', 'self-healing-test', 'code-merge', 'biome-lint'],
+  },
+  {
+    key: 'infrastructure',
+    i18nKey: 'settings.groups.infrastructure',
+    tabs: ['preview', 'containerization', 'database-branching', 'sandbox', 'infrastructure', 'platform-upgrade', 'deployment-health', 'production-sandboxes'],
+  },
+  {
+    key: 'security',
+    i18nKey: 'settings.groups.security',
+    tabs: ['secrets', 'oauth', 'oauth-connectors', 'governance'],
+  },
+  {
+    key: 'agents',
+    i18nKey: 'settings.groups.agents',
+    tabs: ['background-agents', 'agent-automation', 'agent-skills', 'agent-rules', 'agent-terminal', 'agent-trace', 'agentic-workflows', 'agent-messages', 'parallel-agents', 'agent-sdk', 'auto-terminal', 'confidence-scoring', 'orchestration', 'langgraph', 'agentic-planning', 'agent-inbox', 'dynamic-intelligence'],
+  },
+  {
+    key: 'testing',
+    i18nKey: 'settings.groups.testing',
+    tabs: ['test-generation', 'visual-regression', 'self-healing-code', 'playwright-healing', 'repl-test'],
+  },
+  {
+    key: 'data-search',
+    i18nKey: 'settings.groups.dataSearch',
+    tabs: ['schema-designer', 'nl-schema', 'vector-search', 'org-memory', 'turso-database', 'hybrid-cache', 'deepwiki', 'codebase-memory', 'semantic-search', 'context-index', 'query-config'],
+  },
+  {
+    key: 'dev-tools',
+    i18nKey: 'settings.groups.devTools',
+    tabs: ['specifications', 'github-sync', 'bidir-sync', 'collaborative-editing', 'version-history', 'performance', 'observability', 'build-toolchain', 'vision-to-code', 'edit-predictions', 'browser-ide', 'dotnet-perf', 'dotnet10-upgrade', 'figma-import', 'visual-overlay', 'planning-mode', 'project-docs', 'api-cli', 'api-docs', 'pipeline-builder', 'view-transitions', 'voice-input', 'mobile-app'],
+  },
+  {
+    key: 'integrations',
+    i18nKey: 'settings.groups.integrations',
+    tabs: ['mcp-integration', 'mcp-gateway', 'mcp-tools', 'webmcp', 'workers-ai', 'react-use-hook', 'server-components'],
+  },
+  {
+    key: 'analytics-growth',
+    i18nKey: 'settings.groups.analyticsGrowth',
+    tabs: ['analytics', 'marketplace', 'onboarding'],
+  },
+  {
+    key: 'other',
+    i18nKey: 'settings.groups.other',
+    tabs: ['workflows', 'language-expansion', 'hybrid-validation', 'inference-cost'],
+  },
+]
+
+/** Map tab key to its i18n key and fallback label */
+const TAB_LABELS: Record<SettingsTab, [string, string]> = {
+  'tokens': ['settings.tabs.tokens', 'Token Balance'],
+  'usage': ['settings.tabs.usage', 'Usage'],
+  'billing': ['settings.tabs.billing', 'Billing'],
+  'payments': ['settings.tabs.payments', 'Payments'],
+  'memories': ['settings.tabs.memories', 'Memories'],
+  'preferences': ['settings.tabs.preferences', 'Preferences'],
+  'infrastructure': ['settings.tabs.infrastructure', 'Infrastructure'],
+  'secrets': ['settings.tabs.secrets', 'Secrets'],
+  'preview': ['settings.tabs.preview', 'Preview'],
+  'generation': ['settings.tabs.generation', 'Generation'],
+  'oauth': ['settings.tabs.oauth', 'OAuth'],
+  'compiler': ['settings.tabs.compiler', 'Compiler'],
+  'observability': ['settings.tabs.observability', 'Observability'],
+  'workflows': ['settings.tabs.workflows', 'Workflows'],
+  'specifications': ['settings.tabs.specifications', 'Specifications'],
+  'github-sync': ['settings.tabs.githubSync', 'GitHub Sync'],
+  'code-review': ['settings.tabs.codeReview', 'Code Review'],
+  'streaming-generation': ['settings.tabs.streamingGeneration', 'Live Generation'],
+  'mcp-integration': ['settings.tabs.mcpIntegration', 'MCP'],
+  'analytics': ['settings.tabs.analytics', 'Analytics'],
+  'marketplace': ['settings.tabs.marketplace', 'Marketplace'],
+  'containerization': ['settings.tabs.containerization', 'Containers'],
+  'test-generation': ['settings.tabs.testGeneration', 'Tests'],
+  'collaborative-editing': ['settings.tabs.collaborativeEditing', 'Collab'],
+  'onboarding': ['settings.tabs.onboarding', 'Onboarding'],
+  'version-history': ['settings.tabs.versionHistory', 'Versions'],
+  'component-preview': ['settings.tabs.componentPreview', 'Preview'],
+  'variant-comparison': ['settings.tabs.variantComparison', 'Variants'],
+  'performance': ['settings.tabs.performance', 'Performance'],
+  'schema-designer': ['settings.tabs.schemaDesigner', 'Schema'],
+  'api-cli': ['settings.tabs.apiCli', 'API & CLI'],
+  'pipeline-builder': ['settings.tabs.pipelineBuilder', 'Pipelines'],
+  'api-docs': ['settings.tabs.apiDocs', 'API Docs'],
+  'code-merge': ['settings.tabs.codeMerge', 'Code Merge'],
+  'voice-input': ['settings.tabs.voiceInput', 'Voice'],
+  'model-routing': ['settings.tabs.modelRouting', 'AI Models'],
+  'context-index': ['settings.tabs.contextIndex', 'Context Index'],
+  'deployment-health': ['settings.tabs.deploymentHealth', 'Health'],
+  'generative-ui': ['settings.tabs.generativeUi', 'Gen UI'],
+  'mobile-app': ['settings.tabs.mobileApp', 'Mobile'],
+  'background-agents': ['settings.tabs.backgroundAgents', 'Agents'],
+  'platform-upgrade': ['settings.tabs.platformUpgrade', 'Platform'],
+  'visual-prompt': ['settings.tabs.visualPrompt', 'Visual UI'],
+  'multi-framework': ['settings.tabs.multiFramework', 'Frameworks'],
+  'view-transitions': ['settings.tabs.viewTransitions', 'Transitions'],
+  'nl-schema': ['settings.tabs.nlSchema', 'NL Schema'],
+  'query-config': ['settings.tabs.queryConfig', 'Query Config'],
+  'agentic-planning': ['settings.tabs.agenticPlanning', 'Planner'],
+  'visual-regression': ['settings.tabs.visualRegression', 'Visual QA'],
+  'mcp-gateway': ['settings.tabs.mcpGateway', 'MCP Gateway'],
+  'codebase-memory': ['settings.tabs.codebaseMemory', 'Memory AI'],
+  'figma-import': ['settings.tabs.figmaImport', 'Figma'],
+  'arena': ['settings.tabs.arena', 'Arena'],
+  'visual-overlay': ['settings.tabs.visualOverlay', 'Overlay Editor'],
+  'semantic-search': ['settings.tabs.semanticSearch', 'Semantic Search'],
+  'planning-mode': ['settings.tabs.planningMode', 'Planning Mode'],
+  'project-docs': ['settings.tabs.projectDocs', 'Project Docs'],
+  'ai-elements': ['settings.tabs.aiElements', 'AI Elements'],
+  'review-pipeline': ['settings.tabs.reviewPipeline', 'Review Pipeline'],
+  'oauth-connectors': ['settings.tabs.oauthConnectors', 'OAuth Connectors'],
+  'mcp-tools': ['settings.tabs.mcpTools', 'MCP Tools'],
+  'ai-model': ['settings.tabs.aiModel', 'AI Model'],
+  'bidir-sync': ['settings.tabs.bidirSync', 'Bidir Sync'],
+  'self-healing-test': ['settings.tabs.selfHealingTest', 'Self-Healing'],
+  'multi-agent-test': ['settings.tabs.multiAgentTest', 'Multi-Agent Test'],
+  'database-branching': ['settings.tabs.databaseBranching', 'DB Branching'],
+  'sandbox': ['settings.tabs.sandbox', 'Sandbox'],
+  'dynamic-intelligence': ['settings.tabs.dynamicIntelligence', 'Intelligence'],
+  'agent-automation': ['settings.tabs.agentAutomation', 'Agent Auto'],
+  'usage-dashboard': ['settings.tabs.usageDashboard', 'Usage Metering'],
+  'orchestration': ['settings.tabs.orchestration', 'Orchestration'],
+  'langgraph': ['settings.tabs.langgraph', 'LangGraph'],
+  'hybrid-cache': ['settings.tabs.hybridCache', 'Cache'],
+  'playwright-healing': ['settings.tabs.playwrightHealing', 'Test Heal'],
+  'self-healing-code': ['settings.tabs.selfHealingCode', 'Self-Healing Code'],
+  'production-sandboxes': ['settings.tabs.productionSandboxes', 'Sandboxes'],
+  'org-memory': ['settings.tabs.orgMemory', 'Org Memory'],
+  'agent-rules': ['settings.tabs.agentRules', 'Agent Rules'],
+  'server-components': ['settings.tabs.serverComponents', 'Server Components'],
+  'code-lint': ['settings.tabs.codeLint', 'Code Lint'],
+  'vector-search': ['settings.tabs.vectorSearch', 'Vector Search'],
+  'repl-test': ['settings.tabs.replTest', 'REPL Test'],
+  'agent-terminal': ['settings.tabs.agentTerminal', 'Agent Terminal'],
+  'composer': ['settings.tabs.composer', 'Composer'],
+  'dotnet-perf': ['settings.tabs.dotnetPerf', '.NET Perf'],
+  'multi-model': ['settings.tabs.multiModel', 'Multi-Model'],
+  'biome-lint': ['settings.tabs.biomeLint', 'Biome Lint'],
+  'deepwiki': ['settings.tabs.deepwiki', 'DeepWiki'],
+  'build-toolchain': ['settings.tabs.buildToolchain', 'Build'],
+  'vision-to-code': ['settings.tabs.visionToCode', 'Vision'],
+  'dotnet10-upgrade': ['settings.tabs.dotnet10', '.NET 10'],
+  'parallel-agents': ['settings.tabs.parallelAgents', 'Parallel'],
+  'webmcp': ['settings.tabs.webmcp', 'WebMCP'],
+  'agent-sdk': ['settings.tabs.agentSdk', 'Agent SDK'],
+  'auto-terminal': ['settings.tabs.autoTerminal', 'Auto Terminal'],
+  'turso-database': ['settings.tabs.tursoDatabase', 'Turso DB'],
+  'workers-ai': ['settings.tabs.workersAi', 'Workers AI'],
+  'react-use-hook': ['settings.tabs.reactUseHook', 'React Hooks'],
+  'edit-predictions': ['settings.tabs.editPredictions', 'Edit Predict'],
+  'browser-ide': ['settings.tabs.browserIde', 'Browser IDE'],
+  'governance': ['settings.tabs.governance', 'Governance'],
+  'inference-cost': ['settings.tabs.inferenceCost', 'Inference Cost'],
+  'language-expansion': ['settings.tabs.langExpansion', 'Languages'],
+  'hybrid-validation': ['settings.tabs.hybridValidation', 'Hybrid AI'],
+  'agent-messages': ['settings.tabs.agentMessages', 'Agent Comms'],
+  'agentic-workflows': ['settings.tabs.agenticWorkflows', 'Workflows'],
+  'agent-trace': ['settings.tabs.agentTrace', 'Agent Trace'],
+  'confidence-scoring': ['settings.tabs.confidenceScoring', 'Confidence'],
+  'ai-marketplace': ['settings.tabs.aiMarketplace', 'AI Models'],
+  'agent-inbox': ['settings.tabs.agentInbox', 'Agent Inbox'],
+  'agent-skills': ['settings.tabs.agentSkills', 'Agent Skills'],
+}
+
+/** Find which group a tab belongs to */
+function findGroupForTab(tab: SettingsTab): string | null {
+  for (const group of TAB_GROUPS) {
+    if (group.tabs.includes(tab)) return group.key
+  }
+  return null
+}
+
 export default function SettingsLayout() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -125,155 +317,73 @@ export default function SettingsLayout() {
   const location = useLocation()
   const { setTokenBalance, requireAuth } = useAuth()
   const tabParam = searchParams.get('tab') as SettingsTab | null
-  const pathTab = location.pathname === '/settings/specifications' ? 'specifications' as SettingsTab
-    : location.pathname === '/settings/github-sync' ? 'github-sync' as SettingsTab
-    : location.pathname === '/settings/code-review' ? 'code-review' as SettingsTab
-    : location.pathname === '/settings/streaming-generation' ? 'streaming-generation' as SettingsTab
-    : location.pathname === '/settings/billing' ? 'billing' as SettingsTab
-    : location.pathname === '/settings/mcp-integration' ? 'mcp-integration' as SettingsTab
-    : location.pathname === '/settings/analytics' ? 'analytics' as SettingsTab
-    : location.pathname === '/settings/marketplace' ? 'marketplace' as SettingsTab
-    : location.pathname === '/settings/containerization' ? 'containerization' as SettingsTab
-    : location.pathname === '/settings/test-generation' ? 'test-generation' as SettingsTab
-    : location.pathname === '/settings/collaborative-editing' ? 'collaborative-editing' as SettingsTab
-    : location.pathname === '/settings/onboarding' ? 'onboarding' as SettingsTab
-    : location.pathname === '/settings/version-history' ? 'version-history' as SettingsTab
-    : location.pathname === '/settings/component-preview' ? 'component-preview' as SettingsTab
-    : location.pathname === '/settings/variant-comparison' ? 'variant-comparison' as SettingsTab
-    : location.pathname === '/settings/performance' ? 'performance' as SettingsTab
-    : location.pathname === '/settings/schema-designer' ? 'schema-designer' as SettingsTab
-    : location.pathname === '/settings/api-cli' ? 'api-cli' as SettingsTab
-    : location.pathname === '/settings/pipeline-builder' ? 'pipeline-builder' as SettingsTab
-    : location.pathname === '/settings/api-docs' ? 'api-docs' as SettingsTab
-    : location.pathname === '/settings/code-merge' ? 'code-merge' as SettingsTab
-    : location.pathname === '/settings/voice-input' ? 'voice-input' as SettingsTab
-    : location.pathname === '/settings/model-routing' ? 'model-routing' as SettingsTab
-    : location.pathname === '/settings/context-index' ? 'context-index' as SettingsTab
-    : location.pathname === '/settings/deployment-health' ? 'deployment-health' as SettingsTab
-    : location.pathname === '/settings/generative-ui' ? 'generative-ui' as SettingsTab
-    : location.pathname === '/settings/mobile-app' ? 'mobile-app' as SettingsTab
-    : location.pathname === '/settings/background-agents' ? 'background-agents' as SettingsTab
-    : location.pathname === '/settings/platform-upgrade' ? 'platform-upgrade' as SettingsTab
-    : location.pathname === '/settings/visual-prompt' ? 'visual-prompt' as SettingsTab
-    : location.pathname === '/settings/multi-framework' ? 'multi-framework' as SettingsTab
-    : location.pathname === '/settings/view-transitions' ? 'view-transitions' as SettingsTab
-    : location.pathname === '/settings/nl-schema' ? 'nl-schema' as SettingsTab
-    : location.pathname === '/settings/query-config' ? 'query-config' as SettingsTab
-    : location.pathname === '/settings/agentic-planning' ? 'agentic-planning' as SettingsTab
-    : location.pathname === '/settings/visual-regression' ? 'visual-regression' as SettingsTab
-    : location.pathname === '/settings/mcp-gateway' ? 'mcp-gateway' as SettingsTab
-    : location.pathname === '/settings/codebase-memory' ? 'codebase-memory' as SettingsTab
-    : location.pathname === '/settings/figma-import' ? 'figma-import' as SettingsTab
-    : location.pathname === '/settings/arena' ? 'arena' as SettingsTab
-    : location.pathname === '/settings/visual-overlay' ? 'visual-overlay' as SettingsTab
-    : location.pathname === '/settings/semantic-search' ? 'semantic-search' as SettingsTab
-    : location.pathname === '/settings/planning-mode' ? 'planning-mode' as SettingsTab
-    : location.pathname === '/settings/project-docs' ? 'project-docs' as SettingsTab
-    : location.pathname === '/settings/ai-elements' ? 'ai-elements' as SettingsTab
-    : location.pathname === '/settings/review-pipeline' ? 'review-pipeline' as SettingsTab
-    : location.pathname === '/settings/oauth-connectors' ? 'oauth-connectors' as SettingsTab
-    : location.pathname === '/settings/mcp-tools' ? 'mcp-tools' as SettingsTab
-    : location.pathname === '/settings/ai-model' ? 'ai-model' as SettingsTab
-    : location.pathname === '/settings/bidir-sync' ? 'bidir-sync' as SettingsTab
-    : location.pathname === '/settings/self-healing-test' ? 'self-healing-test' as SettingsTab
-    : location.pathname === '/settings/multi-agent-test' ? 'multi-agent-test' as SettingsTab
-    : location.pathname === '/settings/database-branching' ? 'database-branching' as SettingsTab
-    : location.pathname === '/settings/sandbox' ? 'sandbox' as SettingsTab
-    : location.pathname === '/settings/dynamic-intelligence' ? 'dynamic-intelligence' as SettingsTab
-    : location.pathname === '/settings/agent-automation' ? 'agent-automation' as SettingsTab
-    : location.pathname === '/settings/usage-dashboard' ? 'usage-dashboard' as SettingsTab
-    : location.pathname === '/settings/orchestration' ? 'orchestration' as SettingsTab
-    : location.pathname === '/settings/langgraph' ? 'langgraph' as SettingsTab
-    : location.pathname === '/settings/hybrid-cache' ? 'hybrid-cache' as SettingsTab
-    : location.pathname === '/settings/playwright-healing' ? 'playwright-healing' as SettingsTab
-    : location.pathname === '/settings/self-healing-code' ? 'self-healing-code' as SettingsTab
-    : location.pathname === '/settings/production-sandboxes' ? 'production-sandboxes' as SettingsTab
-    : location.pathname === '/settings/org-memory' ? 'org-memory' as SettingsTab
-    : location.pathname === '/settings/agent-rules' ? 'agent-rules' as SettingsTab
-    : location.pathname === '/settings/server-components' ? 'server-components' as SettingsTab
-    : location.pathname === '/settings/code-lint' ? 'code-lint' as SettingsTab
-    : location.pathname === '/settings/vector-search' ? 'vector-search' as SettingsTab
-    : location.pathname === '/settings/repl-test' ? 'repl-test' as SettingsTab
-    : location.pathname === '/settings/agent-terminal' ? 'agent-terminal' as SettingsTab
-    : location.pathname === '/settings/composer' ? 'composer' as SettingsTab
-    : location.pathname === '/settings/dotnet-perf' ? 'dotnet-perf' as SettingsTab
-    : location.pathname === '/settings/multi-model' ? 'multi-model' as SettingsTab
-    : location.pathname === '/settings/biome-lint' ? 'biome-lint' as SettingsTab
-    : location.pathname === '/settings/deepwiki' ? 'deepwiki' as SettingsTab
-    : location.pathname === '/settings/build-toolchain' ? 'build-toolchain' as SettingsTab
-    : location.pathname === '/settings/vision-to-code' ? 'vision-to-code' as SettingsTab
-    : location.pathname === '/settings/dotnet10-upgrade' ? 'dotnet10-upgrade' as SettingsTab
-    : location.pathname === '/settings/parallel-agents' ? 'parallel-agents' as SettingsTab
-    : location.pathname === '/settings/webmcp' ? 'webmcp' as SettingsTab
-    : location.pathname === '/settings/agent-sdk' ? 'agent-sdk' as SettingsTab
-    : location.pathname === '/settings/auto-terminal' ? 'auto-terminal' as SettingsTab
-    : location.pathname === '/settings/turso-database' ? 'turso-database' as SettingsTab
-    : location.pathname === '/settings/workers-ai' ? 'workers-ai' as SettingsTab
-    : location.pathname === '/settings/react-use-hook' ? 'react-use-hook' as SettingsTab
-    : location.pathname === '/settings/edit-predictions' ? 'edit-predictions' as SettingsTab
-    : location.pathname === '/settings/browser-ide' ? 'browser-ide' as SettingsTab
-    : location.pathname === '/settings/governance' ? 'governance' as SettingsTab
-    : location.pathname === '/settings/inference-cost' ? 'inference-cost' as SettingsTab
-    : location.pathname === '/settings/language-expansion' ? 'language-expansion' as SettingsTab
-    : location.pathname === '/settings/hybrid-validation' ? 'hybrid-validation' as SettingsTab
-    : location.pathname === '/settings/agent-messages' ? 'agent-messages' as SettingsTab
-    : location.pathname === '/settings/agent-trace' ? 'agent-trace' as SettingsTab
-    : location.pathname === '/settings/agentic-workflows' ? 'agentic-workflows' as SettingsTab
-    : location.pathname === '/settings/agent-trace' ? 'agent-trace' as SettingsTab
-    : location.pathname === '/settings/confidence-scoring' ? 'confidence-scoring' as SettingsTab
-    : location.pathname === '/settings/ai-marketplace' ? 'ai-marketplace' as SettingsTab
-    : location.pathname === '/settings/agent-inbox' ? 'agent-inbox' as SettingsTab
-    : location.pathname === '/settings/agent-skills' ? 'agent-skills' as SettingsTab
-    : location.pathname === '/settings/observability' ? 'observability' as SettingsTab
-    : location.pathname === '/settings/compiler-validation' ? 'compiler' as SettingsTab : null
+
+  // Derive tab from URL path — check all known settings sub-paths
+  const pathTab = useMemo<SettingsTab | null>(() => {
+    const match = location.pathname.match(/^\/settings\/(.+)$/)
+    if (!match) return null
+    const slug = match[1]
+    // Special case: compiler-validation maps to 'compiler'
+    if (slug === 'compiler-validation') return 'compiler'
+    // Check if slug is a valid tab
+    if (VALID_TABS.includes(slug as SettingsTab)) return slug as SettingsTab
+    return null
+  }, [location.pathname])
+
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
-  // Mobile scroll tracking for tab bar
-  const tabBarRef = useRef<HTMLDivElement>(null)
-  const [atScrollStart, setAtScrollStart] = useState(true)
-  const [atScrollEnd, setAtScrollEnd] = useState(false)
+  // Track which groups are expanded — default: expand the group containing the active tab
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
+    const initial = new Set<string>()
+    const activeGroup = findGroupForTab(initialTab)
+    if (activeGroup) initial.add(activeGroup)
+    return initial
+  })
 
-  const updateScrollIndicators = useCallback(() => {
-    const el = tabBarRef.current
-    if (!el) return
-    setAtScrollStart(el.scrollLeft <= 4)
-    setAtScrollEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4)
+  // Mobile sidebar visibility
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const toggleGroup = useCallback((groupKey: string) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(groupKey)) {
+        next.delete(groupKey)
+      } else {
+        next.add(groupKey)
+      }
+      return next
+    })
   }, [])
 
-  useEffect(() => {
-    const el = tabBarRef.current
-    if (!el) return
-    updateScrollIndicators()
-    el.addEventListener('scroll', updateScrollIndicators, { passive: true })
-    let resizeObserver: ResizeObserver | undefined
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(updateScrollIndicators)
-      resizeObserver.observe(el)
-    }
-    return () => {
-      el.removeEventListener('scroll', updateScrollIndicators)
-      resizeObserver?.disconnect()
-    }
-  }, [updateScrollIndicators])
-
-  // Scroll active tab into view on mount / tab change
-  useEffect(() => {
-    const el = tabBarRef.current
-    if (!el) return
-    // Active tab has bg-warm-700 class
-    const activeBtn = el.querySelector('.bg-warm-700') as HTMLElement | null
-    if (activeBtn) {
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+  const handleTabSelect = useCallback((tab: SettingsTab) => {
+    setSettingsTab(tab)
+    // Auto-expand the group containing the selected tab
+    const group = findGroupForTab(tab)
+    if (group) {
+      setExpandedGroups(prev => {
+        if (prev.has(group)) return prev
+        const next = new Set(prev)
+        next.add(group)
+        return next
       })
     }
-  }, [settingsTab])
+    // Close mobile sidebar after selection
+    setSidebarOpen(false)
+  }, [])
 
   useEffect(() => {
     if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== settingsTab) {
       setSettingsTab(tabParam)
+      const group = findGroupForTab(tabParam)
+      if (group) {
+        setExpandedGroups(prev => {
+          if (prev.has(group)) return prev
+          const next = new Set(prev)
+          next.add(group)
+          return next
+        })
+      }
     }
   }, [tabParam, settingsTab])
 
@@ -283,6 +393,65 @@ export default function SettingsLayout() {
       navigate('/')
     }
   }, [requireAuth, navigate])
+
+  // Sidebar navigation content (shared between desktop & mobile)
+  const sidebarNav = (
+    <nav className="settings-sidebar-nav flex flex-col gap-1" role="tablist" aria-label={t('settings.title')}>
+      {TAB_GROUPS.map((group) => {
+        const isExpanded = expandedGroups.has(group.key)
+        const hasActiveTab = group.tabs.includes(settingsTab)
+        return (
+          <div key={group.key} className="settings-group">
+            <button
+              onClick={() => toggleGroup(group.key)}
+              className={`w-full flex items-center justify-between py-2 px-3 rounded-md text-sm font-semibold transition-colors ${
+                hasActiveTab ? 'text-white bg-warm-800' : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
+              }`}
+              aria-expanded={isExpanded}
+            >
+              <span>{t(group.i18nKey, group.key)}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {isExpanded && (
+              <div className="flex flex-col gap-0.5 mt-0.5 ml-2 pl-2 border-l border-warm-700/50">
+                {group.tabs.map((tab) => {
+                  const [i18nKey, fallback] = TAB_LABELS[tab]
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => handleTabSelect(tab)}
+                      role="tab"
+                      aria-selected={settingsTab === tab}
+                      className={`text-left py-1.5 px-3 rounded-md text-sm transition-colors ${
+                        settingsTab === tab
+                          ? 'bg-warm-700 text-white font-medium'
+                          : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
+                      }`}
+                    >
+                      {t(i18nKey, fallback)}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </nav>
+  )
 
   return (
     <section>
@@ -295,1195 +464,36 @@ export default function SettingsLayout() {
           <span aria-hidden="true">&larr;</span>
         </button>
         <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
-      </div>
-      <div className="settings-tab-wrapper mb-6" data-scroll-start={String(atScrollStart)} data-scroll-end={String(atScrollEnd)}>
-      <div ref={tabBarRef} className="settings-tab-bar flex gap-1 bg-warm-800 rounded-lg p-1 overflow-x-auto whitespace-nowrap" role="tablist" aria-label={t('settings.title')}>
-        <button
-          onClick={() => setSettingsTab('tokens')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'tokens' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.tokens')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('usage')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'usage' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.usage')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('billing')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'billing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-            {t('settings.tabs.billing')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('payments')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'payments' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.payments')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('memories')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'memories' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.memories')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('preferences')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'preferences' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.preferences')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('infrastructure')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'infrastructure' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.infrastructure', 'Infrastructure')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('secrets')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'secrets' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.secrets', 'Secrets')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('preview')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'preview' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.preview', 'Preview')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('generation')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'generation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.generation', 'Generation')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('oauth')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'oauth' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.oauth', 'OAuth')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('compiler')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'compiler' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.compiler', 'Compiler')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('observability')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'observability' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.observability', 'Observability')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('workflows')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'workflows' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.workflows', 'Workflows')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('specifications')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'specifications' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.specifications', 'Specifications')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('github-sync')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'github-sync' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.githubSync', 'GitHub Sync')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('code-review')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'code-review' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          {t('settings.tabs.codeReview', 'Code Review')}
-        </button>
-        <button
-          onClick={() => setSettingsTab('streaming-generation')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'streaming-generation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-            {t('settings.tabs.streamingGeneration', 'Live Generation')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('mcp-integration')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mcp-integration' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/><path d="M12 17v5"/></svg>
-            {t('settings.tabs.mcpIntegration', 'MCP')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('analytics')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'analytics' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-            {t('settings.tabs.analytics', 'Analytics')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('marketplace')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'marketplace' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
-            {t('settings.tabs.marketplace', 'Marketplace')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('containerization')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'containerization' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            {t('settings.tabs.containerization', 'Containers')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('test-generation')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'test-generation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
-            {t('settings.tabs.testGeneration', 'Tests')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('collaborative-editing')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'collaborative-editing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            {t('settings.tabs.collaborativeEditing', 'Collab')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('onboarding')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'onboarding' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            {t('settings.tabs.onboarding', 'Onboarding')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('version-history')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'version-history' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            {t('settings.tabs.versionHistory', 'Versions')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('component-preview')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'component-preview' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-            {t('settings.tabs.componentPreview', 'Preview')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('variant-comparison')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'variant-comparison' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/></svg>
-            {t('settings.tabs.variantComparison', 'Variants')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('performance')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'performance' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            {t('settings.tabs.performance', 'Performance')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('schema-designer')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'schema-designer' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
-            {t('settings.tabs.schemaDesigner', 'Schema')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('api-cli')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'api-cli' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
-            {t('settings.tabs.apiCli', 'API & CLI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('pipeline-builder')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'pipeline-builder' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>
-            {t('settings.tabs.pipelineBuilder', 'Pipelines')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('api-docs')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'api-docs' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3-3 3 3"/></svg>
-            {t('settings.tabs.apiDocs', 'API Docs')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('code-merge')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'code-merge' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
-            {t('settings.tabs.codeMerge', 'Code Merge')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('voice-input')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'voice-input' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-            {t('settings.tabs.voiceInput', 'Voice')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('model-routing')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'model-routing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            {t('settings.tabs.modelRouting', 'AI Models')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('context-index')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'context-index' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-            {t('settings.tabs.contextIndex', 'Context Index')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('deployment-health')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'deployment-health' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-            {t('settings.tabs.deploymentHealth', 'Health')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('generative-ui')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'generative-ui' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            {t('settings.tabs.generativeUi', 'Gen UI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('mobile-app')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mobile-app' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
-            {t('settings.tabs.mobileApp', 'Mobile')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('background-agents')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'background-agents' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-            {t('settings.tabs.backgroundAgents', 'Agents')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('platform-upgrade')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'platform-upgrade' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            {t('settings.tabs.platformUpgrade', 'Platform')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('visual-prompt')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'visual-prompt' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            {t('settings.tabs.visualPrompt', 'Visual UI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('multi-framework')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'multi-framework' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            {t('settings.tabs.multiFramework', 'Frameworks')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('view-transitions')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'view-transitions' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            {t('settings.tabs.viewTransitions', 'Transitions')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('nl-schema')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'nl-schema' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
-            {t('settings.tabs.nlSchema', 'Schema AI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('query-config')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'query-config' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><path d="M21 3v9h-9"/></svg>
-            {t('settings.tabs.queryConfig', 'Query')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agentic-planning')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agentic-planning' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-            {t('settings.tabs.agenticPlanning', 'Planner')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('visual-regression')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'visual-regression' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-            {t('settings.tabs.visualRegression', 'Visual QA')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('mcp-gateway')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mcp-gateway' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4"/><path d="M12 19v4"/><path d="M4.22 4.22l2.83 2.83"/><path d="M16.95 16.95l2.83 2.83"/><path d="M1 12h4"/><path d="M19 12h4"/><path d="M4.22 19.78l2.83-2.83"/><path d="M16.95 7.05l2.83-2.83"/></svg>
-            {t('settings.tabs.mcpGateway', 'MCP Gateway')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('codebase-memory')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'codebase-memory' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3c0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/><path d="M19 9H5a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2z"/><path d="M12 14v8"/><path d="M8 18h8"/></svg>
-            {t('settings.tabs.codebaseMemory', 'Memory AI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('figma-import')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'figma-import' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>
-            {t('settings.tabs.figmaImport', 'Figma')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('arena')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'arena' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
-            {t('settings.tabs.arena', 'Arena')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('visual-overlay')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'visual-overlay' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            {t('settings.tabs.visualOverlay', 'Overlay Editor')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('semantic-search')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'semantic-search' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
-            {t('settings.tabs.semanticSearch', 'Semantic Search')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('planning-mode')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'planning-mode' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
-            {t('settings.tabs.planningMode', 'Planning')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('project-docs')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'project-docs' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
-            {t('settings.tabs.projectDocs', 'Project Docs')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('ai-elements')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'ai-elements' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-            {t('settings.tabs.aiElements', 'AI Elements')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('review-pipeline')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'review-pipeline' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
-            {t('settings.tabs.reviewPipeline', 'Review Pipeline')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('oauth-connectors')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'oauth-connectors' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
-            {t('settings.tabs.oauthConnectors', 'OAuth Connectors')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('mcp-tools')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'mcp-tools' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-            {t('settings.tabs.mcpTools', 'MCP Tools')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('ai-model')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'ai-model' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3c0 2 3 3 3 5s-3 3-3 5a3 3 0 0 0 6 0c0-2-3-3-3-5s3-3 3-5a3 3 0 0 0-3-3z"/><path d="M12 22v-2"/><path d="M12 2V0"/></svg>
-            {t('settings.tabs.aiModel', 'AI Engine')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('bidir-sync')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'bidir-sync' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/><path d="M18 3v12a9 9 0 0 1-9-9"/></svg>
-            {t('settings.tabs.bidirSync', 'Git Sync+')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('self-healing-test')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'self-healing-test' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/><circle cx="12" cy="12" r="3"/></svg>
-            {t('settings.tabs.selfHealingTest', 'Self-Healing')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('multi-agent-test')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'multi-agent-test' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            {t('settings.tabs.multiAgentTest', 'Multi-Agent Test')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('database-branching')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'database-branching' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
-            {t('settings.tabs.databaseBranching', 'DB Branching')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('sandbox')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'sandbox' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/><line x1="17" y1="17" x2="22" y2="17"/></svg>
-            {t('settings.tabs.sandbox', 'Sandbox')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('dynamic-intelligence')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'dynamic-intelligence' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            {t('settings.tabs.dynamicIntelligence', 'Intelligence')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-automation')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-automation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 16h.01"/><path d="M16 16h.01"/></svg>
-            {t('settings.tabs.agentAutomation', 'Agent Auto')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('usage-dashboard')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'usage-dashboard' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-            {t('settings.tabs.usageDashboard', 'Usage Metering')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('orchestration')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'orchestration' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="12" cy="5" r="2"/></svg>
-            {t('settings.tabs.orchestration', 'Orchestration')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('langgraph')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'langgraph' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4m0 12v4M2 12h4m12 0h4m-5.66-5.66 2.83-2.83M4.83 19.17l2.83-2.83m0-8.68L4.83 4.83m14.34 14.34-2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg>
-            {t('settings.tabs.langgraph', 'LangGraph')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('hybrid-cache')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'hybrid-cache' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            {t('settings.tabs.hybridCache', 'Cache')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('playwright-healing')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'playwright-healing' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/><circle cx="12" cy="12" r="3"/></svg>
-            {t('settings.tabs.playwrightHealing', 'Test Heal')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('self-healing-code')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'self-healing-code' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            {t('settings.tabs.selfHealingCode', 'Self-Heal')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('production-sandboxes')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'production-sandboxes' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-            {t('settings.tabs.productionSandboxes', 'Sandboxes')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('org-memory')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'org-memory' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            {t('settings.tabs.orgMemory', 'Org Memory')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-rules')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-rules' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            {t('settings.tabs.agentRules', 'Agent Rules')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('server-components')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'server-components' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            {t('settings.tabs.serverComponents', 'Server Components')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('code-lint')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'code-lint' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            {t('settings.tabs.codeLint', 'Code Lint')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('vector-search')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'vector-search' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            {t('settings.tabs.vectorSearch', 'Vector Search')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('repl-test')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'repl-test' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-            {t('settings.tabs.replTest', 'REPL Test')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-terminal')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-terminal' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            {t('settings.tabs.agentTerminal', 'Agent Terminal')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('composer')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'composer' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            {t('settings.tabs.composer', 'Composer')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('dotnet-perf')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'dotnet-perf' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            {t('settings.tabs.dotnetPerf', '.NET Perf')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('multi-model')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'multi-model' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-            {t('settings.tabs.multiModel', 'Multi-Model')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('biome-lint')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'biome-lint' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            {t('settings.tabs.biomeLint', 'Biome Lint')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('deepwiki')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'deepwiki' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
-            {t('settings.tabs.deepwiki', 'DeepWiki')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('build-toolchain')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'build-toolchain' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            {t('settings.tabs.buildToolchain', 'Build')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('vision-to-code')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'vision-to-code' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            {t('settings.tabs.visionToCode', 'Vision')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('dotnet10-upgrade')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'dotnet10-upgrade' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            {t('settings.tabs.dotnet10', '.NET 10')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('parallel-agents')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'parallel-agents' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-            {t('settings.tabs.parallelAgents', 'Parallel')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('webmcp')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'webmcp' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            {t('settings.tabs.webmcp', 'WebMCP')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-sdk')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-sdk' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            {t('settings.tabs.agentSdk', 'Agent SDK')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('auto-terminal')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'auto-terminal' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-            {t('settings.tabs.autoTerminal', 'Terminal')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('turso-database')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'turso-database' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-            {t('settings.tabs.tursoDatabase', 'Turso DB')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('workers-ai')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'workers-ai' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 12l8.5-5"/></svg>
-            {t('settings.tabs.workersAi', 'Workers AI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('react-use-hook')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'react-use-hook' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            {t('settings.tabs.reactUseHook', 'use() Hook')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('edit-predictions')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'edit-predictions' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-            {t('settings.tabs.editPredictions', 'Edit Predict')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('browser-ide')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'browser-ide' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            {t('settings.tabs.browserIde', 'Browser IDE')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('governance')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'governance' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            {t('settings.tabs.governance', 'Governance')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('inference-cost')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'inference-cost' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            {t('settings.tabs.inferenceCost', 'Cost Opt')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('language-expansion')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'language-expansion' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            {t('settings.tabs.langExpansion', 'Languages')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('hybrid-validation')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'hybrid-validation' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            {t('settings.tabs.hybridValidation', 'Hybrid AI')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-messages')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-messages' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            {t('settings.tabs.agentMessages', 'Agent Comms')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-trace')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-trace' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            {t('settings.tabs.agentTrace', 'Agent Trace')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agentic-workflows')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agentic-workflows' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-            {t('settings.tabs.agenticWorkflows', 'Workflows')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-trace')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-trace' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            {t('settings.tabs.agentTrace', 'Agent Trace')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('confidence-scoring')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'confidence-scoring' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-            {t('settings.tabs.confidenceScoring', 'Confidence')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('ai-marketplace')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'ai-marketplace' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            {t('settings.tabs.aiMarketplace', 'AI Models')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-inbox')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-inbox' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-            {t('settings.tabs.agentInbox', 'Agent Inbox')}
-          </span>
-        </button>
-        <button
-          onClick={() => setSettingsTab('agent-skills')}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-            settingsTab === 'agent-skills' ? 'bg-warm-700 text-white' : 'text-warm-400 hover:text-white'
-          }`}
-        >
-          <span className="flex items-center gap-1 justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            {t('settings.tabs.agentSkills', 'Agent Skills')}
-          </span>
+        {/* Mobile sidebar toggle */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden ml-auto text-warm-400 hover:text-white transition-colors"
+          aria-label={t('settings.toggleNav', 'Toggle navigation')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {sidebarOpen
+              ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+              : <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
+            }
+          </svg>
         </button>
       </div>
-      </div>
+
+      {/* Mobile collapsible sidebar */}
+      {sidebarOpen && (
+        <div className="md:hidden mb-4 bg-warm-900 rounded-lg p-3 max-h-[60vh] overflow-y-auto">
+          {sidebarNav}
+        </div>
+      )}
+
+      <div className="flex gap-6">
+        {/* Desktop sidebar */}
+        <aside className="hidden md:block w-56 shrink-0 bg-warm-900 rounded-lg p-3 max-h-[calc(100vh-8rem)] overflow-y-auto sticky top-4 settings-sidebar">
+          {sidebarNav}
+        </aside>
+
+        {/* Content area */}
+        <div className="flex-1 min-w-0">
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
       {settingsTab === 'billing' && <BillingPage />}
@@ -1596,6 +606,8 @@ export default function SettingsLayout() {
       {settingsTab === 'ai-marketplace' && <AiModelMarketplacePage />}
       {settingsTab === 'agent-inbox' && <AgentInboxPage />}
       {settingsTab === 'agent-skills' && <AgentSkillsPage />}
+        </div>
+      </div>
     </section>
   )
 }

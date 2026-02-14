@@ -1730,3 +1730,11 @@ Predict ripple effects of code changes with AST analysis, dependency graphs, and
 - **Features**: Integration code generation per provider SDK, secure credential management via environment variables, capability-based model selection (chat/image-gen/embeddings/speech/classification), cost estimation per request, browseable provider catalog with quality/speed/cost ratings
 - **Frontend**: `AiModelMarketplacePage` in Settings at `/settings/ai-marketplace` with 4 sub-tabs (Integrate, History, Providers, Stats)
 - **Ticket**: #504 — `Integrated AI model marketplace for generated apps`
+
+### Patent Agent for Innovation Discovery
+- **Backend**: `PatentInnovation` entity + `PatentAgentService` (IPatentAgentService) + `PatentAgentController` (`api/patent-agent`)
+- **Endpoints**: GET list (all innovations), GET {id} (single innovation), POST analyze (codebase scanning, seeds 8 innovations across 3 tiers), POST {id}/draft (generate patent draft), GET stats (counts by tier/status)
+- **Entity**: `PatentInnovation` with Id, Title, Category (Tier 1-3), PatentAngle, Innovation, Uniqueness, PriorArt, RelatedFiles, Status (Identified/Analyzed/DraftReady/Filed), NoveltyScore, NonObviousnessScore, UtilityScore, CommercialValueScore, CreatedAt, UpdatedAt
+- **Features**: Automated codebase analysis for patentable innovations, tiered classification (Tier 1: core platform, Tier 2: AI pipeline, Tier 3: infrastructure), patent draft generation with claims and specifications, prior art analysis, 4-dimensional scoring (novelty, non-obviousness, utility, commercial value)
+- **Frontend**: `PatentAgentPage` in Settings at `/settings/patent-agent` with 3 tabs (Innovations table, Analysis/codebase scanning, Patent Drafts/generation)
+- **Ticket**: #679 — `Patent Agent for Innovation Discovery`

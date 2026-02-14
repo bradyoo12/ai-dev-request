@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 105 Controllers | 92 Services | 116 Entities | 102 Pages | 94 API modules | 33 Components
+**Counts**: 106 Controllers | 93 Services | 117 Entities | 103 Pages | 95 API modules | 33 Components
 
 ---
 
@@ -115,6 +115,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | WorkflowController | /api/workflows | Durable workflow orchestration |
 | VisualWorkflowController | /api/visual-workflow | Visual workflow automation builder with AI generation, execution, and status |
 | A2AController | /api/a2a | Agent-to-agent protocol |
+| PatentAgentController | /api/patent-agent | Patent innovation discovery, codebase analysis, draft generation |
 
 ### Integrations
 
@@ -340,6 +341,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | LangGraphWorkflowService | LangGraph workflow execution |
 | VisualWorkflowService | Visual workflow automation with AI generation and execution |
 | A2AService | Agent-to-agent protocol |
+| PatentAgentService | Patent innovation discovery, codebase analysis, patent draft generation |
 
 ### Analytics & Marketplace
 
@@ -376,7 +378,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 
 ## Backend Entities
 
-All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
+All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 
 ### Core Domain
 
@@ -508,6 +510,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | WorkflowEdge | Workflow graph edge |
 | WorkflowAutomation | Visual workflow automation definition (nodes, edges, AI-generated) |
 | A2A | Agent-to-agent task card |
+| PatentInnovation | Patent innovation record (title, category/tier, scores, status, prior art) |
 
 ### Integrations
 
@@ -689,6 +692,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | WorkflowPage | /settings/workflows | Workflow management |
 | VisualWorkflowPage | /settings/visual-workflow | Visual workflow automation builder |
 | A2APage | /a2a | Agent-to-agent protocol |
+| PatentAgentPage | /settings/patent-agent | Patent innovation discovery with 3-tab UI (innovations, analysis, drafts) |
 
 ### Integrations
 
@@ -948,6 +952,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | workflows.ts | WorkflowController | Durable workflows |
 | visual-workflow.ts | VisualWorkflowController | Visual workflow automation |
 | a2a.ts | A2AController | Agent-to-agent |
+| patent-agent.ts | PatentAgentController | Patent innovation discovery & drafts |
 
 ### Integrations
 
@@ -1034,3 +1039,4 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | GitHub sync | GitHubSyncController + BidirectionalGitSyncController |
 | Semantic search | SemanticSearchController, EfCoreVectorSearchService, EmbeddingService |
 | Org memory | OrganizationalMemoryController, MemoryExtractionService, MemoryRetrievalService |
+| Patent agent | PatentAgentController, PatentAgentService, patent-agent.ts, PatentAgentPage |

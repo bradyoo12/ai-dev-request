@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 105 Controllers | 92 Services | 116 Entities | 101 Pages | 94 API modules | 33 Components
+**Counts**: 105 Controllers | 92 Services | 116 Entities | 102 Pages | 94 API modules | 33 Components
 
 ---
 
@@ -576,7 +576,7 @@ Data Transfer Objects under `platform/backend/AiDevRequest.API/DTOs/`.
 
 ## Frontend Pages
 
-All under `platform/frontend/src/pages/`. 98 pages total.
+All under `platform/frontend/src/pages/`. 102 pages total.
 
 ### Home & Navigation
 
@@ -585,6 +585,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | HomePage | / | Landing page with hero, features, pricing, subtask generation/approval in proposal view |
 | LoginPage | (modal) | Login/register modal |
 | NotFoundPage | * | 404 page |
+| PatentsPage | /patents | Platform patent innovations showcase (20 patents, 3 tiers) |
 | SettingsLayout | /settings/* | Settings page with 12 collapsible tab groups, search filter, auto-expand active group |
 | OnboardingPage | /settings/onboarding | User onboarding wizard |
 

@@ -973,6 +973,8 @@
   "suggestions.registerFailed": "Failed to submit suggestion.",
   "suggestions.submitSuggestion": "Submit Suggestion",
   "suggestions.submitFailed": "Failed to submit suggestion. Please try again.",
+  "suggestions.voteFailed": "Failed to register your vote. Please try again.",
+  "suggestions.voteLoginRequired": "Please log in to vote on suggestions.",
   "suggestions.backToList": "Back to list",
   "suggestions.totalCount": "{{count}} suggestions",
   "suggestions.form.category": "Category",

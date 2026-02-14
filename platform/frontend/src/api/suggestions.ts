@@ -81,7 +81,11 @@ export async function voteSuggestion(id: number): Promise<VoteResponse> {
     method: 'POST',
     headers: getAuthHeaders(),
   })
-  if (!res.ok) throw new Error('Failed to vote')
+  if (!res.ok) {
+    const err = new Error('Failed to vote') as Error & { status: number }
+    err.status = res.status
+    throw err
+  }
   return res.json()
 }
 

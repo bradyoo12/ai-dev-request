@@ -49,9 +49,13 @@ export default function SuggestionDetailPage() {
     try {
       const result = await voteSuggestion(suggestion.id)
       setSuggestion(prev => prev ? { ...prev, upvoteCount: result.upvoteCount, userVoted: result.voted } : null)
-    } catch {
-      setVoteError(t('error.requestFailed'))
-      setTimeout(() => setVoteError(''), 3000)
+    } catch (err) {
+      const status = (err as { status?: number }).status
+      const message = status === 401
+        ? t('suggestions.voteLoginRequired')
+        : t('suggestions.voteFailed')
+      setVoteError(message)
+      setTimeout(() => setVoteError(''), 5000)
     }
   }
 

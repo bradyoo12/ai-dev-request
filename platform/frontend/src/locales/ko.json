@@ -973,6 +973,8 @@
   "suggestions.registerFailed": "건의 제출에 실패했습니다.",
   "suggestions.submitSuggestion": "건의 제출",
   "suggestions.submitFailed": "건의 제출에 실패했습니다. 다시 시도해 주세요.",
+  "suggestions.voteFailed": "투표 등록에 실패했습니다. 다시 시도해 주세요.",
+  "suggestions.voteLoginRequired": "투표하려면 로그인해 주세요.",
   "suggestions.backToList": "목록으로 돌아가기",
   "suggestions.totalCount": "{{count}}개의 건의",
   "suggestions.form.category": "카테고리",

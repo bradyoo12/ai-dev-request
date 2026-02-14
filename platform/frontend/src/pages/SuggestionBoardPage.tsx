@@ -59,9 +59,13 @@ export default function SuggestionBoardPage({ onBalanceChange }: SuggestionBoard
           s.id === id ? { ...s, upvoteCount: result.upvoteCount } : s
         )
       )
-    } catch {
-      setVoteError(t('error.requestFailed'))
-      setTimeout(() => setVoteError(''), 3000)
+    } catch (err) {
+      const status = (err as { status?: number }).status
+      const message = status === 401
+        ? t('suggestions.voteLoginRequired')
+        : t('suggestions.voteFailed')
+      setVoteError(message)
+      setTimeout(() => setVoteError(''), 5000)
     }
   }
 

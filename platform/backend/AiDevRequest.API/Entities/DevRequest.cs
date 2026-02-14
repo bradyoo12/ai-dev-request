@@ -83,8 +83,6 @@ public class DevRequest
 
     public DateTime? CompletedAt { get; set; }
 
-    // Navigation properties
-    public ICollection<SubTask>? SubTasks { get; set; }
 }
 
 public enum RequestCategory

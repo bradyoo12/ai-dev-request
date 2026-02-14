@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
@@ -17,13 +18,27 @@ public class SandboxExecutionService : ISandboxExecutionService
 {
     private readonly AiDevRequestDbContext _context;
     private readonly ILogger<SandboxExecutionService> _logger;
+    private readonly IDockerExecutionService _dockerService;
+    private readonly IContainerLogStreamService _logStreamService;
+
+    // Docker images for different execution types
+    private static readonly Dictionary<string, string> ExecutionTypeImages = new()
+    {
+        { "build", "node:20-alpine" },
+        { "test", "node:20-alpine" },
+        { "preview", "node:20-alpine" },
+    };
 
     public SandboxExecutionService(
         AiDevRequestDbContext context,
-        ILogger<SandboxExecutionService> logger)
+        ILogger<SandboxExecutionService> logger,
+        IDockerExecutionService dockerService,
+        IContainerLogStreamService logStreamService)
     {
         _context = context;
         _logger = logger;
+        _dockerService = dockerService;
+        _logStreamService = logStreamService;
     }
 
     public async Task<SandboxExecution> ExecuteInSandbox(Guid devRequestId, string executionType, string command, string isolationLevel)
@@ -45,20 +60,64 @@ public class SandboxExecutionService : ISandboxExecutionService
             "Started sandbox execution {ExecutionId} for dev request {DevRequestId}: type={Type}, isolation={Isolation}, command={Command}",
             execution.Id, devRequestId, executionType, isolationLevel, command);
 
+        string? containerId = null;
+
         try
         {
-            // Simulate sandbox execution with realistic output
-            var result = SimulateExecution(executionType, command, isolationLevel);
+            // Get appropriate Docker image for execution type
+            if (!ExecutionTypeImages.TryGetValue(executionType, out var imageName))
+            {
+                imageName = "node:20-alpine"; // Default to Node.js
+            }
 
-            execution.OutputLog = result.OutputLog;
-            execution.ErrorLog = result.ErrorLog;
-            execution.ExitCode = result.ExitCode;
-            execution.ResourceUsage = JsonSerializer.Serialize(result.ResourceUsage);
-            execution.SecurityViolationsJson = result.SecurityViolations.Count > 0
-                ? JsonSerializer.Serialize(result.SecurityViolations)
+            var stopwatch = Stopwatch.StartNew();
+
+            // Pull Docker image
+            _logger.LogInformation("Pulling Docker image: {ImageName}", imageName);
+            await _dockerService.PullImageAsync(imageName);
+
+            // Prepare command for container
+            var containerCommand = PrepareContainerCommand(executionType, command);
+
+            // Create container
+            _logger.LogInformation("Creating Docker container for execution {ExecutionId}", execution.Id);
+            containerId = await _dockerService.CreateContainerAsync(imageName, containerCommand);
+
+            // Start container
+            _logger.LogInformation("Starting Docker container {ContainerId} for execution {ExecutionId}", containerId, execution.Id);
+            await _dockerService.StartContainerAsync(containerId);
+
+            // Wait for container to complete
+            var (exitCode, finishedAt) = await _dockerService.WaitForContainerAsync(containerId);
+
+            stopwatch.Stop();
+
+            // Collect logs
+            _logger.LogInformation("Collecting logs from container {ContainerId}", containerId);
+            var (stdout, stderr) = await _logStreamService.GetLogsAsync(containerId);
+
+            // Detect errors
+            var errors = await _logStreamService.DetectErrorsAsync(containerId);
+
+            // Get container stats for resource usage
+            var inspect = await _dockerService.InspectContainerAsync(containerId);
+            var resourceUsage = new ResourceUsageInfo
+            {
+                CpuPercent = 0, // Docker stats would require separate API call
+                MemoryMb = (int)(inspect.HostConfig.Memory / (1024 * 1024)), // Configured limit
+                DurationMs = (int)stopwatch.ElapsedMilliseconds,
+            };
+
+            // Update execution record
+            execution.OutputLog = stdout;
+            execution.ErrorLog = stderr;
+            execution.ExitCode = exitCode;
+            execution.ResourceUsage = JsonSerializer.Serialize(resourceUsage);
+            execution.SecurityViolationsJson = errors.Count > 0
+                ? JsonSerializer.Serialize(errors)
                 : null;
 
-            execution.Status = result.ExitCode == 0 ? "completed" : "failed";
+            execution.Status = exitCode == 0 ? "completed" : "failed";
             execution.CompletedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -80,6 +139,24 @@ public class SandboxExecutionService : ISandboxExecutionService
             _logger.LogError(ex, "Sandbox execution {ExecutionId} failed for dev request {DevRequestId}",
                 execution.Id, devRequestId);
             throw;
+        }
+        finally
+        {
+            // Cleanup: Remove container
+            if (containerId != null)
+            {
+                try
+                {
+                    _logger.LogInformation("Cleaning up container {ContainerId}", containerId);
+                    await _dockerService.StopContainerAsync(containerId, TimeSpan.FromSeconds(5));
+                    await _dockerService.RemoveContainerAsync(containerId, force: true);
+                    _logger.LogInformation("Successfully cleaned up container {ContainerId}", containerId);
+                }
+                catch (Exception cleanupEx)
+                {
+                    _logger.LogWarning(cleanupEx, "Failed to cleanup container {ContainerId}", containerId);
+                }
+            }
         }
     }
 
@@ -105,170 +182,16 @@ public class SandboxExecutionService : ISandboxExecutionService
             .FirstOrDefaultAsync(e => e.Id == executionId);
     }
 
-    private static SimulatedResult SimulateExecution(string executionType, string command, string isolationLevel)
+    private static string[] PrepareContainerCommand(string executionType, string command)
     {
-        var random = new Random();
-        var durationMs = random.Next(800, 15000);
-        var cpuPercent = Math.Round(random.NextDouble() * 80 + 5, 1);
-        var memoryMb = random.Next(64, 512);
-
-        var resourceUsage = new ResourceUsageInfo
-        {
-            CpuPercent = cpuPercent,
-            MemoryMb = memoryMb,
-            DurationMs = durationMs,
-        };
-
-        var violations = new List<string>();
-
-        // Simulate security checks based on isolation level
-        if (isolationLevel == "container" && command.Contains("sudo"))
-        {
-            violations.Add("Attempted privilege escalation via sudo (blocked)");
-        }
-        if (command.Contains("rm -rf /"))
-        {
-            violations.Add("Destructive filesystem operation blocked");
-        }
-        if (command.Contains("curl") || command.Contains("wget"))
-        {
-            if (isolationLevel != "container")
-            {
-                violations.Add("Network access restricted in " + isolationLevel + " isolation");
-            }
-        }
-
         return executionType switch
         {
-            "build" => SimulateBuild(command, resourceUsage, violations),
-            "test" => SimulateTest(command, resourceUsage, violations),
-            "preview" => SimulatePreview(command, resourceUsage, violations),
-            _ => new SimulatedResult
-            {
-                OutputLog = $"Unknown execution type: {executionType}",
-                ErrorLog = "Unsupported execution type",
-                ExitCode = 1,
-                ResourceUsage = resourceUsage,
-                SecurityViolations = violations,
-            }
+            "build" => new[] { "sh", "-c", command.Length > 0 ? command : "npm install && npm run build" },
+            "test" => new[] { "sh", "-c", command.Length > 0 ? command : "npm test" },
+            "preview" => new[] { "sh", "-c", command.Length > 0 ? command : "npm run dev" },
+            _ => new[] { "sh", "-c", command },
         };
     }
-
-    private static SimulatedResult SimulateBuild(string command, ResourceUsageInfo resourceUsage, List<string> violations)
-    {
-        var output = $@"[sandbox] Initializing build environment...
-[sandbox] Isolation: active
-[sandbox] Running: {command}
-
-> Installing dependencies...
-  added 847 packages in 12.3s
-
-> Compiling TypeScript...
-  src/index.ts -> dist/index.js
-  src/App.tsx -> dist/App.js
-  src/components/Header.tsx -> dist/components/Header.js
-  src/components/Footer.tsx -> dist/components/Footer.js
-  src/utils/helpers.ts -> dist/utils/helpers.js
-
-> Bundling with Vite...
-  dist/assets/index-a1b2c3d4.js   142.35 kB | gzip: 45.12 kB
-  dist/assets/index-e5f6g7h8.css   18.67 kB  | gzip:  4.23 kB
-  dist/index.html                   0.46 kB  | gzip:  0.31 kB
-
-Build completed successfully in {resourceUsage.DurationMs}ms";
-
-        return new SimulatedResult
-        {
-            OutputLog = output,
-            ErrorLog = "",
-            ExitCode = 0,
-            ResourceUsage = resourceUsage,
-            SecurityViolations = violations,
-        };
-    }
-
-    private static SimulatedResult SimulateTest(string command, ResourceUsageInfo resourceUsage, List<string> violations)
-    {
-        var random = new Random();
-        var totalTests = random.Next(15, 60);
-        var passedTests = totalTests - random.Next(0, 3);
-        var failedTests = totalTests - passedTests;
-
-        var output = $@"[sandbox] Initializing test environment...
-[sandbox] Isolation: active
-[sandbox] Running: {command}
-
- PASS  src/components/Header.test.tsx (8 tests)
- PASS  src/components/Footer.test.tsx (5 tests)
- PASS  src/utils/helpers.test.ts (12 tests)
-{(failedTests > 0 ? " FAIL  src/App.test.tsx (3 tests)" : " PASS  src/App.test.tsx (3 tests)")}
- PASS  src/api/client.test.ts (6 tests)
- PASS  src/hooks/useAuth.test.ts (4 tests)
-
-Test Suites: {(failedTests > 0 ? "1 failed, " : "")}{(failedTests > 0 ? 5 : 6)} passed, 6 total
-Tests:       {(failedTests > 0 ? $"{failedTests} failed, " : "")}{passedTests} passed, {totalTests} total
-Snapshots:   0 total
-Time:        {resourceUsage.DurationMs / 1000.0:F1}s
-Coverage:    {random.Next(72, 96)}% statements";
-
-        var errorLog = failedTests > 0
-            ? $@"FAIL src/App.test.tsx
-  - renders main heading
-    Expected: ""Welcome to the App""
-    Received: ""Welcome""
-
-  {failedTests} test(s) failed"
-            : "";
-
-        return new SimulatedResult
-        {
-            OutputLog = output,
-            ErrorLog = errorLog,
-            ExitCode = failedTests > 0 ? 1 : 0,
-            ResourceUsage = resourceUsage,
-            SecurityViolations = violations,
-        };
-    }
-
-    private static SimulatedResult SimulatePreview(string command, ResourceUsageInfo resourceUsage, List<string> violations)
-    {
-        var output = $@"[sandbox] Initializing preview environment...
-[sandbox] Isolation: active
-[sandbox] Running: {command}
-
-> Starting development server...
-  VITE v5.4.0  ready in 1247ms
-
-  Local:   http://localhost:3000/
-  Network: http://sandbox-preview.internal:3000/
-
-  Preview URL: https://preview-abc123.sandbox.aidev.app
-
-> Serving static files from dist/
-  index.html ........... 0.46 kB
-  assets/index.js ...... 142.35 kB
-  assets/index.css ..... 18.67 kB
-
-Preview server running. Auto-shutdown in 30 minutes.";
-
-        return new SimulatedResult
-        {
-            OutputLog = output,
-            ErrorLog = "",
-            ExitCode = 0,
-            ResourceUsage = resourceUsage,
-            SecurityViolations = violations,
-        };
-    }
-}
-
-internal class SimulatedResult
-{
-    public string OutputLog { get; set; } = "";
-    public string ErrorLog { get; set; } = "";
-    public int ExitCode { get; set; }
-    public ResourceUsageInfo ResourceUsage { get; set; } = new();
-    public List<string> SecurityViolations { get; set; } = new();
 }
 
 public class ResourceUsageInfo

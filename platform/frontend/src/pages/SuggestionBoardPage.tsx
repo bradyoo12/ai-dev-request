@@ -18,6 +18,7 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
   const [sort, setSort] = useState('newest')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [voteError, setVoteError] = useState('')
 
   const pageSize = 10
 
@@ -48,7 +49,8 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
         )
       )
     } catch {
-      // Silent fail
+      setVoteError(t('error.requestFailed'))
+      setTimeout(() => setVoteError(''), 3000)
     }
   }
 
@@ -102,6 +104,12 @@ export default function SuggestionBoardPage({ onBalanceChange: _onBalanceChange 
         <div className="bg-red-900/30 border border-red-700 rounded-xl p-4 mb-6 flex items-center justify-between">
           <span className="text-red-400">{error}</span>
           <button onClick={loadSuggestions} className="px-3 py-1 bg-red-700 hover:bg-red-600 rounded-lg text-sm">{t('common.retry')}</button>
+        </div>
+      )}
+
+      {voteError && (
+        <div className="bg-red-900/30 border border-red-700 rounded-xl p-3 mb-4 text-sm text-red-400">
+          {voteError}
         </div>
       )}
 

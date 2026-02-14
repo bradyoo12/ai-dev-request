@@ -43,7 +43,8 @@
 
 #### 2. build-and-deploy-frontend
 - Runner: `ubuntu-latest`
-- Steps: Checkout → Setup Node 20 → npm ci → npm run build → Deploy to Azure Static Web Apps
+- Steps: Checkout → Setup Node 20 → npm ci → Check for merge conflict markers → npm run build → Deploy to Azure Static Web Apps
+- Pre-build check: Scans `platform/frontend/src/locales/*.json` for merge conflict markers (`<<<<<<`, `======`, `>>>>>>`)
 - Build env: `VITE_API_URL=https://{AZURE_WEBAPP_NAME_API}.azurewebsites.net`
 - Deployment: `Azure/static-web-apps-deploy@v1`
 - Working dir: `platform/frontend`

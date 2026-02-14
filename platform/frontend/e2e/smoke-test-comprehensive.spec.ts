@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mockAuthentication } from './auth-helper';
 
 const STAGING_URL = 'https://icy-desert-07c08ba00.2.azurestaticapps.net';
-const TIMEOUT = 60000; // 60 seconds (increased from 30s to handle slower settings pages)
+const TIMEOUT = 60000; // 60 seconds (increased to handle slower settings pages)
 
 test.describe('Comprehensive UI Smoke Test', () => {
   let consoleErrors: string[] = [];
@@ -33,14 +33,11 @@ test.describe('Comprehensive UI Smoke Test', () => {
   test('should navigate to all discoverable pages without errors', async ({ page }) => {
     console.log('🔍 Starting comprehensive smoke test...');
 
-    // Navigate to home page
+    // Navigate to home page and set up authentication
     console.log('📍 Navigating to home page...');
     await page.goto(STAGING_URL, { waitUntil: 'networkidle', timeout: TIMEOUT });
-    await expect(page).toHaveTitle(/.*/);
-
-    // Set up mock authentication for protected routes
-    console.log('🔐 Setting up mock authentication...');
     await mockAuthentication(page);
+    await expect(page).toHaveTitle(/.*/);
 
     // Collect all links on the page
     const links = await page.locator('a[href]').all();
@@ -74,8 +71,9 @@ test.describe('Comprehensive UI Smoke Test', () => {
         errors.push(`❌ Failed to navigate to ${href}: ${error instanceof Error ? error.message : String(error)}`);
       }
 
-      // Go back to home page
+      // Go back to home page and restore authentication
       await page.goto(STAGING_URL, { waitUntil: 'networkidle', timeout: TIMEOUT });
+      await mockAuthentication(page);
     }
 
     // Collect all buttons
@@ -107,8 +105,9 @@ test.describe('Comprehensive UI Smoke Test', () => {
         errors.push(`❌ Failed to click button "${buttonText?.trim()}": ${error instanceof Error ? error.message : String(error)}`);
       }
 
-      // Reload page to reset state
+      // Reload page to reset state and restore authentication
       await page.goto(STAGING_URL, { waitUntil: 'networkidle', timeout: TIMEOUT });
+      await mockAuthentication(page);
     }
 
     // Report findings

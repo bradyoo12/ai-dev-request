@@ -1316,6 +1316,14 @@ Log the current status of the project board:
 
 ## Important Notes
 
+- **Claude Usage Limit Account Switching** — Two Claude accounts are available to maximize throughput when hitting weekly or session usage limits:
+  - Account A: `brad.yoo@xbert.io`
+  - Account B: `yoohoony@gmail.com`
+  - When hitting ~90% of the Claude weekly limit or current session usage limit, switch to the other account:
+    - If currently on `brad.yoo@xbert.io` → switch to `yoohoony@gmail.com`
+    - If currently on `yoohoony@gmail.com` → switch to `brad.yoo@xbert.io`
+  - If both accounts are at 90% or above, continue using the current account to 100%, then switch to the other account
+  - Log the switch: "Claude usage limit approaching — switching from <current> to <other>"
 - **Account Switching Strategy** — Two GitHub accounts are available to double the effective rate limit:
   - Primary: `bradyoo12` (bradyoo12@outlook.com)
   - Secondary: `byooxbert` (brad.yoo@xbert.io)

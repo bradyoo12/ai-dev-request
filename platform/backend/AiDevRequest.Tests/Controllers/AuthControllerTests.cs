@@ -394,7 +394,7 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void GetAuthUrl_ReturnsBadRequest_WhenProviderNotConfigured()
+    public void GetAuthUrl_Returns503_WhenProviderNotConfigured()
     {
         var socialAuthService = new Mock<ISocialAuthService>();
         socialAuthService.Setup(s => s.GetAuthorizationUrl("line", It.IsAny<string>(), It.IsAny<string>()))
@@ -404,6 +404,70 @@ public class AuthControllerTests
         ControllerTestHelper.SetupAnonymous(controller);
 
         var result = controller.GetAuthUrl("line", "https://callback.com", "state123");
+
+        var statusResult = result.Result.Should().BeOfType<ObjectResult>().Subject;
+        statusResult.StatusCode.Should().Be(503);
+        var errorResponse = statusResult.Value.Should().BeOfType<OAuthErrorResponseDto>().Subject;
+        errorResponse.Error.Should().Be("line_oauth_not_configured");
+        errorResponse.Message.Should().Contain("LINE OAuth is not configured");
+    }
+
+    [Theory]
+    [InlineData("google", "google_oauth_not_configured", "Google OAuth")]
+    [InlineData("apple", "apple_oauth_not_configured", "Apple OAuth")]
+    [InlineData("kakao", "kakao_oauth_not_configured", "Kakao OAuth")]
+    public void GetAuthUrl_Returns503WithStructuredError_ForEachProvider(string provider, string expectedErrorCode, string expectedMessageFragment)
+    {
+        var socialAuthService = new Mock<ISocialAuthService>();
+        socialAuthService.Setup(s => s.GetAuthorizationUrl(provider, It.IsAny<string>(), It.IsAny<string>()))
+            .Throws(new InvalidOperationException($"{provider} ClientId not configured"));
+
+        var controller = CreateController(socialAuthService: socialAuthService);
+        ControllerTestHelper.SetupAnonymous(controller);
+
+        var result = controller.GetAuthUrl(provider, "https://callback.com", "state123");
+
+        var statusResult = result.Result.Should().BeOfType<ObjectResult>().Subject;
+        statusResult.StatusCode.Should().Be(503);
+        var errorResponse = statusResult.Value.Should().BeOfType<OAuthErrorResponseDto>().Subject;
+        errorResponse.Error.Should().Be(expectedErrorCode);
+        errorResponse.Message.Should().Contain(expectedMessageFragment);
+    }
+
+    // ===== SocialLogin OAuth Not Configured =====
+
+    [Fact]
+    public async Task SocialLogin_Returns503_WhenProviderNotConfigured()
+    {
+        var socialAuthService = new Mock<ISocialAuthService>();
+        socialAuthService.Setup(s => s.SocialLoginAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>()))
+            .ThrowsAsync(new InvalidOperationException("Google ClientId not configured"));
+
+        var controller = CreateController(socialAuthService: socialAuthService);
+        ControllerTestHelper.SetupAnonymous(controller);
+
+        var result = await controller.SocialLogin("google", new SocialLoginRequestDto { Code = "auth-code" });
+
+        var statusResult = result.Result.Should().BeOfType<ObjectResult>().Subject;
+        statusResult.StatusCode.Should().Be(503);
+        var errorResponse = statusResult.Value.Should().BeOfType<OAuthErrorResponseDto>().Subject;
+        errorResponse.Error.Should().Be("google_oauth_not_configured");
+        errorResponse.Message.Should().Contain("Google OAuth is not configured");
+    }
+
+    [Fact]
+    public async Task SocialLogin_ReturnsBadRequest_WhenOtherExceptionOccurs()
+    {
+        var socialAuthService = new Mock<ISocialAuthService>();
+        socialAuthService.Setup(s => s.SocialLoginAsync(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>()))
+            .ThrowsAsync(new InvalidOperationException("Token exchange failed: invalid_grant"));
+
+        var controller = CreateController(socialAuthService: socialAuthService);
+        ControllerTestHelper.SetupAnonymous(controller);
+
+        var result = await controller.SocialLogin("google", new SocialLoginRequestDto { Code = "bad-code" });
 
         result.Result.Should().BeOfType<BadRequestObjectResult>();
     }

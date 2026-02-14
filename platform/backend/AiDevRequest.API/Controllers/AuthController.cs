@@ -111,6 +111,7 @@ public class AuthController : ControllerBase
     [EnableRateLimiting("auth-login")]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(OAuthErrorResponseDto), StatusCodes.Status503ServiceUnavailable)]
     public async Task<ActionResult<AuthResponseDto>> SocialLogin(string provider, [FromBody] SocialLoginRequestDto dto)
     {
         var validProviders = new[] { "google", "kakao", "line", "apple" };
@@ -143,6 +144,15 @@ public class AuthController : ControllerBase
                 }
             });
         }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not configured"))
+        {
+            _logger.LogWarning(ex, "OAuth provider {Provider} is not configured", provider);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new OAuthErrorResponseDto
+            {
+                Error = $"{provider.ToLower()}_oauth_not_configured",
+                Message = $"{char.ToUpper(provider[0]) + provider[1..]} OAuth is not configured for this environment."
+            });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Social login failed for {Provider}", provider);
@@ -163,6 +173,7 @@ public class AuthController : ControllerBase
     [HttpGet("{provider}/url")]
     [ProducesResponseType(typeof(AuthUrlResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(OAuthErrorResponseDto), StatusCodes.Status503ServiceUnavailable)]
     public ActionResult<AuthUrlResponseDto> GetAuthUrl(string provider, [FromQuery] string redirectUri, [FromQuery] string? state)
     {
         var validProviders = new[] { "google", "kakao", "line", "apple" };
@@ -178,8 +189,12 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "OAuth configuration error for {Provider}", provider);
-            return BadRequest(new { error = $"{provider} login is not configured. Please contact support." });
+            _logger.LogWarning(ex, "OAuth provider {Provider} is not configured", provider);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new OAuthErrorResponseDto
+            {
+                Error = $"{provider.ToLower()}_oauth_not_configured",
+                Message = $"{char.ToUpper(provider[0]) + provider[1..]} OAuth is not configured for this environment."
+            });
         }
     }
 
@@ -258,4 +273,10 @@ public record ProvidersResponseDto
 public record AuthUrlResponseDto
 {
     public string Url { get; init; } = "";
+}
+
+public record OAuthErrorResponseDto
+{
+    public string Error { get; init; } = "";
+    public string Message { get; init; } = "";
 }

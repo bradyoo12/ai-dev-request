@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 102 Controllers | 89 Services | 113 Entities | 99 Pages | 92 API modules | 33 Components
+**Counts**: 103 Controllers | 90 Services | 115 Entities | 100 Pages | 93 API modules | 33 Components
 
 ---
 
@@ -71,6 +71,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | AutonomousTestingController | /api/autonomous-testing | Self-healing test execution |
 | VisualRegressionController | /api/visual-regression | Visual regression testing |
 | SelfHealingTestController | /api/self-healing-test | Self-healing code generation |
+| PlaywrightMcpController | /api/playwright-mcp | AI-powered Playwright test generation & self-healing |
 
 ### Infrastructure & Deployment
 
@@ -270,6 +271,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | TestGenerationService | AI test generation |
 | AutonomousTestingService | Autonomous test execution |
 | LiveBrowserTestRunner | Live browser test runner |
+| PlaywrightMcpService | AI-powered Playwright test generation & self-healing |
 
 ### Security
 
@@ -456,6 +458,8 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | AutonomousTestExecution | Autonomous test execution |
 | LiveBrowserTestResult | Live browser test result |
 | VisualRegressionResult | Visual regression test result |
+| PlaywrightMcpTestConfig | Playwright MCP test config (scenario, generated code, healing history, status) |
+| TestHealingRecord | Test self-healing record (original/updated locator, strategy, success) |
 
 ### Infrastructure & Deployment
 
@@ -630,6 +634,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | TestGenerationPage | /settings/test-generation | AI test generation |
 | VisualRegressionPage | /settings/visual-regression | Visual regression testing |
 | SelfHealingTestPage | /settings/self-healing-test | Self-healing tests |
+| PlaywrightMcpPage | /settings/playwright-mcp | AI Playwright test generation & self-healing |
 
 ### Infrastructure & Deployment
 
@@ -887,6 +892,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 |---|---|---|
 | test-generation.ts (not named) | TestGenerationController | Test generation |
 | visualregression.ts | VisualRegressionController | Visual regression |
+| playwright-mcp.ts | PlaywrightMcpController | Playwright MCP test generation & self-healing |
 
 ### Infrastructure
 

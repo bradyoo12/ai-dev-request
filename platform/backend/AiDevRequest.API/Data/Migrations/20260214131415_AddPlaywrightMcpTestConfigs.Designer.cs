@@ -3,6 +3,7 @@ using System;
 using AiDevRequest.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiDevRequest.API.Data.Migrations
 {
     [DbContext(typeof(AiDevRequestDbContext))]
-    partial class AiDevRequestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260214131415_AddPlaywrightMcpTestConfigs")]
+    partial class AddPlaywrightMcpTestConfigs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5245,59 +5248,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LanguageExpansions");
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.LocalModelConfig", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CapabilitiesJson")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("CostPerSecond")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DisplayName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("GpuCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("GpuType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("HealthCheckUrl")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("MaxTokens")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ModelLocation")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ModelName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LocalModelConfigs");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.MarketplaceTemplate", b =>

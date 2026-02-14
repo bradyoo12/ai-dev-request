@@ -1421,3 +1421,8 @@ Log the current status of the project board:
 - **Problem**: Setting ConnectionStrings__DefaultConnection via "az webapp config appsettings set" mangled the password — the "!" character was escaped to "\!" by bash history expansion, even with single quotes.
 - **Solution**: Used `az rest --method PUT --body @file.json` with the connection string in a JSON file to bypass all shell escaping.
 - **Prevention**: For Azure App Settings containing special characters, always use `az rest` with a JSON body file instead of `az webapp config appsettings set`.
+
+### [2026-02-14] Startup allTables check blocks MigrateAsync from creating new tables
+- **Problem**: Adding new tables to the `allTables` array in `Program.cs` causes the startup partial-database detection to throw `InvalidOperationException` in staging/production before `MigrateAsync` runs. This creates a chicken-and-egg problem: migrations can't create new tables because the startup crashes when those tables don't exist.
+- **Solution**: Changed the partial-database path in staging/production from throwing to logging a warning and proceeding with `MigrateAsync`. Also made migrations idempotent (IF EXISTS/IF NOT EXISTS) and made SupportController fault-tolerant for schema mismatches.
+- **Prevention**: Never throw before `MigrateAsync` for missing tables — missing tables are usually just pending migrations. Always make migrations idempotent with IF EXISTS/IF NOT EXISTS guards. Make controllers fault-tolerant with try-catch for database queries that may fail due to schema differences.

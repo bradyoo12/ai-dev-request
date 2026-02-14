@@ -75,6 +75,16 @@ export default function HomePage() {
   const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.slice(1)
+      const el = document.getElementById(id)
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
+      }
+    }
+  }, [location.hash])
+
+  useEffect(() => {
     const loadPricingPlans = async () => {
       try {
         const plans = await getPricingPlans()

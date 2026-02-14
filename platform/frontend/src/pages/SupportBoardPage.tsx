@@ -440,7 +440,7 @@ export default function SupportBoardPage() {
             onClick={() => loadPosts()}
             className="px-4 py-2 bg-accent-blue/20 text-accent-blue border border-accent-blue/30 rounded-lg text-sm hover:bg-accent-blue/30 transition-all"
           >
-            Retry
+            {t('common.retry')}
           </button>
         </div>
       ) : posts.length === 0 ? (

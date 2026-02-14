@@ -95,7 +95,9 @@ public class SocialAuthServiceTests
         Assert.NotEmpty(url);
         Assert.Contains("kauth.kakao.com", url);
         // Kakao requires comma-separated scopes, not space-separated
-        Assert.Contains("scope=profile_nickname%2Cprofile_image%2Caccount_email", url);
+        // Note: account_email removed - requires business verification
+        Assert.Contains("scope=profile_nickname%2Cprofile_image", url);
+        Assert.DoesNotContain("account_email", url);
     }
 
     [Fact]
@@ -528,5 +530,56 @@ public class SocialAuthServiceTests
 
         // Verify Content-Type is application/x-www-form-urlencoded
         Assert.Equal("application/x-www-form-urlencoded", capturedRequest.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task KakaoOAuth_UsesPlaceholderEmailWhenNotProvided()
+    {
+        // Arrange
+        var mockHandler = new Mock<HttpMessageHandler>();
+
+        // Mock token exchange response
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri != null &&
+                    req.RequestUri.ToString() == "https://kauth.kakao.com/oauth/token"),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("{\"access_token\":\"test-access-token\",\"token_type\":\"bearer\"}", Encoding.UTF8, "application/json")
+            });
+
+        // Mock user info response WITHOUT email (account_email scope not granted)
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri != null &&
+                    req.RequestUri.ToString() == "https://kapi.kakao.com/v2/user/me"),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("{\"id\":987654321,\"kakao_account\":{\"profile\":{\"nickname\":\"TestUser\",\"profile_image_url\":\"https://example.com/pic.jpg\"}}}", Encoding.UTF8, "application/json")
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var mockFactory = new Mock<IHttpClientFactory>();
+        mockFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var (service, _, _) = CreateService(mockFactory);
+
+        // Act
+        var (user, token) = await service.SocialLoginAsync("kakao", "test-code", "https://example.com/callback", null);
+
+        // Assert
+        Assert.NotNull(user);
+        Assert.Equal("987654321@kakao.placeholder", user.Email); // Should use placeholder email
+        Assert.Equal("987654321", user.KakaoId);
+        Assert.Equal("TestUser", user.DisplayName);
+        Assert.Equal("https://example.com/pic.jpg", user.ProfileImageUrl);
     }
 }

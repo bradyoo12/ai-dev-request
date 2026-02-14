@@ -443,7 +443,8 @@ public class SocialAuthService : ISocialAuthService
         var clientId = _configuration["OAuth:Kakao:ClientId"]
             ?? throw new InvalidOperationException("Kakao ClientId not configured");
         // Kakao requires comma-separated scopes (not space-separated like OAuth2 standard)
-        var scope = "profile_nickname,profile_image,account_email";
+        // Note: account_email requires business verification - using placeholder email fallback
+        var scope = "profile_nickname,profile_image";
         return $"https://kauth.kakao.com/oauth/authorize?client_id={Uri.EscapeDataString(clientId)}&redirect_uri={Uri.EscapeDataString(redirectUri)}&response_type=code&scope={Uri.EscapeDataString(scope)}&state={Uri.EscapeDataString(state)}";
     }
 

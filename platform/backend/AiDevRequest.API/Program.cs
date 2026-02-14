@@ -115,6 +115,7 @@ builder.Services.AddScoped<IProjectAggregationService, ProjectAggregationService
 builder.Services.AddScoped<IPlaywrightMcpService, PlaywrightMcpService>();
 builder.Services.AddScoped<ILocalModelInferenceService, LocalModelInferenceService>();
 builder.Services.AddScoped<IVisualWorkflowService, VisualWorkflowService>();
+builder.Services.AddScoped<IPatentAgentService, PatentAgentService>();
 
 // Add SSR (Server-Side Rendering) service for pre-rendered page delivery
 builder.Services.AddSingleton<ISsrService, SsrService>();

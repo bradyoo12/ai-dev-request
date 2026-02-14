@@ -43,7 +43,8 @@
 
 #### 2. build-and-deploy-frontend
 - Runner: `ubuntu-latest`
-- Steps: Checkout → Setup Node 20 → npm ci → npm run build → Deploy to Azure Static Web Apps
+- Steps: Checkout → Setup Node 20 → npm ci → Check for merge conflict markers → npm run build → Deploy to Azure Static Web Apps
+- Pre-build check: Scans `platform/frontend/src/locales/*.json` for merge conflict markers (`<<<<<<`, `======`, `>>>>>>`)
 - Build env: `VITE_API_URL=https://{AZURE_WEBAPP_NAME_API}.azurewebsites.net`
 - Deployment: `Azure/static-web-apps-deploy@v1`
 - Working dir: `platform/frontend`
@@ -100,6 +101,16 @@ AZURE_WEBAPP_NAME_WEB: ai-dev-request-web
 | `Jwt__Issuer` | JWT issuer (default: `AiDevRequest`) |
 | `Stripe__SecretKey` | Stripe payment API key |
 | `Stripe__WebhookSecret` | Stripe webhook signing secret |
+| `OAuth__Google__ClientId` | Google OAuth Client ID |
+| `OAuth__Google__ClientSecret` | Google OAuth Client Secret |
+| `OAuth__Kakao__ClientId` | Kakao REST API Key |
+| `OAuth__Kakao__ClientSecret` | Kakao Client Secret (optional but recommended) |
+| `OAuth__Apple__ClientId` | Apple Service ID |
+| `OAuth__Apple__TeamId` | Apple Team ID |
+| `OAuth__Apple__KeyId` | Apple Key ID |
+| `OAuth__Apple__PrivateKey` | Apple Private Key (PEM format) |
+| `OAuth__Line__ChannelId` | LINE Channel ID |
+| `OAuth__Line__ChannelSecret` | LINE Channel Secret |
 
 ### Frontend
 | Variable | Purpose |
@@ -139,6 +150,29 @@ Allowed origins:
 - **Token expiry**: 7 days (dev), configurable
 - **Frontend**: Stored in localStorage, sent via `Authorization: Bearer` header
 - **Auth wrapper**: `authFetch()` in `src/api/auth.ts` auto-handles JWT + 401 redirect
+
+### OAuth Redirect URIs (Register in Provider Consoles)
+
+**Development**:
+- `http://localhost:5173/auth/callback/{provider}`
+
+**Staging**:
+- `https://icy-desert-07c08ba00.2.azurestaticapps.net/auth/callback/{provider}`
+
+**Production**:
+- `https://ai-dev-request.kr/auth/callback/{provider}`
+
+Replace `{provider}` with: `google`, `kakao`, `apple`, or `line`
+
+### Kakao OAuth Setup
+
+1. Go to [Kakao Developers Console](https://developers.kakao.com)
+2. Create/select your app
+3. **Web Platform**: Add redirect URIs (see above)
+4. **Kakao Login**: Activate
+5. **Consent Items**: Enable `profile_nickname`, `profile_image` (required), `account_email` (optional, needs business verification)
+6. **Security**: Get REST API Key (Client ID) from App Settings → App Keys
+7. **Client Secret**: Enable in Security → Client Secret (recommended for production)
 
 ## BradYoo.Core Dependency
 

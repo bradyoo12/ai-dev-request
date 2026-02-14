@@ -153,9 +153,14 @@ public class AuthController : ControllerBase
                 Message = $"{char.ToUpper(provider[0]) + provider[1..]} OAuth is not configured for this environment."
             });
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Network error during {Provider} OAuth - check redirect URI or provider availability", provider);
+            return BadRequest(new { error = "Network error during login. Please check your internet connection and try again." });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Social login failed for {Provider}", provider);
+            _logger.LogError(ex, "Social login failed for {Provider} - Message: {Message}", provider, ex.Message);
             return BadRequest(new { error = "Social login failed. Please try again." });
         }
     }

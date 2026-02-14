@@ -339,9 +339,7 @@ test.describe('Iterative Code Refinement', () => {
 
   test.describe('Error Handling', () => {
     test('should handle network errors gracefully', async ({ page }) => {
-      // TODO: Implement after backend is ready
-      // May require intercepting network requests
-
+      // Intercept both streaming and non-streaming iteration endpoints
       await page.route('**/api/dev-request/*/iterate/stream', route => route.abort())
       await page.route('**/api/dev-request/*/iterate', route => route.abort())
 

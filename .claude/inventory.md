@@ -766,6 +766,8 @@ All under `platform/frontend/src/components/`.
 | PowerLevelSelector | AI power level (model) selector |
 | LanguageSelector | Programming language picker |
 | PlanSelectionDialog | Plan/subscription selection modal |
+| CreditEstimatePreview | Compact credit cost preview in request form |
+| CreditEstimateCard | Detailed credit usage summary with step breakdown |
 
 ### Code Quality
 

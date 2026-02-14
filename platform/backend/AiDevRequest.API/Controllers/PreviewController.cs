@@ -9,13 +9,19 @@ public class PreviewController : ControllerBase
 {
     private readonly IPreviewDeploymentService _previewService;
     private readonly IPromoteToProductionService _promoteService;
+    private readonly IContainerLogStreamService _logStreamService;
+    private readonly ILogger<PreviewController> _logger;
 
     public PreviewController(
         IPreviewDeploymentService previewService,
-        IPromoteToProductionService promoteService)
+        IPromoteToProductionService promoteService,
+        IContainerLogStreamService logStreamService,
+        ILogger<PreviewController> logger)
     {
         _previewService = previewService;
         _promoteService = promoteService;
+        _logStreamService = logStreamService;
+        _logger = logger;
     }
 
     [HttpPost("preview/deploy")]
@@ -123,6 +129,51 @@ public class PreviewController : ControllerBase
             Reason = errorMessage
         });
     }
+
+    [HttpPost("preview/{previewId}/stream-logs")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> StreamLogs(Guid projectId, Guid previewId, [FromBody] StreamLogsRequest request)
+    {
+        try
+        {
+            var preview = await _previewService.GetPreviewStatusAsync(projectId);
+            if (preview == null || preview.Id != previewId)
+            {
+                return NotFound(new { error = "Preview deployment not found" });
+            }
+
+            if (string.IsNullOrEmpty(preview.ContainerName))
+            {
+                return BadRequest(new { error = "Container name not available for this preview" });
+            }
+
+            // Start streaming logs in the background
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _logStreamService.StreamLogsToSignalRAsync(
+                        preview.ContainerName,
+                        previewId,
+                        CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Background log streaming failed for preview {PreviewId}", previewId);
+                }
+            });
+
+            return Accepted(new { message = "Log streaming started", previewId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start log streaming for preview {PreviewId}", previewId);
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     private static PreviewDeploymentDto ToDto(Entities.PreviewDeployment p) => new()
     {
         Id = p.Id,
@@ -178,4 +229,9 @@ public record CanPromoteDto
 {
     public bool CanPromote { get; init; }
     public string? Reason { get; init; }
+}
+
+public record StreamLogsRequest
+{
+    // Empty for now, can add options later (e.g., tail count, filter)
 }

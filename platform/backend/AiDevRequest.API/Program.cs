@@ -231,6 +231,9 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Add CORS for frontend
 builder.Services.AddCors(options =>
 {
@@ -243,6 +246,7 @@ builder.Services.AddCors(options =>
                 "https://ai-dev-request.kr" // Production (future)
             )
             .AllowAnyHeader()
+            .AllowCredentials()
             .WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS");
     });
 });
@@ -518,6 +522,9 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Map SignalR hubs
+app.MapHub<AiDevRequest.API.Hubs.PreviewLogsHub>("/hubs/preview-logs");
 
 // Health check endpoint with DB verification
 app.MapHealthChecks("/health");

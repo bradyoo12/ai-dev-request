@@ -188,6 +188,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<LocalModelConfig> LocalModelConfigs => Set<LocalModelConfig>();
     public DbSet<WorkflowAutomation> WorkflowAutomations => Set<WorkflowAutomation>();
     public DbSet<WorkflowAutomationRun> WorkflowAutomationRuns => Set<WorkflowAutomationRun>();
+    public DbSet<PatentInnovation> PatentInnovations => Set<PatentInnovation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2010,6 +2011,23 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FailureReason).IsRequired().HasMaxLength(5000);
             entity.Property(e => e.HealingStrategy).IsRequired().HasMaxLength(1000);
             entity.HasIndex(e => e.TestConfigId);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<PatentInnovation>(entity =>
+        {
+            entity.ToTable("patent_innovations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.PatentAngle).HasColumnType("text");
+            entity.Property(e => e.Innovation).HasColumnType("text");
+            entity.Property(e => e.Uniqueness).HasColumnType("text");
+            entity.Property(e => e.PriorArt).HasColumnType("text");
+            entity.Property(e => e.RelatedFiles).HasColumnType("text");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
         });
     }

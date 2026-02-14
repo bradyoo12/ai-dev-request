@@ -4352,5 +4352,22 @@
   "tickets.activity.proposed": "제안서가 생성되었습니다",
   "tickets.activity.projectCreated": "프로젝트가 생성되었습니다",
   "tickets.activity.viewProject": "프로젝트 보기",
-  "tickets.activity.cancelled": "요청이 취소되었습니다"
+  "tickets.activity.cancelled": "요청이 취소되었습니다",
+
+  "subtasks.title": "하위 작업",
+  "subtasks.empty": "이 요청에 대한 하위 작업이 없습니다.",
+  "subtasks.approve": "승인",
+  "subtasks.approveAll": "전체 승인",
+  "subtasks.approving": "승인 중...",
+  "subtasks.dependsOn": "의존 대상",
+  "subtasks.dependency": "의존성",
+  "subtasks.credits": "크레딧",
+  "subtasks.order": "순서",
+  "subtasks.addSubtask": "하위 작업 추가",
+  "subtasks.status.pending": "대기 중",
+  "subtasks.status.approved": "승인됨",
+  "subtasks.status.rejected": "거절됨",
+  "subtasks.status.inprogress": "진행 중",
+  "subtasks.status.completed": "완료됨",
+  "subtasks.status.cancelled": "취소됨"
 }

@@ -69,9 +69,10 @@ describe('Layout', () => {
 
   it('renders primary navigation links for authenticated user', () => {
     render(<Layout />)
+    expect(screen.getByText('header.projects')).toBeInTheDocument()
+    expect(screen.getByText('header.myTickets')).toBeInTheDocument()
     expect(screen.getByText('header.mySites')).toBeInTheDocument()
     expect(screen.getByText('header.suggestions')).toBeInTheDocument()
-    expect(screen.getByText('header.settings')).toBeInTheDocument()
   })
 
   it('renders user display name', () => {

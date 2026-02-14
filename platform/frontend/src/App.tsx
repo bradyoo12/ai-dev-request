@@ -32,6 +32,7 @@ const SupportBoardPage = lazy(() => import('./pages/SupportBoardPage'))
 // const SubagentOrchestrationPage = lazy(() => import('./pages/SubagentOrchestrationPage'))
 const IterativeRefinementPage = lazy(() => import('./pages/IterativeRefinementPage'))
 const TemplatesPage = lazy(() => import('./pages/TemplatesPage'))
+const TicketProgressPage = lazy(() => import('./pages/TicketProgressPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {
@@ -79,6 +80,7 @@ function App() {
             <Route path="/settings/agent-automation" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/usage-dashboard" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/ai-model" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/tickets" element={<ProtectedRoute><Suspense fallback={LazyFallback}><TicketProgressPage /></Suspense></ProtectedRoute>} />
             <Route path="/projects" element={<Suspense fallback={LazyFallback}><ProjectsPage /></Suspense>} />
             <Route path="/projects/:id" element={<Suspense fallback={LazyFallback}><ProjectDetailPage /></Suspense>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />

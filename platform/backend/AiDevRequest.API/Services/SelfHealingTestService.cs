@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AiDevRequest.API.Controllers;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using Anthropic.SDK;
@@ -12,6 +13,8 @@ public interface ISelfHealingTestService
     Task<SelfHealingTestResult> RunSelfHealingAnalysis(Guid devRequestId);
     Task<SelfHealingTestResult?> GetLatestResult(Guid devRequestId);
     Task<List<SelfHealingTestResult>> GetHistory(Guid devRequestId);
+    Task<LocatorRepairResult> RepairLocatorsAsync(Guid devRequestId, List<BrokenLocatorInput> brokenLocators);
+    Task<List<HealingTimelineEntry>> GetHealingTimelineAsync(Guid devRequestId);
 }
 
 public class SelfHealingTestService : ISelfHealingTestService
@@ -143,6 +146,158 @@ public class SelfHealingTestService : ISelfHealingTestService
             .ToListAsync();
     }
 
+    public async Task<LocatorRepairResult> RepairLocatorsAsync(Guid devRequestId, List<BrokenLocatorInput> brokenLocators)
+    {
+        _logger.LogInformation("Repairing {Count} broken locators for dev request {DevRequestId}",
+            brokenLocators.Count, devRequestId);
+
+        var locatorsSummary = string.Join("\n", brokenLocators.Select(l =>
+            $"- Test: {l.TestName} in {l.TestFile}\n  Broken locator: {l.OriginalLocator}\n  Error: {l.ErrorMessage ?? "N/A"}"));
+
+        var prompt = $@"You are a Playwright MCP expert specializing in self-healing test locators. Repair the following broken locators using intelligent alternatives.
+
+## Broken Locators
+{locatorsSummary}
+
+## Repair Strategy Priority
+1. Use data-testid attributes (most stable)
+2. Use ARIA roles and labels (getByRole, getByLabel)
+3. Use visible text content (getByText)
+4. Use semantic selectors (heading, button, link)
+5. Fall back to CSS selectors with structural context
+
+## Requirements
+- Each repaired locator must be a valid Playwright locator
+- Include confidence score (0-100) for each repair
+- Explain the repair strategy used
+- Prefer resilient locators that survive UI changes
+
+Respond with ONLY a JSON object:
+{{
+  ""repairedLocators"": [
+    {{
+      ""testFile"": ""file path"",
+      ""testName"": ""test name"",
+      ""originalLocator"": ""broken locator"",
+      ""repairedLocatorValue"": ""new Playwright locator"",
+      ""strategy"": ""strategy name (data-testid, role, text, css, etc.)"",
+      ""confidence"": 0-100,
+      ""reason"": ""explanation of repair""
+    }}
+  ],
+  ""totalRepaired"": number,
+  ""totalFailed"": number,
+  ""overallConfidence"": 0-100,
+  ""summary"": ""brief summary""
+}}
+
+JSON only.";
+
+        try
+        {
+            var messages = new List<Message> { new Message(RoleType.User, prompt) };
+            var parameters = new MessageParameters
+            {
+                Messages = messages,
+                Model = "claude-sonnet-4-20250514",
+                MaxTokens = 4000,
+                Temperature = 0.3m
+            };
+
+            var response = await _client.Messages.GetClaudeMessageAsync(parameters);
+            var content = response.Content.FirstOrDefault()?.ToString() ?? "{}";
+
+            var repairResult = StructuredOutputHelper.DeserializeResponse<LocatorRepairResult>(content);
+            if (repairResult != null)
+            {
+                _logger.LogInformation("Repaired {Count} locators with {Confidence}% confidence",
+                    repairResult.TotalRepaired, repairResult.OverallConfidence);
+                return repairResult;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Locator repair failed for dev request {DevRequestId}", devRequestId);
+        }
+
+        return new LocatorRepairResult
+        {
+            Summary = "Locator repair could not be completed.",
+        };
+    }
+
+    public async Task<List<HealingTimelineEntry>> GetHealingTimelineAsync(Guid devRequestId)
+    {
+        var results = await _context.SelfHealingTestResults
+            .Where(r => r.DevRequestId == devRequestId)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(20)
+            .ToListAsync();
+
+        var timeline = new List<HealingTimelineEntry>();
+
+        foreach (var result in results)
+        {
+            // Parse healed tests
+            if (!string.IsNullOrEmpty(result.HealedTestsJson))
+            {
+                try
+                {
+                    var healed = JsonSerializer.Deserialize<List<HealedTestDetail>>(result.HealedTestsJson);
+                    if (healed != null)
+                    {
+                        foreach (var h in healed)
+                        {
+                            timeline.Add(new HealingTimelineEntry
+                            {
+                                Id = Guid.NewGuid(),
+                                Timestamp = result.UpdatedAt ?? result.CreatedAt,
+                                Action = "healed",
+                                TestName = h.TestName,
+                                OriginalLocator = h.OriginalCode,
+                                HealedLocator = h.FixedCode,
+                                Confidence = h.Confidence,
+                                Reason = h.Reason,
+                                AnalysisVersion = result.AnalysisVersion,
+                            });
+                        }
+                    }
+                }
+                catch { /* Skip malformed JSON */ }
+            }
+
+            // Parse failed tests
+            if (!string.IsNullOrEmpty(result.FailedTestDetailsJson))
+            {
+                try
+                {
+                    var failed = JsonSerializer.Deserialize<List<FailedTestDetail>>(result.FailedTestDetailsJson);
+                    if (failed != null)
+                    {
+                        foreach (var f in failed)
+                        {
+                            timeline.Add(new HealingTimelineEntry
+                            {
+                                Id = Guid.NewGuid(),
+                                Timestamp = result.UpdatedAt ?? result.CreatedAt,
+                                Action = "failed",
+                                TestName = f.TestName,
+                                OriginalLocator = null,
+                                HealedLocator = null,
+                                Confidence = 0,
+                                Reason = f.ErrorMessage,
+                                AnalysisVersion = result.AnalysisVersion,
+                            });
+                        }
+                    }
+                }
+                catch { /* Skip malformed JSON */ }
+            }
+        }
+
+        return timeline.OrderByDescending(t => t.Timestamp).ToList();
+    }
+
     private async Task<string?> ResolveProjectPathAsync(Guid devRequestId)
     {
         var devRequest = await _context.DevRequests
@@ -190,7 +345,7 @@ public class SelfHealingTestService : ISelfHealingTestService
         if (testSummary.Length > 40000)
             testSummary = testSummary[..40000] + "\n\n... (additional test files truncated)";
 
-        var prompt = $@"You are a senior test engineer specializing in self-healing test automation. Analyze the following source code and test files to identify failing or fragile tests and generate fixes.
+        var prompt = $@"You are a senior test engineer specializing in self-healing test automation with Playwright MCP integration. Analyze the following source code and test files to identify failing or fragile tests and generate fixes.
 
 ## Source Files
 {sourceSummary}

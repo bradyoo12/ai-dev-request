@@ -43,6 +43,43 @@ export interface SelfHealingTestResult {
   updatedAt?: string | null
 }
 
+export interface BrokenLocatorInput {
+  testFile: string
+  testName: string
+  originalLocator: string
+  errorMessage?: string
+}
+
+export interface RepairedLocator {
+  testFile: string
+  testName: string
+  originalLocator: string
+  repairedLocatorValue: string
+  strategy: string
+  confidence: number
+  reason: string
+}
+
+export interface LocatorRepairResult {
+  repairedLocators: RepairedLocator[]
+  totalRepaired: number
+  totalFailed: number
+  overallConfidence: number
+  summary: string
+}
+
+export interface HealingTimelineEntry {
+  id: string
+  timestamp: string
+  action: string // healed, failed, skipped
+  testName: string
+  originalLocator?: string | null
+  healedLocator?: string | null
+  confidence: number
+  reason?: string | null
+  analysisVersion: number
+}
+
 // === API Functions ===
 
 export async function triggerSelfHealing(projectId: string): Promise<SelfHealingTestResult> {
@@ -67,6 +104,30 @@ export async function getSelfHealingResults(projectId: string): Promise<SelfHeal
 
 export async function getSelfHealingHistory(projectId: string): Promise<SelfHealingTestResult[]> {
   const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/tests/heal/history`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) return []
+  return response.json()
+}
+
+export async function repairLocators(
+  projectId: string,
+  brokenLocators: BrokenLocatorInput[]
+): Promise<LocatorRepairResult> {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/tests/heal/repair-locators`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ brokenLocators }),
+  })
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(error.error || t('api.error.locatorRepairFailed'))
+  }
+  return response.json()
+}
+
+export async function getHealingTimeline(projectId: string): Promise<HealingTimelineEntry[]> {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/tests/heal/timeline`, {
     headers: authHeaders(),
   })
   if (!response.ok) return []

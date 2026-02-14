@@ -183,6 +183,9 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AgentInboxItem> AgentInboxItems => Set<AgentInboxItem>();
     public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
     public DbSet<Subtask> Subtasks => Set<Subtask>();
+    public DbSet<PlaywrightMcpTestConfig> PlaywrightMcpTestConfigs => Set<PlaywrightMcpTestConfig>();
+    public DbSet<TestHealingRecord> TestHealingRecords => Set<TestHealingRecord>();
+    public DbSet<LocalModelConfig> LocalModelConfigs => Set<LocalModelConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1979,6 +1982,33 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
             entity.Property(e => e.DependsOnSubtaskIdsJson).HasMaxLength(2000);
+        });
+
+        modelBuilder.Entity<PlaywrightMcpTestConfig>(entity =>
+        {
+            entity.ToTable("playwright_mcp_test_configs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.TestScenario).IsRequired();
+            entity.Property(e => e.GeneratedTestCode).HasColumnType("text");
+            entity.Property(e => e.HealingHistoryJson).HasColumnType("jsonb");
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.SuccessRate).HasColumnType("double precision");
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.CreatedAt);
+        });
+
+        modelBuilder.Entity<TestHealingRecord>(entity =>
+        {
+            entity.ToTable("test_healing_records");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OriginalLocator).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.UpdatedLocator).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.FailureReason).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.HealingStrategy).IsRequired().HasMaxLength(1000);
+            entity.HasIndex(e => e.TestConfigId);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

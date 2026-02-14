@@ -112,6 +112,8 @@ builder.Services.AddScoped<ILogStreamService, LogStreamService>();
 builder.Services.AddScoped<GitBranchService>();
 builder.Services.AddScoped<IProjectCostEstimationService, ProjectCostEstimationService>();
 builder.Services.AddScoped<IProjectAggregationService, ProjectAggregationService>();
+builder.Services.AddScoped<IPlaywrightMcpService, PlaywrightMcpService>();
+builder.Services.AddScoped<ILocalModelInferenceService, LocalModelInferenceService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -292,7 +294,9 @@ app.UseExceptionHandler(errorApp =>
             "generation_variants",
             "performance_profiles",
             "data_schemas",
-            "agent_skills" };
+            "agent_skills",
+            "support_posts",
+            "subtasks" };
 
         // Verify actual table state regardless of what migration history says.
         // This handles: fresh DB, legacy DB (EnsureCreatedAsync), partial legacy DB, and
@@ -339,13 +343,11 @@ app.UseExceptionHandler(errorApp =>
             }
             else
             {
-                // In staging/production, never drop the database — require manual intervention
-                logger.LogCritical(
-                    "Database in partial state — manual intervention required. Missing tables: {Missing}",
-                    string.Join(", ", missingTables));
-                throw new InvalidOperationException(
-                    $"Database schema mismatch detected in {app.Environment.EnvironmentName}. " +
-                    $"Missing tables: {string.Join(", ", missingTables)}. Manual intervention required.");
+                // In staging/production, log the partial state but still attempt MigrateAsync.
+                // Missing tables are often just pending migrations that haven't been applied yet.
+                logger.LogWarning(
+                    "Partial database detected — {Missing} tables missing. Attempting MigrateAsync to apply pending migrations. Missing: {MissingList}",
+                    missingTables.Count, string.Join(", ", missingTables));
             }
         }
         else if (existingTables.Count == allTables.Length)

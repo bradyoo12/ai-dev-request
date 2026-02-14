@@ -1259,13 +1259,28 @@ Log the current status of the project board:
    - Tickets with `on hold` label
    - Backlog tickets awaiting triage
 
-### Step 9: Loop (Automatic - Never Ask User)
+### Step 9: Check Stop Signal and Loop
 
-**CRITICAL: Do NOT ask the user for permission to continue. Just loop automatically.**
+**CRITICAL: Do NOT ask the user for permission to continue. Just loop automatically — unless a stop signal exists.**
 
-1. Log "Cycle complete. Starting next cycle in 5 seconds..."
-2. Wait 5 seconds
-3. **Automatically** go back to Step 1 (do not ask user, do not wait for confirmation, just loop)
+1. **Check for stop signal** from `/b-start-end`:
+   ```bash
+   if [ -f .claude/b-start-stop-signal ]; then
+     echo "Stop signal detected — finishing pipeline gracefully."
+     cat .claude/b-start-stop-signal
+     rm .claude/b-start-stop-signal
+   fi
+   ```
+
+2. **If stop signal was found:**
+   - Log: "Pipeline stopped gracefully by /b-start-end. Current cycle is complete."
+   - Clean up the worktree (Step 0 cleanup)
+   - **STOP. Do NOT loop. Exit the pipeline.**
+
+3. **If NO stop signal:**
+   - Log "Cycle complete. Starting next cycle in 5 seconds..."
+   - Wait 5 seconds
+   - **Automatically** go back to Step 1 (do not ask user, do not wait for confirmation, just loop)
 
 **Examples of what NOT to say:**
 - ❌ "Would you like me to continue?"
@@ -1277,7 +1292,7 @@ Log the current status of the project board:
 
 **What to do instead:**
 - ✅ Just log "Starting Cycle #N..." and go to Step 1
-- ✅ Continue autonomously until Ctrl+C
+- ✅ Continue autonomously until Ctrl+C or stop signal
 - ✅ When showing "Next Steps", immediately execute the first step without asking
 
 ## Ticket Flow Summary

@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 106 Controllers | 93 Services | 117 Entities | 104 Pages | 96 API modules | 33 Components
+**Counts**: 108 Controllers | 95 Services | 119 Entities | 105 Pages | 97 API modules | 33 Components
 
 ---
 
@@ -35,6 +35,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | Controller | Route | Purpose |
 |---|---|---|
 | StreamingGenerationController | /api/requests/{id}/generate | Real-time SSE code generation (stream, live-stream, start, cancel, status, history) |
+| StreamingCodeGenController | /api/streaming-codegen | Real-time streaming code gen with SSE, sessions, live preview |
 | CompilerController | /api/projects/{id}/compiler | Compiler-in-the-loop validation |
 | SpecificationController | /api/requests/{id}/specs | Spec-driven development pipeline |
 | GenerativeUiController | /api/generative-ui | Generative UI chat interface |
@@ -206,6 +207,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | CostTrackingService | Per-request cost tracking |
 | RefinementService | Conversational refinement flow |
 | StreamingGenerationService | SSE streaming code generation |
+| StreamingCodeGenService | Real-time streaming code gen sessions with SSE events and live preview |
 | FileGenerationService | File output manifest generation |
 | CompilerValidationService | Compiler-in-the-loop validation |
 | SpecificationService | Spec-driven pipeline service |
@@ -433,6 +435,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 | Entity | Purpose |
 |---|---|
 | GenerationStream | SSE generation stream |
+| StreamingCodeGenSession | Streaming code gen session (prompt, status, file tree, build progress, preview URL) |
 | GenerationManifest | File generation manifest |
 | GenerationVariant | A/B test variant |
 | CompilationResult | Compiler validation result |
@@ -616,6 +619,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 |---|---|---|
 | StreamingGenerationPage | /settings/streaming-generation | SSE code generation config |
 | LiveGenerationPage | /live-generation/:requestId | Real-time code gen visualization with file tree, editor, progress |
+| StreamingCodeGenPage | /settings/streaming-codegen | Real-time code gen with live preview (Bolt.new-style) |
 | CompilerValidationPage | /settings/compiler-validation | Compiler validation settings |
 | SpecificationPage | /settings/specifications | Spec-driven development |
 | GenerativeUiPage | /settings/generative-ui | Generative UI chat |
@@ -877,6 +881,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 |---|---|---|
 | streaming-generation.ts | StreamingGenerationController | SSE generation |
 | live-generation.ts | StreamingGenerationController | Live SSE code gen visualization (start, cancel, status, connect) |
+| streaming-codegen.ts | StreamingCodeGenController | Real-time streaming code gen |
 | compiler.ts | CompilerController | Compiler validation |
 | specifications.ts | SpecificationController | Spec pipeline |
 | generativeui.ts | GenerativeUiController | Generative UI |

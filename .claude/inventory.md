@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 104 Controllers | 91 Services | 115 Entities | 100 Pages | 93 API modules | 33 Components
+**Counts**: 105 Controllers | 92 Services | 116 Entities | 101 Pages | 94 API modules | 33 Components
 
 ---
 
@@ -113,6 +113,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | LangGraphWorkflowController | /api/langgraph | LangGraph workflow engine |
 | AgenticPlanController | /api/agentic-plan | Autonomous planning system |
 | WorkflowController | /api/workflows | Durable workflow orchestration |
+| VisualWorkflowController | /api/visual-workflow | Visual workflow automation builder with AI generation, execution, and status |
 | A2AController | /api/a2a | Agent-to-agent protocol |
 
 ### Integrations
@@ -337,6 +338,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | AgentSkillService | Agent skills management and detection |
 | WorkflowOrchestrationService | Durable workflow engine |
 | LangGraphWorkflowService | LangGraph workflow execution |
+| VisualWorkflowService | Visual workflow automation with AI generation and execution |
 | A2AService | Agent-to-agent protocol |
 
 ### Analytics & Marketplace
@@ -504,6 +506,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 111 entities total.
 | AgentWorkflow | Agent workflow definition |
 | WorkflowNode | Workflow graph node |
 | WorkflowEdge | Workflow graph edge |
+| WorkflowAutomation | Visual workflow automation definition (nodes, edges, AI-generated) |
 | A2A | Agent-to-agent task card |
 
 ### Integrations
@@ -683,6 +686,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | LangGraphWorkflowPage | /langgraph-workflows/:workflowId | LangGraph workflow detail |
 | AgenticPlannerPage | /settings/agentic-plan | Autonomous planner |
 | WorkflowPage | /settings/workflows | Workflow management |
+| VisualWorkflowPage | /settings/visual-workflow | Visual workflow automation builder |
 | A2APage | /a2a | Agent-to-agent protocol |
 
 ### Integrations
@@ -941,6 +945,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | agent-skills.ts | AgentSkillController | Agent skills |
 | langgraph-workflows.ts | LangGraphWorkflowController | LangGraph workflows |
 | workflows.ts | WorkflowController | Durable workflows |
+| visual-workflow.ts | VisualWorkflowController | Visual workflow automation |
 | a2a.ts | A2AController | Agent-to-agent |
 
 ### Integrations

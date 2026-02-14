@@ -26,6 +26,7 @@ export default function FooterSection() {
               <li><a href="#pricing" className="hover:text-white transition-colors">{t('footer.link.pricing')}</a></li>
               <li><Link to="/sites" className="hover:text-white transition-colors">{t('footer.link.mySites')}</Link></li>
               <li><Link to="/suggestions" className="hover:text-white transition-colors">{t('footer.link.suggestions')}</Link></li>
+              <li><Link to="/patents" className="hover:text-white transition-colors">{t('footer.link.patents')}</Link></li>
             </ul>
           </div>
 

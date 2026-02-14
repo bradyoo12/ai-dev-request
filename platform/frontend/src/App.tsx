@@ -36,7 +36,12 @@ const TicketProgressPage = lazy(() => import('./pages/TicketProgressPage'))
 const SubtasksPage = lazy(() => import('./pages/SubtasksPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
-function App() {
+/**
+ * AppRoutes contains all route definitions without a router wrapper.
+ * This is exported separately so that both the client (BrowserRouter)
+ * and server (StaticRouter) entry points can share the same route tree.
+ */
+export function AppRoutes() {
   const { i18n } = useTranslation()
 
   useEffect(() => {
@@ -44,10 +49,8 @@ function App() {
   }, [i18n.language])
 
   return (
-    <ErrorBoundary>
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+    <AuthProvider>
+      <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/settings" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
@@ -153,7 +156,20 @@ function App() {
           </Route>
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+  )
+}
+
+/**
+ * App is the default export that wraps AppRoutes with BrowserRouter
+ * and ErrorBoundary for client-side usage.
+ * For SSR, use AppRoutes directly with StaticRouter instead.
+ */
+function App() {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
     </ErrorBoundary>
   )
 }

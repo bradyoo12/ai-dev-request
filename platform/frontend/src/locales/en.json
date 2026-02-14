@@ -4450,5 +4450,14 @@
   "playwrightMcp.running": "Running...",
   "api.error.playwrightMcpGenerateFailed": "Failed to generate Playwright tests",
   "api.error.playwrightMcpHealFailed": "Failed to heal test",
-  "api.error.playwrightMcpRunFailed": "Failed to run test"
+  "api.error.playwrightMcpRunFailed": "Failed to run test",
+  "ssr.title": "Server-Side Rendering",
+  "ssr.description": "Pre-rendered pages for improved performance and SEO",
+  "ssr.status.enabled": "SSR Enabled",
+  "ssr.status.disabled": "SSR Disabled",
+  "ssr.prerendered": "Pre-rendered Pages",
+  "ssr.prerenderedCount": "{{count}} pages pre-rendered",
+  "ssr.fallback": "Loading...",
+  "ssr.hydrating": "Hydrating application...",
+  "ssr.error.renderFailed": "Server rendering failed"
 }

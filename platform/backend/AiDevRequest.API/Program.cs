@@ -115,6 +115,9 @@ builder.Services.AddScoped<IProjectAggregationService, ProjectAggregationService
 builder.Services.AddScoped<IPlaywrightMcpService, PlaywrightMcpService>();
 builder.Services.AddScoped<ILocalModelInferenceService, LocalModelInferenceService>();
 
+// Add SSR (Server-Side Rendering) service for pre-rendered page delivery
+builder.Services.AddSingleton<ISsrService, SsrService>();
+
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "AiDevRequest";

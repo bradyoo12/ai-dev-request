@@ -92,6 +92,42 @@ public class StreamingGenerationController : ControllerBase
         return Ok(history.Select(MapDto));
     }
 
+    /// <summary>
+    /// SSE endpoint for live generation preview. Emits structured events:
+    /// file_created, file_updated, build_progress, preview_ready
+    /// in addition to standard stream events.
+    /// </summary>
+    [HttpGet("live-stream")]
+    [Produces("text/event-stream")]
+    public async Task LiveStream(int id, CancellationToken cancellationToken)
+    {
+        Response.ContentType = "text/event-stream";
+        Response.Headers.CacheControl = "no-cache";
+        Response.Headers.Connection = "keep-alive";
+
+        try
+        {
+            await foreach (var streamEvent in _streamingService.LiveStreamGenerationAsync(id, cancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                await Response.WriteAsync($"event: {streamEvent.Type}\n", cancellationToken);
+                await Response.WriteAsync($"data: {streamEvent.Data}\n\n", cancellationToken);
+                await Response.Body.FlushAsync(cancellationToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Live SSE stream cancelled for request {Id}", id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in live SSE stream for request {Id}", id);
+            await Response.WriteAsync($"event: error\ndata: {ex.Message}\n\n", CancellationToken.None);
+            await Response.Body.FlushAsync(CancellationToken.None);
+        }
+    }
+
     private static GenerationStreamDto MapDto(Entities.GenerationStream s) => new()
     {
         Id = s.Id,

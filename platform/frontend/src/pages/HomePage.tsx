@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError, generateSubtasks, approveSubtask, rejectSubtask, approveAllSubtasks } from '../api/requests'
 import { createSite, getSiteDetail } from '../api/sites'
 import type { SiteResponse } from '../api/sites'
@@ -34,6 +34,7 @@ type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingP
 export default function HomePage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { setTokenBalance, requireAuth } = useAuth()
 
   const [request, setRequest] = useState('')
@@ -72,6 +73,16 @@ export default function HomePage() {
   const [syncing, setSyncing] = useState(false)
   const deployPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.slice(1)
+      const el = document.getElementById(id)
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100)
+      }
+    }
+  }, [location.hash])
 
   useEffect(() => {
     const loadPricingPlans = async () => {

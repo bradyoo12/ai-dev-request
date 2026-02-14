@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18n';
+import { useTranslation } from 'react-i18next';
 import {
   generateAgent,
   previewAgent,
@@ -7,10 +7,10 @@ import {
   deployAgent,
   getDeployments,
   undeployAgent,
-  AgentSkill,
-  AgentDeployment,
-  AgentTemplate,
-  AgentPreview,
+  type AgentSkill,
+  type AgentDeployment,
+  type AgentTemplate,
+  type AgentPreview,
 } from '../api/agent-builder';
 import { StatusBadge } from '../components/StatusBadge';
 

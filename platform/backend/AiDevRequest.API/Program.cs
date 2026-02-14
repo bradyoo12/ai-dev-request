@@ -113,6 +113,7 @@ builder.Services.AddScoped<GitBranchService>();
 builder.Services.AddScoped<IProjectCostEstimationService, ProjectCostEstimationService>();
 builder.Services.AddScoped<IProjectAggregationService, ProjectAggregationService>();
 builder.Services.AddScoped<IPlaywrightMcpService, PlaywrightMcpService>();
+builder.Services.AddScoped<ILocalModelInferenceService, LocalModelInferenceService>();
 
 // Add JWT Authentication
 var jwtSecret = builder.Configuration["Jwt:Secret"];

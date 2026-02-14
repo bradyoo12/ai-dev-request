@@ -52,6 +52,8 @@ public class SocialAuthService : ISocialAuthService
 
     public async Task<(User User, string Token)> SocialLoginAsync(string provider, string code, string redirectUri, string? anonymousUserId)
     {
+        _logger.LogInformation("Starting social login for {Provider} - RedirectUri: {RedirectUri}", provider, redirectUri);
+
         var userInfo = provider.ToLower() switch
         {
             "google" => await ExchangeGoogleCodeAsync(code, redirectUri),
@@ -68,7 +70,7 @@ public class SocialAuthService : ISocialAuthService
         await _context.SaveChangesAsync();
 
         var token = _authService.GenerateJwt(user);
-        _logger.LogInformation("Social login via {Provider} for {Email}", provider, user.Email);
+        _logger.LogInformation("Social login via {Provider} successful for {Email}", provider, user.Email);
 
         return (user, token);
     }

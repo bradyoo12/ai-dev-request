@@ -223,7 +223,7 @@ public class AuthController : ControllerBase
 
         return Ok(new UserDto
         {
-            Id = user.Id,
+            Id = user.Id.ToString(),
             Email = user.Email,
             DisplayName = user.DisplayName,
             ProfileImageUrl = user.ProfileImageUrl,

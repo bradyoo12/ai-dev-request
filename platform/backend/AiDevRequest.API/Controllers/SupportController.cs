@@ -48,40 +48,48 @@ public class SupportController : ControllerBase
         [FromQuery] string? category = null,
         [FromQuery] string sort = "newest")
     {
-        var query = _db.SupportPosts.AsQueryable();
-
-        if (!string.IsNullOrEmpty(category) && category != "all")
-            query = query.Where(p => p.Category == category);
-
-        query = sort switch
+        try
         {
-            "oldest" => query.OrderBy(p => p.CreatedAt),
-            _ => query.OrderByDescending(p => p.CreatedAt)
-        };
+            var query = _db.SupportPosts.AsQueryable();
 
-        var total = await query.CountAsync();
-        var items = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(p => new
+            if (!string.IsNullOrEmpty(category) && category != "all")
+                query = query.Where(p => p.Category == category);
+
+            query = sort switch
             {
-                p.Id,
-                p.UserId,
-                p.Title,
-                p.Content,
-                p.Category,
-                p.Status,
-                p.FeedbackType,
-                p.RewardCredit,
-                p.RewardedByUserId,
-                p.RewardMessage,
-                p.RewardedAt,
-                p.CreatedAt,
-                p.UpdatedAt
-            })
-            .ToListAsync();
+                "oldest" => query.OrderBy(p => p.CreatedAt),
+                _ => query.OrderByDescending(p => p.CreatedAt)
+            };
 
-        return Ok(new { items, total, page, pageSize });
+            var total = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.UserId,
+                    p.Title,
+                    p.Content,
+                    p.Category,
+                    p.Status,
+                    p.FeedbackType,
+                    p.RewardCredit,
+                    p.RewardedByUserId,
+                    p.RewardMessage,
+                    p.RewardedAt,
+                    p.CreatedAt,
+                    p.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Ok(new { items, total, page, pageSize });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to query support posts — possible schema mismatch. Returning empty result.");
+            return Ok(new { items = Array.Empty<object>(), total = 0, page, pageSize, warning = "Support posts temporarily unavailable" });
+        }
     }
 
     /// <summary>

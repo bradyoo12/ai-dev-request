@@ -118,9 +118,76 @@ type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'p
 
 const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index', 'deployment-health', 'generative-ui', 'mobile-app', 'background-agents', 'platform-upgrade', 'visual-prompt', 'multi-framework', 'view-transitions', 'nl-schema', 'query-config', 'agentic-planning', 'visual-regression', 'mcp-gateway', 'codebase-memory', 'figma-import', 'arena', 'visual-overlay', 'semantic-search', 'planning-mode', 'project-docs', 'ai-elements', 'review-pipeline', 'oauth-connectors', 'mcp-tools', 'ai-model', 'bidir-sync', 'self-healing-test', 'multi-agent-test', 'database-branching', 'sandbox', 'dynamic-intelligence', 'agent-automation', 'usage-dashboard', 'orchestration', 'langgraph', 'hybrid-cache', 'playwright-healing', 'self-healing-code', 'production-sandboxes', 'org-memory', 'agent-rules', 'server-components', 'code-lint', 'vector-search', 'repl-test', 'agent-terminal', 'composer', 'dotnet-perf', 'multi-model', 'biome-lint', 'deepwiki', 'build-toolchain', 'vision-to-code', 'dotnet10-upgrade', 'parallel-agents', 'webmcp', 'agent-sdk', 'auto-terminal', 'turso-database', 'workers-ai', 'react-use-hook', 'edit-predictions', 'browser-ide', 'governance', 'inference-cost', 'language-expansion', 'hybrid-validation', 'agent-messages', 'agentic-workflows', 'agent-trace', 'confidence-scoring', 'ai-marketplace', 'agent-inbox', 'agent-skills']
 
-type TabGroupKey = 'core' | 'ai-generation' | 'code-quality' | 'testing' | 'security' | 'infrastructure' | 'billing-usage' | 'integrations' | 'collaboration' | 'analytics-admin' | 'agents' | 'other'
+type TabGroup = {
+  key: string
+  i18nKey: string
+  tabs: SettingsTab[]
+}
 
-/** Tab label translation key and fallback for each tab */
+const TAB_GROUPS: TabGroup[] = [
+  {
+    key: 'account',
+    i18nKey: 'settings.groups.account',
+    tabs: ['tokens', 'billing', 'payments', 'usage', 'usage-dashboard', 'preferences', 'memories'],
+  },
+  {
+    key: 'ai-generation',
+    i18nKey: 'settings.groups.aiGeneration',
+    tabs: ['ai-model', 'streaming-generation', 'generative-ui', 'visual-prompt', 'component-preview', 'variant-comparison', 'arena', 'ai-elements', 'multi-framework', 'multi-model', 'composer', 'model-routing', 'generation', 'ai-marketplace'],
+  },
+  {
+    key: 'code-quality',
+    i18nKey: 'settings.groups.codeQuality',
+    tabs: ['code-review', 'review-pipeline', 'multi-agent-test', 'code-lint', 'compiler', 'self-healing-test', 'code-merge', 'biome-lint'],
+  },
+  {
+    key: 'infrastructure',
+    i18nKey: 'settings.groups.infrastructure',
+    tabs: ['preview', 'containerization', 'database-branching', 'sandbox', 'infrastructure', 'platform-upgrade', 'deployment-health', 'production-sandboxes'],
+  },
+  {
+    key: 'security',
+    i18nKey: 'settings.groups.security',
+    tabs: ['secrets', 'oauth', 'oauth-connectors', 'governance'],
+  },
+  {
+    key: 'agents',
+    i18nKey: 'settings.groups.agents',
+    tabs: ['background-agents', 'agent-automation', 'agent-skills', 'agent-rules', 'agent-terminal', 'agent-trace', 'agentic-workflows', 'agent-messages', 'parallel-agents', 'agent-sdk', 'auto-terminal', 'confidence-scoring', 'orchestration', 'langgraph', 'agentic-planning', 'agent-inbox', 'dynamic-intelligence'],
+  },
+  {
+    key: 'testing',
+    i18nKey: 'settings.groups.testing',
+    tabs: ['test-generation', 'visual-regression', 'self-healing-code', 'playwright-healing', 'repl-test'],
+  },
+  {
+    key: 'data-search',
+    i18nKey: 'settings.groups.dataSearch',
+    tabs: ['schema-designer', 'nl-schema', 'vector-search', 'org-memory', 'turso-database', 'hybrid-cache', 'deepwiki', 'codebase-memory', 'semantic-search', 'context-index', 'query-config'],
+  },
+  {
+    key: 'dev-tools',
+    i18nKey: 'settings.groups.devTools',
+    tabs: ['specifications', 'github-sync', 'bidir-sync', 'collaborative-editing', 'version-history', 'performance', 'observability', 'build-toolchain', 'vision-to-code', 'edit-predictions', 'browser-ide', 'dotnet-perf', 'dotnet10-upgrade', 'figma-import', 'visual-overlay', 'planning-mode', 'project-docs', 'api-cli', 'api-docs', 'pipeline-builder', 'view-transitions', 'voice-input', 'mobile-app'],
+  },
+  {
+    key: 'integrations',
+    i18nKey: 'settings.groups.integrations',
+    tabs: ['mcp-integration', 'mcp-gateway', 'mcp-tools', 'webmcp', 'workers-ai', 'react-use-hook', 'server-components'],
+  },
+  {
+    key: 'analytics-growth',
+    i18nKey: 'settings.groups.analyticsGrowth',
+    tabs: ['analytics', 'marketplace', 'onboarding'],
+  },
+  {
+    key: 'other',
+    i18nKey: 'settings.groups.other',
+    tabs: ['workflows', 'language-expansion', 'hybrid-validation', 'inference-cost'],
+  },
+]
+
+/** Map tab key to its i18n key and fallback label */
 const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'tokens': ['settings.tabs.tokens', 'Token Balance'],
   'usage': ['settings.tabs.usage', 'Usage'],
@@ -167,8 +234,8 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'visual-prompt': ['settings.tabs.visualPrompt', 'Visual UI'],
   'multi-framework': ['settings.tabs.multiFramework', 'Frameworks'],
   'view-transitions': ['settings.tabs.viewTransitions', 'Transitions'],
-  'nl-schema': ['settings.tabs.nlSchema', 'Schema AI'],
-  'query-config': ['settings.tabs.queryConfig', 'Query'],
+  'nl-schema': ['settings.tabs.nlSchema', 'NL Schema'],
+  'query-config': ['settings.tabs.queryConfig', 'Query Config'],
   'agentic-planning': ['settings.tabs.agenticPlanning', 'Planner'],
   'visual-regression': ['settings.tabs.visualRegression', 'Visual QA'],
   'mcp-gateway': ['settings.tabs.mcpGateway', 'MCP Gateway'],
@@ -177,14 +244,14 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'arena': ['settings.tabs.arena', 'Arena'],
   'visual-overlay': ['settings.tabs.visualOverlay', 'Overlay Editor'],
   'semantic-search': ['settings.tabs.semanticSearch', 'Semantic Search'],
-  'planning-mode': ['settings.tabs.planningMode', 'Planning'],
+  'planning-mode': ['settings.tabs.planningMode', 'Planning Mode'],
   'project-docs': ['settings.tabs.projectDocs', 'Project Docs'],
   'ai-elements': ['settings.tabs.aiElements', 'AI Elements'],
   'review-pipeline': ['settings.tabs.reviewPipeline', 'Review Pipeline'],
   'oauth-connectors': ['settings.tabs.oauthConnectors', 'OAuth Connectors'],
   'mcp-tools': ['settings.tabs.mcpTools', 'MCP Tools'],
-  'ai-model': ['settings.tabs.aiModel', 'AI Engine'],
-  'bidir-sync': ['settings.tabs.bidirSync', 'Git Sync+'],
+  'ai-model': ['settings.tabs.aiModel', 'AI Model'],
+  'bidir-sync': ['settings.tabs.bidirSync', 'Bidir Sync'],
   'self-healing-test': ['settings.tabs.selfHealingTest', 'Self-Healing'],
   'multi-agent-test': ['settings.tabs.multiAgentTest', 'Multi-Agent Test'],
   'database-branching': ['settings.tabs.databaseBranching', 'DB Branching'],
@@ -196,7 +263,7 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'langgraph': ['settings.tabs.langgraph', 'LangGraph'],
   'hybrid-cache': ['settings.tabs.hybridCache', 'Cache'],
   'playwright-healing': ['settings.tabs.playwrightHealing', 'Test Heal'],
-  'self-healing-code': ['settings.tabs.selfHealingCode', 'Self-Heal'],
+  'self-healing-code': ['settings.tabs.selfHealingCode', 'Self-Healing Code'],
   'production-sandboxes': ['settings.tabs.productionSandboxes', 'Sandboxes'],
   'org-memory': ['settings.tabs.orgMemory', 'Org Memory'],
   'agent-rules': ['settings.tabs.agentRules', 'Agent Rules'],
@@ -216,14 +283,14 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'parallel-agents': ['settings.tabs.parallelAgents', 'Parallel'],
   'webmcp': ['settings.tabs.webmcp', 'WebMCP'],
   'agent-sdk': ['settings.tabs.agentSdk', 'Agent SDK'],
-  'auto-terminal': ['settings.tabs.autoTerminal', 'Terminal'],
+  'auto-terminal': ['settings.tabs.autoTerminal', 'Auto Terminal'],
   'turso-database': ['settings.tabs.tursoDatabase', 'Turso DB'],
   'workers-ai': ['settings.tabs.workersAi', 'Workers AI'],
-  'react-use-hook': ['settings.tabs.reactUseHook', 'use() Hook'],
+  'react-use-hook': ['settings.tabs.reactUseHook', 'React Hooks'],
   'edit-predictions': ['settings.tabs.editPredictions', 'Edit Predict'],
   'browser-ide': ['settings.tabs.browserIde', 'Browser IDE'],
   'governance': ['settings.tabs.governance', 'Governance'],
-  'inference-cost': ['settings.tabs.inferenceCost', 'Cost Opt'],
+  'inference-cost': ['settings.tabs.inferenceCost', 'Inference Cost'],
   'language-expansion': ['settings.tabs.langExpansion', 'Languages'],
   'hybrid-validation': ['settings.tabs.hybridValidation', 'Hybrid AI'],
   'agent-messages': ['settings.tabs.agentMessages', 'Agent Comms'],
@@ -235,96 +302,8 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'agent-skills': ['settings.tabs.agentSkills', 'Agent Skills'],
 }
 
-/** Grouped tab categories with i18n-keyed group names */
-const TAB_GROUPS: { key: TabGroupKey; labelKey: string; labelFallback: string; tabs: SettingsTab[] }[] = [
-  {
-    key: 'core',
-    labelKey: 'settings.groups.core',
-    labelFallback: 'Core',
-    tabs: ['tokens', 'preferences', 'memories', 'specifications', 'onboarding', 'project-docs', 'version-history', 'performance'],
-  },
-  {
-    key: 'ai-generation',
-    labelKey: 'settings.groups.aiGeneration',
-    labelFallback: 'AI & Generation',
-    tabs: ['ai-model', 'streaming-generation', 'component-preview', 'generative-ui', 'visual-prompt', 'visual-overlay', 'schema-designer', 'nl-schema', 'multi-framework', 'generation', 'variant-comparison', 'model-routing', 'multi-model', 'vision-to-code', 'ai-elements', 'dynamic-intelligence', 'confidence-scoring', 'edit-predictions', 'hybrid-validation', 'ai-marketplace', 'context-index', 'codebase-memory', 'semantic-search', 'vector-search', 'query-config'],
-  },
-  {
-    key: 'code-quality',
-    labelKey: 'settings.groups.codeQuality',
-    labelFallback: 'Code Quality',
-    tabs: ['code-review', 'review-pipeline', 'multi-agent-test', 'compiler', 'code-lint', 'biome-lint', 'code-merge', 'self-healing-code'],
-  },
-  {
-    key: 'testing',
-    labelKey: 'settings.groups.testing',
-    labelFallback: 'Testing',
-    tabs: ['test-generation', 'self-healing-test', 'visual-regression', 'playwright-healing', 'repl-test'],
-  },
-  {
-    key: 'security',
-    labelKey: 'settings.groups.security',
-    labelFallback: 'Security',
-    tabs: ['secrets', 'oauth', 'governance', 'oauth-connectors'],
-  },
-  {
-    key: 'infrastructure',
-    labelKey: 'settings.groups.infrastructure',
-    labelFallback: 'Infrastructure',
-    tabs: ['infrastructure', 'containerization', 'preview', 'deployment-health', 'database-branching', 'sandbox', 'production-sandboxes', 'platform-upgrade', 'build-toolchain', 'dotnet-perf', 'dotnet10-upgrade', 'server-components', 'turso-database', 'hybrid-cache', 'react-use-hook', 'view-transitions'],
-  },
-  {
-    key: 'billing-usage',
-    labelKey: 'settings.groups.billingUsage',
-    labelFallback: 'Billing & Usage',
-    tabs: ['billing', 'usage', 'payments', 'usage-dashboard', 'inference-cost'],
-  },
-  {
-    key: 'integrations',
-    labelKey: 'settings.groups.integrations',
-    labelFallback: 'Integrations',
-    tabs: ['github-sync', 'bidir-sync', 'mcp-integration', 'mcp-gateway', 'mcp-tools', 'webmcp', 'figma-import', 'api-cli', 'api-docs', 'pipeline-builder'],
-  },
-  {
-    key: 'collaboration',
-    labelKey: 'settings.groups.collaboration',
-    labelFallback: 'Collaboration',
-    tabs: ['collaborative-editing', 'planning-mode', 'org-memory'],
-  },
-  {
-    key: 'analytics-admin',
-    labelKey: 'settings.groups.analyticsAdmin',
-    labelFallback: 'Analytics & Admin',
-    tabs: ['analytics', 'observability', 'marketplace', 'deepwiki', 'language-expansion'],
-  },
-  {
-    key: 'agents',
-    labelKey: 'settings.groups.agents',
-    labelFallback: 'Agents',
-    tabs: ['background-agents', 'orchestration', 'agent-automation', 'agent-skills', 'langgraph', 'agentic-planning', 'workflows', 'agentic-workflows', 'agent-inbox', 'agent-messages', 'agent-trace', 'agent-rules', 'agent-terminal', 'agent-sdk', 'auto-terminal', 'parallel-agents', 'composer', 'workers-ai'],
-  },
-  {
-    key: 'other',
-    labelKey: 'settings.groups.other',
-    labelFallback: 'Other',
-    tabs: ['mobile-app', 'voice-input', 'arena', 'browser-ide'],
-  },
-]
-
-/** Collect all tabs already assigned to a group */
-const GROUPED_TABS = new Set(TAB_GROUPS.flatMap((g) => g.tabs))
-
-/** Any tabs in VALID_TABS not yet assigned go into "Other" */
-const UNGROUPED_TABS = VALID_TABS.filter((t) => !GROUPED_TABS.has(t))
-if (UNGROUPED_TABS.length > 0) {
-  const otherGroup = TAB_GROUPS.find((g) => g.key === 'other')
-  if (otherGroup) {
-    otherGroup.tabs.push(...UNGROUPED_TABS)
-  }
-}
-
 /** Find which group a tab belongs to */
-function findGroupForTab(tab: SettingsTab): TabGroupKey | null {
+function findGroupForTab(tab: SettingsTab): string | null {
   for (const group of TAB_GROUPS) {
     if (group.tabs.includes(tab)) return group.key
   }
@@ -339,41 +318,34 @@ export default function SettingsLayout() {
   const { setTokenBalance, requireAuth } = useAuth()
   const tabParam = searchParams.get('tab') as SettingsTab | null
 
-  // Derive tab from URL path
-  const pathTab = (() => {
-    const path = location.pathname
-    const prefix = '/settings/'
-    if (!path.startsWith(prefix)) return null
-    const slug = path.slice(prefix.length)
-    // Map special slugs
-    if (slug === 'compiler-validation') return 'compiler' as SettingsTab
+  // Derive tab from URL path — check all known settings sub-paths
+  const pathTab = useMemo<SettingsTab | null>(() => {
+    const match = location.pathname.match(/^\/settings\/(.+)$/)
+    if (!match) return null
+    const slug = match[1]
+    // Special case: compiler-validation maps to 'compiler'
+    if (slug === 'compiler-validation') return 'compiler'
+    // Check if slug is a valid tab
     if (VALID_TABS.includes(slug as SettingsTab)) return slug as SettingsTab
     return null
-  })()
+  }, [location.pathname])
 
   const initialTab = pathTab || (tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'tokens')
   const [settingsTab, setSettingsTab] = useState<SettingsTab>(initialTab)
 
-  // Search filter for tabs
-  const [searchQuery, setSearchQuery] = useState('')
-
-  // Expanded groups state - default: expand the group containing the active tab
-  const [expandedGroups, setExpandedGroups] = useState<Set<TabGroupKey>>(() => {
+  // Track which groups are expanded — default: expand the group containing the active tab
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
+    const initial = new Set<string>()
     const activeGroup = findGroupForTab(initialTab)
-    return new Set(activeGroup ? [activeGroup] : [])
+    if (activeGroup) initial.add(activeGroup)
+    return initial
   })
 
-  // When active tab changes, auto-expand its group
-  useEffect(() => {
-    const group = findGroupForTab(settingsTab)
-    if (group && !expandedGroups.has(group)) {
-      setExpandedGroups((prev) => new Set([...prev, group]))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settingsTab])
+  // Mobile sidebar visibility
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const toggleGroup = useCallback((groupKey: TabGroupKey) => {
-    setExpandedGroups((prev) => {
+  const toggleGroup = useCallback((groupKey: string) => {
+    setExpandedGroups(prev => {
       const next = new Set(prev)
       if (next.has(groupKey)) {
         next.delete(groupKey)
@@ -384,9 +356,34 @@ export default function SettingsLayout() {
     })
   }, [])
 
+  const handleTabSelect = useCallback((tab: SettingsTab) => {
+    setSettingsTab(tab)
+    // Auto-expand the group containing the selected tab
+    const group = findGroupForTab(tab)
+    if (group) {
+      setExpandedGroups(prev => {
+        if (prev.has(group)) return prev
+        const next = new Set(prev)
+        next.add(group)
+        return next
+      })
+    }
+    // Close mobile sidebar after selection
+    setSidebarOpen(false)
+  }, [])
+
   useEffect(() => {
     if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== settingsTab) {
       setSettingsTab(tabParam)
+      const group = findGroupForTab(tabParam)
+      if (group) {
+        setExpandedGroups(prev => {
+          if (prev.has(group)) return prev
+          const next = new Set(prev)
+          next.add(group)
+          return next
+        })
+      }
     }
   }, [tabParam, settingsTab])
 
@@ -397,28 +394,64 @@ export default function SettingsLayout() {
     }
   }, [requireAuth, navigate])
 
-  // Filter groups and tabs based on search query
-  const filteredGroups = useMemo(() => {
-    if (!searchQuery.trim()) return TAB_GROUPS
-
-    const query = searchQuery.toLowerCase()
-    return TAB_GROUPS.map((group) => ({
-      ...group,
-      tabs: group.tabs.filter((tab) => {
-        const [labelKey, fallback] = TAB_LABELS[tab]
-        const label = t(labelKey, fallback)
-        return label.toLowerCase().includes(query) || tab.toLowerCase().includes(query)
-      }),
-    })).filter((group) => group.tabs.length > 0)
-  }, [searchQuery, t])
-
-  // When searching, expand all groups that have matching tabs
-  const displayGroups = useMemo(() => {
-    if (searchQuery.trim()) {
-      return filteredGroups.map((g) => ({ ...g, expanded: true }))
-    }
-    return filteredGroups.map((g) => ({ ...g, expanded: expandedGroups.has(g.key) }))
-  }, [filteredGroups, expandedGroups, searchQuery])
+  // Sidebar navigation content (shared between desktop & mobile)
+  const sidebarNav = (
+    <nav className="settings-sidebar-nav flex flex-col gap-1" role="tablist" aria-label={t('settings.title')}>
+      {TAB_GROUPS.map((group) => {
+        const isExpanded = expandedGroups.has(group.key)
+        const hasActiveTab = group.tabs.includes(settingsTab)
+        return (
+          <div key={group.key} className="settings-group">
+            <button
+              onClick={() => toggleGroup(group.key)}
+              className={`w-full flex items-center justify-between py-2 px-3 rounded-md text-sm font-semibold transition-colors ${
+                hasActiveTab ? 'text-white bg-warm-800' : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
+              }`}
+              aria-expanded={isExpanded}
+            >
+              <span>{t(group.i18nKey, group.key)}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {isExpanded && (
+              <div className="flex flex-col gap-0.5 mt-0.5 ml-2 pl-2 border-l border-warm-700/50">
+                {group.tabs.map((tab) => {
+                  const [i18nKey, fallback] = TAB_LABELS[tab]
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => handleTabSelect(tab)}
+                      role="tab"
+                      aria-selected={settingsTab === tab}
+                      className={`text-left py-1.5 px-3 rounded-md text-sm transition-colors ${
+                        settingsTab === tab
+                          ? 'bg-warm-700 text-white font-medium'
+                          : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
+                      }`}
+                    >
+                      {t(i18nKey, fallback)}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </nav>
+  )
 
   return (
     <section>
@@ -431,218 +464,148 @@ export default function SettingsLayout() {
           <span aria-hidden="true">&larr;</span>
         </button>
         <h2 className="text-2xl font-bold">{t('settings.title')}</h2>
+        {/* Mobile sidebar toggle */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden ml-auto text-warm-400 hover:text-white transition-colors"
+          aria-label={t('settings.toggleNav', 'Toggle navigation')}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {sidebarOpen
+              ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+              : <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
+            }
+          </svg>
+        </button>
       </div>
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar with grouped tabs */}
-        <nav className="w-full md:w-64 md:min-w-[16rem] shrink-0" aria-label={t('settings.title')}>
-          {/* Search input */}
-          <div className="mb-3">
-            <div className="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-warm-500"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('settings.searchTabs', 'Search settings...')}
-                className="w-full pl-9 pr-3 py-2 bg-warm-800 border border-warm-700 rounded-lg text-sm text-white placeholder-warm-500 focus:outline-none focus:ring-1 focus:ring-warm-500 transition-colors"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-warm-500 hover:text-white"
-                  aria-label={t('settings.clearSearch', 'Clear search')}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-              )}
-            </div>
-          </div>
 
-          {/* Grouped tab list */}
-          <div className="space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin pr-1">
-            {displayGroups.map((group) => (
-              <div key={group.key}>
-                {/* Group header */}
-                <button
-                  onClick={() => toggleGroup(group.key)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-warm-400 hover:text-white transition-colors rounded-md hover:bg-warm-800/50"
-                >
-                  <span>{t(group.labelKey, group.labelFallback)}</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className={`transition-transform duration-200 ${group.expanded ? 'rotate-90' : ''}`}
-                  >
-                    <path d="m9 18 6-6-6-6" />
-                  </svg>
-                </button>
+      {/* Mobile collapsible sidebar */}
+      {sidebarOpen && (
+        <div className="md:hidden mb-4 bg-warm-900 rounded-lg p-3 max-h-[60vh] overflow-y-auto">
+          {sidebarNav}
+        </div>
+      )}
 
-                {/* Group tabs */}
-                {group.expanded && (
-                  <div className="ml-1 space-y-0.5 pb-1">
-                    {group.tabs.map((tab) => {
-                      const [labelKey, fallback] = TAB_LABELS[tab]
-                      const isActive = settingsTab === tab
-                      return (
-                        <button
-                          key={tab}
-                          onClick={() => setSettingsTab(tab)}
-                          className={`w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
-                            isActive
-                              ? 'bg-warm-700 text-white font-medium'
-                              : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
-                          }`}
-                        >
-                          {t(labelKey, fallback)}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-            {displayGroups.length === 0 && searchQuery && (
-              <p className="text-warm-500 text-sm px-3 py-4 text-center">
-                {t('settings.noResults', 'No settings found')}
-              </p>
-            )}
-          </div>
-        </nav>
+      <div className="flex gap-6">
+        {/* Desktop sidebar */}
+        <aside className="hidden md:block w-56 shrink-0 bg-warm-900 rounded-lg p-3 max-h-[calc(100vh-8rem)] overflow-y-auto sticky top-4 settings-sidebar">
+          {sidebarNav}
+        </aside>
 
-        {/* Tab content */}
+        {/* Content area */}
         <div className="flex-1 min-w-0">
-          {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
-          {settingsTab === 'usage' && <UsagePage />}
-          {settingsTab === 'billing' && <BillingPage />}
-          {settingsTab === 'payments' && <PaymentHistoryPage />}
-          {settingsTab === 'memories' && <MemoryPage />}
-          {settingsTab === 'preferences' && <PreferencePage />}
-          {settingsTab === 'infrastructure' && <InfrastructurePage />}
-          {settingsTab === 'secrets' && <SecretDetectionPage />}
-          {settingsTab === 'preview' && <PreviewDeploymentPage />}
-          {settingsTab === 'generation' && <GenerationManifestPage />}
-          {settingsTab === 'oauth' && <OAuthCompliancePage />}
-          {settingsTab === 'compiler' && <CompilerValidationPage />}
-          {settingsTab === 'observability' && <ObservabilityPage />}
-          {settingsTab === 'workflows' && <WorkflowPage />}
-          {settingsTab === 'specifications' && <SpecificationPage />}
-          {settingsTab === 'github-sync' && <GitHubSyncPage />}
-          {settingsTab === 'code-review' && <CodeReviewPage />}
-          {settingsTab === 'streaming-generation' && <StreamingGenerationPage />}
-          {settingsTab === 'mcp-integration' && <McpIntegrationPage />}
-          {settingsTab === 'analytics' && <AnalyticsDashboardPage />}
-          {settingsTab === 'marketplace' && <MarketplacePage />}
-          {settingsTab === 'containerization' && <ContainerizationPage />}
-          {settingsTab === 'test-generation' && <TestGenerationPage />}
-          {settingsTab === 'collaborative-editing' && <CollaborativeEditingPage />}
-          {settingsTab === 'onboarding' && <OnboardingPage />}
-          {settingsTab === 'version-history' && <ProjectVersionPage />}
-          {settingsTab === 'component-preview' && <ComponentPreviewPage />}
-          {settingsTab === 'variant-comparison' && <VariantComparisonPage />}
-          {settingsTab === 'performance' && <PerformanceProfilePage />}
-          {settingsTab === 'schema-designer' && <SchemaDesignerPage />}
-          {settingsTab === 'api-cli' && <ApiCliPage />}
-          {settingsTab === 'pipeline-builder' && <PipelineBuilderPage />}
-          {settingsTab === 'api-docs' && <ApiDocsPage />}
-          {settingsTab === 'code-merge' && <CodeMergePage />}
-          {settingsTab === 'voice-input' && <VoicePage />}
-          {settingsTab === 'model-routing' && <ModelRoutingPage />}
-          {settingsTab === 'context-index' && <ContextIndexPage />}
-          {settingsTab === 'deployment-health' && <DeploymentHealthPage />}
-          {settingsTab === 'generative-ui' && <GenerativeUiPage />}
-          {settingsTab === 'mobile-app' && <MobileAppPage />}
-          {settingsTab === 'background-agents' && <BackgroundAgentPage />}
-          {settingsTab === 'platform-upgrade' && <PlatformUpgradePage />}
-          {settingsTab === 'visual-prompt' && <VisualPromptPage />}
-          {settingsTab === 'multi-framework' && <MultiFrameworkPage />}
-          {settingsTab === 'view-transitions' && <ViewTransitionPage />}
-          {settingsTab === 'nl-schema' && <NlSchemaDesignerPage />}
-          {settingsTab === 'query-config' && <QueryConfigPage />}
-          {settingsTab === 'agentic-planning' && <AgenticPlannerPage />}
-          {settingsTab === 'visual-regression' && <VisualRegressionPage />}
-          {settingsTab === 'mcp-gateway' && <McpGatewayPage />}
-          {settingsTab === 'codebase-memory' && <CodebaseMemoryPage />}
-          {settingsTab === 'figma-import' && <FigmaImportPage />}
-          {settingsTab === 'arena' && <ArenaPage />}
-          {settingsTab === 'visual-overlay' && <VisualOverlayPage />}
-          {settingsTab === 'semantic-search' && <SemanticSearchPage />}
-          {settingsTab === 'planning-mode' && <PlanningModePage />}
-          {settingsTab === 'project-docs' && <ProjectDocsPage />}
-          {settingsTab === 'ai-elements' && <AiElementsPage />}
-          {settingsTab === 'review-pipeline' && <ReviewPipelinePage />}
-          {settingsTab === 'oauth-connectors' && <OAuthConnectorsPage />}
-          {settingsTab === 'mcp-tools' && <McpToolIntegrationPage />}
-          {settingsTab === 'ai-model' && <AiModelPage />}
-          {settingsTab === 'bidir-sync' && <BidirectionalGitSyncPage />}
-          {settingsTab === 'self-healing-test' && <SelfHealingTestPage />}
-          {settingsTab === 'multi-agent-test' && <MultiAgentTestPage />}
-          {settingsTab === 'database-branching' && <DatabaseBranchPage />}
-          {settingsTab === 'sandbox' && <SandboxExecutionPage />}
-          {settingsTab === 'dynamic-intelligence' && <DynamicIntelligencePage />}
-          {settingsTab === 'agent-automation' && <AgentAutomationPage />}
-          {settingsTab === 'usage-dashboard' && <UsageDashboardPage />}
-          {settingsTab === 'orchestration' && <SubagentOrchestrationPage />}
-          {settingsTab === 'langgraph' && <LangGraphPage />}
-          {settingsTab === 'hybrid-cache' && <HybridCachePage />}
-          {settingsTab === 'playwright-healing' && <PlaywrightHealingPage />}
-          {settingsTab === 'self-healing-code' && <SelfHealingPage />}
-          {settingsTab === 'production-sandboxes' && <ProductionSandboxPage />}
-          {settingsTab === 'org-memory' && <OrgMemoryPage />}
-          {settingsTab === 'agent-rules' && <AgentRulesPage />}
-          {settingsTab === 'server-components' && <ServerComponentsPage />}
-          {settingsTab === 'code-lint' && <CodeLintPage />}
-          {settingsTab === 'vector-search' && <VectorSearchPage />}
-          {settingsTab === 'repl-test' && <ReplTestPage />}
-          {settingsTab === 'agent-terminal' && <AgentTerminalPage />}
-          {settingsTab === 'composer' && <ComposerPage />}
-          {settingsTab === 'dotnet-perf' && <DotnetPerfPage />}
-          {settingsTab === 'multi-model' && <MultiModelRoutingPage />}
-          {settingsTab === 'biome-lint' && <BiomeLintPage />}
-          {settingsTab === 'deepwiki' && <DeepWikiPage />}
-          {settingsTab === 'build-toolchain' && <BuildToolchainPage />}
-          {settingsTab === 'vision-to-code' && <VisionToCodePage />}
-          {settingsTab === 'dotnet10-upgrade' && <DotnetUpgradePage />}
-          {settingsTab === 'parallel-agents' && <ParallelAgentsPage />}
-          {settingsTab === 'webmcp' && <WebMcpPage />}
-          {settingsTab === 'agent-sdk' && <AgentSdkPage />}
-          {settingsTab === 'auto-terminal' && <TerminalExecutionPage />}
-          {settingsTab === 'turso-database' && <TursoDatabasePage />}
-          {settingsTab === 'workers-ai' && <WorkersAiPage />}
-          {settingsTab === 'react-use-hook' && <ReactUseHookPage />}
-          {settingsTab === 'edit-predictions' && <EditPredictionPage />}
-          {settingsTab === 'browser-ide' && <BrowserIdePage />}
-          {settingsTab === 'governance' && <GovernancePage />}
-          {settingsTab === 'inference-cost' && <InferenceCostPage />}
-          {settingsTab === 'language-expansion' && <LanguageExpansionPage />}
-          {settingsTab === 'hybrid-validation' && <HybridValidationPage />}
-          {settingsTab === 'agent-messages' && <AgentMessagesPage />}
-          {settingsTab === 'agent-trace' && <AgentTracePage />}
-          {settingsTab === 'agentic-workflows' && <AgenticWorkflowsPage />}
-          {settingsTab === 'confidence-scoring' && <ConfidenceScorePage />}
-          {settingsTab === 'ai-marketplace' && <AiModelMarketplacePage />}
-          {settingsTab === 'agent-inbox' && <AgentInboxPage />}
-          {settingsTab === 'agent-skills' && <AgentSkillsPage />}
+      {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
+      {settingsTab === 'usage' && <UsagePage />}
+      {settingsTab === 'billing' && <BillingPage />}
+      {settingsTab === 'payments' && <PaymentHistoryPage />}
+      {settingsTab === 'memories' && <MemoryPage />}
+      {settingsTab === 'preferences' && <PreferencePage />}
+      {settingsTab === 'infrastructure' && <InfrastructurePage />}
+      {settingsTab === 'secrets' && <SecretDetectionPage />}
+      {settingsTab === 'preview' && <PreviewDeploymentPage />}
+      {settingsTab === 'generation' && <GenerationManifestPage />}
+      {settingsTab === 'oauth' && <OAuthCompliancePage />}
+      {settingsTab === 'compiler' && <CompilerValidationPage />}
+      {settingsTab === 'observability' && <ObservabilityPage />}
+      {settingsTab === 'workflows' && <WorkflowPage />}
+      {settingsTab === 'specifications' && <SpecificationPage />}
+      {settingsTab === 'github-sync' && <GitHubSyncPage />}
+      {settingsTab === 'code-review' && <CodeReviewPage />}
+      {settingsTab === 'streaming-generation' && <StreamingGenerationPage />}
+      {settingsTab === 'mcp-integration' && <McpIntegrationPage />}
+      {settingsTab === 'analytics' && <AnalyticsDashboardPage />}
+      {settingsTab === 'marketplace' && <MarketplacePage />}
+      {settingsTab === 'containerization' && <ContainerizationPage />}
+      {settingsTab === 'test-generation' && <TestGenerationPage />}
+      {settingsTab === 'collaborative-editing' && <CollaborativeEditingPage />}
+      {settingsTab === 'onboarding' && <OnboardingPage />}
+      {settingsTab === 'version-history' && <ProjectVersionPage />}
+      {settingsTab === 'component-preview' && <ComponentPreviewPage />}
+      {settingsTab === 'variant-comparison' && <VariantComparisonPage />}
+      {settingsTab === 'performance' && <PerformanceProfilePage />}
+      {settingsTab === 'schema-designer' && <SchemaDesignerPage />}
+      {settingsTab === 'api-cli' && <ApiCliPage />}
+      {settingsTab === 'pipeline-builder' && <PipelineBuilderPage />}
+      {settingsTab === 'api-docs' && <ApiDocsPage />}
+      {settingsTab === 'code-merge' && <CodeMergePage />}
+      {settingsTab === 'voice-input' && <VoicePage />}
+      {settingsTab === 'model-routing' && <ModelRoutingPage />}
+      {settingsTab === 'context-index' && <ContextIndexPage />}
+      {settingsTab === 'deployment-health' && <DeploymentHealthPage />}
+      {settingsTab === 'generative-ui' && <GenerativeUiPage />}
+      {settingsTab === 'mobile-app' && <MobileAppPage />}
+      {settingsTab === 'background-agents' && <BackgroundAgentPage />}
+      {settingsTab === 'platform-upgrade' && <PlatformUpgradePage />}
+      {settingsTab === 'visual-prompt' && <VisualPromptPage />}
+      {settingsTab === 'multi-framework' && <MultiFrameworkPage />}
+      {settingsTab === 'view-transitions' && <ViewTransitionPage />}
+      {settingsTab === 'nl-schema' && <NlSchemaDesignerPage />}
+      {settingsTab === 'query-config' && <QueryConfigPage />}
+      {settingsTab === 'agentic-planning' && <AgenticPlannerPage />}
+      {settingsTab === 'visual-regression' && <VisualRegressionPage />}
+      {settingsTab === 'mcp-gateway' && <McpGatewayPage />}
+      {settingsTab === 'codebase-memory' && <CodebaseMemoryPage />}
+      {settingsTab === 'figma-import' && <FigmaImportPage />}
+      {settingsTab === 'arena' && <ArenaPage />}
+      {settingsTab === 'visual-overlay' && <VisualOverlayPage />}
+      {settingsTab === 'semantic-search' && <SemanticSearchPage />}
+      {settingsTab === 'planning-mode' && <PlanningModePage />}
+      {settingsTab === 'project-docs' && <ProjectDocsPage />}
+      {settingsTab === 'ai-elements' && <AiElementsPage />}
+      {settingsTab === 'review-pipeline' && <ReviewPipelinePage />}
+      {settingsTab === 'oauth-connectors' && <OAuthConnectorsPage />}
+      {settingsTab === 'mcp-tools' && <McpToolIntegrationPage />}
+      {settingsTab === 'ai-model' && <AiModelPage />}
+      {settingsTab === 'bidir-sync' && <BidirectionalGitSyncPage />}
+      {settingsTab === 'self-healing-test' && <SelfHealingTestPage />}
+      {settingsTab === 'multi-agent-test' && <MultiAgentTestPage />}
+      {settingsTab === 'database-branching' && <DatabaseBranchPage />}
+      {settingsTab === 'sandbox' && <SandboxExecutionPage />}
+      {settingsTab === 'dynamic-intelligence' && <DynamicIntelligencePage />}
+      {settingsTab === 'agent-automation' && <AgentAutomationPage />}
+      {settingsTab === 'usage-dashboard' && <UsageDashboardPage />}
+      {settingsTab === 'orchestration' && <SubagentOrchestrationPage />}
+      {settingsTab === 'langgraph' && <LangGraphPage />}
+      {settingsTab === 'hybrid-cache' && <HybridCachePage />}
+      {settingsTab === 'playwright-healing' && <PlaywrightHealingPage />}
+      {settingsTab === 'self-healing-code' && <SelfHealingPage />}
+      {settingsTab === 'production-sandboxes' && <ProductionSandboxPage />}
+      {settingsTab === 'org-memory' && <OrgMemoryPage />}
+      {settingsTab === 'agent-rules' && <AgentRulesPage />}
+      {settingsTab === 'server-components' && <ServerComponentsPage />}
+      {settingsTab === 'code-lint' && <CodeLintPage />}
+      {settingsTab === 'vector-search' && <VectorSearchPage />}
+      {settingsTab === 'repl-test' && <ReplTestPage />}
+      {settingsTab === 'agent-terminal' && <AgentTerminalPage />}
+      {settingsTab === 'composer' && <ComposerPage />}
+      {settingsTab === 'dotnet-perf' && <DotnetPerfPage />}
+      {settingsTab === 'multi-model' && <MultiModelRoutingPage />}
+      {settingsTab === 'biome-lint' && <BiomeLintPage />}
+      {settingsTab === 'deepwiki' && <DeepWikiPage />}
+      {settingsTab === 'build-toolchain' && <BuildToolchainPage />}
+      {settingsTab === 'vision-to-code' && <VisionToCodePage />}
+      {settingsTab === 'dotnet10-upgrade' && <DotnetUpgradePage />}
+      {settingsTab === 'parallel-agents' && <ParallelAgentsPage />}
+      {settingsTab === 'webmcp' && <WebMcpPage />}
+      {settingsTab === 'agent-sdk' && <AgentSdkPage />}
+      {settingsTab === 'auto-terminal' && <TerminalExecutionPage />}
+      {settingsTab === 'turso-database' && <TursoDatabasePage />}
+      {settingsTab === 'workers-ai' && <WorkersAiPage />}
+      {settingsTab === 'react-use-hook' && <ReactUseHookPage />}
+      {settingsTab === 'edit-predictions' && <EditPredictionPage />}
+      {settingsTab === 'browser-ide' && <BrowserIdePage />}
+      {settingsTab === 'governance' && <GovernancePage />}
+      {settingsTab === 'inference-cost' && <InferenceCostPage />}
+      {settingsTab === 'language-expansion' && <LanguageExpansionPage />}
+      {settingsTab === 'hybrid-validation' && <HybridValidationPage />}
+      {settingsTab === 'agent-messages' && <AgentMessagesPage />}
+      {settingsTab === 'agent-trace' && <AgentTracePage />}
+      {settingsTab === 'agentic-workflows' && <AgenticWorkflowsPage />}
+      {settingsTab === 'agent-trace' && <AgentTracePage />}
+      {settingsTab === 'confidence-scoring' && <ConfidenceScorePage />}
+      {settingsTab === 'ai-marketplace' && <AiModelMarketplacePage />}
+      {settingsTab === 'agent-inbox' && <AgentInboxPage />}
+      {settingsTab === 'agent-skills' && <AgentSkillsPage />}
         </div>
       </div>
     </section>

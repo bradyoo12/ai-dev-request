@@ -26,6 +26,7 @@ import PowerLevelSelector from '../components/PowerLevelSelector'
 import type { PowerLevel } from '../components/PowerLevelSelector'
 import ModelQuickSelector from '../components/ModelQuickSelector'
 import CreditEstimateCard from '../components/CreditEstimateCard'
+import CreditEstimatePreview from '../components/CreditEstimatePreview'
 
 type ViewState = 'form' | 'submitting' | 'analyzing' | 'analyzed' | 'generatingProposal' | 'proposal' | 'approving' | 'building' | 'verifying' | 'completed' | 'error'
 
@@ -584,6 +585,7 @@ export default function HomePage() {
             </div>
             <ModelQuickSelector value={selectedModel} onChange={setSelectedModel} />
             <PowerLevelSelector value={powerLevel} onChange={setPowerLevel} />
+            <CreditEstimatePreview />
             <button type="submit" disabled={!request.trim()}
               className="mt-6 w-full py-4 bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue disabled:from-warm-700 disabled:to-warm-700 disabled:cursor-not-allowed rounded-2xl font-semibold text-lg transition-all btn-premium">
               {t('form.submit')}
@@ -914,6 +916,16 @@ export default function HomePage() {
 
             {submittedRequest && (
               <CostSavingsDisplay requestId={submittedRequest.id} />
+            )}
+
+            {analysisResult && (
+              <CreditEstimateCard
+                complexity={analysisResult.complexity}
+                analysisTokensUsed={analysisResult.tokensUsed}
+                proposalTokensUsed={proposalResult?.tokensUsed}
+                buildTokensUsed={productionResult.tokensUsed}
+                completedSteps={['analysis', 'proposal', 'build']}
+              />
             )}
 
             {productionResult.production.accessibilityScore != null && (

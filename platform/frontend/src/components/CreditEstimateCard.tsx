@@ -11,6 +11,8 @@ interface CreditEstimateCardProps {
   analysisTokensUsed?: number
   /** Credits already used for proposal (if available) */
   proposalTokensUsed?: number
+  /** Credits already used for build (if available) */
+  buildTokensUsed?: number
   /** Which steps have already been completed */
   completedSteps?: ('analysis' | 'proposal' | 'build')[]
 }
@@ -30,6 +32,7 @@ export default function CreditEstimateCard({
   complexity,
   analysisTokensUsed,
   proposalTokensUsed,
+  buildTokensUsed,
   completedSteps = [],
 }: CreditEstimateCardProps) {
   const { t } = useTranslation()
@@ -67,7 +70,7 @@ export default function CreditEstimateCard({
 
   const analysisCost = analysisTokensUsed ?? Math.round(getBaseCost('analysis') * multiplier)
   const proposalCost = proposalTokensUsed ?? Math.round(getBaseCost('proposal') * multiplier)
-  const buildCost = Math.round(getBaseCost('build') * multiplier)
+  const buildCost = buildTokensUsed ?? Math.round(getBaseCost('build') * multiplier)
 
   // Calculate total estimated cost for all steps
   const alreadySpent = (completedSteps.includes('analysis') ? analysisCost : 0) +

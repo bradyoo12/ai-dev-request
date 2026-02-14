@@ -823,103 +823,204 @@ For each failed run:
    **Code/config failure** (build error, test failure, lint error, deployment config issue):
    - Proceed to Step 4b-3
 
-#### Step 4b-3: Create Ticket for Build/Deploy Failures Using create-ticket Skill
+#### Step 4b-3: Classify and Fix Code/Config Failures
 
-For each code/config failure, use the **/create-ticket** skill to create a ticket that will be picked up in the next cycle.
+1. **Determine if the failure is related to the just-merged PR:**
 
-1. **Gather failure context:**
-   ```bash
-   # Get the full error log excerpt
-   ERROR_LOG=$(gh run view <run_id> --repo bradyoo12/ai-dev-request --log-failed 2>&1 | head -100)
+   a. Get the failed run details:
+      ```bash
+      FAILED_RUN_SHA=$(gh run view <run_id> --repo bradyoo12/ai-dev-request --json headSha --jq '.headSha')
+      ```
 
-   # Get the failed run details
-   RUN_INFO=$(gh run view <run_id> --repo bradyoo12/ai-dev-request --json displayTitle,headSha,headBranch,conclusion,createdAt,event --jq '{title: .displayTitle, sha: .headSha, branch: .headBranch, event: .event}')
+   b. Check if this commit was part of a recently merged PR:
+      ```bash
+      RELATED_PR=$(gh api "search/issues?q=repo:bradyoo12/ai-dev-request+is:pr+is:merged+sha:$FAILED_RUN_SHA&per_page=1" --jq '.items[0].number')
+      ```
 
-   WORKFLOW_NAME=$(echo "$RUN_INFO" | jq -r '.title')
-   HEAD_SHA=$(echo "$RUN_INFO" | jq -r '.sha')
-   HEAD_BRANCH=$(echo "$RUN_INFO" | jq -r '.branch')
-   ```
+   c. If `RELATED_PR` is found and it was merged in the last 30 minutes, this is a **same-ticket failure** (the PR broke the build). Otherwise, it's an **unrelated failure**.
 
-2. **Find the related PR (if any):**
-   ```bash
-   # Check if this commit was part of a recently merged PR
-   RELATED_PR_INFO=$(gh api "search/issues?q=repo:bradyoo12/ai-dev-request+is:pr+is:merged+sha:$HEAD_SHA&per_page=1" --jq '.items[0] | {number, title, url}')
-   RELATED_PR_NUMBER=$(echo "$RELATED_PR_INFO" | jq -r '.number // empty')
-   RELATED_PR_TITLE=$(echo "$RELATED_PR_INFO" | jq -r '.title // empty')
-   ```
+2. Analyze the error logs and classify the failure type:
 
-3. **Create a ticket using the create-ticket skill:**
+   **Quick Fix (fix immediately):**
+   - Lint/format violations (prettier, eslint)
+   - Simple type errors (missing imports, typos)
+   - Outdated snapshots
+   - Missing semicolons or trivial syntax issues
+   - Wrong file paths in configs
+   - Missing references or dependencies
+   - Clear one-line fixes
 
-   Invoke: `Skill(skill: "create-ticket", args: "<ticket-description>")`
+   **Needs Investigation (reopen ticket or create new one):**
+   - Test failures with unclear root cause
+   - Complex build errors affecting multiple files
+   - Race conditions or flaky tests
+   - Deployment/infrastructure issues
+   - Database migration failures
+   - Environment-specific bugs
+   - Anything requiring >15 minutes of analysis
 
-   Where `<ticket-description>` is formatted as:
-   ```
-   [CI/CD] Fix build/deploy failure in {WORKFLOW_NAME}
+3. **If QUICK FIX + SAME-TICKET FAILURE:**
 
-   GitHub Actions workflow '{WORKFLOW_NAME}' failed on branch '{HEAD_BRANCH}'.
+   a. Create a fix branch (worktree-safe):
+      ```bash
+      git fetch origin
+      git checkout -b fix/ci-<run_id> origin/main
+      ```
 
-   **Failure Details:**
-   - Run ID: <run_id>
-   - Run URL: https://github.com/bradyoo12/ai-dev-request/actions/runs/<run_id>
-   - Branch: {HEAD_BRANCH}
-   - Commit: {HEAD_SHA}
-   - Related PR: #{RELATED_PR_NUMBER} - {RELATED_PR_TITLE} (if found, else "None")
+   b. Fix the issue in the worktree
 
-   **Error Log Excerpt:**
-   ```
-   {ERROR_LOG}
-   ```
+   c. Run the relevant checks locally to verify the fix:
+      - Build: `cd platform/frontend && npm run build`
+      - Tests: `cd platform/frontend && npm test`
+      - Backend: `cd platform/backend/AiDevRequest.API && dotnet build`
 
-   **Root Cause:**
-   [Analyze the error log and describe the root cause - e.g., "Missing entity in DbContext.OnModelCreating", "Type error: missing import", "Build error: wrong namespace", etc.]
+   d. Commit and push (reference the original ticket):
+      ```bash
+      git add -A
+      git commit -m "fix: resolve CI failure from Actions run #<run_id>
 
-   **Fix Required:**
-   [Describe what needs to be fixed based on the error - e.g., "Add GeneratedAgent entity to AiDevRequestDbContext.OnModelCreating method", "Import missing namespace in file X", etc.]
+Refs #<RELATED_PR ticket number>
 
-   **Testing:**
-   1. Fix the identified issue locally
-   2. Run relevant build/test commands to verify:
-      - Frontend: `cd platform/frontend && npm run build && npm test`
-      - Backend: `cd platform/backend/AiDevRequest.API && dotnet build && dotnet test`
-   3. Commit and create PR
-   4. Verify CI passes on the PR
-   5. Merge and verify main branch CI passes
-   ```
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+      git push origin fix/ci-<run_id>
+      ```
 
-4. **Add a comment to the related PR/ticket (if found):**
+   e. Create a PR and merge immediately:
+      ```bash
+      gh pr create --repo bradyoo12/ai-dev-request --title "fix: CI failure from #<RELATED_PR ticket number>" --body "Fixes CI failure from GitHub Actions run #<run_id> caused by PR #<RELATED_PR>.\n\n**Root cause:** <description>\n**Fix:** <what was changed>\n\nRefs #<RELATED_PR ticket number>"
+      # Wait for PR number
+      gh pr merge <pr_number> --merge --delete-branch
+      ```
 
-   If `RELATED_PR_NUMBER` exists:
-   ```bash
-   gh api --method POST "repos/bradyoo12/ai-dev-request/issues/$RELATED_PR_NUMBER/comments" \
-     -f body="⚠️ **CI Failure After Merge**
+   f. Add a comment to the original ticket explaining the fix:
+      ```bash
+      gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<RELATED_PR ticket number>/comments" -f body="✅ **CI Failure Fixed**\n\nGitHub Actions run #<run_id> failed after merging this PR.\n\n**Root cause:** <description>\n**Fix:** <what was changed>\n**Fix PR:** #<fix_pr_number>\n\nThe fix has been merged and CI is now passing."
+      ```
 
-GitHub Actions run #<run_id> failed after merging this PR.
+   g. Return to worktree main and verify:
+      ```bash
+      git fetch origin && git checkout --detach origin/main
+      sleep 30
+      gh run list --repo bradyoo12/ai-dev-request --branch main --limit 3 --json databaseId,status,conclusion,name
+      ```
 
-**Workflow:** $WORKFLOW_NAME
-**Error:** [Brief 1-line summary of the error]
-**Logs:** https://github.com/bradyoo12/ai-dev-request/actions/runs/<run_id>
+   h. Log: "Fixed CI failure #<run_id> as part of ticket #<RELATED_PR ticket number>"
 
-A fix ticket has been created: #<new_ticket_number>
+4. **If QUICK FIX + UNRELATED FAILURE:**
 
-The build/deploy is currently broken on \`main\` branch."
-   ```
+   a. Create a fix branch (worktree-safe):
+      ```bash
+      git fetch origin
+      git checkout -b fix/ci-<run_id> origin/main
+      ```
 
-5. **Log and proceed:**
-   ```bash
-   echo "✓ Created ticket #<new_ticket_number> for CI failure run #<run_id>"
-   if [ -n "$RELATED_PR_NUMBER" ]; then
-     echo "✓ Added comment to related ticket #$RELATED_PR_NUMBER"
-   fi
-   echo "→ This ticket will be picked up in the next b-start cycle"
-   ```
+   b. Fix the issue in the worktree
 
-6. **Invalidate the cache** so the new ticket appears in the next cycle:
-   ```bash
-   bash .claude/scripts/gh-project-cache.sh invalidate
-   ```
+   c. Run the relevant checks locally to verify the fix
 
-7. Proceed to Step 5
+   d. Commit and push:
+      ```bash
+      git add -A
+      git commit -m "fix: resolve CI failure from Actions run #<run_id>
 
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+      git push origin fix/ci-<run_id>
+      ```
+
+   e. Create a PR and merge immediately:
+      ```bash
+      gh pr create --repo bradyoo12/ai-dev-request --title "[CI Fix] <short description of failure>" --body "Fixes CI failure from GitHub Actions run #<run_id>.\n\n**Root cause:** <description>\n**Fix:** <what was changed>"
+      # Wait for PR number
+      gh pr merge <pr_number> --merge --delete-branch
+      ```
+
+   f. Return to worktree main and verify
+
+   g. Log: "Fixed unrelated CI failure #<run_id> immediately"
+
+5. **If NEEDS INVESTIGATION + SAME-TICKET FAILURE:**
+
+   a. Reopen the original ticket:
+      ```bash
+      gh api --method PATCH "repos/bradyoo12/ai-dev-request/issues/<RELATED_PR ticket number>" -f state=open
+      ```
+
+   b. Move the ticket back to "In Progress" and add "on hold" label:
+      ```bash
+      gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id <item_id> --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 47fc9ee4
+      gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<RELATED_PR ticket number>/labels" -f "labels[]=on hold"
+      ```
+
+   c. Add a detailed comment explaining the failure:
+      ```bash
+      gh api --method POST "repos/bradyoo12/ai-dev-request/issues/<RELATED_PR ticket number>/comments" -f body="⚠️ **CI Failure After Merge**\n\nGitHub Actions run #<run_id> failed after merging this PR.\n\n**Workflow:** <workflow_name>\n**Error Summary:**\n\`\`\`\n<error_log_excerpt>\n\`\`\`\n\n**Logs:** https://github.com/bradyoo12/ai-dev-request/actions/runs/<run_id>\n\n**Classification:** Needs investigation due to <reason>\n\nThis ticket has been reopened and marked 'on hold' for investigation."
+      ```
+
+   d. Invalidate cache and log:
+      ```bash
+      bash .claude/scripts/gh-project-cache.sh invalidate
+      echo "Reopened ticket #<RELATED_PR ticket number> due to CI failure requiring investigation"
+      ```
+
+   e. Proceed to Step 5
+
+6. **If NEEDS INVESTIGATION + UNRELATED FAILURE:**
+
+   a. Create a detailed investigation ticket (REST):
+      ```bash
+      gh api --method POST "repos/bradyoo12/ai-dev-request/issues" \
+        -f title="[CI] Investigate failure in <workflow_name>" \
+        -f body="GitHub Actions run #<run_id> failed on \`main\` branch.\n\n**Workflow:** <workflow_name>\n**Branch:** <branch>\n**Error Summary:**\n\`\`\`\n<error_log_excerpt>\n\`\`\`\n\n**Reproduction:** Logs available at https://github.com/bradyoo12/ai-dev-request/actions/runs/<run_id>\n\n**Classification:** Needs investigation due to <reason>\n\n**Next Steps:**\n1. Analyze root cause\n2. Determine fix approach\n3. Implement and test fix\n4. Verify CI passes" \
+        -f "labels[]=bug" \
+        -f "labels[]=ci"
+      ```
+
+   b. Add the ticket to the project and set to **Ready** (with error handling):
+      ```bash
+      # Add to project
+      ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url <issue_url> --format json --jq '.id')
+
+      if [ -z "$ITEM_ID" ]; then
+        echo "❌ ERROR: Failed to add issue to project board"
+      else
+        echo "✓ Added issue to project (Item ID: $ITEM_ID)"
+
+        # Set status to Ready with error handling
+        if ! gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id "$ITEM_ID" \
+             --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c 2>&1; then
+
+          # Failed - check if rate limited
+          CURRENT_USER=$(gh api user --jq '.login' 2>/dev/null)
+          echo "❌ ERROR: Failed to set status to Ready for Item $ITEM_ID (account: $CURRENT_USER)"
+          echo "   Attempting to switch accounts and retry..."
+
+          # Switch accounts
+          if [ "$CURRENT_USER" = "bradyoo12" ]; then
+            gh auth switch -u byooxbert 2>/dev/null && echo "   Switched to byooxbert"
+          else
+            gh auth switch -u bradyoo12 2>/dev/null && echo "   Switched to bradyoo12"
+          fi
+
+          # Retry once
+          if gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id "$ITEM_ID" \
+               --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c 2>&1; then
+            echo "   ✓ Retry succeeded - status set to Ready"
+          else
+            echo "   ❌ Retry also failed - ticket will have 'No Status'"
+            echo "   Manual fix needed: gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c"
+          fi
+        else
+          echo "✓ Status set to Ready"
+
+          # Move to top (best-effort, don't fail if this errors)
+          gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }" 2>/dev/null && echo "✓ Moved to top of column" || echo "⚠️ Could not move to top"
+        fi
+      fi
+      ```
+
+   c. Log: "Created investigation ticket for CI failure #<run_id> - ticket #<issue_number>"
+
+   d. Proceed to Step 5 (this ticket will be picked up in the next cycle)
 
 ### Step 5: b-review — Verify with Agent Team
 

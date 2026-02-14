@@ -131,13 +131,14 @@ public class TeamService : ITeamService
         var targetUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == memberEmail);
         if (targetUser == null) return null;
 
-        var existing = await _db.TeamMembers.FirstOrDefaultAsync(m => m.TeamId == teamId && m.UserId == targetUser.Id);
+        var targetUserIdStr = targetUser.Id.ToString();
+        var existing = await _db.TeamMembers.FirstOrDefaultAsync(m => m.TeamId == teamId && m.UserId == targetUserIdStr);
         if (existing != null) return existing;
 
         var member = new TeamMember
         {
             TeamId = teamId,
-            UserId = targetUser.Id,
+            UserId = targetUserIdStr,
             Role = role,
         };
         _db.TeamMembers.Add(member);
@@ -147,7 +148,7 @@ public class TeamService : ITeamService
             TeamId = teamId,
             UserId = userId,
             Action = "member_added",
-            TargetUserId = targetUser.Id,
+            TargetUserId = targetUserIdStr,
             Detail = $"Added {targetUser.Email} as {role}",
         });
 

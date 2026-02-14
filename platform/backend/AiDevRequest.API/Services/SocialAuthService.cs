@@ -447,7 +447,7 @@ public class SocialAuthService : ISocialAuthService
         // Migrate anonymous data if provided
         if (!string.IsNullOrEmpty(anonymousUserId))
         {
-            await MigrateAnonymousDataAsync(anonymousUserId, user.Id);
+            await MigrateAnonymousDataAsync(anonymousUserId, user.Id.ToString());
         }
 
         _logger.LogInformation("New user created via {Provider}: {Email}", provider, normalizedEmail);

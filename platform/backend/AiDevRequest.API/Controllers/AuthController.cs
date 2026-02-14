@@ -47,7 +47,7 @@ public class AuthController : ControllerBase
                 Token = token,
                 User = new UserDto
                 {
-                    Id = user.Id,
+                    Id = user.Id.ToString(),
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
@@ -87,7 +87,7 @@ public class AuthController : ControllerBase
                 Token = token,
                 User = new UserDto
                 {
-                    Id = user.Id,
+                    Id = user.Id.ToString(),
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,
@@ -135,7 +135,7 @@ public class AuthController : ControllerBase
                 Token = token,
                 User = new UserDto
                 {
-                    Id = user.Id,
+                    Id = user.Id.ToString(),
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     ProfileImageUrl = user.ProfileImageUrl,

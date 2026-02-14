@@ -55,7 +55,7 @@ public class AuthService : IAuthService
         // Migrate anonymous data if provided
         if (!string.IsNullOrEmpty(anonymousUserId))
         {
-            await MigrateAnonymousDataAsync(anonymousUserId, user.Id);
+            await MigrateAnonymousDataAsync(anonymousUserId, user.Id.ToString());
         }
 
         _logger.LogInformation("User registered: {Email} (migrated from {AnonymousId})", normalizedEmail, anonymousUserId ?? "none");
@@ -101,9 +101,9 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim("display_name", user.DisplayName ?? user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

@@ -33,7 +33,9 @@ public class SupportController : ControllerBase
     private async Task<bool> IsAdmin()
     {
         var userId = GetUserId();
-        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+        if (!Guid.TryParse(userId, out var userGuid))
+            return false;
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userGuid);
         return user?.IsAdmin == true;
     }
 

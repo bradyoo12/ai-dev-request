@@ -706,6 +706,7 @@ All under `platform/frontend/src/pages/`. 98 pages total.
 | RecommendationsPage | /recommendations | App recommendations |
 | AgentInboxPage | /settings/agent-inbox | Agent inbox |
 | TemplatesPage | /templates | App/website templates gallery with category filtering |
+| TicketProgressPage | /tickets | User ticket progress tracking with status filtering, search, expandable detail with timeline |
 
 ### Config & Misc
 
@@ -818,7 +819,7 @@ All under `platform/frontend/src/components/`.
 
 ## Frontend API Modules
 
-All under `platform/frontend/src/api/`. 91 modules total.
+All under `platform/frontend/src/api/`. 92 modules total.
 
 ### Core
 
@@ -833,6 +834,7 @@ All under `platform/frontend/src/api/`. 91 modules total.
 | sites.ts | SitesController | Site management |
 | hosting.ts | HostingController | Hosting plans |
 | domains.ts | DomainsController | Domain management |
+| ticket-progress.ts | RequestsController | User ticket progress tracking |
 
 ### AI & Generation
 

@@ -114,6 +114,7 @@ builder.Services.AddScoped<IProjectCostEstimationService, ProjectCostEstimationS
 builder.Services.AddScoped<IProjectAggregationService, ProjectAggregationService>();
 builder.Services.AddScoped<IPlaywrightMcpService, PlaywrightMcpService>();
 builder.Services.AddScoped<ILocalModelInferenceService, LocalModelInferenceService>();
+builder.Services.AddScoped<IVisualWorkflowService, VisualWorkflowService>();
 
 // Add SSR (Server-Side Rendering) service for pre-rendered page delivery
 builder.Services.AddSingleton<ISsrService, SsrService>();

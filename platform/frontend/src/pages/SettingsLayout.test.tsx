@@ -231,14 +231,16 @@ describe('SettingsLayout', () => {
     expect(screen.getByText('settings.title')).toBeInTheDocument()
   })
 
-  it('renders tab buttons', () => {
+  it('renders tab buttons in the active group', () => {
     render(<SettingsLayout />)
+    // The "core" group is expanded by default since "tokens" is the active tab
+    // All tabs in the core group should be visible
     expect(screen.getByText('settings.tabs.tokens')).toBeInTheDocument()
-    expect(screen.getByText('settings.tabs.usage')).toBeInTheDocument()
-    expect(screen.getByText('settings.tabs.billing')).toBeInTheDocument()
-    expect(screen.getByText('settings.tabs.payments')).toBeInTheDocument()
-    expect(screen.getByText('settings.tabs.memories')).toBeInTheDocument()
     expect(screen.getByText('settings.tabs.preferences')).toBeInTheDocument()
+    expect(screen.getByText('settings.tabs.memories')).toBeInTheDocument()
+    // Group headers should be visible
+    expect(screen.getByText('settings.groups.core')).toBeInTheDocument()
+    expect(screen.getByText('settings.groups.billingUsage')).toBeInTheDocument()
   })
 
   it('renders tokens tab by default', () => {
@@ -246,16 +248,20 @@ describe('SettingsLayout', () => {
     expect(screen.getByTestId('settings-page')).toBeInTheDocument()
   })
 
-  it('switches to usage tab', async () => {
+  it('switches to usage tab after expanding group', async () => {
     render(<SettingsLayout />)
     const user = userEvent.setup()
+    // Usage is in the "Billing & Usage" group which is collapsed by default
+    await user.click(screen.getByText('settings.groups.billingUsage'))
     await user.click(screen.getByText('settings.tabs.usage'))
     expect(screen.getByTestId('usage-page')).toBeInTheDocument()
   })
 
-  it('switches to billing tab', async () => {
+  it('switches to billing tab after expanding group', async () => {
     render(<SettingsLayout />)
     const user = userEvent.setup()
+    // Billing is in the "Billing & Usage" group which is collapsed by default
+    await user.click(screen.getByText('settings.groups.billingUsage'))
     await user.click(screen.getByText('settings.tabs.billing'))
     expect(screen.getByTestId('billing-page')).toBeInTheDocument()
   })

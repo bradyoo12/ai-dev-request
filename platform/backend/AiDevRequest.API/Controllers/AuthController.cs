@@ -96,14 +96,17 @@ public class AuthController : ControllerBase
                 }
             });
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
         {
+            // Invalid credentials - return 401
+            _logger.LogWarning("Login attempt failed for {Email}: {Message}", dto.Email, ex.Message);
             return Unauthorized(new { error = "Invalid email or password." });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Login failed for {Email}", dto.Email);
-            return StatusCode(500, new { error = "Login failed." });
+            // Only true server errors should return 500
+            _logger.LogError(ex, "Unexpected error during login for {Email}", dto.Email);
+            return StatusCode(500, new { error = "An unexpected error occurred. Please try again later." });
         }
     }
 

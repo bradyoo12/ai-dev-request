@@ -4352,5 +4352,22 @@
   "tickets.activity.proposed": "Proposal generated",
   "tickets.activity.projectCreated": "Project created",
   "tickets.activity.viewProject": "View Project",
-  "tickets.activity.cancelled": "Request cancelled"
+  "tickets.activity.cancelled": "Request cancelled",
+
+  "subtasks.title": "Subtasks",
+  "subtasks.empty": "No subtasks for this request.",
+  "subtasks.approve": "Approve",
+  "subtasks.approveAll": "Approve All",
+  "subtasks.approving": "Approving...",
+  "subtasks.dependsOn": "Depends on",
+  "subtasks.dependency": "dependency",
+  "subtasks.credits": "credits",
+  "subtasks.order": "Order",
+  "subtasks.addSubtask": "Add Subtask",
+  "subtasks.status.pending": "Pending",
+  "subtasks.status.approved": "Approved",
+  "subtasks.status.rejected": "Rejected",
+  "subtasks.status.inprogress": "In Progress",
+  "subtasks.status.completed": "Completed",
+  "subtasks.status.cancelled": "Cancelled"
 }

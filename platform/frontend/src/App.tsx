@@ -33,6 +33,7 @@ const SupportBoardPage = lazy(() => import('./pages/SupportBoardPage'))
 const IterativeRefinementPage = lazy(() => import('./pages/IterativeRefinementPage'))
 const TemplatesPage = lazy(() => import('./pages/TemplatesPage'))
 const TicketProgressPage = lazy(() => import('./pages/TicketProgressPage'))
+const SubtasksPage = lazy(() => import('./pages/SubtasksPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function App() {
@@ -83,6 +84,7 @@ function App() {
             <Route path="/tickets" element={<ProtectedRoute><Suspense fallback={LazyFallback}><TicketProgressPage /></Suspense></ProtectedRoute>} />
             <Route path="/projects" element={<Suspense fallback={LazyFallback}><ProjectsPage /></Suspense>} />
             <Route path="/projects/:id" element={<Suspense fallback={LazyFallback}><ProjectDetailPage /></Suspense>} />
+            <Route path="/projects/:projectId/subtasks" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SubtasksPage /></Suspense></ProtectedRoute>} />
             <Route path="/sites" element={<Suspense fallback={LazyFallback}><SitesPage /></Suspense>} />
             <Route path="/my-sites" element={<Navigate to="/sites" replace />} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />

@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { StatusBadge } from '../components/StatusBadge'
 import FadeIn from '../components/motion/FadeIn'
 import StaggerChildren, { staggerItemVariants } from '../components/motion/StaggerChildren'
+import SubtaskList from '../components/SubtaskList'
 import {
   getUserTickets,
   getTicketDetail,
@@ -342,6 +343,23 @@ export default function TicketProgressPage() {
                                 )
                               })}
                             </div>
+                          </div>
+
+                          {/* Subtasks section */}
+                          <div className="pt-2 border-t border-warm-700/50">
+                            <SubtaskList
+                              requestId={selectedTicket.id}
+                              requestStatus={selectedTicket.status}
+                              onPlanApproved={() => {
+                                // Refresh ticket detail to update status
+                                getTicketDetail(selectedTicket.id).then(setSelectedTicket)
+                                loadTickets()
+                              }}
+                              onPlanRejected={() => {
+                                // Refresh ticket detail
+                                getTicketDetail(selectedTicket.id).then(setSelectedTicket)
+                              }}
+                            />
                           </div>
 
                           {/* Activity log */}

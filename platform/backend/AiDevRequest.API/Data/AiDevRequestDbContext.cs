@@ -181,6 +181,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<AiModelIntegration> AiModelIntegrations => Set<AiModelIntegration>();
     public DbSet<AgentInboxItem> AgentInboxItems => Set<AgentInboxItem>();
     public DbSet<AgentSkill> AgentSkills => Set<AgentSkill>();
+    public DbSet<Subtask> Subtasks => Set<Subtask>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1960,6 +1961,23 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.Status);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Subtask>(entity =>
+        {
+            entity.ToTable("subtasks");
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.DevRequestId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.ParentSubtaskId);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Description).HasMaxLength(5000);
+            entity.Property(e => e.EstimatedHours).HasPrecision(10, 2);
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            entity.Property(e => e.DependsOnSubtaskIdsJson).HasMaxLength(2000);
         });
     }
 }

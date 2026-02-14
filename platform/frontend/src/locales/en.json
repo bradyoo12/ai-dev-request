@@ -4214,5 +4214,20 @@
   "api.error.projectListFailed": "Failed to load projects",
   "api.error.projectLoadFailed": "Failed to load project details",
   "api.error.projectCostFailed": "Failed to load cost information",
-  "api.error.projectLogsFailed": "Failed to load project logs"
+  "api.error.projectLogsFailed": "Failed to load project logs",
+  "settings.groups.core": "Core",
+  "settings.groups.aiGeneration": "AI & Generation",
+  "settings.groups.codeQuality": "Code Quality",
+  "settings.groups.testing": "Testing",
+  "settings.groups.security": "Security",
+  "settings.groups.infrastructure": "Infrastructure",
+  "settings.groups.billingUsage": "Billing & Usage",
+  "settings.groups.integrations": "Integrations",
+  "settings.groups.collaboration": "Collaboration",
+  "settings.groups.analyticsAdmin": "Analytics & Admin",
+  "settings.groups.agents": "Agents",
+  "settings.groups.other": "Other",
+  "settings.searchTabs": "Search settings...",
+  "settings.clearSearch": "Clear search",
+  "settings.noResults": "No settings found"
 }

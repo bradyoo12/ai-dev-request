@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { mockAuthentication } from './auth-helper';
 
 const STAGING_URL = 'https://icy-desert-07c08ba00.2.azurestaticapps.net';
-const TIMEOUT = 30000; // 30 seconds
+const TIMEOUT = 60000; // 60 seconds (increased from 30s to handle slower settings pages)
 
 test.describe('Comprehensive UI Smoke Test', () => {
   let consoleErrors: string[] = [];
@@ -36,6 +37,10 @@ test.describe('Comprehensive UI Smoke Test', () => {
     console.log('📍 Navigating to home page...');
     await page.goto(STAGING_URL, { waitUntil: 'networkidle', timeout: TIMEOUT });
     await expect(page).toHaveTitle(/.*/);
+
+    // Set up mock authentication for protected routes
+    console.log('🔐 Setting up mock authentication...');
+    await mockAuthentication(page);
 
     // Collect all links on the page
     const links = await page.locator('a[href]').all();

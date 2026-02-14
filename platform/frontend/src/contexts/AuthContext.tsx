@@ -67,11 +67,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadTokenBalance])
 
   // Handle auth expiration (401 responses)
+  // Clear auth state but do NOT force the login modal open — let users
+  // continue browsing public pages. The login modal only appears when
+  // a user explicitly triggers requireAuth() (e.g., submitting a form
+  // or navigating to a protected route).
   useEffect(() => {
     const handleExpired = () => {
       setAuthUser(null)
       setTokenBalance(null)
-      setShowLogin(true)
     }
     window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired)
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired)

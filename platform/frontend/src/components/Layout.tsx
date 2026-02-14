@@ -65,13 +65,12 @@ export default function Layout() {
   )
 
   // --- Authenticated primary nav items (always visible) ---
+  // Support is kept in primary nav (not in More dropdown) so it's always accessible
   const authPrimaryNav = (
     <>
       <button onClick={() => navigateProtected('/projects')} className={navLinkClass} aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}>{t('header.projects')}</button>
       <button onClick={() => navigateProtected('/sites')} className={navLinkClass} aria-current={currentPath === '/sites' ? 'page' : undefined}>{t('header.mySites')}</button>
       <button onClick={() => navigateProtected('/suggestions')} className={navLinkClass} aria-current={currentPath === '/suggestions' ? 'page' : undefined}>{t('header.suggestions')}</button>
-      <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
-      <button onClick={() => navigateProtected('/settings')} className={navLinkClass} aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}>{t('header.settings')}</button>
       <Link to="/support" onClick={() => setMobileMenuOpen(false)} className={navLinkClass} aria-current={currentPath === '/support' ? 'page' : undefined}>{t('header.support')}</Link>
     </>
   )
@@ -79,6 +78,8 @@ export default function Layout() {
   // --- Authenticated secondary nav items (inside "More" dropdown on desktop, flat on mobile) ---
   const authSecondaryItems = (
     <>
+      <Link to="/#pricing" onClick={() => { setMobileMenuOpen(false); setMoreMenuOpen(false) }} className={navLinkAccentClass}>{t('header.pricing')}</Link>
+      <button onClick={() => navigateProtected('/settings')} className={navLinkAccentClass} aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}>{t('header.settings')}</button>
       <button onClick={() => navigateProtected('/recommendations')} className={navLinkAccentClass} aria-current={currentPath === '/recommendations' ? 'page' : undefined}>{t('header.recommendations')}</button>
       <button onClick={() => navigateProtected('/project-health')} className={navLinkAccentClass} aria-current={currentPath === '/project-health' ? 'page' : undefined}>{t('header.projectHealth')}</button>
       <button onClick={() => navigateProtected('/teams')} className={navLinkAccentClass} aria-current={currentPath === '/teams' ? 'page' : undefined}>{t('header.teams')}</button>

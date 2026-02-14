@@ -671,3 +671,62 @@ export async function getTemplates(category?: string, framework?: string): Promi
   if (!response.ok) return [];
   return response.json();
 }
+
+// ─── Subtask APIs ────────────────────────────────────────────────────
+
+export interface SubTaskDto {
+  id: string
+  devRequestId: string
+  title: string
+  description: string | null
+  status: string
+  order: number
+  estimatedCredits: number | null
+  dependsOnSubTaskId: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export async function getSubtasks(requestId: string): Promise<SubTaskDto[]> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/subtasks`, {
+    headers: authHeaders(),
+  })
+  if (!response.ok) return []
+  return response.json()
+}
+
+export async function generateSubtasks(requestId: string): Promise<SubTaskDto[]> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/subtasks/generate`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new Error('Failed to generate subtasks')
+  return response.json()
+}
+
+export async function approveSubtask(requestId: string, subtaskId: string): Promise<SubTaskDto> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/subtasks/${subtaskId}/approve`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new Error('Failed to approve subtask')
+  return response.json()
+}
+
+export async function rejectSubtask(requestId: string, subtaskId: string): Promise<SubTaskDto> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/subtasks/${subtaskId}/reject`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new Error('Failed to reject subtask')
+  return response.json()
+}
+
+export async function approveAllSubtasks(requestId: string): Promise<SubTaskDto[]> {
+  const response = await fetch(`${API_BASE_URL}/api/requests/${requestId}/subtasks/approve-all`, {
+    method: 'POST',
+    headers: authHeaders(),
+  })
+  if (!response.ok) throw new Error('Failed to approve all subtasks')
+  return response.json()
+}

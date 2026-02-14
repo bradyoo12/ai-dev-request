@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError } from '../api/requests'
+import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError, generateSubtasks, approveSubtask, rejectSubtask, approveAllSubtasks } from '../api/requests'
 import { createSite, getSiteDetail } from '../api/sites'
 import type { SiteResponse } from '../api/sites'
-import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion, ProjectTemplate, GitHubSyncStatus } from '../api/requests'
+import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion, ProjectTemplate, GitHubSyncStatus, SubTaskDto } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
 import { useAuth } from '../contexts/AuthContext'
@@ -48,6 +48,8 @@ export default function HomePage() {
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
   const [proposalResult, setProposalResult] = useState<ProposalResponse | null>(null)
+  const [subtasks, setSubtasks] = useState<SubTaskDto[]>([])
+  const [subtasksLoading, setSubtasksLoading] = useState(false)
   const [productionResult, setProductionResult] = useState<ProductionResponse | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [insufficientDialog, setInsufficientDialog] = useState<{ required: number; balance: number; shortfall: number; action: string } | null>(null)
@@ -386,6 +388,52 @@ export default function HomePage() {
     setShowPlanSelection(false)
     executeBuild()
   }
+
+  const handleGenerateSubtasks = async () => {
+    if (!submittedRequest) return
+    setSubtasksLoading(true)
+    try {
+      const result = await generateSubtasks(submittedRequest.id)
+      setSubtasks(result)
+    } catch (err) {
+      console.error('Failed to generate subtasks:', err)
+    } finally {
+      setSubtasksLoading(false)
+    }
+  }
+
+  const handleApproveSubtask = async (subtaskId: string) => {
+    if (!submittedRequest) return
+    try {
+      const updated = await approveSubtask(submittedRequest.id, subtaskId)
+      setSubtasks(prev => prev.map(s => s.id === subtaskId ? updated : s))
+    } catch (err) {
+      console.error('Failed to approve subtask:', err)
+    }
+  }
+
+  const handleRejectSubtask = async (subtaskId: string) => {
+    if (!submittedRequest) return
+    try {
+      const updated = await rejectSubtask(submittedRequest.id, subtaskId)
+      setSubtasks(prev => prev.map(s => s.id === subtaskId ? updated : s))
+    } catch (err) {
+      console.error('Failed to reject subtask:', err)
+    }
+  }
+
+  const handleApproveAllSubtasks = async () => {
+    if (!submittedRequest) return
+    try {
+      const result = await approveAllSubtasks(submittedRequest.id)
+      setSubtasks(result)
+    } catch (err) {
+      console.error('Failed to approve all subtasks:', err)
+    }
+  }
+
+  const allSubtasksApproved = subtasks.length > 0 && subtasks.every(s => s.status === 'Approved' || s.status === 'Rejected')
+  const hasSubtasks = subtasks.length > 0
 
   const handleApproveAndBuild = async () => {
     if (!submittedRequest) return
@@ -742,6 +790,95 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Subtasks Section */}
+            <div className="bg-warm-900 rounded-xl p-4 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-bold">{t('subtasks.title')}</h4>
+                {!hasSubtasks && (
+                  <button
+                    onClick={handleGenerateSubtasks}
+                    disabled={subtasksLoading}
+                    className="px-3 py-1.5 bg-accent-blue/20 hover:bg-accent-blue/30 text-accent-blue rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    {subtasksLoading ? t('subtasks.generating') : t('subtasks.generate')}
+                  </button>
+                )}
+                {hasSubtasks && !allSubtasksApproved && (
+                  <button
+                    onClick={handleApproveAllSubtasks}
+                    className="px-3 py-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    {t('subtasks.approveAll')}
+                  </button>
+                )}
+              </div>
+              {!hasSubtasks && !subtasksLoading && (
+                <p className="text-warm-400 text-sm">{t('subtasks.description')}</p>
+              )}
+              {subtasksLoading && (
+                <div className="text-center py-4">
+                  <div className="animate-pulse text-warm-400">{t('subtasks.generating')}</div>
+                </div>
+              )}
+              {hasSubtasks && (
+                <div className="space-y-2">
+                  {subtasks.map((subtask, i) => (
+                    <div key={subtask.id} className="flex items-start gap-3 bg-warm-800 rounded-lg p-3">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                        style={{
+                          backgroundColor: subtask.status === 'Approved' ? 'rgba(34, 197, 94, 0.2)' :
+                            subtask.status === 'Rejected' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(107, 114, 128, 0.2)',
+                          color: subtask.status === 'Approved' ? '#22c55e' :
+                            subtask.status === 'Rejected' ? '#ef4444' : '#9ca3af'
+                        }}
+                      >
+                        {i + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm">{subtask.title}</div>
+                        {subtask.description && (
+                          <div className="text-warm-400 text-xs mt-0.5 line-clamp-2">{subtask.description}</div>
+                        )}
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs px-1.5 py-0.5 rounded ${
+                            subtask.status === 'Approved' ? 'bg-green-500/20 text-green-400' :
+                            subtask.status === 'Rejected' ? 'bg-red-500/20 text-red-400' :
+                            'bg-warm-700 text-warm-400'
+                          }`}>
+                            {t(`subtasks.status.${subtask.status.toLowerCase()}`)}
+                          </span>
+                          {subtask.estimatedCredits && (
+                            <span className="text-xs text-warm-500">{subtask.estimatedCredits} {t('subtasks.credits')}</span>
+                          )}
+                          {subtask.dependsOnSubTaskId && (
+                            <span className="text-xs text-warm-500">{t('subtasks.dependsOn', { order: subtasks.findIndex(s => s.id === subtask.dependsOnSubTaskId) + 1 })}</span>
+                          )}
+                        </div>
+                      </div>
+                      {subtask.status === 'Pending' && (
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => handleApproveSubtask(subtask.id)}
+                            className="p-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-md transition-colors"
+                            title={t('subtasks.approve')}
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          </button>
+                          <button
+                            onClick={() => handleRejectSubtask(subtask.id)}
+                            className="p-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-md transition-colors"
+                            title={t('subtasks.reject')}
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="bg-warm-900 rounded-xl p-4 mb-4">

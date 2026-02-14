@@ -13,6 +13,8 @@ import {
   type TicketListItem,
   type TicketDetail,
 } from '../api/ticket-progress'
+import { fetchSubTasks, type SubTask } from '../api/subtasks'
+import SubTaskList from '../components/SubTaskList'
 
 const STATUS_FILTERS = [
   'All',
@@ -73,6 +75,16 @@ export default function TicketProgressPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTicket, setSelectedTicket] = useState<TicketDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [subTasks, setSubTasks] = useState<SubTask[]>([])
+
+  const loadSubTasks = useCallback(async (ticketId: string) => {
+    try {
+      const data = await fetchSubTasks(ticketId)
+      setSubTasks(data)
+    } catch {
+      setSubTasks([])
+    }
+  }, [])
 
   const loadTickets = useCallback(async () => {
     try {
@@ -99,12 +111,14 @@ export default function TicketProgressPage() {
   const handleTicketClick = async (ticketId: string) => {
     if (selectedTicket?.id === ticketId) {
       setSelectedTicket(null)
+      setSubTasks([])
       return
     }
     try {
       setDetailLoading(true)
       const detail = await getTicketDetail(ticketId)
       setSelectedTicket(detail)
+      loadSubTasks(ticketId)
     } catch {
       // silently fail, the list item is still shown
     } finally {
@@ -410,6 +424,15 @@ export default function TicketProgressPage() {
                               )}
                             </div>
                           </div>
+
+                          {/* Subtasks */}
+                          {subTasks.length > 0 && (
+                            <SubTaskList
+                              requestId={selectedTicket.id}
+                              subTasks={subTasks}
+                              onRefresh={() => loadSubTasks(selectedTicket.id)}
+                            />
+                          )}
 
                           {/* Meta info */}
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-warm-700/50">

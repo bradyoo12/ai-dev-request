@@ -48,6 +48,7 @@ export default function Layout() {
   // --- Public nav items (shown to unauthenticated users) ---
   const publicDesktopNav = (
     <>
+      <Link to="/templates" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.templates')}</Link>
       <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
       <Link to="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.howItWorks')}</Link>
       <Link to="/support" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.support')}</Link>
@@ -57,6 +58,7 @@ export default function Layout() {
 
   const publicMobileNav = (
     <>
+      <Link to="/templates" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.templates')}</Link>
       <Link to="/#pricing" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.pricing')}</Link>
       <Link to="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.howItWorks')}</Link>
       <Link to="/support" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>{t('header.support')}</Link>
@@ -69,6 +71,7 @@ export default function Layout() {
   const authPrimaryNav = (
     <>
       <button onClick={() => navigateProtected('/projects')} className={navLinkClass} aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}>{t('header.projects')}</button>
+      <Link to="/templates" onClick={() => setMobileMenuOpen(false)} className={navLinkClass} aria-current={currentPath === '/templates' ? 'page' : undefined}>{t('header.templates')}</Link>
       <button onClick={() => navigateProtected('/sites')} className={navLinkClass} aria-current={currentPath === '/sites' ? 'page' : undefined}>{t('header.mySites')}</button>
       <button onClick={() => navigateProtected('/suggestions')} className={navLinkClass} aria-current={currentPath === '/suggestions' ? 'page' : undefined}>{t('header.suggestions')}</button>
       <Link to="/support" onClick={() => setMobileMenuOpen(false)} className={navLinkClass} aria-current={currentPath === '/support' ? 'page' : undefined}>{t('header.support')}</Link>

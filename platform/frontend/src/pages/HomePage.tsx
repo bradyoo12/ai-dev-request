@@ -15,6 +15,7 @@ import HeroSection from '../components/HeroSection'
 import StatsSection from '../components/StatsSection'
 import FeaturesSection from '../components/FeaturesSection'
 import PricingSection from '../components/PricingSection'
+import TemplatesSection from '../components/TemplatesSection'
 import StepIndicator from '../components/StepIndicator'
 import LivePreview from '../components/LivePreview'
 import MobilePreview from '../components/MobilePreview'
@@ -1278,6 +1279,7 @@ export default function HomePage() {
         <>
           <StatsSection />
           <FeaturesSection />
+          <TemplatesSection />
           <PricingSection plans={pricingPlans} onSelectPlan={(planId) => {
             if (planId === 'enterprise') {
               window.location.href = 'mailto:contact@ai-dev-request.kr?subject=Enterprise%20Plan%20Inquiry'

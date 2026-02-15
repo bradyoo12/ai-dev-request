@@ -247,7 +247,7 @@ builder.Services.AddCors(options =>
             )
             .AllowAnyHeader()
             .AllowCredentials()
-            .WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS");
+            .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
     });
 });
 

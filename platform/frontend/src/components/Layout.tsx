@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 import { Menu, X, Sparkles } from 'lucide-react'
 import LanguageSelector from './LanguageSelector'
-import LoginPage from '../pages/LoginPage'
 import FooterSection from './FooterSection'
+
+const LoginPage = lazy(() => import('../pages/LoginPage'))
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -22,7 +23,11 @@ export default function Layout() {
   }
 
   if (showLogin) {
-    return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
+    return (
+      <Suspense fallback={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" /></div>}>
+        <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
+      </Suspense>
+    )
   }
 
   // --- Navigation item styling (standardized hover colors) ---

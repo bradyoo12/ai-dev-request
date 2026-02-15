@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { AuthProvider } from './contexts/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
-import HomePage from './pages/HomePage'
 import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
 
 const LazyFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" /></div>
+const HomePage = lazy(() => import('./pages/HomePage'))
 const SettingsLayout = lazy(() => import('./pages/SettingsLayout'))
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
 const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'))
@@ -57,7 +57,7 @@ export function AppRoutes() {
     <AuthProvider>
       <Routes>
           <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<Suspense fallback={LazyFallback}><HomePage /></Suspense>} />
             <Route path="/settings" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/specifications" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/github-sync" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />

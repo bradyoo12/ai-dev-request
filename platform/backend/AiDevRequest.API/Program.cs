@@ -516,7 +516,13 @@ app.UseExceptionHandler(errorApp =>
     }
 }
 
-app.UseHttpsRedirection();
+// Only use HTTPS redirection in development
+// In Azure App Service, the load balancer handles HTTPS termination
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 app.UseAuthentication();
@@ -528,5 +534,15 @@ app.MapHub<AiDevRequest.API.Hubs.PreviewLogsHub>("/hubs/preview-logs");
 
 // Health check endpoint with DB verification
 app.MapHealthChecks("/health");
+
+// Root endpoint for diagnostics
+app.MapGet("/", () => new
+{
+    status = "ok",
+    service = "AI Dev Request API",
+    version = "1.0.0",
+    environment = app.Environment.EnvironmentName,
+    timestamp = DateTime.UtcNow
+});
 
 app.Run();

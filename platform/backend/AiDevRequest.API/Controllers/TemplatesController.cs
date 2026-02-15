@@ -39,8 +39,8 @@ public class TemplatesController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load templates");
-            return Ok(new List<TemplateDto>());
+            _logger.LogError(ex, "Failed to load templates from database");
+            return StatusCode(500, new { error = "Failed to load templates. Check server logs for details." });
         }
     }
 

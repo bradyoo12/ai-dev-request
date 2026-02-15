@@ -6,10 +6,8 @@ import { SettingsPanel } from './views/settingsPanel';
 import { ClaudePtyTerminal } from './terminal/claudePtyTerminal';
 import { ConversationStore } from './store/conversationStore';
 import { ChatViewProvider } from './sidebar/chatViewProvider';
-import { ClaudeProcessManager } from './process/claudeProcessManager';
 
 let activeTerminal: ClaudePtyTerminal | undefined;
-let processManager: ClaudeProcessManager | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
   const config = new ConfigManager();
@@ -22,8 +20,10 @@ export function activate(context: vscode.ExtensionContext): void {
   const chatViewProvider = new ChatViewProvider(
     context.extensionUri,
     conversationStore,
+    config,
+    responseLog,
+    statusBar,
   );
-  processManager = new ClaudeProcessManager();
 
   // Register sidebar webview provider
   const chatViewRegistration = vscode.window.registerWebviewViewProvider(
@@ -31,72 +31,12 @@ export function activate(context: vscode.ExtensionContext): void {
     chatViewProvider,
   );
 
-  // Handle send message from sidebar: start process if needed and send input
-  const sendMessageDisposable = chatViewProvider.onSendMessage((text) => {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    const cwd = workspaceFolder ?? process.cwd();
-
-    // Add user message to conversation
-    conversationStore.addMessage({
-      id: `msg-${Date.now()}`,
-      role: 'user',
-      timestamp: Date.now(),
-      content: [{ type: 'text', text }],
-      status: 'complete',
-    });
-
-    // Start process if not running
-    if (!processManager!.isRunning()) {
-      chatViewProvider.updateUIState({ status: 'starting', statusMessage: 'Starting Claude CLI...' });
-      processManager!.start(cwd);
-    }
-
-    // Send input to process (with Enter to submit)
-    processManager!.sendInput(text + '\n');
-    chatViewProvider.updateUIState({ status: 'responding' });
-  });
-
-  // Handle process output: add raw chunks as assistant messages
-  const outputDisposable = processManager.onOutputReceived((data) => {
-    const currentId = conversationStore.getCurrentMessageId();
-    if (currentId) {
-      // Update existing streaming message
-      const messages = conversationStore.getMessages();
-      const existing = messages.find((m) => m.id === currentId);
-      if (existing) {
-        const textContent = existing.content.find((c) => c.type === 'text');
-        if (textContent && textContent.type === 'text') {
-          conversationStore.updateMessage(currentId, {
-            content: [{ type: 'text', text: textContent.text + data }],
-          });
-        }
-      }
-    } else {
-      // Start new assistant message
-      const newId = `msg-${Date.now()}`;
-      conversationStore.setCurrentMessageId(newId);
-      conversationStore.addMessage({
-        id: newId,
-        role: 'assistant',
-        timestamp: Date.now(),
-        content: [{ type: 'text', text: data }],
-        status: 'streaming',
-      });
-    }
-  });
-
-  // Handle process exit
-  const exitDisposable = processManager.onProcessExited((exitCode) => {
-    const currentId = conversationStore.getCurrentMessageId();
-    if (currentId) {
-      conversationStore.updateMessage(currentId, { status: 'complete' });
-      conversationStore.setCurrentMessageId(null);
-    }
-    chatViewProvider.updateUIState({
-      status: exitCode === 0 ? 'idle' : 'error',
-      statusMessage: exitCode === 0 ? 'Process exited' : `Process exited with code ${exitCode}`,
-    });
-  });
+  // Note: Process manager event handling is now done inside ChatViewProvider.wireAutoPilot()
+  // This includes:
+  // - ProcessManager output -> OutputParser -> PromptDetector -> AutoResponder
+  // - Automatic UI state updates during auto-response
+  // - Response logging to ResponseLog
+  // - Manual override support
 
   // Handle toggle from sidebar
   const toggleFromSidebar = chatViewProvider.onToggleAutoPilot(async () => {
@@ -106,6 +46,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Handle clear conversation from sidebar
   const clearFromSidebar = chatViewProvider.onClearConversation(() => {
     conversationStore.clear();
+    const processManager = chatViewProvider.getProcessManager();
     if (processManager?.isRunning()) {
       processManager.stop();
     }
@@ -191,11 +132,16 @@ export function activate(context: vscode.ExtensionContext): void {
   });
 
   context.subscriptions.push(
+    chatViewRegistration,
+    toggleFromSidebar,
+    clearFromSidebar,
+    clearCmd,
     startCmd,
     toggleCmd,
     settingsCmd,
     logCmd,
     pauseCmd,
+    chatViewProvider,
     config,
     responseLog,
     statusBar,

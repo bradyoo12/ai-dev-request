@@ -40,6 +40,9 @@ const TermsPage = lazy(() => import('./pages/TermsPage'))
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 const FaqPage = lazy(() => import('./pages/FaqPage'))
 const ReferralPage = lazy(() => import('./pages/ReferralPage'))
+const MessagesPage = lazy(() => import('./pages/MessagesPage'))
+const DiscussionsPage = lazy(() => import('./pages/DiscussionsPage'))
+const DiscussionDetailPage = lazy(() => import('./pages/DiscussionDetailPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 /**
@@ -113,6 +116,7 @@ export function AppRoutes() {
             <Route path="/buy-credits" element={<Suspense fallback={LazyFallback}><BuyCreditsPage /></Suspense>} />
             <Route path="/templates" element={<Suspense fallback={LazyFallback}><TemplatesPage /></Suspense>} />
             <Route path="/support" element={<Suspense fallback={LazyFallback}><SupportBoardPage /></Suspense>} />
+            <Route path="/messages" element={<ProtectedRoute><Suspense fallback={LazyFallback}><MessagesPage /></Suspense></ProtectedRoute>} />
             <Route path="/patents" element={<Suspense fallback={LazyFallback}><PatentsPage /></Suspense>} />
             <Route path="/terms" element={<Suspense fallback={LazyFallback}><TermsPage /></Suspense>} />
             <Route path="/privacy" element={<Suspense fallback={LazyFallback}><PrivacyPage /></Suspense>} />

@@ -113,10 +113,10 @@ This command orchestrates the entire development workflow using Agent Teams for 
 │  4. b-progress → merge PR to main, move to In Review             │
 │  4b. GitHub Actions health check → find & fix CI failures        │
 │  5. b-review team → parallel test + verify on staging            │
-│  5e-ii. Doc maintenance → update inventory/design if changed     │
+│  5e. Doc maintenance → update inventory/design if changed        │
 │  6. b-modernize team → parallel research + create suggestions    │
 │  7. Site audit → visit live site, find errors, create tickets    │
-│  8. Report status & loop back to step 1                          │
+│  8. Report status, check stop signal, start from Step 1          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -279,34 +279,13 @@ This pattern works in both regular repos and worktrees, so all agents and comman
 
 > Work in directory: `<WORKTREE_DIR>`. This is a git worktree. All file operations and git commands must happen in this directory. Never check out the `main` branch directly — use `git fetch origin && git checkout --detach origin/main` instead.
 
+**After completing this step, continue to Step 1.**
+
 ## Main Loop
 
-**CRITICAL AUTONOMOUS OPERATION RULES:**
-- ✅ **ALWAYS** proceed to the next cycle automatically after completing a cycle
-- ✅ **ALWAYS** continue looping until the user presses Ctrl+C
-- ✅ **When presenting "Next Steps", IMMEDIATELY execute the first step without asking**
-- ✅ **When agents are working**, AUTOMATICALLY continue waiting for them to complete
-- ❌ **NEVER** ask "Would you like me to continue?" or any variation
-- ❌ **NEVER** ask "What would you prefer?" or offer options to stop/continue
-- ❌ **NEVER** ask "Do you want me to continue? Or did you have a specific question?"
-- ❌ **NEVER** wait for user confirmation to proceed to the next ticket
-- ❌ **NEVER** say "Stop here" or suggest stopping
-- ❌ **NEVER** ask what to do while waiting for agents (always choose option 1: continue waiting)
+**This pipeline runs autonomously. Execute steps in sequence without asking for permission to continue.**
 
-**The pipeline runs autonomously in an infinite loop. It does not require or request user permission to continue.**
-
-**"Next Steps" Protocol:**
-When you produce a "Next Steps" list (numbered or bulleted), you MUST immediately proceed with executing the first item. Do NOT present the list and then ask the user what to do. The "Next Steps" list is informational only - showing the user what you're about to do, not asking for permission.
-
-**Agent Waiting Protocol:**
-When agents are spawned and working on tasks:
-- ✅ **AUTOMATICALLY** wait for agents to complete their work
-- ✅ **AUTOMATICALLY** select option 1 (continue waiting) if any choice appears
-- ❌ **NEVER** interrupt agent work to ask the user what to do
-- ❌ **NEVER** offer options like "pause", "show output", or "stop" while agents are working
-- The pipeline is fully autonomous - agents work until completion without user intervention
-
-Execute this workflow in sequence, then loop:
+Execute this workflow in sequence:
 
 ### Step 1: Load Policy and Design Documents
 
@@ -338,6 +317,8 @@ Read and internalize the project guidelines. These are living documents that get
    - Know deployment targets and URLs
    - Understand CI/CD pipeline
    - Know required environment variables
+
+**After completing this step, continue to Step 1.5.**
 
 ### Step 1.5: Fetch Project Board State (Once Per Cycle)
 
@@ -384,6 +365,8 @@ Read and internalize the project guidelines. These are living documents that get
 3. Only force-refresh when necessary:
    - After claiming a ticket in Step 3a (to verify the claim succeeded)
    - Cache is automatically invalidated in Step 4 after status changes
+
+**After completing this step, continue to Step 2.**
 
 ### Step 2: Audit All Tickets for Alignment
 
@@ -434,6 +417,8 @@ Check all tickets in the project to ensure they align with policy and design:
    - Log: "Skipping #<number>: <reason> — will retry next cycle"
 
 5. Log summary of audit results
+
+**After completing this step, continue to Step 3.**
 
 ### Step 3: b-ready — Implement with Agent Team
 
@@ -717,7 +702,8 @@ If the team fails or gets stuck:
 3. Add `on hold` label to the ticket
 4. Add a comment explaining the failure
 5. Return to latest main: `git fetch origin && git checkout --detach origin/main`, delete the branch
-6. Proceed to Step 4
+
+**After completing Step 3 (success or failure), continue to Step 4.**
 
 ### Step 4: b-progress — Merge PR (No Team)
 
@@ -918,7 +904,7 @@ The build/deploy is currently broken on \`main\` branch."
    bash .claude/scripts/gh-project-cache.sh invalidate
    ```
 
-7. Proceed to Step 5
+**After completing Step 4 and 4b, continue to Step 5.**
 
 
 ### Step 5: b-review — Verify with Agent Team
@@ -1007,6 +993,8 @@ Verify changes on staging using parallel agents.
 
 Shut down all agents, delete the team.
 
+**After completing this step, continue to Step 5e (if a ticket was moved to Done) or Step 6 (otherwise).**
+
 #### Step 5e: Update Policy and Design Documents
 
 **Only runs when a ticket was moved to Done in Step 5c.**
@@ -1069,6 +1057,8 @@ After a ticket is verified and completed, update the project documentation to re
    ```
 
 10. If no files need updating (e.g., the ticket was a minor bug fix with no impact), skip this step and log: "No doc updates needed for #<issue_number>"
+
+**After completing this step, continue to Step 6.**
 
 ### Step 6: b-modernize — Research with Agent Team
 
@@ -1219,6 +1209,8 @@ After collecting findings from both scouts:
 
 Shut down all agents, delete the team.
 
+**After completing this step, continue to Step 7.**
+
 ### Step 7: Site Audit — Find Errors and Improvements
 
 After modernization research, audit the live site to catch errors, bugs, and UX improvements.
@@ -1326,9 +1318,11 @@ After collecting findings from both agents:
 
 Shut down all agents, delete the team.
 
-### Step 8: Report Cycle Status
+**After completing this step, continue to Step 8.**
 
-Log the current status of the project board:
+### Step 8: Report Cycle Status and Loop
+
+Log the current status of the project board, check for stop signal, then start the next cycle:
 
 1. Fetch the project board (uses cache if still valid from Step 5a, otherwise refreshes):
    ```bash
@@ -1348,11 +1342,7 @@ Log the current status of the project board:
    - Tickets with `on hold` label
    - Backlog tickets awaiting triage
 
-### Step 9: Check Stop Signal and Loop
-
-**CRITICAL: Do NOT ask the user for permission to continue. Just loop automatically — unless a stop signal exists.**
-
-1. **Check for stop signal** from `/b-start-end`:
+4. **Check for stop signal** from `/b-start-end`:
    ```bash
    if [ -f .claude/b-start-stop-signal ]; then
      echo "Stop signal detected — finishing pipeline gracefully."
@@ -1361,28 +1351,16 @@ Log the current status of the project board:
    fi
    ```
 
-2. **If stop signal was found:**
+5. **If stop signal was found:**
    - Log: "Pipeline stopped gracefully by /b-start-end. Current cycle is complete."
    - Clean up the worktree (Step 0 cleanup)
    - **STOP. Do NOT loop. Exit the pipeline.**
 
-3. **If NO stop signal:**
+6. **If NO stop signal:**
    - Log "Cycle complete. Starting next cycle in 5 seconds..."
    - Wait 5 seconds
-   - **Automatically** go back to Step 1 (do not ask user, do not wait for confirmation, just loop)
 
-**Examples of what NOT to say:**
-- ❌ "Would you like me to continue?"
-- ❌ "What would you prefer?"
-- ❌ "Stop here - You've seen how the pipeline works"
-- ❌ "Should I process the next ticket?"
-- ❌ "Do you want me to continue? Or did you have a specific question about the pipeline?"
-- ❌ Presenting "Next Steps" followed by asking what to do
-
-**What to do instead:**
-- ✅ Just log "Starting Cycle #N..." and go to Step 1
-- ✅ Continue autonomously until Ctrl+C or stop signal
-- ✅ When showing "Next Steps", immediately execute the first step without asking
+**After completing this step, start from Step 1.**
 
 ## Ticket Flow Summary
 
@@ -1445,15 +1423,12 @@ Log the current status of the project board:
   gh api graphql -f query='mutation { updateProjectV2ItemPosition(input: { projectId: "PVT_kwHNf9fOATn4hA", itemId: "<item_id>" }) { item { id } } }'
   ```
   Omitting `afterId` places the item at the top of the list.
-- **This command runs in an infinite loop** - orchestrates all agents until Ctrl+C
-- **NEVER ask the user for permission to continue** - always proceed to the next cycle automatically. Do NOT say "Would you like me to continue?", "What would you prefer?", "Stop here", or any variation. The loop is 100% autonomous and requires zero user interaction to continue. Just keep looping.
 - **ONLY processes tickets in Project 26 (AI Dev Request)** - ignores tickets in other projects
 - **ONE ticket at a time** - teams parallelize WITHIN a ticket, not across tickets
 - **Multi-instance safe** - Multiple b-start instances can run on the same machine (via git worktrees — see Step 0) or on different machines. The "claim" step (moving to "In Progress") MUST happen before any other work to prevent two instances from picking up the same ticket. Always verify the claim succeeded before proceeding.
 - **Worktree required** - Every b-start instance MUST run Step 0 to acquire a dedicated worktree. Never run directly in the main repository checkout. Never check out the `main` branch — always use `git fetch origin && git checkout --detach origin/main`.
 - Teams are created and destroyed per-step — no long-lived teams
 - 5-second delay between full cycles (can be increased to 10-30s if rate limiting still occurs)
-- Always check policy.md and design.md at the start of each cycle
 - Tickets out of alignment get `on hold` label automatically
 - Human removes `on hold` label to signal approval/readiness
 

@@ -43,7 +43,7 @@ public class MessageService : IMessageService
         if (senderId == receiverId)
             throw new ArgumentException("Cannot send a message to yourself.", nameof(receiverId));
 
-        var message = new Message
+        var message = new UserMessage
         {
             SenderId = senderId,
             ReceiverId = receiverId,

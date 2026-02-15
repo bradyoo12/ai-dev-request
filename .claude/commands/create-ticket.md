@@ -127,9 +127,26 @@ ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue-url} --format js
 # Status field: PVTSSF_lAHNf9fOATn4hM4PS3yh
 # Ready option: 61e4505c | In progress: 47fc9ee4 | In review: df73e18b | Done: 98236657
 gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id $ITEM_ID --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c
+
+# Move item to top of Ready column (position 0)
+gh api graphql -f query='
+mutation {
+  updateProjectV2ItemPosition(
+    input: {
+      projectId: "PVT_kwHNf9fOATn4hA"
+      itemId: "'$ITEM_ID'"
+    }
+  ) {
+    items(first: 1) {
+      nodes {
+        id
+      }
+    }
+  }
+}' > /dev/null
 ```
 
-Report the created issue URL and confirm it was added to the project with **Ready** status.
+Report the created issue URL and confirm it was added to the project with **Ready** status at the **top of the column**.
 
 ## Important Notes
 
@@ -142,3 +159,4 @@ Report the created issue URL and confirm it was added to the project with **Read
 - Text/code file contents are included inline in the ticket body using fenced code blocks
 - If an image upload fails (e.g., file not found, API error), note it in the ticket body and continue
 - If issue creation fails but the issue was created (check by searching), use the existing issue URL instead of retrying
+- **New tickets are automatically positioned at the top of the Ready column** for visibility

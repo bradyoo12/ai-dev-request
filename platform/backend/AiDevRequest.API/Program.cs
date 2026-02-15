@@ -389,12 +389,44 @@ app.UseExceptionHandler(errorApp =>
 
             if (!appliedMigrations.Any() && pendingMigrations.Any())
             {
-                logger.LogInformation("Complete database without migration history. Bootstrapping...");
+                logger.LogInformation("Complete database without migration history. Bootstrapping all {Count} pending migrations...", pendingMigrations.Count);
                 var historyRepository = dbContext.GetService<IHistoryRepository>();
                 await dbContext.Database.ExecuteSqlRawAsync(historyRepository.GetCreateIfNotExistsScript());
-                await dbContext.Database.ExecuteSqlRawAsync(historyRepository.GetInsertScript(new HistoryRow(
-                    pendingMigrations.First(), ProductInfo.GetVersion())));
-                logger.LogInformation("Migration history bootstrapped.");
+
+                // Mark all pending migrations as applied since tables already exist
+                foreach (var migration in pendingMigrations)
+                {
+                    await dbContext.Database.ExecuteSqlRawAsync(historyRepository.GetInsertScript(new HistoryRow(
+                        migration, ProductInfo.GetVersion())));
+                    logger.LogInformation("Marked migration {Migration} as applied", migration);
+                }
+                logger.LogInformation("Migration history bootstrapped with {Count} migrations.", pendingMigrations.Count);
+            }
+            else if (appliedMigrations.Any() && pendingMigrations.Any())
+            {
+                // Some migrations applied, some pending - this can happen after migration consolidation
+                // Check if this is the migration consolidation scenario
+                var hasOldMigrations = appliedMigrations.Any(m => m.StartsWith("20260207") || m.StartsWith("20260208") || m.StartsWith("202602091") || m.StartsWith("202602102"));
+                var hasNewInitialCreate = pendingMigrations.Any(m => m == "20260215122450_InitialCreate");
+
+                if (hasOldMigrations && hasNewInitialCreate)
+                {
+                    logger.LogInformation("Detected migration consolidation scenario. Old migrations: {Old}, New pending: {New}",
+                        appliedMigrations.Count, pendingMigrations.Count);
+
+                    // Clear old migration history and mark only the new consolidated migration
+                    var historyRepository = dbContext.GetService<IHistoryRepository>();
+                    await dbContext.Database.ExecuteSqlRawAsync("DELETE FROM \"__EFMigrationsHistory\"");
+
+                    // Mark all current pending migrations as applied
+                    foreach (var migration in pendingMigrations)
+                    {
+                        await dbContext.Database.ExecuteSqlRawAsync(historyRepository.GetInsertScript(new HistoryRow(
+                            migration, ProductInfo.GetVersion())));
+                        logger.LogInformation("Marked consolidated migration {Migration} as applied", migration);
+                    }
+                    logger.LogInformation("Migration history rebuilt for consolidated migrations.");
+                }
             }
         }
         // else: existingTables.Count == 0 means fresh database, MigrateAsync handles it

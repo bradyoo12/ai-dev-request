@@ -188,11 +188,11 @@ public class BackgroundAgentController : ControllerBase
     {
         return Ok(new[]
         {
-            new { type = "general", name = "General Purpose", description = "Full-stack development and feature implementation", icon = "wrench" },
-            new { type = "frontend", name = "Frontend Specialist", description = "UI components, styling, and user experience", icon = "palette" },
-            new { type = "backend", name = "Backend Specialist", description = "API endpoints, database schemas, and business logic", icon = "server" },
-            new { type = "testing", name = "Testing Agent", description = "Test generation, coverage improvement, and QA", icon = "shield" },
-            new { type = "refactor", name = "Refactoring Agent", description = "Code cleanup, performance optimization, and modernization", icon = "refresh" }
+            new { type = "general", name = "General Purpose", description = "Full-stack development and feature implementation", icon = "wrench", frameworkManaged = true },
+            new { type = "frontend", name = "Frontend Specialist", description = "UI components, styling, and user experience", icon = "palette", frameworkManaged = true },
+            new { type = "backend", name = "Backend Specialist", description = "API endpoints, database schemas, and business logic", icon = "server", frameworkManaged = true },
+            new { type = "testing", name = "Testing Agent", description = "Test generation, coverage improvement, and QA", icon = "shield", frameworkManaged = true },
+            new { type = "refactor", name = "Refactoring Agent", description = "Code cleanup, performance optimization, and modernization", icon = "refresh", frameworkManaged = true }
         });
     }
 

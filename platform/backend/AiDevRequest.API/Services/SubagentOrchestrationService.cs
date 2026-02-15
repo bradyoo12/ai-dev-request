@@ -22,6 +22,7 @@ public class SubagentOrchestrationService : ISubagentOrchestrationService
 {
     private readonly AiDevRequestDbContext _context;
     private readonly ITaskDecompositionService _decompositionService;
+    private readonly IAgentFrameworkService _agentFrameworkService;
     private readonly AnthropicClient _client;
     private readonly ILogger<SubagentOrchestrationService> _logger;
     private readonly SemaphoreSlim _concurrencySemaphore;
@@ -30,11 +31,13 @@ public class SubagentOrchestrationService : ISubagentOrchestrationService
     public SubagentOrchestrationService(
         AiDevRequestDbContext context,
         ITaskDecompositionService decompositionService,
+        IAgentFrameworkService agentFrameworkService,
         IConfiguration configuration,
         ILogger<SubagentOrchestrationService> logger)
     {
         _context = context;
         _decompositionService = decompositionService;
+        _agentFrameworkService = agentFrameworkService;
         _logger = logger;
         _concurrencySemaphore = new SemaphoreSlim(MaxConcurrentTasks, MaxConcurrentTasks);
 
@@ -236,19 +239,31 @@ public class SubagentOrchestrationService : ISubagentOrchestrationService
                 }
 
                 // Generate specialized context for this agent
-                var context = await _decompositionService.GenerateAgentContextAsync(task, devRequest);
+                var agentContext = await _decompositionService.GenerateAgentContextAsync(task, devRequest);
 
-                // Call Claude API with specialized prompt
+                // Try native .NET Agent Framework for middleware processing
+                var frameworkResult = await _agentFrameworkService.ExecuteWithFrameworkAsync(
+                    devRequest.UserId, task.Id, agentContext);
+
+                if (frameworkResult.UsedNativeFramework && frameworkResult.Success)
+                {
+                    _logger.LogInformation(
+                        "Task {TaskId} routed through native Agent Framework (middleware: {Middleware})",
+                        task.Id, string.Join(", ", frameworkResult.MiddlewareApplied));
+                }
+
+                // Use Anthropic SDK for actual AI inference
+                // Native framework handles middleware (logging, rate limiting, telemetry)
                 var messages = new List<Message>
                 {
-                    new Message(RoleType.User, context)
+                    new Message(RoleType.User, agentContext)
                 };
 
                 var parameters = new MessageParameters
                 {
                     Messages = messages,
                     MaxTokens = 8192,
-                    Model = "claude-sonnet-4-20250514", // Use Sonnet for balanced performance
+                    Model = frameworkResult.Model ?? "claude-sonnet-4-20250514",
                     Stream = false,
                     Temperature = 0.7m
                 };
@@ -272,8 +287,9 @@ public class SubagentOrchestrationService : ISubagentOrchestrationService
 
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("Task {TaskId} completed successfully in {DurationMs}ms using {TokenCount} tokens",
-                    task.Id, task.DurationMs, task.TokensUsed);
+                _logger.LogInformation(
+                    "Task {TaskId} completed in {DurationMs}ms using {TokenCount} tokens (nativeFramework={UsedFramework})",
+                    task.Id, task.DurationMs, task.TokensUsed, frameworkResult.UsedNativeFramework);
             }
             catch (Exception ex)
             {

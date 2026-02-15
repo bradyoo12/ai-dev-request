@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
@@ -14,12 +14,36 @@ export default function Layout() {
   const location = useLocation()
   const { authUser, tokenBalance, showLogin, setShowLogin, handleLogin, handleLogout, requireAuth } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isAuthReloading, setIsAuthReloading] = useState(false)
+
+  // Handle OAuth reload loading state to prevent UI flash
+  useEffect(() => {
+    const authReloadingFlag = sessionStorage.getItem('auth-reloading')
+    if (authReloadingFlag === 'true') {
+      setIsAuthReloading(true)
+      // Clear the flag and hide loading overlay after auth has settled
+      const timer = setTimeout(() => {
+        sessionStorage.removeItem('auth-reloading')
+        setIsAuthReloading(false)
+      }, 500) // Brief delay to allow auth state to initialize
+      return () => clearTimeout(timer)
+    }
+  }, [])
 
   const navigateProtected = (path: string) => {
     setMobileMenuOpen(false)
     if (requireAuth()) {
       navigate(path)
     }
+  }
+
+  // Show loading overlay during OAuth reload to prevent UI flash
+  if (isAuthReloading) {
+    return (
+      <div className="min-h-screen bg-warm-950 flex items-center justify-center">
+        <div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" />
+      </div>
+    )
   }
 
   if (showLogin) {

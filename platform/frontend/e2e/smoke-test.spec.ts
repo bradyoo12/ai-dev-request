@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { mockAuthentication } from './auth-helper';
 
 const STAGING_URL = 'https://icy-desert-07c08ba00.2.azurestaticapps.net';
 
@@ -59,6 +60,12 @@ test.describe('Staging Site Smoke Test', () => {
   for (const route of routes) {
     test(`${route} should load without critical errors`, async ({ page }) => {
       try {
+        // Authenticate before accessing protected routes
+        if (route.startsWith('/settings')) {
+          await page.goto(STAGING_URL);
+          await mockAuthentication(page);
+        }
+
         await page.goto(`${STAGING_URL}${route}`, {
           waitUntil: 'networkidle',
           timeout: 30000 // Reduced to 30s after performance optimizations

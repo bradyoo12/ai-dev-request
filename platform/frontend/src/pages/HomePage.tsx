@@ -1477,7 +1477,7 @@ export default function HomePage() {
           <TemplatesSection />
           <PricingSection plans={pricingPlans} onSelectPlan={(planId) => {
             if (planId === 'enterprise') {
-              window.location.href = 'mailto:contact@ai-dev-request.kr?subject=Enterprise%20Plan%20Inquiry'
+              window.location.href = 'mailto:contact@aidevrequest.com?subject=Enterprise%20Plan%20Inquiry'
             } else if (planId === 'free') {
               window.scrollTo({ top: 0, behavior: 'smooth' })
             } else {

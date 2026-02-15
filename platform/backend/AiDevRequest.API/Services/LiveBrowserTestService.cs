@@ -143,7 +143,7 @@ Respond with ONLY a JSON object:
 
             var messages = new List<Message>
             {
-                new Message(RoleType.User, new List<ContentBase> { imageContent, textContent })
+                new Message { Role = RoleType.User, Content = new List<ContentBase> { imageContent, textContent } }
             };
 
             var parameters = new MessageParameters

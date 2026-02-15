@@ -161,18 +161,19 @@ Be thorough but realistic. Only report actual issues visible in the screenshot. 
 
         try
         {
-            var imageContent = new ImageContent
+            var contentBlocks = new List<ContentBase>
             {
-                Source = new ImageSource
+                new ImageContent
                 {
-                    Type = "base64",
-                    MediaType = "image/png",
-                    Data = screenshotBase64
-                }
+                    Source = new ImageSource
+                    {
+                        MediaType = "image/png",
+                        Data = screenshotBase64
+                    }
+                },
+                new TextContent { Text = prompt }
             };
-
-            var textContent = new TextContent { Text = prompt };
-            var message = new Message(RoleType.User, new List<ContentBase> { imageContent, textContent });
+            var message = new Message { Role = RoleType.User, Content = contentBlocks };
 
             var parameters = new MessageParameters
             {

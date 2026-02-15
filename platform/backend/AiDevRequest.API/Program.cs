@@ -75,6 +75,7 @@ builder.Services.AddScoped<IDatabaseSchemaService, DatabaseSchemaService>();
 builder.Services.AddScoped<IProjectVersionService, ProjectVersionService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IFigmaImportService, FigmaImportService>();
+builder.Services.AddScoped<IScreenshotToCodeService, ScreenshotToCodeService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ITechTrendService, TechTrendService>();
 builder.Services.AddScoped<ITeamService, TeamService>();

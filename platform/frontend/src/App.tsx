@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider } from './contexts/AuthContext'
@@ -52,10 +52,33 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
  */
 export function AppRoutes() {
   const { i18n } = useTranslation()
+  const [isAuthReloading, setIsAuthReloading] = useState(false)
 
   useEffect(() => {
     document.documentElement.lang = i18n.language
   }, [i18n.language])
+
+  // Check for auth-reloading flag on mount
+  useEffect(() => {
+    if (sessionStorage.getItem('auth-reloading')) {
+      setIsAuthReloading(true)
+      sessionStorage.removeItem('auth-reloading')
+      // Show loading state briefly to allow auth to settle
+      const timer = setTimeout(() => {
+        setIsAuthReloading(false)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  // Show loading overlay if auth is reloading after OAuth
+  if (isAuthReloading) {
+    return (
+      <div className="min-h-screen bg-warm-950 flex items-center justify-center">
+        <div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" />
+      </div>
+    )
+  }
 
   return (
     <AuthProvider>

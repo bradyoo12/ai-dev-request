@@ -20,7 +20,6 @@ public class ContainerLogStreamService : IContainerLogStreamService
     private readonly IDockerClient _dockerClient;
     private readonly ILogger<ContainerLogStreamService> _logger;
     private readonly IHubContext<PreviewLogsHub> _hubContext;
-    private readonly IAutonomousTestingService? _autonomousTestingService;
 
     // Error detection patterns
     private static readonly Regex[] ErrorPatterns = new[]
@@ -40,13 +39,11 @@ public class ContainerLogStreamService : IContainerLogStreamService
     public ContainerLogStreamService(
         IDockerClient dockerClient,
         ILogger<ContainerLogStreamService> logger,
-        IHubContext<PreviewLogsHub> hubContext,
-        IAutonomousTestingService? autonomousTestingService = null)
+        IHubContext<PreviewLogsHub> hubContext)
     {
         _dockerClient = dockerClient;
         _logger = logger;
         _hubContext = hubContext;
-        _autonomousTestingService = autonomousTestingService;
     }
 
     public async Task<(string Stdout, string Stderr)> GetLogsAsync(string containerId, CancellationToken cancellationToken = default)
@@ -160,31 +157,13 @@ public class ContainerLogStreamService : IContainerLogStreamService
                     },
                     cancellationToken);
 
-                // Trigger AI error analysis if error detected
-                if (isError && _autonomousTestingService != null)
+                // Log errors for monitoring
+                if (isError)
                 {
                     _logger.LogWarning(
                         "Error detected in preview {PreviewId}: {Message}",
                         previewId,
                         entry.Message.Length > 200 ? entry.Message[..200] + "..." : entry.Message);
-
-                    // Note: In a production system, you'd queue this for async processing
-                    // to avoid blocking the log stream
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            // Optionally trigger autonomous testing based on error context
-                            // This is a placeholder - implementation would depend on business logic
-                            _logger.LogInformation(
-                                "AI error analysis triggered for preview {PreviewId}",
-                                previewId);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Failed to trigger AI error analysis for preview {PreviewId}", previewId);
-                        }
-                    }, cancellationToken);
                 }
             }
 

@@ -1481,7 +1481,7 @@ export default function HomePage() {
             } else if (planId === 'free') {
               window.scrollTo({ top: 0, behavior: 'smooth' })
             } else {
-              navigate('/settings?tab=billing')
+              navigate(`/settings?tab=billing&plan=${planId}`)
             }
           }} />
         </>

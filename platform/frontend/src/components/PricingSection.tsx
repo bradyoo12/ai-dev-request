@@ -162,7 +162,11 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {plan.priceMonthly < 0 ? t('pricing.contactUs') : t('pricing.getStarted')}
+              {plan.priceMonthly < 0
+                ? t('pricing.contactUs')
+                : plan.priceMonthly === 0
+                  ? t('pricing.startFree')
+                  : t('pricing.choosePlan', { plan: getName(plan) })}
             </motion.button>
           </motion.div>
         ))}

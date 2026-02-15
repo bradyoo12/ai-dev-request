@@ -138,9 +138,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("ToAgentId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -196,9 +197,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -328,9 +330,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<string>("OutputSchemaJson")
                         .HasColumnType("jsonb");
 
-                    b.Property<Guid>("OwnerId")
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Scopes")
                         .HasMaxLength(500)
@@ -871,9 +874,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("UserPrompt")
                         .IsRequired()
@@ -1062,9 +1066,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1291,9 +1296,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1342,9 +1348,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1398,9 +1405,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1461,9 +1469,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("TotalTokens")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1511,9 +1520,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1684,9 +1694,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -1856,9 +1867,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -2370,9 +2382,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<string>("UserContent")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("Version")
                         .HasColumnType("integer");
@@ -2599,9 +2612,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -3107,9 +3121,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ValidationJson")
                         .IsRequired()
@@ -3230,9 +3245,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -3326,9 +3342,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<double>("UptimePercentage")
                         .HasColumnType("double precision");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -3378,9 +3395,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -3492,9 +3510,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("ValidationIterations")
                         .HasColumnType("integer");
@@ -3726,9 +3745,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -3774,9 +3794,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -4053,9 +4074,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -4128,9 +4150,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -4307,9 +4330,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("TokensUsed")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("VariantNumber")
                         .HasColumnType("integer");
@@ -4394,9 +4418,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("UserMessages")
                         .HasColumnType("integer");
@@ -5640,9 +5665,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -5846,9 +5872,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -5902,9 +5929,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -6182,9 +6210,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("ViewCount")
                         .HasColumnType("integer");
@@ -6454,9 +6483,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -6507,9 +6537,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -6871,9 +6902,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -7009,9 +7041,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -7196,9 +7229,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("VectorDimensions")
                         .HasColumnType("integer");
@@ -7439,9 +7473,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -7692,9 +7727,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -7806,9 +7842,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -7857,9 +7894,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("ReviewedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -8034,9 +8072,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -8243,9 +8282,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -8633,9 +8673,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -8757,9 +8798,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -8949,9 +8991,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -8997,9 +9040,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -9120,9 +9164,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("UpvoteCount")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -9159,17 +9204,16 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("SuggestionId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedAt");
 
                     b.HasIndex("SuggestionId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("suggestion_comments", (string)null);
                 });
@@ -9233,15 +9277,14 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("SuggestionId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SuggestionId");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("SuggestionId", "UserId")
                         .IsUnique();
@@ -9377,9 +9420,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -9447,9 +9491,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<Guid>("OwnerId")
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -9728,9 +9773,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -9923,9 +9969,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -10203,6 +10250,7 @@ namespace AiDevRequest.API.Data.Migrations
             modelBuilder.Entity("AiDevRequest.API.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("AnonymousUserId")
@@ -10300,9 +10348,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -10347,9 +10396,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -10396,9 +10446,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Value")
                         .IsRequired()
@@ -10433,9 +10484,10 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(5000)
                         .HasColumnType("character varying(5000)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -10567,9 +10619,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -10691,9 +10744,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("ViewportHeight")
                         .HasColumnType("integer");
@@ -10803,9 +10857,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("ViewCount")
                         .HasColumnType("integer");
@@ -10888,9 +10943,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ViewportSize")
                         .IsRequired()
@@ -10946,9 +11002,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -11122,9 +11179,10 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("uuid");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("WelcomeMessage")
                         .HasMaxLength(1000)
@@ -11371,12 +11429,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("ToAgentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.A2ATask", b =>
@@ -11392,75 +11444,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("ToAgentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AgentCard", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AgenticPlan", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AiElementsConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ApiDocConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ApiKey", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AppRecommendation", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ArenaComparison", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.AutoTopUpConfig", b =>
@@ -11468,30 +11451,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasOne("AiDevRequest.API.Entities.TokenPackage", null)
                         .WithMany()
                         .HasForeignKey("TokenPackageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.BackgroundAgent", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.BillingAccount", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -11505,15 +11464,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.CodeSnapshot", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.CompilationResult", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
@@ -11523,29 +11473,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.ComponentPreview", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.CreditPackagePrice", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.TokenPackage", null)
                         .WithMany()
                         .HasForeignKey("TokenPackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DataSchema", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -11562,39 +11494,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("HostingPlanId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DeploymentHealth", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DevPipeline", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DevRequest", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.Domain", b =>
@@ -11604,12 +11503,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("DeploymentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.DomainTransaction", b =>
@@ -11617,30 +11510,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasOne("AiDevRequest.API.Entities.Domain", null)
                         .WithMany()
                         .HasForeignKey("DomainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.FigmaImport", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.FrameworkConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -11654,65 +11523,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.GenerationVariant", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.GenerativeUiSession", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.InfrastructureConfig", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.McpGatewayServer", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.MobileAppConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ModelRoutingConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.NlSchema", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -11741,21 +11556,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("DevRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.OnboardingProgress", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.Payment", b =>
@@ -11764,30 +11564,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("TokenPackageId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.PerformanceProfile", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.PlatformUpgrade", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.PreviewDeployment", b =>
@@ -11796,12 +11572,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("DevRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -11812,15 +11582,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("DevRequestId");
 
                     b.Navigation("DevRequest");
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectIndex", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.ProjectLog", b =>
@@ -11834,38 +11595,11 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectMemory", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectReview", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.ProjectVersion", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.QueryConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -11885,12 +11619,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -11912,26 +11640,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.SemanticIndex", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.ServiceBlueprint", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -11946,36 +11659,12 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Navigation("ParentOrchestration");
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubscriptionEvent", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubscriptionRecord", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.Suggestion", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.SuggestionComment", b =>
@@ -11984,12 +11673,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("SuggestionId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -12009,12 +11692,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("SuggestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.TeamActivity", b =>
@@ -12033,12 +11710,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.TeamProject", b =>
@@ -12056,119 +11727,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.TeamWorkspace", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.TenantUsage", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.WhiteLabelTenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.TokenBalance", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.TokenTransaction", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserInterest", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserMemory", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserPreference", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserPreferenceSummary", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ViewTransitionConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VisualOverlaySession", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VisualPromptUi", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VisualRegressionResult", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VoiceConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -12179,15 +11742,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("SbomReportId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.WhiteLabelTenant", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

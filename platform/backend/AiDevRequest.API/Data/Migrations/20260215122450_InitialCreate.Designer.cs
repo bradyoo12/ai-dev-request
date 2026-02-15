@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiDevRequest.API.Data.Migrations
 {
     [DbContext(typeof(AiDevRequestDbContext))]
-    [Migration("20260213083323_AddAdaptiveThinkingConfig")]
-    partial class AddAdaptiveThinkingConfig
+    [Migration("20260215122450_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -221,6 +221,38 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("a2a_tasks", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.AdaptiveThinkingConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConfigJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdaptiveThinkingConfigs");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.AgentAutomationConfig", b =>
@@ -686,6 +718,58 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AgentTerminalSessions");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.AgentTestExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ActionsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ActionsJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<int>("IssuesCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IssuesJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LogsJson")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PersonaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("StackTrace")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AgentTestExecutions");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.AgentTrace", b =>
@@ -1452,6 +1536,54 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("auto_topup_configs", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.AutonomousTestExecution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CodeRegenerationAttempts")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CurrentIteration")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FinalTestResult")
+                        .HasColumnType("text");
+
+                    b.Property<int>("MaxIterations")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PreviewDeploymentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TestExecutionIds")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TestsPassed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AutonomousTestExecutions");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.BackgroundAgent", b =>
@@ -2571,6 +2703,63 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("ComposerPlans");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.ConcurrencyIssue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AffectedPersonasJson")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ConfidenceScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConflictingOperations")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DetectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IssueType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResourcePath")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("StackTrace")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("SuggestedFixJson")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ConcurrencyIssues");
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.ConfidenceScore", b =>
                 {
                     b.Property<int>("Id")
@@ -2675,6 +2864,9 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<Guid?>("DevRequestId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Dockerfile")
                         .IsRequired()
                         .HasColumnType("text");
@@ -2696,12 +2888,18 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<string>("K8sManifest")
                         .HasColumnType("text");
 
+                    b.Property<string>("MemoryGb")
+                        .HasColumnType("text");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
 
                     b.Property<string>("RegistryUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Vcpu")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -3281,6 +3479,9 @@ namespace AiDevRequest.API.Data.Migrations
 
                     b.Property<int>("PowerLevel")
                         .HasColumnType("integer");
+
+                    b.Property<string>("PreferredModel")
+                        .HasColumnType("text");
 
                     b.Property<string>("PreviewUrl")
                         .HasMaxLength(2000)
@@ -5049,6 +5250,187 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("LanguageExpansions");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.LocalModelConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CapabilitiesJson")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("CostPerSecond")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("GpuCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GpuType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HealthCheckUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxTokens")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ModelLocation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LocalModelConfigs");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.ManagedBackend", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthConfigJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("AuthProvider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ContainerAppId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ContainerAppUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal>("CpuCores")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("CurrentMonthCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("CustomDomain")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("DatabaseConnectionString")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("DatabaseType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("HostingProvider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("LastHealthCheck")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("MemoryGb")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<decimal>("MonthlyBudget")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("PreviewUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ProvisionedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("StorageBucket")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("StorageConnectionString")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("StorageLimitGb")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StorageProvider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Tier")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("managed_backends", (string)null);
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.MarketplaceTemplate", b =>
                 {
                     b.Property<Guid>("Id")
@@ -5682,6 +6064,69 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("MultiAgentReviews");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.MultiAgentTestSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ConcurrencyLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConfigJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("FailedActions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IssuesDetected")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("OverallScore")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("PersonaCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ResultsJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScenarioType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("SuccessfulActions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalActions")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MultiAgentTestSessions");
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.NlSchema", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6168,6 +6613,38 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("OrgMemories");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.OrganizationalMemory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmbeddingVectorJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrganizationalMemories");
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.ParallelAgentRun", b =>
                 {
                     b.Property<Guid>("Id")
@@ -6280,6 +6757,76 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("parallel_orchestrations", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.PatentInnovation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("CommercialValueScore")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Innovation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("NonObviousnessScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NoveltyScore")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PatentAngle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PriorArt")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RelatedFiles")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Uniqueness")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UtilityScore")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("patent_innovations", (string)null);
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.Payment", b =>
@@ -6771,11 +7318,119 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("PlaywrightHealingResults");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.PlaywrightMcpConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AuthToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("AuthType")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("AutoHealEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CapabilitiesJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<int>("HealingConfidenceThreshold")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LastConnectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ServerUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Transport")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlaywrightMcpConfigs");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.PlaywrightMcpTestConfig", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("GeneratedTestCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HealingHistoryJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid?>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<double>("SuccessRate")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("TestScenario")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("playwright_mcp_test_configs", (string)null);
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.PreviewDeployment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ContainerGroupName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContainerName")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -6789,6 +7444,15 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Fqdn")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageUri")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PreviewUrl")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -6797,6 +7461,12 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Region")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ResourceGroupName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -6883,6 +7553,52 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProductionSandboxes");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.Project", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("LastDeployedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("PreviewUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ProductionUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevRequestId");
+
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.ProjectDocumentation", b =>
@@ -7027,6 +7743,37 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("project_indexes", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectLogs");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.ProjectMemory", b =>
@@ -7413,10 +8160,17 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<Guid>("DevRequestId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("FileChangesJson")
+                        .HasColumnType("text");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("TokensUsed")
                         .HasColumnType("integer");
@@ -8061,6 +8815,84 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("service_blueprints", (string)null);
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.StreamingCodeGenSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BuildProgressJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CompletedFiles")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CurrentFile")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("DevRequestId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GeneratedFilesJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("PreviewUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<double>("ProgressPercent")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Prompt")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("StreamedTokens")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalFiles")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TotalTokens")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("streaming_code_gen_sessions", (string)null);
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.SubagentTask", b =>
                 {
                     b.Property<int>("Id")
@@ -8227,6 +9059,68 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("subscription_records", (string)null);
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.Subtask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DependsOnSubtaskIdsJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<Guid>("DevRequestId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("EstimatedHours")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ParentSubtaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevRequestId");
+
+                    b.HasIndex("ParentSubtaskId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("subtasks", (string)null);
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.Suggestion", b =>
                 {
                     b.Property<int>("Id")
@@ -8324,8 +9218,6 @@ namespace AiDevRequest.API.Data.Migrations
 
                     b.HasIndex("SuggestionId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("suggestion_comments", (string)null);
                 });
 
@@ -8397,8 +9289,6 @@ namespace AiDevRequest.API.Data.Migrations
 
                     b.HasIndex("SuggestionId");
 
-                    b.HasIndex("UserId");
-
                     b.HasIndex("SuggestionId", "UserId")
                         .IsUnique();
 
@@ -8424,8 +9314,16 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("FeedbackType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<decimal?>("RewardCredit")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("RewardMessage")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<DateTime?>("RewardedAt")
                         .HasColumnType("timestamp with time zone");
@@ -8756,6 +9654,103 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("test_generation_records", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.TestHealingRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FailureReason")
+                        .IsRequired()
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
+
+                    b.Property<string>("HealingStrategy")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("OriginalLocator")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("TestConfigId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UpdatedLocator")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("TestConfigId");
+
+                    b.ToTable("test_healing_records", (string)null);
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.TestPersona", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("ActionsFailed")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ActionsPerformed")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ActionsSucceeded")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("AgentId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("BehaviorJson")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PersonaName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PersonaType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TestPersonas");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.TokenBalance", b =>
@@ -9230,6 +10225,9 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -9254,9 +10252,9 @@ namespace AiDevRequest.API.Data.Migrations
 
             modelBuilder.Entity("AiDevRequest.API.Entities.User", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("AnonymousUserId")
                         .HasMaxLength(100)
@@ -10265,6 +11263,105 @@ namespace AiDevRequest.API.Data.Migrations
                     b.ToTable("WorkersAiDeployments");
                 });
 
+            modelBuilder.Entity("AiDevRequest.API.Entities.WorkflowAutomation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("EdgesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MetadataJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("NaturalLanguagePrompt")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NodesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TriggerConfigJson")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TriggerType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkflowAutomations");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.WorkflowAutomationRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CurrentNodeId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NodeResultsJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NodesSnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("WorkflowAutomationId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkflowAutomationRuns");
+                });
+
             modelBuilder.Entity("AiDevRequest.API.Entities.WorkflowExecution", b =>
                 {
                     b.Property<int>("Id")
@@ -10335,12 +11432,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("ToAgentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.A2ATask", b =>
@@ -10356,75 +11447,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("ToAgentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AgentCard", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AgenticPlan", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AiElementsConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ApiDocConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ApiKey", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.AppRecommendation", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ArenaComparison", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.AutoTopUpConfig", b =>
@@ -10432,30 +11454,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasOne("AiDevRequest.API.Entities.TokenPackage", null)
                         .WithMany()
                         .HasForeignKey("TokenPackageId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.BackgroundAgent", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.BillingAccount", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -10469,15 +11467,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.CodeSnapshot", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.CompilationResult", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
@@ -10487,29 +11476,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.ComponentPreview", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.CreditPackagePrice", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.TokenPackage", null)
                         .WithMany()
                         .HasForeignKey("TokenPackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DataSchema", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -10526,39 +11497,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("HostingPlanId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DeploymentHealth", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DevPipeline", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.DevRequest", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.Domain", b =>
@@ -10568,12 +11506,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("DeploymentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.DomainTransaction", b =>
@@ -10581,30 +11513,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasOne("AiDevRequest.API.Entities.Domain", null)
                         .WithMany()
                         .HasForeignKey("DomainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.FigmaImport", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.FrameworkConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -10618,65 +11526,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.GenerationVariant", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.GenerativeUiSession", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.InfrastructureConfig", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.McpGatewayServer", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.MobileAppConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ModelRoutingConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.NlSchema", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -10705,21 +11559,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("DevRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.OnboardingProgress", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.Payment", b =>
@@ -10728,30 +11567,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("TokenPackageId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.PerformanceProfile", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.PlatformUpgrade", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.PreviewDeployment", b =>
@@ -10761,39 +11576,26 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("DevRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectIndex", b =>
+            modelBuilder.Entity("AiDevRequest.API.Entities.Project", b =>
                 {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
+                    b.HasOne("AiDevRequest.API.Entities.DevRequest", "DevRequest")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DevRequestId");
+
+                    b.Navigation("DevRequest");
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectMemory", b =>
+            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectLog", b =>
                 {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("AiDevRequest.API.Entities.Project", "Project")
+                        .WithMany("Logs")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.ProjectReview", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.ProjectVersion", b =>
@@ -10801,15 +11603,6 @@ namespace AiDevRequest.API.Data.Migrations
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.QueryConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -10829,12 +11622,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -10856,26 +11643,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.SemanticIndex", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.ServiceBlueprint", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -10890,36 +11662,12 @@ namespace AiDevRequest.API.Data.Migrations
                     b.Navigation("ParentOrchestration");
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubscriptionEvent", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.SubscriptionRecord", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.Suggestion", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.DevRequest", null)
                         .WithMany()
                         .HasForeignKey("DevRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.SuggestionComment", b =>
@@ -10928,12 +11676,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("SuggestionId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -10953,21 +11695,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("SuggestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.SupportPost", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.TeamActivity", b =>
@@ -10986,12 +11713,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("AiDevRequest.API.Entities.TeamProject", b =>
@@ -11009,119 +11730,11 @@ namespace AiDevRequest.API.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AiDevRequest.API.Entities.TeamWorkspace", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AiDevRequest.API.Entities.TenantUsage", b =>
                 {
                     b.HasOne("AiDevRequest.API.Entities.WhiteLabelTenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.TokenBalance", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.TokenTransaction", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserInterest", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserMemory", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserPreference", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.UserPreferenceSummary", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.ViewTransitionConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VisualOverlaySession", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VisualPromptUi", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VisualRegressionResult", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.VoiceConfig", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -11132,15 +11745,6 @@ namespace AiDevRequest.API.Data.Migrations
                         .WithMany()
                         .HasForeignKey("SbomReportId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AiDevRequest.API.Entities.WhiteLabelTenant", b =>
-                {
-                    b.HasOne("AiDevRequest.API.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -11156,6 +11760,11 @@ namespace AiDevRequest.API.Data.Migrations
             modelBuilder.Entity("AiDevRequest.API.Entities.ParallelOrchestration", b =>
                 {
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("AiDevRequest.API.Entities.Project", b =>
+                {
+                    b.Navigation("Logs");
                 });
 #pragma warning restore 612, 618
         }

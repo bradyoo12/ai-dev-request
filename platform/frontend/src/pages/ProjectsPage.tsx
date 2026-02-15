@@ -85,16 +85,16 @@ export default function ProjectsPage() {
   }
 
   return (
-    <section className="p-6 space-y-6">
+    <section className="p-4 sm:p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold">{t('projects.title')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t('projects.title')}</h1>
           <p className="text-warm-400 mt-1">{t('projects.subtitle')}</p>
         </div>
         <button
           onClick={() => navigate('/')}
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded transition-colors"
+          className="px-4 py-2 min-h-[44px] bg-blue-500 hover:bg-blue-600 rounded transition-colors self-start sm:self-auto"
         >
           {t('projects.newProject')}
         </button>

@@ -87,7 +87,7 @@ export default function PaymentHistoryPage() {
       )}
 
       <div className="bg-warm-800 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <h3 className="text-lg font-bold">{t('payments.history')}</h3>
           <span className="text-warm-400 text-sm">
             {t('payments.totalPayments', { count: totalCount })}
@@ -98,8 +98,8 @@ export default function PaymentHistoryPage() {
           <p className="text-warm-500 text-center py-8">{t('payments.noHistory')}</p>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+              <table className="w-full text-sm min-w-[700px]">
                 <thead>
                   <tr className="text-warm-400 border-b border-warm-700">
                     <th className="text-left py-2 px-2">{t('payments.date')}</th>
@@ -163,7 +163,7 @@ export default function PaymentHistoryPage() {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="px-3 py-1 bg-warm-700 hover:bg-warm-600 disabled:bg-warm-800 disabled:text-warm-600 rounded-lg text-sm transition-colors"
+                  className="px-4 py-2 min-h-[44px] bg-warm-700 hover:bg-warm-600 disabled:bg-warm-800 disabled:text-warm-600 rounded-lg text-sm transition-colors"
                 >
                   {t('payments.prev')}
                 </button>
@@ -173,7 +173,7 @@ export default function PaymentHistoryPage() {
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={page >= Math.ceil(totalCount / pageSize)}
-                  className="px-3 py-1 bg-warm-700 hover:bg-warm-600 disabled:bg-warm-800 disabled:text-warm-600 rounded-lg text-sm transition-colors"
+                  className="px-4 py-2 min-h-[44px] bg-warm-700 hover:bg-warm-600 disabled:bg-warm-800 disabled:text-warm-600 rounded-lg text-sm transition-colors"
                 >
                   {t('payments.next')}
                 </button>

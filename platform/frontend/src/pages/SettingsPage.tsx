@@ -144,12 +144,12 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
 
       {/* Token Balance Overview */}
       {overview && (
-        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-xl p-6">
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-xl p-4 sm:p-6">
           <h3 className="text-lg font-bold mb-4">{t('settings.tokens.balance')}</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <div>
-              <div className="text-warm-300 text-sm">{t('settings.tokens.currentBalance')}</div>
-              <div className="text-3xl font-bold">{overview.balance.toLocaleString()}</div>
+              <div className="text-warm-300 text-xs sm:text-sm">{t('settings.tokens.currentBalance')}</div>
+              <div className="text-2xl sm:text-3xl font-bold">{overview.balance.toLocaleString()}</div>
               <div className="text-warm-400 text-sm">
                 ≈ ${overview.balanceValueUsd.toFixed(2)}
               </div>
@@ -196,12 +196,12 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
 
       {/* Transaction History */}
       <div className="bg-warm-800 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <h3 className="text-lg font-bold">{t('settings.tokens.history')}</h3>
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1 text-sm"
+            className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 sm:py-1 text-sm min-h-[44px] sm:min-h-0"
           >
             <option value="">{t('settings.tokens.allActions')}</option>
             <option value="welcome_bonus">{t('settings.tokens.action.welcome_bonus')}</option>
@@ -217,8 +217,8 @@ export default function SettingsPage({ onBalanceChange }: SettingsPageProps) {
           <p className="text-warm-500 text-center py-4">{t('settings.tokens.noHistory')}</p>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="text-warm-400 border-b border-warm-700">
                     <th className="text-left py-2 px-2">{t('settings.tokens.historyDate')}</th>

@@ -25,8 +25,8 @@ export default function Layout() {
     return <LoginPage onLogin={handleLogin} onSkip={() => setShowLogin(false)} />
   }
 
-  // --- Navigation item styling (standardized hover colors) ---
-  const navLinkClass = 'text-warm-400 hover:text-white transition-colors text-left'
+  // --- Navigation item styling (standardized hover colors, mobile touch targets) ---
+  const navLinkClass = 'text-warm-400 hover:text-white transition-colors text-left min-h-[44px] flex items-center lg:min-h-0 lg:inline'
 
   const currentPath = location.pathname
 
@@ -130,7 +130,7 @@ export default function Layout() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-warm-800/50 rounded-xl transition-colors"
+              className="lg:hidden p-2 min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-warm-800/50 rounded-xl transition-colors"
               aria-label={mobileMenuOpen ? t('header.closeMenu', 'Close menu') : t('header.openMenu', 'Open menu')}
               aria-expanded={mobileMenuOpen}
             >

@@ -60,7 +60,7 @@ export default function PowerLevelSelector({ value, onChange, disabled }: PowerL
               type="button"
               disabled={disabled}
               onClick={() => onChange(pl.level)}
-              className={`relative text-left p-4 rounded-xl border-2 transition-all ${
+              className={`relative text-left p-4 min-h-[44px] rounded-xl border-2 transition-all ${
                 isSelected
                   ? 'border-accent-blue bg-accent-blue/10 shadow-glow-blue'
                   : 'border-warm-700/50 bg-warm-900/50 hover:border-warm-500/50 hover:bg-warm-800/50'

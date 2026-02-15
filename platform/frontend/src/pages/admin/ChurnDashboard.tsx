@@ -100,14 +100,14 @@ export default function ChurnDashboard() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h3 className="text-xl font-bold">{t('churn.title')}</h3>
           <p className="text-warm-400 text-sm mt-1">{t('churn.description')}</p>
         </div>
         <button
           onClick={() => exportChurnCsv()}
-          className="px-4 py-2 bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors"
+          className="px-4 py-2 min-h-[44px] bg-warm-700 hover:bg-warm-600 rounded-lg text-sm transition-colors self-start sm:self-auto"
         >
           {t('churn.exportCsv')}
         </button>
@@ -188,8 +188,8 @@ export default function ChurnDashboard() {
       {planData.length > 0 && (
         <div className="bg-warm-800 rounded-xl p-6 mb-6">
           <h4 className="font-bold mb-4">{t('churn.byPlanTitle')}</h4>
-          <div className="overflow-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <table className="w-full min-w-[500px]">
               <thead>
                 <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                   <th className="pb-2">{t('churn.plan')}</th>
@@ -224,13 +224,13 @@ export default function ChurnDashboard() {
 
       {/* Subscription Events */}
       <div className="bg-warm-800 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h4 className="font-bold">{t('churn.eventsTitle')}</h4>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <select
               value={eventFilter}
               onChange={(e) => { setEventFilter(e.target.value); setEventsPage(1) }}
-              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1.5 text-sm"
+              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 sm:py-1.5 text-sm min-h-[44px] sm:min-h-0 flex-1 sm:flex-none"
             >
               <option value="all">{t('churn.filter.allEvents')}</option>
               <option value="Created">{t('churn.event.created')}</option>
@@ -243,7 +243,7 @@ export default function ChurnDashboard() {
             <select
               value={planFilter}
               onChange={(e) => { setPlanFilter(e.target.value); setEventsPage(1) }}
-              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-1.5 text-sm"
+              className="bg-warm-900 border border-warm-700 rounded-lg px-3 py-2 sm:py-1.5 text-sm min-h-[44px] sm:min-h-0 flex-1 sm:flex-none"
             >
               <option value="all">{t('churn.filter.allPlans')}</option>
               <option value="Free">Free</option>
@@ -258,8 +258,8 @@ export default function ChurnDashboard() {
           <div className="text-center py-8 text-warm-400">{t('churn.noEvents')}</div>
         ) : (
           <>
-            <div className="overflow-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+              <table className="w-full min-w-[500px]">
                 <thead>
                   <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                     <th className="pb-2">{t('churn.time')}</th>
@@ -303,17 +303,17 @@ export default function ChurnDashboard() {
                 <button
                   onClick={() => setEventsPage(p => Math.max(1, p - 1))}
                   disabled={eventsPage === 1}
-                  className="px-3 py-1.5 bg-warm-900 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-warm-900 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
                 >
                   &larr;
                 </button>
-                <span className="px-3 py-1.5 text-sm text-warm-400">
+                <span className="px-3 py-1.5 text-sm text-warm-400 flex items-center">
                   {eventsPage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setEventsPage(p => Math.min(totalPages, p + 1))}
                   disabled={eventsPage === totalPages}
-                  className="px-3 py-1.5 bg-warm-900 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-warm-900 hover:bg-warm-700 disabled:opacity-50 rounded-lg text-sm"
                 >
                   &rarr;
                 </button>

@@ -156,12 +156,12 @@ export default function TicketProgressPage() {
   }
 
   return (
-    <section className="p-6 space-y-6">
+    <section className="p-4 sm:p-6 space-y-6">
       {/* Header */}
       <FadeIn>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl font-bold">{t('tickets.title')}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">{t('tickets.title')}</h1>
             <p className="text-warm-400 mt-1">{t('tickets.subtitle')}</p>
           </div>
           <button
@@ -180,7 +180,7 @@ export default function TicketProgressPage() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              className={`px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 statusFilter === status
                   ? 'bg-accent-blue text-white shadow-glow-blue'
                   : 'bg-warm-800 text-warm-400 hover:bg-warm-700 hover:text-white'
@@ -298,7 +298,7 @@ export default function TicketProgressPage() {
                             <h4 className="text-xs font-semibold text-warm-400 uppercase tracking-wider mb-3">
                               {t('tickets.detail.timeline')}
                             </h4>
-                            <div className="flex items-center gap-1 overflow-x-auto pb-2">
+                            <div className="flex items-center gap-1 overflow-x-auto pb-2 -mx-2 px-2">
                               {STATUS_TIMELINE.map((stage, idx) => {
                                 const currentIdx = getStatusIndex(selectedTicket.status)
                                 const isCancelled = selectedTicket.status === 'Cancelled'
@@ -307,7 +307,7 @@ export default function TicketProgressPage() {
 
                                 return (
                                   <div key={stage} className="flex items-center">
-                                    <div className="flex flex-col items-center min-w-[56px]">
+                                    <div className="flex flex-col items-center min-w-[48px] sm:min-w-[56px]">
                                       <div
                                         className={`w-3 h-3 rounded-full border-2 transition-colors ${
                                           isCurrent

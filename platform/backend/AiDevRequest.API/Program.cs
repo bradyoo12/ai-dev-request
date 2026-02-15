@@ -126,6 +126,8 @@ builder.Services.AddScoped<IAgentSkillService, AgentSkillService>();
 builder.Services.AddScoped<IAgentBuilderService, AgentBuilderService>();
 builder.Services.AddScoped<ISubtaskService, SubtaskService>();
 builder.Services.AddScoped<IAutonomousTestingService, AutonomousTestingService>();
+builder.Services.AddScoped<ILiveBrowserTestRunner, LiveBrowserTestRunner>();
+builder.Services.AddScoped<ILiveBrowserTestService, LiveBrowserTestService>();
 builder.Services.AddScoped<ILogStreamService, LogStreamService>();
 builder.Services.AddScoped<GitBranchService>();
 builder.Services.AddScoped<IProjectCostEstimationService, ProjectCostEstimationService>();

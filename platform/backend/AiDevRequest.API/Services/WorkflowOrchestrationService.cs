@@ -331,10 +331,13 @@ public class WorkflowOrchestrationService : IWorkflowOrchestrationService
             {
                 try
                 {
-                    var testExecution = await _autonomousTestingService.StartAutonomousTestingLoopAsync(
+                    var testExecution = await _autonomousTestingService.StartBrowserTestingLoopAsync(
+                        preview.UserId,
                         execution.DevRequestId,
-                        preview.Id,
-                        maxIterations: 3);
+                        preview.PreviewUrl ?? $"https://preview-{execution.DevRequestId}",
+                        null,
+                        "chromium",
+                        3);
 
                     // Update step status based on test results
                     var updatedSteps = JsonSerializer.Deserialize<List<WorkflowStep>>(execution.StepsJson) ?? [];

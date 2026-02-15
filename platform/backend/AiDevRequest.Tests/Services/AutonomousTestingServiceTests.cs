@@ -1,3 +1,4 @@
+using AiDevRequest.API.Controllers;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
@@ -15,9 +16,7 @@ public class AutonomousTestingServiceTests : IDisposable
     private readonly AiDevRequestDbContext _context;
     private readonly Mock<ILogger<AutonomousTestingService>> _mockLogger;
     private readonly Mock<IConfiguration> _mockConfig;
-    private readonly Mock<ISelfHealingTestService> _mockSelfHealingTestService;
-    private readonly Mock<IPreviewDeploymentService> _mockPreviewDeploymentService;
-    private readonly Mock<ISandboxExecutionService> _mockSandboxExecutionService;
+    private readonly Mock<ILiveBrowserTestRunner> _mockBrowserTestRunner;
 
     public AutonomousTestingServiceTests()
     {
@@ -28,278 +27,325 @@ public class AutonomousTestingServiceTests : IDisposable
         _context = new AiDevRequestDbContext(options);
         _mockLogger = new Mock<ILogger<AutonomousTestingService>>();
         _mockConfig = new Mock<IConfiguration>();
-        _mockSelfHealingTestService = new Mock<ISelfHealingTestService>();
-        _mockPreviewDeploymentService = new Mock<IPreviewDeploymentService>();
-        _mockSandboxExecutionService = new Mock<ISandboxExecutionService>();
+        _mockBrowserTestRunner = new Mock<ILiveBrowserTestRunner>();
 
         // Setup configuration
         _mockConfig.Setup(c => c["Projects:BasePath"]).Returns("./test-projects");
         _mockConfig.Setup(c => c["Anthropic:ApiKey"]).Returns("test-api-key");
     }
 
+    private AutonomousTestingService CreateService() => new(
+        _context,
+        _mockConfig.Object,
+        _mockLogger.Object,
+        _mockBrowserTestRunner.Object);
+
     [Fact]
-    public async Task StartAutonomousTestingLoopAsync_ShouldCreateExecution()
+    public async Task StartBrowserTestingLoopAsync_ShouldCreateExecution()
     {
         // Arrange
         var devRequestId = Guid.NewGuid();
-        var previewId = Guid.NewGuid();
-
-        var devRequest = new DevRequest
-        {
-            Id = devRequestId,
-            UserId = "test-user",
-            Description = "Test project",
-            ProjectPath = "./test-project"
-        };
-        _context.DevRequests.Add(devRequest);
-        await _context.SaveChangesAsync();
-
-        var sandboxExecution = new SandboxExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            Status = "completed",
-            ExitCode = 0
-        };
-
-        _mockSandboxExecutionService
-            .Setup(s => s.ExecuteInSandbox(devRequestId, "test", "npm test", "container"))
-            .ReturnsAsync(sandboxExecution);
-
-        var service = new AutonomousTestingService(
-            _context,
-            _mockConfig.Object,
-            _mockLogger.Object,
-            _mockSelfHealingTestService.Object,
-            _mockPreviewDeploymentService.Object,
-            _mockSandboxExecutionService.Object);
+        var service = CreateService();
 
         // Act
-        var result = await service.StartAutonomousTestingLoopAsync(devRequestId, previewId, maxIterations: 3);
+        var result = await service.StartBrowserTestingLoopAsync(
+            "test-user", devRequestId, "https://example.com", "Test Project", "chromium", 3);
 
         // Assert
         result.Should().NotBeNull();
+        result.UserId.Should().Be("test-user");
         result.DevRequestId.Should().Be(devRequestId);
-        result.PreviewDeploymentId.Should().Be(previewId);
+        result.TargetUrl.Should().Be("https://example.com");
+        result.ProjectName.Should().Be("Test Project");
+        result.BrowserType.Should().Be("chromium");
         result.MaxIterations.Should().Be(3);
-        result.Status.Should().Be("completed");
-        result.TestsPassed.Should().BeTrue();
+        result.Status.Should().Be("running");
+
+        // Verify persisted to database
+        var saved = await _context.AutonomousTestExecutions.FindAsync(result.Id);
+        saved.Should().NotBeNull();
+        saved!.UserId.Should().Be("test-user");
     }
 
     [Fact]
-    public async Task StartAutonomousTestingLoopAsync_WhenTestsPass_ShouldCompleteOnFirstIteration()
+    public async Task GetUserExecutionsAsync_ShouldReturnOnlyUserExecutions()
     {
         // Arrange
-        var devRequestId = Guid.NewGuid();
-        var previewId = Guid.NewGuid();
-
-        var devRequest = new DevRequest
-        {
-            Id = devRequestId,
-            UserId = "test-user",
-            Description = "Test project",
-            ProjectPath = "./test-project"
-        };
-        _context.DevRequests.Add(devRequest);
-        await _context.SaveChangesAsync();
-
-        var sandboxExecution = new SandboxExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            Status = "completed",
-            ExitCode = 0
-        };
-
-        _mockSandboxExecutionService
-            .Setup(s => s.ExecuteInSandbox(devRequestId, "test", "npm test", "container"))
-            .ReturnsAsync(sandboxExecution);
-
-        var service = new AutonomousTestingService(
-            _context,
-            _mockConfig.Object,
-            _mockLogger.Object,
-            _mockSelfHealingTestService.Object,
-            _mockPreviewDeploymentService.Object,
-            _mockSandboxExecutionService.Object);
-
-        // Act
-        var result = await service.StartAutonomousTestingLoopAsync(devRequestId, previewId, maxIterations: 3);
-
-        // Assert
-        result.CurrentIteration.Should().Be(1);
-        result.Status.Should().Be("completed");
-        result.TestsPassed.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task StartAutonomousTestingLoopAsync_ShouldEnforceMaxIterations()
-    {
-        // Arrange
-        var devRequestId = Guid.NewGuid();
-        var previewId = Guid.NewGuid();
-
-        var devRequest = new DevRequest
-        {
-            Id = devRequestId,
-            UserId = "test-user",
-            Description = "Test project",
-            ProjectPath = "./test-project"
-        };
-        _context.DevRequests.Add(devRequest);
-        await _context.SaveChangesAsync();
-
-        // Simulate failing tests on all iterations
-        var sandboxExecution = new SandboxExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            Status = "completed",
-            ExitCode = 1,
-            ErrorLog = "Test failed: expected true but got false"
-        };
-
-        _mockSandboxExecutionService
-            .Setup(s => s.ExecuteInSandbox(devRequestId, "test", "npm test", "container"))
-            .ReturnsAsync(sandboxExecution);
-
-        _mockSelfHealingTestService
-            .Setup(s => s.RunSelfHealingAnalysis(devRequestId))
-            .ReturnsAsync(new SelfHealingTestResult
+        _context.AutonomousTestExecutions.AddRange(
+            new AutonomousTestExecution
             {
-                Id = Guid.NewGuid(),
-                DevRequestId = devRequestId,
-                Status = "completed",
-                FailedTests = 1
-            });
-
-        _mockPreviewDeploymentService
-            .Setup(s => s.DeployPreviewAsync(devRequestId, "test-user"))
-            .ReturnsAsync(new PreviewDeployment
+                UserId = "user-a",
+                DevRequestId = Guid.NewGuid(),
+                TargetUrl = "https://a.com",
+                BrowserType = "chromium"
+            },
+            new AutonomousTestExecution
             {
-                Id = Guid.NewGuid(),
-                DevRequestId = devRequestId,
-                UserId = "test-user",
-                Status = PreviewDeploymentStatus.Deployed
+                UserId = "user-a",
+                DevRequestId = Guid.NewGuid(),
+                TargetUrl = "https://a2.com",
+                BrowserType = "chromium"
+            },
+            new AutonomousTestExecution
+            {
+                UserId = "user-b",
+                DevRequestId = Guid.NewGuid(),
+                TargetUrl = "https://b.com",
+                BrowserType = "chromium"
             });
-
-        var service = new AutonomousTestingService(
-            _context,
-            _mockConfig.Object,
-            _mockLogger.Object,
-            _mockSelfHealingTestService.Object,
-            _mockPreviewDeploymentService.Object,
-            _mockSandboxExecutionService.Object);
-
-        // Act
-        var result = await service.StartAutonomousTestingLoopAsync(devRequestId, previewId, maxIterations: 3);
-
-        // Assert
-        result.CurrentIteration.Should().Be(3);
-        result.Status.Should().Be("failed");
-        result.TestsPassed.Should().BeFalse();
-        result.FinalTestResult.Should().Contain("3 iterations");
-
-        // Verify services were called correct number of times
-        _mockSandboxExecutionService.Verify(
-            s => s.ExecuteInSandbox(devRequestId, "test", "npm test", "container"),
-            Times.Exactly(3));
-
-        _mockSelfHealingTestService.Verify(
-            s => s.RunSelfHealingAnalysis(devRequestId),
-            Times.Exactly(3));
-
-        _mockPreviewDeploymentService.Verify(
-            s => s.DeployPreviewAsync(devRequestId, "test-user"),
-            Times.Exactly(3));
-    }
-
-    [Fact]
-    public async Task GetLatestExecutionAsync_ShouldReturnLatestExecution()
-    {
-        // Arrange
-        var devRequestId = Guid.NewGuid();
-
-        var execution1 = new AutonomousTestExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            PreviewDeploymentId = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow.AddHours(-2)
-        };
-
-        var execution2 = new AutonomousTestExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            PreviewDeploymentId = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow.AddHours(-1)
-        };
-
-        _context.AutonomousTestExecutions.AddRange(execution1, execution2);
         await _context.SaveChangesAsync();
 
-        var service = new AutonomousTestingService(
-            _context,
-            _mockConfig.Object,
-            _mockLogger.Object,
-            _mockSelfHealingTestService.Object,
-            _mockPreviewDeploymentService.Object,
-            _mockSandboxExecutionService.Object);
+        var service = CreateService();
 
         // Act
-        var result = await service.GetLatestExecutionAsync(devRequestId);
-
-        // Assert
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(execution2.Id);
-    }
-
-    [Fact]
-    public async Task GetExecutionHistoryAsync_ShouldReturnAllExecutionsForDevRequest()
-    {
-        // Arrange
-        var devRequestId = Guid.NewGuid();
-        var otherDevRequestId = Guid.NewGuid();
-
-        var execution1 = new AutonomousTestExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            PreviewDeploymentId = Guid.NewGuid()
-        };
-
-        var execution2 = new AutonomousTestExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = devRequestId,
-            PreviewDeploymentId = Guid.NewGuid()
-        };
-
-        var execution3 = new AutonomousTestExecution
-        {
-            Id = Guid.NewGuid(),
-            DevRequestId = otherDevRequestId,
-            PreviewDeploymentId = Guid.NewGuid()
-        };
-
-        _context.AutonomousTestExecutions.AddRange(execution1, execution2, execution3);
-        await _context.SaveChangesAsync();
-
-        var service = new AutonomousTestingService(
-            _context,
-            _mockConfig.Object,
-            _mockLogger.Object,
-            _mockSelfHealingTestService.Object,
-            _mockPreviewDeploymentService.Object,
-            _mockSandboxExecutionService.Object);
-
-        // Act
-        var result = await service.GetExecutionHistoryAsync(devRequestId);
+        var result = await service.GetUserExecutionsAsync("user-a");
 
         // Assert
         result.Should().HaveCount(2);
-        result.Should().OnlyContain(e => e.DevRequestId == devRequestId);
+        result.Should().OnlyContain(e => e.UserId == "user-a");
+    }
+
+    [Fact]
+    public async Task GetUserExecutionsAsync_ShouldOrderByCreatedAtDescending()
+    {
+        // Arrange
+        var older = new AutonomousTestExecution
+        {
+            UserId = "test-user",
+            DevRequestId = Guid.NewGuid(),
+            TargetUrl = "https://old.com",
+            BrowserType = "chromium",
+            CreatedAt = DateTime.UtcNow.AddHours(-2)
+        };
+        var newer = new AutonomousTestExecution
+        {
+            UserId = "test-user",
+            DevRequestId = Guid.NewGuid(),
+            TargetUrl = "https://new.com",
+            BrowserType = "chromium",
+            CreatedAt = DateTime.UtcNow.AddHours(-1)
+        };
+        _context.AutonomousTestExecutions.AddRange(older, newer);
+        await _context.SaveChangesAsync();
+
+        var service = CreateService();
+
+        // Act
+        var result = await service.GetUserExecutionsAsync("test-user");
+
+        // Assert
+        result.Should().HaveCount(2);
+        result[0].Id.Should().Be(newer.Id);
+        result[1].Id.Should().Be(older.Id);
+    }
+
+    [Fact]
+    public async Task GetExecutionByIdAsync_ShouldReturnExecution()
+    {
+        // Arrange
+        var execution = new AutonomousTestExecution
+        {
+            UserId = "test-user",
+            DevRequestId = Guid.NewGuid(),
+            TargetUrl = "https://test.com",
+            BrowserType = "chromium",
+            Status = "completed"
+        };
+        _context.AutonomousTestExecutions.Add(execution);
+        await _context.SaveChangesAsync();
+
+        var service = CreateService();
+
+        // Act
+        var result = await service.GetExecutionByIdAsync(execution.Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(execution.Id);
+        result.Status.Should().Be("completed");
+    }
+
+    [Fact]
+    public async Task GetExecutionByIdAsync_ShouldReturnNullForMissingId()
+    {
+        // Arrange
+        var service = CreateService();
+
+        // Act
+        var result = await service.GetExecutionByIdAsync(Guid.NewGuid());
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task CancelExecutionAsync_ShouldCancelRunningExecution()
+    {
+        // Arrange
+        var execution = new AutonomousTestExecution
+        {
+            UserId = "test-user",
+            DevRequestId = Guid.NewGuid(),
+            TargetUrl = "https://test.com",
+            BrowserType = "chromium",
+            Status = "running"
+        };
+        _context.AutonomousTestExecutions.Add(execution);
+        await _context.SaveChangesAsync();
+
+        var service = CreateService();
+
+        // Act
+        var result = await service.CancelExecutionAsync(execution.Id);
+
+        // Assert
+        result.Status.Should().Be("cancelled");
+        result.CompletedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task CancelExecutionAsync_ShouldThrowForCompletedExecution()
+    {
+        // Arrange
+        var execution = new AutonomousTestExecution
+        {
+            UserId = "test-user",
+            DevRequestId = Guid.NewGuid(),
+            TargetUrl = "https://test.com",
+            BrowserType = "chromium",
+            Status = "completed"
+        };
+        _context.AutonomousTestExecutions.Add(execution);
+        await _context.SaveChangesAsync();
+
+        var service = CreateService();
+
+        // Act & Assert
+        var act = () => service.CancelExecutionAsync(execution.Id);
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Cannot cancel*");
+    }
+
+    [Fact]
+    public async Task CancelExecutionAsync_ShouldThrowForMissingExecution()
+    {
+        // Arrange
+        var service = CreateService();
+
+        // Act & Assert
+        var act = () => service.CancelExecutionAsync(Guid.NewGuid());
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*not found*");
+    }
+
+    [Fact]
+    public async Task GetStatsAsync_ShouldReturnCorrectStats()
+    {
+        // Arrange
+        _context.AutonomousTestExecutions.AddRange(
+            new AutonomousTestExecution
+            {
+                UserId = "test-user",
+                DevRequestId = Guid.NewGuid(),
+                TargetUrl = "https://test.com",
+                BrowserType = "chromium",
+                Status = "completed",
+                CurrentIteration = 1,
+                IssuesDetected = 3,
+                IssuesFixed = 3,
+                VisionAnalysisCount = 1,
+                TotalDurationMs = 5000
+            },
+            new AutonomousTestExecution
+            {
+                UserId = "test-user",
+                DevRequestId = Guid.NewGuid(),
+                TargetUrl = "https://test2.com",
+                BrowserType = "firefox",
+                Status = "failed",
+                CurrentIteration = 3,
+                IssuesDetected = 5,
+                IssuesFixed = 2,
+                VisionAnalysisCount = 3,
+                TotalDurationMs = 15000
+            },
+            new AutonomousTestExecution
+            {
+                UserId = "other-user",
+                DevRequestId = Guid.NewGuid(),
+                TargetUrl = "https://other.com",
+                BrowserType = "chromium",
+                Status = "completed"
+            });
+        await _context.SaveChangesAsync();
+
+        var service = CreateService();
+
+        // Act
+        var stats = await service.GetStatsAsync("test-user");
+
+        // Assert
+        stats.TotalExecutions.Should().Be(2);
+        stats.CompletedExecutions.Should().Be(1);
+        stats.FailedExecutions.Should().Be(1);
+        stats.TotalIssuesDetected.Should().Be(8);
+        stats.TotalIssuesFixed.Should().Be(5);
+        stats.TotalVisionAnalyses.Should().Be(4);
+        stats.ByBrowser.Should().ContainKey("chromium").WhoseValue.Should().Be(1);
+        stats.ByBrowser.Should().ContainKey("firefox").WhoseValue.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task GetStatsAsync_ShouldReturnEmptyStatsForNewUser()
+    {
+        // Arrange
+        var service = CreateService();
+
+        // Act
+        var stats = await service.GetStatsAsync("new-user");
+
+        // Assert
+        stats.TotalExecutions.Should().Be(0);
+        stats.CompletedExecutions.Should().Be(0);
+        stats.PassRate.Should().Be(0);
+        stats.AvgIterations.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task GetScreenshotsAsync_ShouldReturnEmptyListWhenNoScreenshots()
+    {
+        // Arrange
+        var execution = new AutonomousTestExecution
+        {
+            UserId = "test-user",
+            DevRequestId = Guid.NewGuid(),
+            TargetUrl = "https://test.com",
+            BrowserType = "chromium",
+            ScreenshotsJson = null
+        };
+        _context.AutonomousTestExecutions.Add(execution);
+        await _context.SaveChangesAsync();
+
+        var service = CreateService();
+
+        // Act
+        var result = await service.GetScreenshotsAsync(execution.Id);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetScreenshotsAsync_ShouldReturnEmptyListForMissingExecution()
+    {
+        // Arrange
+        var service = CreateService();
+
+        // Act
+        var result = await service.GetScreenshotsAsync(Guid.NewGuid());
+
+        // Assert
+        result.Should().BeEmpty();
     }
 
     public void Dispose()

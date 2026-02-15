@@ -6,9 +6,9 @@ namespace AiDevRequest.API.Services;
 
 public interface IMessageService
 {
-    Task<Message> SendMessageAsync(string senderId, string receiverId, string content);
-    Task<List<Message>> GetMessagesAsync(string userId);
-    Task<List<Message>> GetConversationAsync(string userId1, string userId2);
+    Task<UserMessage> SendMessageAsync(string senderId, string receiverId, string content);
+    Task<List<UserMessage>> GetMessagesAsync(string userId);
+    Task<List<UserMessage>> GetConversationAsync(string userId1, string userId2);
     Task<Message?> MarkAsReadAsync(Guid messageId, string userId);
     Task<int> GetUnreadCountAsync(string userId);
     Task<List<ConversationSummary>> GetConversationListAsync(string userId);
@@ -35,7 +35,7 @@ public class MessageService : IMessageService
         _logger = logger;
     }
 
-    public async Task<Message> SendMessageAsync(string senderId, string receiverId, string content)
+    public async Task<UserMessage> SendMessageAsync(string senderId, string receiverId, string content)
     {
         if (string.IsNullOrWhiteSpace(content))
             throw new ArgumentException("Message content cannot be empty.", nameof(content));
@@ -59,7 +59,7 @@ public class MessageService : IMessageService
         return message;
     }
 
-    public async Task<List<Message>> GetMessagesAsync(string userId)
+    public async Task<List<UserMessage>> GetMessagesAsync(string userId)
     {
         return await _db.Messages
             .Where(m => m.SenderId == userId || m.ReceiverId == userId)
@@ -67,7 +67,7 @@ public class MessageService : IMessageService
             .ToListAsync();
     }
 
-    public async Task<List<Message>> GetConversationAsync(string userId1, string userId2)
+    public async Task<List<UserMessage>> GetConversationAsync(string userId1, string userId2)
     {
         return await _db.Messages
             .Where(m =>

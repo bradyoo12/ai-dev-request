@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AiDevRequest.API.Entities;
 
-public class Message
+public class UserMessage
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 

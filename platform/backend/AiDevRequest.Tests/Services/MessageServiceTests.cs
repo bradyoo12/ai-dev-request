@@ -12,7 +12,7 @@ public class MessageServiceTests
     {
         db ??= TestDbContextFactory.Create();
         var logger = new Mock<ILogger<MessageService>>();
-        return new MessageService(db, logger.Object);
+        return new UserMessageService(db, logger.Object);
     }
 
     [Fact]

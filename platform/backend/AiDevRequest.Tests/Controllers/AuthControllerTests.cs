@@ -74,7 +74,8 @@ public class AuthControllerTests
     public async Task Register_ReturnsOk_WhenSuccessful()
     {
         var authService = new Mock<IAuthService>();
-        var testUser = new User { Id = "user-1", Email = "test@test.com", DisplayName = "Test User" };
+        var userId = Guid.NewGuid();
+        var testUser = new User { Id = userId, Email = "test@test.com", DisplayName = "Test User" };
         authService.Setup(s => s.RegisterAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>()))
             .ReturnsAsync((testUser, "jwt-token-123"));
 
@@ -92,7 +93,7 @@ public class AuthControllerTests
         var response = okResult.Value.Should().BeOfType<AuthResponseDto>().Subject;
         response.Token.Should().Be("jwt-token-123");
         response.User.Email.Should().Be("test@test.com");
-        response.User.Id.Should().Be("user-1");
+        response.User.Id.Should().Be(userId.ToString());
     }
 
     [Fact]
@@ -131,7 +132,7 @@ public class AuthControllerTests
     {
         var authService = new Mock<IAuthService>();
         authService.Setup(s => s.RegisterAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<string?>()))
-            .ReturnsAsync((new User { Id = "1", Email = "test@test.com" }, "jwt-token"));
+            .ReturnsAsync((new User { Id = Guid.NewGuid(), Email = "test@test.com" }, "jwt-token"));
 
         var controller = CreateController(authService);
         ControllerTestHelper.SetupAnonymous(controller);
@@ -174,7 +175,7 @@ public class AuthControllerTests
     public async Task Login_ReturnsOk_WhenSuccessful()
     {
         var authService = new Mock<IAuthService>();
-        var testUser = new User { Id = "1", Email = "test@test.com", IsAdmin = true };
+        var testUser = new User { Id = Guid.NewGuid(), Email = "test@test.com", IsAdmin = true };
         authService.Setup(s => s.LoginAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync((testUser, "jwt-token"));
 
@@ -236,12 +237,13 @@ public class AuthControllerTests
     [Fact]
     public async Task GetMe_ReturnsUnauthorized_WhenUserNotFound()
     {
+        var testUserId = Guid.NewGuid();
         var authService = new Mock<IAuthService>();
-        authService.Setup(s => s.GetUserAsync("test-user-id"))
+        authService.Setup(s => s.GetUserAsync(testUserId.ToString()))
             .ReturnsAsync((User?)null);
 
         var controller = CreateController(authService);
-        ControllerTestHelper.SetupUser(controller, "test-user-id");
+        ControllerTestHelper.SetupUser(controller, testUserId.ToString());
 
         var result = await controller.GetMe();
 
@@ -251,11 +253,12 @@ public class AuthControllerTests
     [Fact]
     public async Task GetMe_ReturnsOk_WhenAuthenticated()
     {
+        var testUserId = Guid.NewGuid();
         var authService = new Mock<IAuthService>();
-        authService.Setup(s => s.GetUserAsync("test-user-id"))
+        authService.Setup(s => s.GetUserAsync(testUserId.ToString()))
             .ReturnsAsync(new User
             {
-                Id = "test-user-id",
+                Id = testUserId,
                 Email = "test@test.com",
                 DisplayName = "Test User",
                 ProfileImageUrl = "https://example.com/avatar.png",
@@ -264,13 +267,13 @@ public class AuthControllerTests
             });
 
         var controller = CreateController(authService);
-        ControllerTestHelper.SetupUser(controller, "test-user-id");
+        ControllerTestHelper.SetupUser(controller, testUserId.ToString());
 
         var result = await controller.GetMe();
 
         var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
         var user = okResult.Value.Should().BeOfType<UserDto>().Subject;
-        user.Id.Should().Be("test-user-id");
+        user.Id.Should().Be(testUserId.ToString());
         user.Email.Should().Be("test@test.com");
         user.DisplayName.Should().Be("Test User");
         user.ProfileImageUrl.Should().Be("https://example.com/avatar.png");
@@ -314,7 +317,7 @@ public class AuthControllerTests
         var socialAuthService = new Mock<ISocialAuthService>();
         socialAuthService.Setup(s => s.SocialLoginAsync(
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>()))
-            .ReturnsAsync((new User { Id = "1", Email = "test@social.com" }, "social-jwt"));
+            .ReturnsAsync((new User { Id = Guid.NewGuid(), Email = "test@social.com" }, "social-jwt"));
 
         var controller = CreateController(socialAuthService: socialAuthService);
         ControllerTestHelper.SetupAnonymous(controller);

@@ -199,7 +199,7 @@ public class AuthServiceTests
         var service = CreateService(db);
 
         var (registered, _) = await service.RegisterAsync("test@example.com", "password123", null, null);
-        var user = await service.GetUserAsync(registered.Id);
+        var user = await service.GetUserAsync(registered.Id.ToString());
 
         user.Should().NotBeNull();
         user!.Email.Should().Be("test@example.com");
@@ -223,7 +223,7 @@ public class AuthServiceTests
         var service = CreateService();
         var user = new User
         {
-            Id = "test-id",
+            Id = Guid.NewGuid(),
             Email = "test@example.com",
             DisplayName = "Test User"
         };
@@ -241,7 +241,7 @@ public class AuthServiceTests
         var service = CreateService();
         var adminUser = new User
         {
-            Id = "admin-id",
+            Id = Guid.NewGuid(),
             Email = "admin@example.com",
             IsAdmin = true
         };
@@ -260,7 +260,7 @@ public class AuthServiceTests
             .AddInMemoryCollection(new Dictionary<string, string?>())
             .Build();
         var service = CreateService(config: config);
-        var user = new User { Id = "1", Email = "test@example.com" };
+        var user = new User { Id = Guid.NewGuid(), Email = "test@example.com" };
 
         var act = () => service.GenerateJwt(user);
 
@@ -273,8 +273,8 @@ public class AuthServiceTests
     {
         var service = CreateService();
 
-        var token1 = service.GenerateJwt(new User { Id = "user-1", Email = "a@a.com" });
-        var token2 = service.GenerateJwt(new User { Id = "user-2", Email = "b@b.com" });
+        var token1 = service.GenerateJwt(new User { Id = Guid.NewGuid(), Email = "a@a.com" });
+        var token2 = service.GenerateJwt(new User { Id = Guid.NewGuid(), Email = "b@b.com" });
 
         token1.Should().NotBe(token2);
     }

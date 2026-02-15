@@ -122,7 +122,7 @@ public class TeamServiceTests
     {
         var db = TestDbContextFactory.Create();
         // Need a user to add
-        db.Users.Add(new User { Id = "user2", Email = "user2@test.com", PasswordHash = "hash" });
+        db.Users.Add(new User { Id = Guid.NewGuid(), Email = "user2@test.com", PasswordHash = "hash" });
         await db.SaveChangesAsync();
 
         var service = CreateService(db);
@@ -136,7 +136,7 @@ public class TeamServiceTests
     public async Task RemoveMemberAsync_RemovesMember()
     {
         var db = TestDbContextFactory.Create();
-        db.Users.Add(new User { Id = "user2", Email = "user2@test.com", PasswordHash = "hash" });
+        db.Users.Add(new User { Id = Guid.NewGuid(), Email = "user2@test.com", PasswordHash = "hash" });
         await db.SaveChangesAsync();
 
         var service = CreateService(db);

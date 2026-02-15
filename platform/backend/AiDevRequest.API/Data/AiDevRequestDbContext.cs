@@ -443,7 +443,7 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.Id).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Id).IsRequired();
             entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
             entity.Property(e => e.PasswordHash).HasMaxLength(500);
             entity.Property(e => e.DisplayName).HasMaxLength(100);

@@ -185,17 +185,18 @@ export default function LanguageManagement() {
       <main className="max-w-6xl mx-auto p-6">
         {/* Language List */}
         <div className="bg-warm-800 rounded-xl p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <h2 className="text-xl font-bold">{t('admin.languages.title')}</h2>
             <button
               onClick={() => setShowAddDialog(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors"
+              className="px-4 py-2 min-h-[44px] bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors self-start sm:self-auto"
             >
               {t('admin.languages.addLanguage')}
             </button>
           </div>
 
-          <table className="w-full">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                 <th className="pb-2">{t('admin.languages.code')}</th>
@@ -258,32 +259,33 @@ export default function LanguageManagement() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* Translation Editor */}
         {selectedLang && (
           <div className="bg-warm-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h2 className="text-lg sm:text-xl font-bold">
                 {t('admin.translations.title')} — {languages.find(l => l.code === selectedLang)?.nativeName} ({selectedLang})
               </h2>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => handleImport(selectedLang)}
-                  className="px-3 py-1.5 bg-warm-600 hover:bg-warm-500 rounded text-sm transition-colors"
+                  className="px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 bg-warm-600 hover:bg-warm-500 rounded text-sm transition-colors"
                 >
                   {t('admin.translations.importJson')}
                 </button>
                 <button
                   onClick={() => handleExport(selectedLang)}
-                  className="px-3 py-1.5 bg-warm-600 hover:bg-warm-500 rounded text-sm transition-colors"
+                  className="px-3 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 bg-warm-600 hover:bg-warm-500 rounded text-sm transition-colors"
                 >
                   {t('admin.translations.exportJson')}
                 </button>
                 <button
                   onClick={handleSaveTranslations}
                   disabled={Object.keys(editedTranslations).length === 0}
-                  className="px-4 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-warm-600 disabled:cursor-not-allowed rounded text-sm transition-colors"
+                  className="px-4 py-2 sm:py-1.5 min-h-[44px] sm:min-h-0 bg-green-600 hover:bg-green-700 disabled:bg-warm-600 disabled:cursor-not-allowed rounded text-sm transition-colors"
                 >
                   {t('admin.translations.save')} ({Object.keys(editedTranslations).length})
                 </button>
@@ -291,15 +293,15 @@ export default function LanguageManagement() {
             </div>
 
             {/* Filters */}
-            <div className="flex gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4">
               <input
                 type="text"
                 value={filterText}
                 onChange={e => setFilterText(e.target.value)}
                 placeholder={t('admin.translations.filter')}
-                className="flex-1 p-2 bg-warm-900 border border-warm-700 rounded text-sm"
+                className="flex-1 p-2 min-h-[44px] sm:min-h-0 bg-warm-900 border border-warm-700 rounded text-sm"
               />
-              <label className="flex items-center gap-2 text-sm text-warm-400">
+              <label className="flex items-center gap-2 text-sm text-warm-400 min-h-[44px] sm:min-h-0">
                 <input
                   type="checkbox"
                   checked={missingOnly}
@@ -313,8 +315,8 @@ export default function LanguageManagement() {
             </div>
 
             {/* Translation Table */}
-            <div className="overflow-auto max-h-[600px]">
-              <table className="w-full">
+            <div className="overflow-auto max-h-[600px] -mx-4 sm:mx-0 px-4 sm:px-0">
+              <table className="w-full min-w-[600px]">
                 <thead className="sticky top-0 bg-warm-800">
                   <tr className="text-left text-warm-400 text-sm border-b border-warm-700">
                     <th className="pb-2 w-1/4">{t('admin.translations.key')}</th>

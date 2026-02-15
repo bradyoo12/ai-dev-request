@@ -524,7 +524,7 @@ export default function HomePage() {
         <HeroSection onScrollToForm={() => formRef.current?.scrollIntoView({ behavior: 'smooth' })} />
       )}
 
-      <section ref={formRef} className="glass-card rounded-2xl p-8 shadow-premium-xl">
+      <section ref={formRef} className="glass-card rounded-2xl p-4 sm:p-8 shadow-premium-xl">
         <StepIndicator viewState={viewState} />
         {viewState === 'form' && (
           <form onSubmit={handleSubmit}>
@@ -569,7 +569,7 @@ export default function HomePage() {
               value={request}
               onChange={(e) => setRequest(e.target.value)}
               placeholder={t('form.placeholder')}
-              className={`w-full h-40 p-5 bg-warm-950/80 border rounded-2xl text-warm-100 placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/30 resize-none transition-all font-sans text-base leading-relaxed ${
+              className={`w-full min-h-[120px] sm:min-h-[160px] h-40 p-4 sm:p-5 bg-warm-950/80 border rounded-2xl text-warm-100 placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/30 resize-none transition-all font-sans text-base leading-relaxed ${
                 request.length === 0
                   ? 'border-warm-700/50'
                   : request.length < 20
@@ -630,7 +630,7 @@ export default function HomePage() {
             <div className="mt-4 flex flex-wrap gap-2">
               {exampleRequests.map((example) => (
                 <button key={example} type="button" onClick={() => setRequest(example)}
-                  className="px-4 py-1.5 bg-warm-800/80 hover:bg-warm-700 border border-warm-700/30 rounded-full text-sm text-warm-300 transition-all hover:text-white hover:border-warm-600/50">
+                  className="px-4 py-2.5 sm:py-1.5 min-h-[44px] bg-warm-800/80 hover:bg-warm-700 border border-warm-700/30 rounded-full text-sm text-warm-300 transition-all hover:text-white hover:border-warm-600/50">
                   {example}
                 </button>
               ))}
@@ -879,16 +879,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-accent-blue/20 to-accent-purple/10 border border-accent-blue/20 rounded-2xl p-6 mb-6">
+            <div className="bg-gradient-to-r from-accent-blue/20 to-accent-purple/10 border border-accent-blue/20 rounded-2xl p-4 sm:p-6 mb-6">
               <h4 className="font-bold mb-4 text-lg">{t('proposal.estimate')}</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <div className="text-warm-300 text-sm">{t('proposal.developmentCost')}</div>
-                  <div className="text-3xl font-bold">{formatCurrency(proposalResult.proposal.pricing.development.amount)}</div>
+                  <div className="text-2xl sm:text-3xl font-bold">{formatCurrency(proposalResult.proposal.pricing.development.amount)}</div>
                 </div>
                 <div>
                   <div className="text-warm-300 text-sm">{t('proposal.monthlyCost')}</div>
-                  <div className="text-2xl font-bold">{formatCurrency(proposalResult.proposal.pricing.monthly.total)}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{formatCurrency(proposalResult.proposal.pricing.monthly.total)}</div>
                 </div>
               </div>
               {proposalResult.proposal.pricing.development.breakdown.length > 0 && (
@@ -1000,14 +1000,14 @@ export default function HomePage() {
                         <div className="flex gap-1 flex-shrink-0">
                           <button
                             onClick={() => handleApproveSubtask(subtask.id)}
-                            className="p-1.5 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-md transition-colors"
+                            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-md transition-colors"
                             title={t('subtasks.approve')}
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           </button>
                           <button
                             onClick={() => handleRejectSubtask(subtask.id)}
-                            className="p-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-md transition-colors"
+                            className="p-2 sm:p-1.5 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-md transition-colors"
                             title={t('subtasks.reject')}
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -1126,9 +1126,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="bg-green-900/30 border border-green-700 rounded-xl p-6 mb-6">
+            <div className="bg-green-900/30 border border-green-700 rounded-xl p-4 sm:p-6 mb-6">
               <h4 className="font-bold mb-4 text-green-400">{t('completed.projectInfo')}</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="text-warm-400">{t('completed.projectId')}</div>
                   <div className="font-mono">{productionResult.production.projectId}</div>
@@ -1274,8 +1274,8 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-sm text-warm-400 mb-3">{productionResult.production.codeReviewSummary}</p>
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="bg-warm-800 rounded-lg p-2">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
+                  <div className="bg-warm-800 rounded-lg p-1.5 sm:p-2">
                     <div className="text-xs text-warm-500">{t('codeReview.security')}</div>
                     <div className={`text-lg font-bold ${
                       (productionResult.production.securityScore ?? 0) >= 85 ? 'text-green-400' :
@@ -1366,9 +1366,9 @@ export default function HomePage() {
             {productionResult.production.setupCommands.length > 0 && (
               <div className="bg-warm-900 rounded-xl p-4 mb-4">
                 <h4 className="font-bold mb-3">{t('completed.setupCommands')}</h4>
-                <div className="bg-black rounded-lg p-3 font-mono text-sm overflow-x-auto">
+                <div className="bg-black rounded-lg p-3 font-mono text-xs sm:text-sm overflow-x-auto">
                   {productionResult.production.setupCommands.map((cmd, i) => (
-                    <div key={i} className="text-green-400">$ {cmd}</div>
+                    <div key={i} className="text-green-400 whitespace-nowrap">$ {cmd}</div>
                   ))}
                 </div>
               </div>
@@ -1379,8 +1379,8 @@ export default function HomePage() {
                 <h4 className="font-bold mb-3">{t('completed.envVariables')}</h4>
                 <div className="space-y-2">
                   {productionResult.production.envVariables.map((env, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
-                      <code className="bg-warm-800 px-2 py-1 rounded">{env.name}</code>
+                    <div key={i} className="flex flex-wrap items-center gap-2 text-sm">
+                      <code className="bg-warm-800 px-2 py-1 rounded text-xs sm:text-sm break-all">{env.name}</code>
                       <span className="text-warm-400">{env.description}</span>
                       {env.required && <span className="text-red-400 text-xs">{t('completed.required')}</span>}
                     </div>
@@ -1512,26 +1512,26 @@ export default function HomePage() {
 
             <div className="flex flex-wrap gap-3">
               <button onClick={handleReset}
-                className="flex-1 min-w-[120px] py-3 bg-warm-800 hover:bg-warm-700 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] min-h-[44px] py-3 bg-warm-800 hover:bg-warm-700 rounded-xl font-medium transition-colors text-sm sm:text-base">
                 {t('button.newRequest')}
               </button>
               <button
                 onClick={() => navigate(`/preview?projectId=${productionResult.production.projectId}&name=${encodeURIComponent(productionResult.production.projectName || '')}&requestId=${submittedRequest?.id || ''}`)}
-                className="flex-1 min-w-[120px] py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] min-h-[44px] py-3 bg-purple-600 hover:bg-purple-700 rounded-xl font-medium transition-colors text-sm sm:text-base">
                 {t('codePreview.openPreview')}
               </button>
               {!deployStatus && (
                 <button onClick={handleDeploy} disabled={deploying}
-                  className="flex-1 min-w-[120px] py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-800 rounded-xl font-medium transition-colors">
+                  className="flex-1 min-w-[120px] min-h-[44px] py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-800 rounded-xl font-medium transition-colors text-sm sm:text-base">
                   {deploying ? t('deploy.deploying') : t('deploy.deployNow')}
                 </button>
               )}
               <button onClick={handleExportZip} disabled={exportingZip}
-                className="flex-1 min-w-[120px] py-3 bg-accent-blue hover:bg-accent-blue/90 disabled:bg-blue-800 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] min-h-[44px] py-3 bg-accent-blue hover:bg-accent-blue/90 disabled:bg-blue-800 rounded-xl font-medium transition-colors text-sm sm:text-base">
                 {exportingZip ? t('export.downloading') : t('button.downloadProject')}
               </button>
               <button onClick={() => setGithubDialog(true)}
-                className="flex-1 min-w-[120px] py-3 bg-warm-900 hover:bg-warm-800 border border-warm-600 rounded-xl font-medium transition-colors">
+                className="flex-1 min-w-[120px] min-h-[44px] py-3 bg-warm-900 hover:bg-warm-800 border border-warm-600 rounded-xl font-medium transition-colors text-sm sm:text-base">
                 {t('export.toGitHub')}
               </button>
             </div>

@@ -425,7 +425,7 @@ export default function SettingsLayout() {
           <div key={group.key} className="settings-group">
             <button
               onClick={() => toggleGroup(group.key)}
-              className={`w-full flex items-center justify-between py-2 px-3 rounded-md text-sm font-semibold transition-colors ${
+              className={`w-full flex items-center justify-between py-2.5 sm:py-2 px-3 rounded-md text-sm font-semibold transition-colors min-h-[44px] sm:min-h-0 ${
                 hasActiveTab ? 'text-white bg-warm-800' : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
               }`}
               aria-expanded={isExpanded}
@@ -456,7 +456,7 @@ export default function SettingsLayout() {
                       onClick={() => handleTabSelect(tab)}
                       role="tab"
                       aria-selected={settingsTab === tab}
-                      className={`text-left py-1.5 px-3 rounded-md text-sm transition-colors ${
+                      className={`text-left py-2.5 sm:py-1.5 px-3 rounded-md text-sm transition-colors min-h-[44px] sm:min-h-0 ${
                         settingsTab === tab
                           ? 'bg-warm-700 text-white font-medium'
                           : 'text-warm-400 hover:text-white hover:bg-warm-800/50'
@@ -488,7 +488,7 @@ export default function SettingsLayout() {
         {/* Mobile sidebar toggle */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden ml-auto text-warm-400 hover:text-white transition-colors"
+          className="md:hidden ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center text-warm-400 hover:text-white transition-colors rounded-lg hover:bg-warm-800/50"
           aria-label={t('settings.toggleNav', 'Toggle navigation')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

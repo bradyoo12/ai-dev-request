@@ -197,6 +197,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<UserMessage> Messages => Set<UserMessage>();
     public DbSet<Discussion> Discussions => Set<Discussion>();
     public DbSet<DiscussionMessage> DiscussionMessages => Set<DiscussionMessage>();
+    public DbSet<ScreenshotToCode> ScreenshotToCodeConversions => Set<ScreenshotToCode>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2097,6 +2098,26 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.ReferrerId);
             entity.HasIndex(e => e.ReferredUserId);
             entity.HasIndex(e => e.Status);
+        });
+    }
+
+        modelBuilder.Entity<ScreenshotToCode>(entity =>
+        {
+            entity.ToTable("screenshot_to_code");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DesignName).HasMaxLength(500);
+            entity.Property(e => e.ImageFileName).HasMaxLength(500);
+            entity.Property(e => e.ImageContentType).HasMaxLength(100);
+            entity.Property(e => e.AnalysisJson).HasColumnType("text");
+            entity.Property(e => e.GeneratedCodeJson).HasColumnType("text");
+            entity.Property(e => e.ComponentTreeJson).HasColumnType("text");
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Framework).HasMaxLength(50);
+            entity.Property(e => e.StylingLib).HasMaxLength(50);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

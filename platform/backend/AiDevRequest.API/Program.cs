@@ -516,6 +516,20 @@ app.UseExceptionHandler(errorApp =>
     }
 }
 
+// Security headers middleware — early in the pipeline so every response includes them
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'");
+    if (!context.Response.Headers.ContainsKey("Strict-Transport-Security"))
+    {
+        context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
+    await next();
+});
+
 // Only use HTTPS redirection in development
 // In Azure App Service, the load balancer handles HTTPS termination
 if (app.Environment.IsDevelopment())

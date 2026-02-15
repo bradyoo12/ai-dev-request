@@ -194,7 +194,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<ManagedBackend> ManagedBackends => Set<ManagedBackend>();
     public DbSet<Referral> Referrals => Set<Referral>();
     public DbSet<AgentFrameworkConfig> AgentFrameworkConfigs => Set<AgentFrameworkConfig>();
-    public DbSet<UserMessage> Messages => Set<Message>();
+    public DbSet<UserMessage> Messages => Set<UserMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

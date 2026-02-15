@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-const mockNavigate = vi.fn()
 const mockRequireAuth = vi.fn()
+let mockAuthUser: { isAdmin?: boolean } | null = null
 
 vi.mock('react-router-dom', () => ({
   Navigate: ({ to, replace }: { to: string; replace?: boolean }) => (
@@ -10,17 +10,24 @@ vi.mock('react-router-dom', () => ({
       Navigate to {to}
     </div>
   ),
+  useLocation: () => ({ pathname: '/test', search: '', hash: '' }),
 }))
 
 vi.mock('../contexts/AuthContext', () => ({
   useAuth: () => ({
     requireAuth: mockRequireAuth,
+    authUser: mockAuthUser,
   }),
 }))
 
 import ProtectedRoute from './ProtectedRoute'
 
 describe('ProtectedRoute', () => {
+  beforeEach(() => {
+    mockAuthUser = null
+    mockRequireAuth.mockReset()
+  })
+
   it('redirects to "/" when not authenticated', () => {
     mockRequireAuth.mockReturnValue(false)
 
@@ -38,6 +45,7 @@ describe('ProtectedRoute', () => {
 
   it('renders children when authenticated', () => {
     mockRequireAuth.mockReturnValue(true)
+    mockAuthUser = { isAdmin: false }
 
     render(
       <ProtectedRoute>
@@ -52,6 +60,7 @@ describe('ProtectedRoute', () => {
 
   it('calls requireAuth on component render', () => {
     mockRequireAuth.mockReturnValue(true)
+    mockAuthUser = { isAdmin: false }
 
     render(
       <ProtectedRoute>
@@ -64,6 +73,7 @@ describe('ProtectedRoute', () => {
 
   it('renders multiple children when authenticated', () => {
     mockRequireAuth.mockReturnValue(true)
+    mockAuthUser = { isAdmin: false }
 
     render(
       <ProtectedRoute>
@@ -86,5 +96,48 @@ describe('ProtectedRoute', () => {
     )
 
     expect(screen.queryByTestId('should-not-render')).not.toBeInTheDocument()
+  })
+
+  it('redirects non-admin users when requireAdmin is set', () => {
+    mockRequireAuth.mockReturnValue(true)
+    mockAuthUser = { isAdmin: false }
+
+    render(
+      <ProtectedRoute requireAdmin>
+        <div data-testid="admin-content">Admin Content</div>
+      </ProtectedRoute>
+    )
+
+    expect(screen.getByTestId('navigate')).toBeInTheDocument()
+    expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', '/')
+    expect(screen.queryByTestId('admin-content')).not.toBeInTheDocument()
+  })
+
+  it('renders children for admin users when requireAdmin is set', () => {
+    mockRequireAuth.mockReturnValue(true)
+    mockAuthUser = { isAdmin: true }
+
+    render(
+      <ProtectedRoute requireAdmin>
+        <div data-testid="admin-content">Admin Content</div>
+      </ProtectedRoute>
+    )
+
+    expect(screen.getByTestId('admin-content')).toBeInTheDocument()
+    expect(screen.queryByTestId('navigate')).not.toBeInTheDocument()
+  })
+
+  it('redirects when requireAdmin is set and authUser is null', () => {
+    mockRequireAuth.mockReturnValue(true)
+    mockAuthUser = null
+
+    render(
+      <ProtectedRoute requireAdmin>
+        <div data-testid="admin-content">Admin Content</div>
+      </ProtectedRoute>
+    )
+
+    expect(screen.getByTestId('navigate')).toBeInTheDocument()
+    expect(screen.queryByTestId('admin-content')).not.toBeInTheDocument()
   })
 })

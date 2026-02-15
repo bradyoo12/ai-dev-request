@@ -5,10 +5,11 @@ const RETURN_URL_KEY = 'auth-return-url'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
+  requireAdmin?: boolean
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { requireAuth } = useAuth()
+export default function ProtectedRoute({ children, requireAdmin: adminRequired }: ProtectedRouteProps) {
+  const { requireAuth, authUser } = useAuth()
   const location = useLocation()
 
   if (!requireAuth()) {
@@ -17,6 +18,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     if (returnUrl && returnUrl !== '/') {
       sessionStorage.setItem(RETURN_URL_KEY, returnUrl)
     }
+    return <Navigate to="/" replace />
+  }
+
+  if (adminRequired && !authUser?.isAdmin) {
     return <Navigate to="/" replace />
   }
 

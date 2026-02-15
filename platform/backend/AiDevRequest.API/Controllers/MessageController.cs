@@ -34,7 +34,7 @@ public class MessageController : ControllerBase
     /// Send a new message to another user
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> SendMessage([FromBody] SendMessageRequest body)
+    public async Task<IActionResult> SendMessage([FromBody] ChatMessageRequest body)
     {
         if (string.IsNullOrWhiteSpace(body.ReceiverId))
             return BadRequest(new { error = "Receiver ID is required" });
@@ -238,7 +238,7 @@ public class MessageController : ControllerBase
     }
 }
 
-public class SendMessageRequest
+public class ChatMessageRequest
 {
     public string ReceiverId { get; set; } = "";
     public string Content { get; set; } = "";

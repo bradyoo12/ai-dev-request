@@ -110,7 +110,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-warm-100">5. Data Storage and Security</h2>
             <p className="text-warm-400">
               <strong>Storage Location:</strong> Your data is stored on secure servers hosted by Microsoft Azure,
-              with primary data centers in [REGION - TODO: Specify actual region].
+              with primary data centers in the Asia-Pacific region.
             </p>
             <p className="text-warm-400">
               <strong>Database:</strong> We use PostgreSQL with encryption at rest. Vector embeddings for semantic
@@ -219,16 +219,6 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          <section className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-6 mt-8">
-            <p className="text-yellow-300 text-sm font-semibold">
-              [TODO: Legal Review Required]
-            </p>
-            <p className="text-yellow-400 text-sm mt-2">
-              This Privacy Policy is a template and must be reviewed by legal counsel before deployment. Specific
-              compliance requirements for GDPR, CCPA, and other regulations should be verified. The actual data
-              center region, DPO contact, and third-party processor agreements should be confirmed and documented.
-            </p>
-          </section>
         </div>
       </div>
     </div>

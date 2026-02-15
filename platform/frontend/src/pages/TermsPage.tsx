@@ -170,16 +170,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          <section className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-6 mt-8">
-            <p className="text-yellow-300 text-sm font-semibold">
-              [TODO: Legal Review Required]
-            </p>
-            <p className="text-yellow-400 text-sm mt-2">
-              This Terms of Service document is a template and should be reviewed by legal counsel before being
-              considered legally binding. Specific jurisdiction requirements, compliance regulations, and business
-              model details should be verified and incorporated.
-            </p>
-          </section>
         </div>
       </div>
     </div>

@@ -128,6 +128,7 @@ export function AppRoutes() {
             <Route path="/settings/production-sandboxes" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/org-memory" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/background-agents" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/settings/agent-framework" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/agent-rules" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/server-components" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/code-lint" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />

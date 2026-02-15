@@ -1,0 +1,7 @@
+.vscode/**
+src/**
+tsconfig.json
+esbuild.js
+.gitignore
+node_modules/**
+!node_modules/node-pty/**

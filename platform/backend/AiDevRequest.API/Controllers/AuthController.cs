@@ -195,13 +195,22 @@ public class AuthController : ControllerBase
             var url = _socialAuthService.GetAuthorizationUrl(provider, redirectUri, state ?? Guid.NewGuid().ToString("N"));
             return Ok(new AuthUrlResponseDto { Url = url });
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not configured"))
         {
             _logger.LogWarning(ex, "OAuth provider {Provider} is not configured", provider);
             return StatusCode(StatusCodes.Status503ServiceUnavailable, new OAuthErrorResponseDto
             {
                 Error = $"{provider.ToLower()}_oauth_not_configured",
                 Message = $"{char.ToUpper(provider[0]) + provider[1..]} OAuth is not configured for this environment."
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to get auth URL for {Provider}", provider);
+            return StatusCode(StatusCodes.Status500InternalServerError, new OAuthErrorResponseDto
+            {
+                Error = "oauth_url_error",
+                Message = "Failed to generate authorization URL. Please try again."
             });
         }
     }

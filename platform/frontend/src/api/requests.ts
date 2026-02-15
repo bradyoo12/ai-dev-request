@@ -1,5 +1,6 @@
 import i18n from '../i18n'
-import { getAuthHeaders } from './auth'
+import { getAuthHeaders, isAuthenticated } from './auth'
+import { getUserId } from './settings'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -32,6 +33,7 @@ export interface CreateDevRequestDto {
   framework?: string;
   powerLevel?: string;
   preferredModel?: string;
+  anonymousUserId?: string;
 }
 
 export interface DevRequestResponse {
@@ -279,12 +281,18 @@ const t = (key: string) => i18n.t(key);
 
 // API Functions
 export async function createRequest(data: CreateDevRequestDto): Promise<DevRequestResponse> {
+  // For unauthenticated users, include anonymousUserId from localStorage
+  const requestData = { ...data };
+  if (!isAuthenticated()) {
+    requestData.anonymousUserId = getUserId()
+  }
+
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}/api/requests`, {
       method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify(data),
+      headers: isAuthenticated() ? authHeaders() : { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData),
     });
   } catch {
     throw new Error(t('api.error.networkError'));
@@ -296,7 +304,7 @@ export async function createRequest(data: CreateDevRequestDto): Promise<DevReque
     }
     if (response.status === 400) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || t('api.error.invalidRequest'));
+      throw new Error(error.error || error.message || t('api.error.invalidRequest'));
     }
     if (response.status >= 500) {
       throw new Error(t('api.error.serverError'));
@@ -334,9 +342,12 @@ export async function getRequests(page = 1, pageSize = 20): Promise<DevRequestRe
 }
 
 export async function analyzeRequest(id: string): Promise<AnalysisResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/analyze`, {
+  // For unauthenticated users, pass anonymousUserId as a query param for ownership verification
+  const anonParam = !isAuthenticated() ? `?anonymousUserId=${encodeURIComponent(getUserId())}` : '';
+
+  const response = await fetch(`${API_BASE_URL}/api/requests/${id}/analyze${anonParam}`, {
     method: 'POST',
-    headers: authHeaders(),
+    headers: isAuthenticated() ? authHeaders() : { 'Content-Type': 'application/json' },
   });
 
   if (response.status === 402) {

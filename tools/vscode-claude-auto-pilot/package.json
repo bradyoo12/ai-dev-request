@@ -1,0 +1,128 @@
+{
+  "name": "claude-auto-pilot",
+  "displayName": "Claude Auto-Pilot",
+  "description": "Auto-respond to Claude CLI prompts using AI-interpreted instructions",
+  "version": "0.1.0",
+  "publisher": "bradyoo12",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "claudeAutoPilot",
+          "title": "Claude Auto-Pilot",
+          "icon": "resources/icons/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "claudeAutoPilot": [
+        {
+          "type": "webview",
+          "id": "claudeAutoPilot.chatView",
+          "name": "Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "claudeAutoPilot.startSession",
+        "title": "Start Claude Auto-Pilot Session",
+        "icon": "$(rocket)",
+        "category": "Claude Auto-Pilot"
+      },
+      {
+        "command": "claudeAutoPilot.toggleAutoPilot",
+        "title": "Toggle Auto-Pilot On/Off",
+        "icon": "$(debug-start)",
+        "category": "Claude Auto-Pilot"
+      },
+      {
+        "command": "claudeAutoPilot.editInstructions",
+        "title": "Edit Auto-Pilot Instructions",
+        "icon": "$(edit)",
+        "category": "Claude Auto-Pilot"
+      },
+      {
+        "command": "claudeAutoPilot.showLog",
+        "title": "Show Response Log",
+        "icon": "$(list-ordered)",
+        "category": "Claude Auto-Pilot"
+      },
+      {
+        "command": "claudeAutoPilot.pauseForNext",
+        "title": "Pause Auto-Pilot for Next Prompt",
+        "icon": "$(debug-pause)",
+        "category": "Claude Auto-Pilot"
+      },
+      {
+        "command": "claudeAutoPilot.clearConversation",
+        "title": "Clear Conversation",
+        "icon": "$(clear-all)",
+        "category": "Claude Auto-Pilot"
+      }
+    ],
+    "configuration": {
+      "title": "Claude Auto-Pilot",
+      "properties": {
+        "claudeAutoPilot.defaultInstructions": {
+          "type": "string",
+          "default": "Approve all tool calls. Answer questions concisely.",
+          "description": "Default instructions for auto-responding to Claude CLI prompts"
+        },
+        "claudeAutoPilot.idleTimeoutMs": {
+          "type": "number",
+          "default": 1500,
+          "minimum": 500,
+          "maximum": 10000,
+          "description": "Milliseconds of idle output before detecting a prompt"
+        },
+        "claudeAutoPilot.model": {
+          "type": "string",
+          "default": "haiku",
+          "enum": ["haiku", "sonnet"],
+          "description": "AI model for generating auto-responses"
+        },
+        "claudeAutoPilot.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API key (or set ANTHROPIC_API_KEY env var)"
+        },
+        "claudeAutoPilot.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether auto-pilot is enabled by default"
+        },
+        "claudeAutoPilot.claudeBinaryPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Claude CLI binary (auto-detected if empty)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node esbuild.js --production",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "npx @vscode/vsce package"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0",
+    "@anthropic-ai/sdk": "^0.39.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.0",
+    "@vscode/vsce": "^2.24.0"
+  }
+}

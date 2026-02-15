@@ -195,6 +195,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<Referral> Referrals => Set<Referral>();
     public DbSet<AgentFrameworkConfig> AgentFrameworkConfigs => Set<AgentFrameworkConfig>();
     public DbSet<UserMessage> Messages => Set<UserMessage>();
+    public DbSet<Discussion> Discussions => Set<Discussion>();
+    public DbSet<DiscussionMessage> DiscussionMessages => Set<DiscussionMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

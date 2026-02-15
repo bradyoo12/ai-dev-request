@@ -136,7 +136,6 @@ builder.Services.AddScoped<IPatentAgentService, PatentAgentService>();
 builder.Services.AddScoped<IStreamingCodeGenService, StreamingCodeGenService>();
 builder.Services.AddScoped<IManagedBackendService, ManagedBackendService>();
 builder.Services.AddScoped<IReferralService, ReferralService>();
-builder.Services.AddScoped<IAgentFrameworkService, AgentFrameworkService>();
 
 // Add SSR (Server-Side Rendering) service for pre-rendered page delivery
 builder.Services.AddSingleton<ISsrService, SsrService>();

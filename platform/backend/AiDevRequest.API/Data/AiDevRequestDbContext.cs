@@ -193,7 +193,6 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<StreamingCodeGenSession> StreamingCodeGenSessions => Set<StreamingCodeGenSession>();
     public DbSet<ManagedBackend> ManagedBackends => Set<ManagedBackend>();
     public DbSet<Referral> Referrals => Set<Referral>();
-    public DbSet<AgentFrameworkConfig> AgentFrameworkConfigs => Set<AgentFrameworkConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

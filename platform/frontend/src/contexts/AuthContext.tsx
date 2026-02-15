@@ -104,8 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const state = params.get('state')
     const savedState = localStorage.getItem('oauth-state')
 
-    // Clean up URL immediately
-    window.history.replaceState({}, '', '/')
+    // Navigate to home page immediately to clear the loading spinner
+    // Use replace: true to avoid adding to browser history
+    navigate('/', { replace: true })
 
     // Handle OAuth error (e.g. user denied consent)
     if (error) {

@@ -28,9 +28,9 @@ public class SocialAuthServiceTests
             })
             .Build();
 
-        httpClientFactory ??= new Mock<IHttpClientFactory>();
-        if (httpClientFactory.Invocations.Count == 0)
+        if (httpClientFactory == null)
         {
+            httpClientFactory = new Mock<IHttpClientFactory>();
             httpClientFactory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient());
         }
 

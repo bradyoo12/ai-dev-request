@@ -262,7 +262,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FixHistory)
                 .HasColumnType("jsonb");
 
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
 
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -324,7 +324,7 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("token_balances");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -337,7 +337,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Action).IsRequired().HasMaxLength(50);
             entity.Property(e => e.ReferenceId).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.CreatedAt);
         });
@@ -401,7 +401,7 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<TokenPackage>().WithMany().HasForeignKey(e => e.TokenPackageId).OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => e.UserId);
@@ -429,7 +429,7 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<HostingPlan>().WithMany().HasForeignKey(e => e.HostingPlanId).OnDelete(DeleteBehavior.SetNull);
 
@@ -443,7 +443,7 @@ public class AiDevRequestDbContext : DbContext
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.Id).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Id).IsRequired();
             entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
             entity.Property(e => e.PasswordHash).HasMaxLength(500);
             entity.Property(e => e.DisplayName).HasMaxLength(100);
@@ -471,7 +471,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MonthlyLimitUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.MonthlySpentUsd).HasColumnType("decimal(10,2)");
             entity.Property(e => e.FailureReason).HasMaxLength(500);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<TokenPackage>().WithMany().HasForeignKey(e => e.TokenPackageId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId).IsUnique();
         });
@@ -508,7 +508,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Description).IsRequired().HasMaxLength(5000);
             entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.SetNull);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -521,7 +521,7 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.HasOne<Suggestion>().WithMany().HasForeignKey(e => e.SuggestionId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => new { e.SuggestionId, e.UserId }).IsUnique();
             entity.HasIndex(e => e.SuggestionId);
         });
@@ -533,7 +533,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Content).IsRequired().HasMaxLength(5000);
             entity.HasOne<Suggestion>().WithMany().HasForeignKey(e => e.SuggestionId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.SuggestionId);
             entity.HasIndex(e => e.CreatedAt);
         });
@@ -558,7 +558,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PlanType).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.StartedAt);
@@ -574,7 +574,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FromPlan).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.ToPlan).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.Reason).HasMaxLength(500);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.EventType);
             entity.HasIndex(e => e.CreatedAt);
@@ -613,7 +613,7 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<Deployment>().WithMany().HasForeignKey(e => e.DeploymentId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DeploymentId);
@@ -637,7 +637,7 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<Domain>().WithMany().HasForeignKey(e => e.DomainId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.DomainId);
             entity.HasIndex(e => e.UserId);
@@ -709,7 +709,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Scopes).HasMaxLength(500);
             entity.Property(e => e.ClientId).HasMaxLength(100);
             entity.Property(e => e.ClientSecretHash).HasMaxLength(500);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.OwnerId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string OwnerId vs Guid User.Id)
             entity.HasIndex(e => e.AgentKey).IsUnique();
             entity.HasIndex(e => e.OwnerId);
         });
@@ -724,7 +724,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ErrorMessage).HasMaxLength(1000);
             entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.FromAgentId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.ToAgentId).OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.TaskUid).IsUnique();
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -749,7 +749,7 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Scopes).IsRequired().HasMaxLength(500);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.FromAgentId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<AgentCard>().WithMany().HasForeignKey(e => e.ToAgentId).OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(e => e.UserId);
@@ -777,7 +777,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.SessionId).HasMaxLength(100);
             entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
             entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Scope);
             entity.HasIndex(e => new { e.UserId, e.SessionId });
@@ -794,7 +794,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Value).IsRequired().HasMaxLength(500);
             entity.Property(e => e.Confidence).HasColumnType("double precision");
             entity.Property(e => e.Source).IsRequired().HasMaxLength(20);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => new { e.UserId, e.Category, e.Key }).IsUnique();
@@ -806,7 +806,7 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.SummaryText).IsRequired().HasMaxLength(5000);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -818,7 +818,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Confidence).HasColumnType("double precision");
             entity.Property(e => e.Source).IsRequired().HasMaxLength(20);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => new { e.UserId, e.Category }).IsUnique();
         });
@@ -833,7 +833,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Reason).IsRequired().HasMaxLength(500);
             entity.Property(e => e.PromptTemplate).IsRequired().HasMaxLength(2000);
             entity.Property(e => e.InterestCategory).IsRequired().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.InterestCategory);
         });
@@ -855,7 +855,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.ProjectName).IsRequired().HasMaxLength(200);
             entity.Property(e => e.FindingsJson).IsRequired();
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
         });
@@ -884,7 +884,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.OwnerId).IsRequired().HasMaxLength(100);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.OwnerId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string OwnerId vs Guid User.Id)
             entity.HasIndex(e => e.OwnerId);
         });
 
@@ -895,7 +895,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
             entity.HasOne<TeamWorkspace>().WithMany().HasForeignKey(e => e.TeamId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.TeamId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => new { e.TeamId, e.UserId }).IsUnique();
@@ -936,7 +936,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.GatewayConfigJson).HasColumnType("jsonb");
             entity.Property(e => e.DockerComposeYaml).HasColumnType("text");
             entity.Property(e => e.K8sManifestYaml).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
@@ -957,7 +957,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.CustomCss).HasColumnType("text");
             entity.Property(e => e.AiPromptGuidelines).HasMaxLength(5000);
             entity.Property(e => e.WelcomeMessage).HasMaxLength(1000);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Slug).IsUnique();
         });
@@ -973,7 +973,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.CommissionRate).HasColumnType("decimal(5,2)");
             entity.Property(e => e.Status).HasMaxLength(20);
             entity.HasOne<WhiteLabelTenant>().WithMany().HasForeignKey(e => e.TenantId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.TenantId);
             entity.HasIndex(e => e.UserId);
         });
@@ -1079,7 +1079,7 @@ public class AiDevRequestDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50);
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -1139,7 +1139,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
             entity.Property(e => e.AttributesJson).HasColumnType("jsonb");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasOne<DevRequest>().WithMany().HasForeignKey(e => e.DevRequestId).OnDelete(DeleteBehavior.SetNull);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.TraceId).IsUnique();
@@ -1267,7 +1267,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MonthlyRate).HasColumnType("decimal(10,2)");
             entity.Property(e => e.PerRequestOverageRate).HasColumnType("decimal(10,2)");
             entity.Property(e => e.InvoiceHistory).HasColumnType("jsonb");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
             entity.HasIndex(e => e.Plan);
             entity.HasIndex(e => e.Status);
@@ -1383,7 +1383,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
             entity.Property(e => e.CompletedStepsJson).HasColumnType("jsonb");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
             entity.HasIndex(e => e.Status);
         });
@@ -1398,7 +1398,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ChatHistoryJson).HasColumnType("jsonb");
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
             entity.Property(e => e.DesignTokensJson).HasColumnType("jsonb");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
@@ -1414,7 +1414,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FilesJson).HasColumnType("jsonb");
             entity.Property(e => e.ModelTier).HasMaxLength(50);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -1428,7 +1428,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.SuggestionsJson).HasColumnType("jsonb");
             entity.Property(e => e.MetricsJson).HasColumnType("jsonb");
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -1448,7 +1448,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.GeneratedControllers).HasColumnType("text");
             entity.Property(e => e.GeneratedFrontend).HasColumnType("text");
             entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
@@ -1463,7 +1463,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.KeyHash).IsRequired().HasMaxLength(500);
             entity.Property(e => e.KeyPrefix).IsRequired().HasMaxLength(20);
             entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.KeyHash).IsUnique();
         });
@@ -1478,7 +1478,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.StepsJson).IsRequired().HasColumnType("text");
             entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
             entity.Property(e => e.TemplateCategory).HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.IsTemplate);
         });
@@ -1494,7 +1494,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.OpenApiSpecJson).HasColumnType("text");
             entity.Property(e => e.SdkLanguages).HasMaxLength(200);
             entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
         });
@@ -1508,7 +1508,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.BaselineContent).IsRequired().HasColumnType("text");
             entity.Property(e => e.UserContent).HasColumnType("text");
             entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => new { e.UserId, e.DevRequestId, e.FilePath }).IsUnique();
@@ -1522,7 +1522,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Language).IsRequired().HasMaxLength(20);
             entity.Property(e => e.TtsVoice).HasMaxLength(100);
             entity.Property(e => e.TranscriptionHistoryJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -1536,7 +1536,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.MonthlyBudget).HasColumnType("decimal(10,2)");
             entity.Property(e => e.CurrentMonthCost).HasColumnType("decimal(10,2)");
             entity.Property(e => e.EstimatedSavings).HasColumnType("decimal(10,2)");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -1553,7 +1553,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.DependentsJson).HasColumnType("text");
             entity.Property(e => e.Summary).HasMaxLength(1000);
             entity.Property(e => e.ExportedSymbols).HasMaxLength(2000);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.DevRequestId);
             entity.HasIndex(e => new { e.UserId, e.DevRequestId, e.FilePath }).IsUnique();
         });
@@ -1567,7 +1567,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).HasMaxLength(20);
             entity.Property(e => e.HealthEventsJson).HasColumnType("text");
             entity.Property(e => e.IncidentsJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
         });
 
@@ -1583,7 +1583,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ToolDefinitionsJson).HasColumnType("text");
             entity.Property(e => e.GeneratedComponentsJson).HasColumnType("text");
             entity.Property(e => e.ReasoningStepsJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
         });
 
@@ -1607,7 +1607,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ScreenListJson).HasColumnType("text");
             entity.Property(e => e.BuildHistoryJson).HasColumnType("text");
             entity.Property(e => e.PublishHistoryJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
         });
 
@@ -1627,7 +1627,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.LogEntriesJson).HasColumnType("text");
             entity.Property(e => e.StepsJson).HasColumnType("text");
             entity.Property(e => e.InstalledPackagesJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => new { e.UserId, e.Status });
         });
 
@@ -1643,7 +1643,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FeatureFlagsJson).HasColumnType("text");
             entity.Property(e => e.PerformanceHistoryJson).HasColumnType("text");
             entity.Property(e => e.MigrationLogJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -1663,7 +1663,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Tags).HasMaxLength(500);
             entity.Property(e => e.ConversationJson).HasColumnType("text");
             entity.Property(e => e.ThemeTokensJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => new { e.UserId, e.Category });
         });
 
@@ -1679,7 +1679,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FavoriteFrameworks).HasMaxLength(500);
             entity.Property(e => e.CustomTemplateJson).HasColumnType("text");
             entity.Property(e => e.FrameworkHistoryJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -1692,7 +1692,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.EasingFunction).HasMaxLength(50);
             entity.Property(e => e.CustomCssJson).HasColumnType("text");
             entity.Property(e => e.PresetHistoryJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -1713,7 +1713,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ExportFormat).HasMaxLength(50);
             entity.Property(e => e.DatabaseType).HasMaxLength(50);
             entity.Property(e => e.EstimatedCost).HasColumnType("decimal(10,6)");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1723,7 +1723,7 @@ public class AiDevRequestDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
             entity.Property(e => e.QueryPatternsJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 
@@ -1737,7 +1737,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.StepsJson).HasColumnType("text");
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.ExecutionLogJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1755,7 +1755,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.IgnoreRegionsJson).HasColumnType("text");
             entity.Property(e => e.MetadataJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1775,7 +1775,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ResourcesJson).HasColumnType("text");
             entity.Property(e => e.HealthMessage).HasMaxLength(500);
             entity.Property(e => e.ConfigJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1793,7 +1793,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.SourceRef).HasMaxLength(500);
             entity.Property(e => e.TagsJson).HasColumnType("text");
             entity.Property(e => e.EmbeddingJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => new { e.UserId, e.Category });
         });
@@ -1815,7 +1815,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Framework).HasMaxLength(50);
             entity.Property(e => e.StylingLib).HasMaxLength(50);
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1830,7 +1830,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.SelectedModel).HasMaxLength(100);
             entity.Property(e => e.SelectionReason).HasMaxLength(500);
             entity.Property(e => e.Status).HasMaxLength(50);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1845,7 +1845,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ComponentTreeJson).HasColumnType("text");
             entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.PreviewUrl).HasMaxLength(2000);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
         });
 
@@ -1860,7 +1860,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Content).HasColumnType("text");
             entity.Property(e => e.ContentHash).IsRequired().HasMaxLength(64);
             entity.Property(e => e.EmbeddingJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.SourceType);
             entity.HasIndex(e => new { e.UserId, e.ContentHash }).IsUnique();
@@ -1874,7 +1874,7 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ThemeMode).HasMaxLength(20);
             entity.Property(e => e.ActiveModel).HasMaxLength(100);
             entity.Property(e => e.PreviewHistoryJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            // Removed: User FK incompatible (string UserId vs Guid User.Id)
             entity.HasIndex(e => e.UserId).IsUnique();
         });
 

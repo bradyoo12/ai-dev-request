@@ -439,9 +439,10 @@ app.UseExceptionHandler(errorApp =>
         }
 
         // Auto-seed project templates if the table is empty
-        if (!await dbContext.ProjectTemplates.AnyAsync())
+        var existingTemplateCount = await dbContext.ProjectTemplates.CountAsync();
+        if (existingTemplateCount == 0)
         {
-            logger.LogInformation("Seeding built-in project templates...");
+            logger.LogInformation("ProjectTemplates table is empty. Seeding built-in project templates...");
             dbContext.ProjectTemplates.AddRange(
                 new AiDevRequest.API.Entities.ProjectTemplate
                 {
@@ -451,7 +452,8 @@ app.UseExceptionHandler(errorApp =>
                     Framework = "react",
                     Tags = "auth,billing,dashboard,stripe",
                     PromptTemplate = "Build a SaaS application with user authentication (email/password + OAuth), Stripe subscription billing with multiple tiers, an admin dashboard with analytics charts, and a user settings page. Include a landing page with pricing section.",
-                    CreatedBy = "system"
+                    CreatedBy = "system",
+                    IsPublished = true
                 },
                 new AiDevRequest.API.Entities.ProjectTemplate
                 {
@@ -461,7 +463,8 @@ app.UseExceptionHandler(errorApp =>
                     Framework = "react",
                     Tags = "shop,cart,products,payments",
                     PromptTemplate = "Build an e-commerce store with a product catalog (grid/list view with filtering), shopping cart, checkout flow with Stripe payments, order history, and an admin panel for managing products and orders.",
-                    CreatedBy = "system"
+                    CreatedBy = "system",
+                    IsPublished = true
                 },
                 new AiDevRequest.API.Entities.ProjectTemplate
                 {
@@ -471,7 +474,8 @@ app.UseExceptionHandler(errorApp =>
                     Framework = "nextjs",
                     Tags = "blog,markdown,cms,seo",
                     PromptTemplate = "Build a blog platform with a markdown editor for creating posts, category and tag management, comment system, SEO-friendly URLs, and an RSS feed. Include a clean reading experience with dark mode support.",
-                    CreatedBy = "system"
+                    CreatedBy = "system",
+                    IsPublished = true
                 },
                 new AiDevRequest.API.Entities.ProjectTemplate
                 {
@@ -481,7 +485,8 @@ app.UseExceptionHandler(errorApp =>
                     Framework = "react",
                     Tags = "admin,charts,analytics,tables",
                     PromptTemplate = "Build an admin dashboard with interactive charts (line, bar, pie), data tables with sorting/filtering/pagination, user management (CRUD), role-based access control, and a notification system.",
-                    CreatedBy = "system"
+                    CreatedBy = "system",
+                    IsPublished = true
                 },
                 new AiDevRequest.API.Entities.ProjectTemplate
                 {
@@ -491,7 +496,8 @@ app.UseExceptionHandler(errorApp =>
                     Framework = "flutter",
                     Tags = "tasks,mobile,offline,notifications",
                     PromptTemplate = "Build a cross-platform mobile task management app with project boards, task lists with drag-and-drop, due dates and reminders, offline support with local storage sync, and push notifications.",
-                    CreatedBy = "system"
+                    CreatedBy = "system",
+                    IsPublished = true
                 },
                 new AiDevRequest.API.Entities.ProjectTemplate
                 {
@@ -501,18 +507,25 @@ app.UseExceptionHandler(errorApp =>
                     Framework = "react",
                     Tags = "landing,marketing,responsive,animations",
                     PromptTemplate = "Build a modern landing page with a hero section with animated background, feature highlights with icons, testimonials carousel, pricing comparison table, FAQ accordion, and a contact form. Fully responsive with smooth scroll animations.",
-                    CreatedBy = "system"
+                    CreatedBy = "system",
+                    IsPublished = true
                 }
             );
             await dbContext.SaveChangesAsync();
             logger.LogInformation("Template seeding completed: 6 built-in templates.");
+        }
+        else
+        {
+            var publishedCount = await dbContext.ProjectTemplates.CountAsync(t => t.IsPublished);
+            logger.LogInformation("ProjectTemplates table already has {Total} templates ({Published} published). Skipping seed.",
+                existingTemplateCount, publishedCount);
         }
     }
     catch (Exception ex)
     {
         // Log but do NOT crash the app. The endpoints will return errors individually,
         // but the health check and logs will remain accessible for debugging.
-        logger.LogError(ex, "Database migration failed. The application will start but database-dependent endpoints may not work.");
+        logger.LogError(ex, "Database migration/seeding failed. The application will start but database-dependent endpoints may not work.");
     }
 }
 

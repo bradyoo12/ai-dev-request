@@ -1,172 +1,149 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function TermsPage() {
+  const { t } = useTranslation()
 
   return (
     <div className="min-h-screen bg-warm-950">
       <div className="max-w-4xl mx-auto px-6 py-12">
         <Link to="/" className="inline-flex items-center gap-2 text-warm-400 hover:text-white transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          {t('terms.backToHome')}
         </Link>
 
-        <h1 className="text-4xl font-bold mb-8 gradient-text">Terms of Service</h1>
+        <h1 className="text-4xl font-bold mb-8 gradient-text">{t('terms.title')}</h1>
 
         <div className="prose prose-invert prose-warm max-w-none space-y-8">
           <section className="bg-warm-900/30 border border-warm-800/50 rounded-lg p-6">
             <p className="text-warm-300 text-sm mb-4">
-              <strong>Last Updated:</strong> February 15, 2026
+              <strong>{t('terms.lastUpdated')}</strong> {t('terms.lastUpdatedDate')}
             </p>
             <p className="text-warm-400">
-              Welcome to AI Dev Request Platform. By accessing or using our services, you agree to be bound by these Terms of Service.
-            </p>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">1. Service Description</h2>
-            <p className="text-warm-400">
-              AI Dev Request Platform is an AI-powered development platform that enables users to submit natural language
-              development requests and automatically generates software solutions using advanced AI models including Claude API.
-            </p>
-            <p className="text-warm-400">
-              Our platform provides code generation, project deployment, hosting services, and related developer tools
-              through a combination of automated AI systems and cloud infrastructure.
+              {t('terms.intro')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">2. User Accounts and Responsibilities</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s1.title')}</h2>
             <p className="text-warm-400">
-              <strong>Account Creation:</strong> You must create an account to access certain features. You are responsible
-              for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+              {t('terms.s1.p1')}
             </p>
             <p className="text-warm-400">
-              <strong>Acceptable Use:</strong> You agree to use the platform only for lawful purposes and in accordance with
-              these Terms. You may not:
+              {t('terms.s1.p2')}
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s2.title')}</h2>
+            <p className="text-warm-400">
+              <strong>{t('terms.s2.accountCreation')}</strong>{t('terms.s2.accountCreationText')}
+            </p>
+            <p className="text-warm-400">
+              <strong>{t('terms.s2.acceptableUse')}</strong>{t('terms.s2.acceptableUseText')}
             </p>
             <ul className="list-disc list-inside text-warm-400 space-y-2 ml-4">
-              <li>Use the service to generate malicious code, malware, or harmful software</li>
-              <li>Attempt to reverse engineer, decompile, or hack the platform</li>
-              <li>Share, sell, or transfer your account to third parties</li>
-              <li>Violate any applicable laws or regulations</li>
-              <li>Infringe upon intellectual property rights of others</li>
+              <li>{t('terms.s2.prohibited1')}</li>
+              <li>{t('terms.s2.prohibited2')}</li>
+              <li>{t('terms.s2.prohibited3')}</li>
+              <li>{t('terms.s2.prohibited4')}</li>
+              <li>{t('terms.s2.prohibited5')}</li>
             </ul>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">3. AI-Generated Code and Intellectual Property</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s3.title')}</h2>
             <p className="text-warm-400">
-              <strong>Code Ownership:</strong> You retain ownership of the code generated through your requests. However,
-              the AI Dev Request Platform retains ownership of the underlying AI models, algorithms, and platform technology.
+              <strong>{t('terms.s3.codeOwnership')}</strong>{t('terms.s3.codeOwnershipText')}
             </p>
             <p className="text-warm-400">
-              <strong>License:</strong> We grant you a non-exclusive, non-transferable license to use the generated code
-              for your projects. You are responsible for reviewing and validating all AI-generated code before deployment
-              to production environments.
+              <strong>{t('terms.s3.license')}</strong>{t('terms.s3.licenseText')}
             </p>
             <p className="text-warm-400">
-              <strong>No Warranty:</strong> AI-generated code is provided "as is" without warranties of any kind. We do not
-              guarantee that generated code will be error-free, secure, or suitable for your specific use case.
+              <strong>{t('terms.s3.noWarranty')}</strong>{t('terms.s3.noWarrantyText')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">4. Billing and Payments</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s4.title')}</h2>
             <p className="text-warm-400">
-              <strong>Pricing:</strong> Our platform operates on a credit-based system. Pricing for credits and subscription
-              plans is available on our pricing page and may be updated from time to time.
+              <strong>{t('terms.s4.pricing')}</strong>{t('terms.s4.pricingText')}
             </p>
             <p className="text-warm-400">
-              <strong>Payment Processing:</strong> Payments are processed through Stripe. By providing payment information,
-              you authorize us to charge the applicable fees to your payment method.
+              <strong>{t('terms.s4.paymentProcessing')}</strong>{t('terms.s4.paymentProcessingText')}
             </p>
             <p className="text-warm-400">
-              <strong>Refunds:</strong> Credits are generally non-refundable except as required by law or at our sole discretion
-              in cases of service outages or billing errors.
+              <strong>{t('terms.s4.refunds')}</strong>{t('terms.s4.refundsText')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">5. Service Availability and Limitations</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s5.title')}</h2>
             <p className="text-warm-400">
-              We strive to maintain high service availability but do not guarantee uninterrupted access. The platform may
-              experience downtime for maintenance, updates, or due to circumstances beyond our control.
+              {t('terms.s5.p1')}
             </p>
             <p className="text-warm-400">
-              <strong>Usage Limits:</strong> We may implement rate limits, usage quotas, or other restrictions to ensure
-              fair access and platform stability. Excessive usage may result in temporary suspension or additional charges.
+              <strong>{t('terms.s5.usageLimits')}</strong>{t('terms.s5.usageLimitsText')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">6. Data and Privacy</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s6.title')}</h2>
             <p className="text-warm-400">
-              Your use of the platform is also governed by our Privacy Policy, which describes how we collect, use, and
-              protect your data. By using our services, you consent to our data practices as described in the Privacy Policy.
+              {t('terms.s6.p1')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">7. Termination</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s7.title')}</h2>
             <p className="text-warm-400">
-              We reserve the right to suspend or terminate your account at any time for violation of these Terms,
-              non-payment, or any other reason at our sole discretion. You may terminate your account at any time
-              through your account settings.
+              {t('terms.s7.p1')}
             </p>
             <p className="text-warm-400">
-              Upon termination, your access to the platform will be revoked, but data retention will be governed by
-              our Privacy Policy and applicable laws.
+              {t('terms.s7.p2')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">8. Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s8.title')}</h2>
             <p className="text-warm-400">
-              TO THE MAXIMUM EXTENT PERMITTED BY LAW, AI DEV REQUEST PLATFORM SHALL NOT BE LIABLE FOR ANY INDIRECT,
-              INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER
-              INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+              {t('terms.s8.p1')}
             </p>
             <p className="text-warm-400">
-              Our total liability for any claims arising from your use of the platform shall not exceed the amount
-              you paid to us in the twelve (12) months preceding the claim.
+              {t('terms.s8.p2')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">9. Indemnification</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s9.title')}</h2>
             <p className="text-warm-400">
-              You agree to indemnify and hold harmless AI Dev Request Platform, its affiliates, and their respective
-              officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses
-              arising from your use of the platform or violation of these Terms.
+              {t('terms.s9.p1')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">10. Changes to Terms</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s10.title')}</h2>
             <p className="text-warm-400">
-              We reserve the right to modify these Terms at any time. We will notify users of material changes via
-              email or platform notifications. Your continued use of the platform after changes constitutes acceptance
-              of the updated Terms.
+              {t('terms.s10.p1')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">11. Governing Law</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s11.title')}</h2>
             <p className="text-warm-400">
-              These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which
-              AI Dev Request Platform operates, without regard to conflict of law principles.
+              {t('terms.s11.p1')}
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-warm-100">12. Contact Information</h2>
+            <h2 className="text-2xl font-bold text-warm-100">{t('terms.s12.title')}</h2>
             <p className="text-warm-400">
-              If you have questions about these Terms, please contact us at:
+              {t('terms.s12.p1')}
               <br />
-              Email: <a href="mailto:legal@aidevrequest.com" className="text-accent-blue hover:underline">legal@aidevrequest.com</a>
+              {t('terms.s12.emailLabel')}<a href="mailto:legal@aidevrequest.com" className="text-accent-blue hover:underline">legal@aidevrequest.com</a>
               <br />
-              Support: <a href="mailto:support@aidevrequest.com" className="text-accent-blue hover:underline">support@aidevrequest.com</a>
+              {t('terms.s12.supportLabel')}<a href="mailto:support@aidevrequest.com" className="text-accent-blue hover:underline">support@aidevrequest.com</a>
             </p>
           </section>
 

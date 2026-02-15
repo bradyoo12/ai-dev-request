@@ -97,7 +97,7 @@ When any rate limit drops below 20% remaining OR hits 403/429 errors:
 - **Step 3a**: Check before claiming ticket (GraphQL operations)
 - **Step 4**: Check before merging PR and moving status
 - **Step 5c**: Check before moving ticket to Done
-- **Step 6d/7c**: Check before creating multiple tickets
+- **Step 6c**: Check before creating multiple tickets
 
 ## Overview
 
@@ -114,9 +114,8 @@ This command orchestrates the entire development workflow using Agent Teams for 
 │  4b. GitHub Actions health check → find & fix CI failures        │
 │  5. b-review team → parallel test + verify on staging            │
 │  5e. Doc maintenance → update inventory/design if changed        │
-│  6. b-modernize team → parallel research + create suggestions    │
-│  7. Site audit → visit live site, find errors, create tickets    │
-│  8. Report status, check stop signal, start from Step 1          │
+│  6. Site audit → visit live site, find errors, create tickets    │
+│  7. Report status, check stop signal, start from Step 1          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -130,7 +129,6 @@ Teams are used within a single ticket to parallelize independent work:
 | b-progress | No team | Single operation | Simple merge, no parallelism needed |
 | Actions check | No team | Single operation | Diagnose & fix CI failures sequentially |
 | b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
-| b-modernize | `modernize` | tech-scout + competitor-scout | Independent web searches |
 | site-audit | `site-audit` | error-checker + ux-reviewer | Error checking and UX review run independently |
 
 **Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
@@ -434,7 +432,7 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    echo "$PROJECT_ITEMS" | jq '...'
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
-3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
+3. If no ticket found, skip to Step 4.
 4. **Check GraphQL rate limit before claiming** (claiming uses GraphQL):
    ```bash
    GRAPHQL_REMAINING=$(gh api rate_limit --jq '.resources.graphql.remaining')
@@ -1060,15 +1058,13 @@ After a ticket is verified and completed, update the project documentation to re
 
 **After completing this step, continue to Step 6.**
 
-### Step 6: b-modernize — Research with Agent Team
+### Step 6: UI Testing and Site Audit
 
-Search for recent technologies and create suggestion tickets using parallel researchers.
-
-**This step also runs as an idle fallback:** If Steps 3–5 all found no tickets to process (no Ready tickets, no In Progress PRs to merge, no In Review tickets to verify), b-modernize runs automatically so the pipeline stays productive instead of looping empty cycles.
+Test all links and buttons on the live UI, then audit for errors, bugs, and UX improvements.
 
 #### Step 6a: Playwright UI Smoke Test (Idle Pre-check)
 
-Before researching new technologies, use Playwright to test all links and buttons on the live UI to catch any errors or unexpected results.
+Before auditing the site, use Playwright to test all links and buttons on the live UI to catch any errors or unexpected results.
 
 1. Pull latest and install deps (worktree-safe):
    ```bash
@@ -1124,106 +1120,9 @@ Before researching new technologies, use Playwright to test all links and button
      bash .claude/scripts/gh-project-cache.sh invalidate
      ```
 
-4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
+4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to site audit.
 
-#### Step 6b: Pre-check
-
-1. Check existing open suggestion tickets (REST):
-   ```bash
-   gh api "repos/bradyoo12/ai-dev-request/issues?state=open&labels=suggestion&per_page=50" --jq '[.[] | {number, title}]'
-   ```
-2. If 4+ suggestion tickets exist in Backlog, skip b-modernize entirely
-
-#### Step 6c: Create Research Team
-
-1. Create the team:
-   ```
-   TeamCreate: modernize
-   ```
-
-2. **Spawn BOTH scouts in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
-
-   In a SINGLE message, spawn both agents with two Task calls:
-   ```
-   Task(subagent_type: "general-purpose", team_name: "modernize", name: "tech-scout", prompt: "...")
-   Task(subagent_type: "general-purpose", team_name: "modernize", name: "competitor-scout", prompt: "...")
-   ```
-
-   **tech-scout** agent:
-   - Searches for recent technologies: AI code generation, agent frameworks, .NET innovations, React ecosystem, DevOps tools
-   - Evaluates relevance, effort, and impact scores
-   - Reports top findings with scores
-
-   **competitor-scout** agent:
-   - Researches competitor features: Replit, Base44, Bolt.new, v0.dev, Cursor
-   - Evaluates differentiation, user value, feasibility
-   - Reports top findings with scores
-
-   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
-
-#### Step 6d: Create Tickets
-
-After collecting findings from both scouts:
-1. Filter for qualifying technologies (relevance >= 3, impact >= 3, effort <= 4)
-2. Deduplicate against existing tickets
-3. Create suggestion tickets for qualifying findings (REST):
-   ```bash
-   gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="{body}" -f "labels[]=suggestion"
-   ```
-4. Add each ticket to the project and set status to **Ready** (with error handling):
-   ```bash
-   # Add to project
-   ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
-
-   if [ -z "$ITEM_ID" ]; then
-     echo "❌ ERROR: Failed to add suggestion ticket to project board"
-   else
-     # Set status to Ready with error handling
-     if ! gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id "$ITEM_ID" \
-          --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c 2>&1; then
-
-       # Failed - try switching accounts
-       CURRENT_USER=$(gh api user --jq '.login' 2>/dev/null)
-       echo "❌ Failed to set status (account: $CURRENT_USER), retrying..."
-
-       [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u byooxbert || gh auth switch -u bradyoo12
-
-       # Retry
-       gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id "$ITEM_ID" \
-         --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c 2>&1 \
-         && echo "✓ Retry succeeded" || echo "❌ Retry failed - ticket has No Status"
-     else
-       echo "✓ Status set to Ready"
-     fi
-
-     # Move to top (best-effort)
-     gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }" 2>/dev/null
-   fi
-   ```
-5. Invalidate cache after adding tickets:
-   ```bash
-   bash .claude/scripts/gh-project-cache.sh invalidate
-   ```
-
-#### Step 6e: Cleanup
-
-Shut down all agents, delete the team.
-
-**After completing this step, continue to Step 7.**
-
-### Step 7: Site Audit — Find Errors and Improvements
-
-After modernization research, audit the live site to catch errors, bugs, and UX improvements.
-
-#### Step 7a: Pre-check
-
-1. Check existing open bug/improvement tickets to avoid duplicates (REST):
-   ```bash
-   gh api "repos/bradyoo12/ai-dev-request/issues?state=open&per_page=100" --paginate --jq '[.[] | {number, title, labels: [.labels[].name]}]'
-   ```
-2. Note all existing titles for dedup
-
-#### Step 7b: Create Audit Team
+#### Step 6b: Create Audit Team
 
 1. Create the team:
    ```
@@ -1265,7 +1164,7 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
 
    **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
-#### Step 7c: Create Tickets
+#### Step 6c: Create Tickets
 
 After collecting findings from both agents:
 
@@ -1314,13 +1213,13 @@ After collecting findings from both agents:
    bash .claude/scripts/gh-project-cache.sh invalidate
    ```
 
-#### Step 7d: Cleanup
+#### Step 6d: Cleanup
 
 Shut down all agents, delete the team.
 
-**After completing this step, continue to Step 8.**
+**After completing this step, continue to Step 7.**
 
-### Step 8: Report Cycle Status and Loop
+### Step 7: Report Cycle Status and Loop
 
 Log the current status of the project board, check for stop signal, then start the next cycle:
 
@@ -1416,7 +1315,7 @@ Log the current status of the project board, check for stop signal, then start t
 - **Rate Limit Optimization** — The project board is fetched in Step 1.5 and cached in `$PROJECT_ITEMS` for reuse throughout the cycle. Only re-fetch when necessary:
   - After claiming a ticket in Step 3a (to verify the claim)
   - Before Step 5a (after Step 4 made changes)
-  - Before Step 8 (to get final state for reporting)
+  - Before Step 7 (to get final state for reporting)
   This reduces GraphQL API calls from ~4-5 per cycle to ~2-3 per cycle, preventing rate limit exhaustion.
 - **Move to top on status change** — After every `gh project item-edit` that changes a ticket's status, immediately move the item to the top of the column so it's visible on the board:
   ```bash
@@ -1492,6 +1391,6 @@ Log the current status of the project board, check for stop signal, then start t
 - **Prevention**: Never throw before `MigrateAsync` for missing tables — missing tables are usually just pending migrations. Always make migrations idempotent with IF EXISTS/IF NOT EXISTS guards. Make controllers fault-tolerant with try-catch for database queries that may fail due to schema differences.
 
 ### [2026-02-15] Silent GraphQL rate limit failures left 13 tickets with "No Status"
-- **Problem**: 13 tickets (created Feb 13-14 by b-modernize and site-audit) were successfully added to the project board but had "No Status" instead of "Ready". The `gh project item-add` succeeded, but the subsequent `gh project item-edit` (to set status) failed silently due to GraphQL rate limit exhaustion. Bash scripts without strict error handling (`set -e`) continued execution despite the failure.
-- **Solution**: Added comprehensive error handling to all ticket creation sections (Steps 4b-3, 6a, 6d, 7c): 1) Check if ITEM_ID is empty after item-add, 2) Check exit code of item-edit command, 3) On failure, switch GitHub accounts (bradyoo12 ↔ byooxbert) and retry once, 4) Log clear error messages if both attempts fail. Manually fixed the 13 affected tickets by switching to byooxbert account (which had remaining GraphQL quota) and setting their status to Ready.
+- **Problem**: 13 tickets (created Feb 13-14 by automated ticket creation) were successfully added to the project board but had "No Status" instead of "Ready". The `gh project item-add` succeeded, but the subsequent `gh project item-edit` (to set status) failed silently due to GraphQL rate limit exhaustion. Bash scripts without strict error handling (`set -e`) continued execution despite the failure.
+- **Solution**: Added comprehensive error handling to all ticket creation sections (Steps 4b-3, 6c): 1) Check if ITEM_ID is empty after item-add, 2) Check exit code of item-edit command, 3) On failure, switch GitHub accounts (bradyoo12 ↔ byooxbert) and retry once, 4) Log clear error messages if both attempts fail. Manually fixed the 13 affected tickets by switching to byooxbert account (which had remaining GraphQL quota) and setting their status to Ready.
 - **Prevention**: Always check exit codes and capture stderr for GitHub API commands. Use the account switching pattern when rate limits are hit. Add retry logic with alternate account for all GraphQL project operations. Monitor for "No Status" tickets in Step 2 audit and auto-fix them. Consider implementing a periodic cleanup job that finds and fixes tickets with missing status.

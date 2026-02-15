@@ -568,8 +568,64 @@ export default function HomePage() {
               value={request}
               onChange={(e) => setRequest(e.target.value)}
               placeholder={t('form.placeholder')}
-              className="w-full h-40 p-5 bg-warm-950/80 border border-warm-700/50 rounded-2xl text-warm-100 placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/30 resize-none transition-all font-sans text-base leading-relaxed"
+              className={`w-full h-40 p-5 bg-warm-950/80 border rounded-2xl text-warm-100 placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/30 resize-none transition-all font-sans text-base leading-relaxed ${
+                request.length === 0
+                  ? 'border-warm-700/50'
+                  : request.length < 20
+                    ? 'border-yellow-500/50'
+                    : request.length < 50
+                      ? 'border-accent-blue/50'
+                      : 'border-green-500/50'
+              }`}
             />
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <span className={request.length < 20 ? 'text-warm-500' : 'text-warm-400'}>
+                  {t('form.charCount', { count: request.length })}
+                </span>
+                {request.length < 20 && (
+                  <span className="text-warm-600 text-xs">{t('form.charMinimum')}</span>
+                )}
+              </div>
+            </div>
+            <AnimatePresence mode="wait">
+              {request.length > 0 && request.length < 20 && (
+                <motion.p
+                  key="tooShort"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-1 text-sm text-yellow-400"
+                >
+                  {t('form.hint.tooShort')}
+                </motion.p>
+              )}
+              {request.length >= 20 && request.length < 50 && (
+                <motion.p
+                  key="addDetails"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-1 text-sm text-accent-blue"
+                >
+                  {t('form.hint.addDetails')}
+                </motion.p>
+              )}
+              {request.length >= 50 && (
+                <motion.p
+                  key="good"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
+                  className="mt-1 text-sm text-green-400"
+                >
+                  {t('form.hint.good')}
+                </motion.p>
+              )}
+            </AnimatePresence>
             <div className="mt-4 flex flex-wrap gap-2">
               {exampleRequests.map((example) => (
                 <button key={example} type="button" onClick={() => setRequest(example)}

@@ -603,14 +603,15 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// CORS must come before HTTPS redirection to handle preflight OPTIONS requests
+app.UseCors("AllowFrontend");
+
 // Only use HTTPS redirection in development
 // In Azure App Service, the load balancer handles HTTPS termination
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-
-app.UseCors("AllowFrontend");
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -129,6 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const redirectUri = `${window.location.origin}/auth/callback/${provider}`
     socialLogin(provider, code, redirectUri)
       .then(() => {
+        // Set flag in sessionStorage before reload to show loading state
+        // This prevents the UI flash of non-authenticated state during reload
+        sessionStorage.setItem('auth-reloading', 'true')
         // Force page reload to load stored auth from localStorage
         // This ensures React state is properly initialized with the authenticated user
         window.location.href = '/'

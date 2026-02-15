@@ -519,6 +519,17 @@ app.UseExceptionHandler(errorApp =>
             var publishedCount = await dbContext.ProjectTemplates.CountAsync(t => t.IsPublished);
             logger.LogInformation("ProjectTemplates table already has {Total} templates ({Published} published). Skipping seed.",
                 existingTemplateCount, publishedCount);
+
+            // Fix previously seeded templates that have IsPublished = false
+            if (publishedCount == 0 && existingTemplateCount > 0)
+            {
+                var unpublished = await dbContext.ProjectTemplates
+                    .Where(t => !t.IsPublished)
+                    .ToListAsync();
+                foreach (var t in unpublished) t.IsPublished = true;
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation("Updated {Count} existing templates to IsPublished=true", unpublished.Count);
+            }
         }
     }
     catch (Exception ex)

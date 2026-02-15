@@ -62,6 +62,7 @@ export default function Layout() {
       <button onClick={() => navigateProtected('/projects')} className={navLinkClass} aria-current={currentPath.startsWith('/projects') ? 'page' : undefined}>{t('header.projects')}</button>
       <button onClick={() => navigateProtected('/sites')} className={navLinkClass} aria-current={currentPath === '/sites' ? 'page' : undefined}>{t('header.mySites')}</button>
       <Link to="/templates" onClick={() => setMobileMenuOpen(false)} className={navLinkClass} aria-current={currentPath === '/templates' ? 'page' : undefined}>{t('header.templates')}</Link>
+      <button onClick={() => navigateProtected('/messages')} className={navLinkClass} aria-current={currentPath === '/messages' ? 'page' : undefined}>{t('header.messages')}</button>
       <button onClick={() => navigateProtected('/referrals')} className={navLinkClass} aria-current={currentPath === '/referrals' ? 'page' : undefined}>{t('header.referrals')}</button>
       <button onClick={() => navigateProtected('/settings')} className={navLinkClass} aria-current={currentPath.startsWith('/settings') ? 'page' : undefined}>{t('header.settings')}</button>
       <button onClick={() => navigateProtected('/settings/billing')} className={navLinkClass} aria-current={currentPath === '/settings/billing' ? 'page' : undefined}>{t('header.billing')}</button>

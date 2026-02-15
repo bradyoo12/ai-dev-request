@@ -1,124 +1,128 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
-import SettingsPage from './SettingsPage'
-import UsagePage from './UsagePage'
-import BillingPage from './BillingPage'
-import PaymentHistoryPage from './PaymentHistoryPage'
-import MemoryPage from './MemoryPage'
-import PreferencePage from './PreferencePage'
-import InfrastructurePage from './InfrastructurePage'
-import SecretDetectionPage from './SecretDetectionPage'
-import PreviewDeploymentPage from './PreviewDeploymentPage'
-import GenerationManifestPage from './GenerationManifestPage'
-import OAuthCompliancePage from './OAuthCompliancePage'
-import CompilerValidationPage from './CompilerValidationPage'
-import ObservabilityPage from './ObservabilityPage'
-import WorkflowPage from './WorkflowPage'
-import SpecificationPage from './SpecificationPage'
-import GitHubSyncPage from './GitHubSyncPage'
-import CodeReviewPage from './CodeReviewPage'
-import StreamingGenerationPage from './StreamingGenerationPage'
-import McpIntegrationPage from './McpIntegrationPage'
-import AnalyticsDashboardPage from './AnalyticsDashboardPage'
-import MarketplacePage from './MarketplacePage'
-import ContainerizationPage from './ContainerizationPage'
-import TestGenerationPage from './TestGenerationPage'
-import CollaborativeEditingPage from './CollaborativeEditingPage'
-import OnboardingPage from './OnboardingPage'
-import ProjectVersionPage from './ProjectVersionPage'
-import ComponentPreviewPage from './ComponentPreviewPage'
-import VariantComparisonPage from './VariantComparisonPage'
-import PerformanceProfilePage from './PerformanceProfilePage'
-import SchemaDesignerPage from './SchemaDesignerPage'
-import ApiCliPage from './ApiCliPage'
-import PipelineBuilderPage from './PipelineBuilderPage'
-import ApiDocsPage from './ApiDocsPage'
-import CodeMergePage from './CodeMergePage'
-import VoicePage from './VoicePage'
-import ModelRoutingPage from './ModelRoutingPage'
-import ContextIndexPage from './ContextIndexPage'
-import DeploymentHealthPage from './DeploymentHealthPage'
-import GenerativeUiPage from './GenerativeUiPage'
-import MobileAppPage from './MobileAppPage'
-import BackgroundAgentPage from './BackgroundAgentPage'
-import PlatformUpgradePage from './PlatformUpgradePage'
-import VisualPromptPage from './VisualPromptPage'
-import MultiFrameworkPage from './MultiFrameworkPage'
-import ViewTransitionPage from './ViewTransitionPage'
-import NlSchemaDesignerPage from './NlSchemaDesignerPage'
-import QueryConfigPage from './QueryConfigPage'
-import AgenticPlannerPage from './AgenticPlannerPage'
-import VisualRegressionPage from './VisualRegressionPage'
-import McpGatewayPage from './McpGatewayPage'
-import CodebaseMemoryPage from './CodebaseMemoryPage'
-import FigmaImportPage from './FigmaImportPage'
-import ArenaPage from './ArenaPage'
-import VisualOverlayPage from './VisualOverlayPage'
-import SemanticSearchPage from './SemanticSearchPage'
-import PlanningModePage from './PlanningModePage'
-import ProjectDocsPage from './ProjectDocsPage'
-import AiElementsPage from './AiElementsPage'
-import ReviewPipelinePage from './ReviewPipelinePage'
-import OAuthConnectorsPage from './OAuthConnectorsPage'
-import AiModelPage from './AiModelPage'
-import McpToolIntegrationPage from './McpToolIntegrationPage'
-import BidirectionalGitSyncPage from './BidirectionalGitSyncPage'
-import SelfHealingTestPage from './SelfHealingTestPage'
-import MultiAgentTestPage from './MultiAgentTestPage'
-import DatabaseBranchPage from './DatabaseBranchPage'
-import SandboxExecutionPage from './SandboxExecutionPage'
-import DynamicIntelligencePage from './DynamicIntelligencePage'
-import AgentAutomationPage from './AgentAutomationPage'
-import UsageDashboardPage from './UsageDashboardPage'
-import SubagentOrchestrationPage from './SubagentOrchestrationPage'
-import LangGraphPage from './LangGraphPage'
-import HybridCachePage from './HybridCachePage'
-import PlaywrightHealingPage from './PlaywrightHealingPage'
-import SelfHealingPage from './SelfHealingPage'
-import ProductionSandboxPage from './ProductionSandboxPage'
-import OrgMemoryPage from './OrgMemoryPage'
-import AgentRulesPage from './AgentRulesPage'
-import ServerComponentsPage from './ServerComponentsPage'
-import CodeLintPage from './CodeLintPage'
-import VectorSearchPage from './VectorSearchPage'
-import ReplTestPage from './ReplTestPage'
-import AgentTerminalPage from './AgentTerminalPage'
-import ComposerPage from './ComposerPage'
-import DotnetPerfPage from './DotnetPerfPage'
-import MultiModelRoutingPage from './MultiModelRoutingPage'
-import BiomeLintPage from './BiomeLintPage'
-import DeepWikiPage from './DeepWikiPage'
-import BuildToolchainPage from './BuildToolchainPage'
-import VisionToCodePage from './VisionToCodePage'
-import DotnetUpgradePage from './DotnetUpgradePage'
-import ParallelAgentsPage from './ParallelAgentsPage'
-import WebMcpPage from './WebMcpPage'
-import AgentSdkPage from './AgentSdkPage'
-import TerminalExecutionPage from './TerminalExecutionPage'
-import TursoDatabasePage from './TursoDatabasePage'
-import WorkersAiPage from './WorkersAiPage'
-import ReactUseHookPage from './ReactUseHookPage'
-import EditPredictionPage from './EditPredictionPage'
-import BrowserIdePage from './BrowserIdePage'
-import GovernancePage from './GovernancePage'
-import InferenceCostPage from './InferenceCostPage'
-import LanguageExpansionPage from './LanguageExpansionPage'
-import HybridValidationPage from './HybridValidationPage'
-import AgentMessagesPage from './AgentMessagesPage'
-import AgentTracePage from './AgentTracePage'
-import AgenticWorkflowsPage from './AgenticWorkflowsPage'
-import ConfidenceScorePage from './ConfidenceScorePage'
-import AiModelMarketplacePage from './AiModelMarketplacePage'
-import AgentInboxPage from './AgentInboxPage'
-import AgentSkillsPage from './AgentSkillsPage'
-import AgentBuilderPage from './AgentBuilderPage'
-import PlaywrightMcpPage from './PlaywrightMcpPage'
-import VisualWorkflowPage from './VisualWorkflowPage'
-import PatentAgentPage from './PatentAgentPage'
-import StreamingCodeGenPage from './StreamingCodeGenPage'
-import ManagedBackendPage from './ManagedBackendPage'
 import { useAuth } from '../contexts/AuthContext'
+
+// Lazy-load all settings sub-pages for code splitting
+const SettingsPage = lazy(() => import('./SettingsPage'))
+const UsagePage = lazy(() => import('./UsagePage'))
+const BillingPage = lazy(() => import('./BillingPage'))
+const PaymentHistoryPage = lazy(() => import('./PaymentHistoryPage'))
+const MemoryPage = lazy(() => import('./MemoryPage'))
+const PreferencePage = lazy(() => import('./PreferencePage'))
+const InfrastructurePage = lazy(() => import('./InfrastructurePage'))
+const SecretDetectionPage = lazy(() => import('./SecretDetectionPage'))
+const PreviewDeploymentPage = lazy(() => import('./PreviewDeploymentPage'))
+const GenerationManifestPage = lazy(() => import('./GenerationManifestPage'))
+const OAuthCompliancePage = lazy(() => import('./OAuthCompliancePage'))
+const CompilerValidationPage = lazy(() => import('./CompilerValidationPage'))
+const ObservabilityPage = lazy(() => import('./ObservabilityPage'))
+const WorkflowPage = lazy(() => import('./WorkflowPage'))
+const SpecificationPage = lazy(() => import('./SpecificationPage'))
+const GitHubSyncPage = lazy(() => import('./GitHubSyncPage'))
+const CodeReviewPage = lazy(() => import('./CodeReviewPage'))
+const StreamingGenerationPage = lazy(() => import('./StreamingGenerationPage'))
+const McpIntegrationPage = lazy(() => import('./McpIntegrationPage'))
+const AnalyticsDashboardPage = lazy(() => import('./AnalyticsDashboardPage'))
+const MarketplacePage = lazy(() => import('./MarketplacePage'))
+const ContainerizationPage = lazy(() => import('./ContainerizationPage'))
+const TestGenerationPage = lazy(() => import('./TestGenerationPage'))
+const CollaborativeEditingPage = lazy(() => import('./CollaborativeEditingPage'))
+const OnboardingPage = lazy(() => import('./OnboardingPage'))
+const ProjectVersionPage = lazy(() => import('./ProjectVersionPage'))
+const ComponentPreviewPage = lazy(() => import('./ComponentPreviewPage'))
+const VariantComparisonPage = lazy(() => import('./VariantComparisonPage'))
+const PerformanceProfilePage = lazy(() => import('./PerformanceProfilePage'))
+const SchemaDesignerPage = lazy(() => import('./SchemaDesignerPage'))
+const ApiCliPage = lazy(() => import('./ApiCliPage'))
+const PipelineBuilderPage = lazy(() => import('./PipelineBuilderPage'))
+const ApiDocsPage = lazy(() => import('./ApiDocsPage'))
+const CodeMergePage = lazy(() => import('./CodeMergePage'))
+const VoicePage = lazy(() => import('./VoicePage'))
+const ModelRoutingPage = lazy(() => import('./ModelRoutingPage'))
+const ContextIndexPage = lazy(() => import('./ContextIndexPage'))
+const DeploymentHealthPage = lazy(() => import('./DeploymentHealthPage'))
+const GenerativeUiPage = lazy(() => import('./GenerativeUiPage'))
+const MobileAppPage = lazy(() => import('./MobileAppPage'))
+const BackgroundAgentPage = lazy(() => import('./BackgroundAgentPage'))
+const PlatformUpgradePage = lazy(() => import('./PlatformUpgradePage'))
+const VisualPromptPage = lazy(() => import('./VisualPromptPage'))
+const MultiFrameworkPage = lazy(() => import('./MultiFrameworkPage'))
+const ViewTransitionPage = lazy(() => import('./ViewTransitionPage'))
+const NlSchemaDesignerPage = lazy(() => import('./NlSchemaDesignerPage'))
+const QueryConfigPage = lazy(() => import('./QueryConfigPage'))
+const AgenticPlannerPage = lazy(() => import('./AgenticPlannerPage'))
+const VisualRegressionPage = lazy(() => import('./VisualRegressionPage'))
+const McpGatewayPage = lazy(() => import('./McpGatewayPage'))
+const CodebaseMemoryPage = lazy(() => import('./CodebaseMemoryPage'))
+const FigmaImportPage = lazy(() => import('./FigmaImportPage'))
+const ArenaPage = lazy(() => import('./ArenaPage'))
+const VisualOverlayPage = lazy(() => import('./VisualOverlayPage'))
+const SemanticSearchPage = lazy(() => import('./SemanticSearchPage'))
+const PlanningModePage = lazy(() => import('./PlanningModePage'))
+const ProjectDocsPage = lazy(() => import('./ProjectDocsPage'))
+const AiElementsPage = lazy(() => import('./AiElementsPage'))
+const ReviewPipelinePage = lazy(() => import('./ReviewPipelinePage'))
+const OAuthConnectorsPage = lazy(() => import('./OAuthConnectorsPage'))
+const AiModelPage = lazy(() => import('./AiModelPage'))
+const McpToolIntegrationPage = lazy(() => import('./McpToolIntegrationPage'))
+const BidirectionalGitSyncPage = lazy(() => import('./BidirectionalGitSyncPage'))
+const SelfHealingTestPage = lazy(() => import('./SelfHealingTestPage'))
+const MultiAgentTestPage = lazy(() => import('./MultiAgentTestPage'))
+const DatabaseBranchPage = lazy(() => import('./DatabaseBranchPage'))
+const SandboxExecutionPage = lazy(() => import('./SandboxExecutionPage'))
+const DynamicIntelligencePage = lazy(() => import('./DynamicIntelligencePage'))
+const AgentAutomationPage = lazy(() => import('./AgentAutomationPage'))
+const UsageDashboardPage = lazy(() => import('./UsageDashboardPage'))
+const SubagentOrchestrationPage = lazy(() => import('./SubagentOrchestrationPage'))
+const LangGraphPage = lazy(() => import('./LangGraphPage'))
+const HybridCachePage = lazy(() => import('./HybridCachePage'))
+const PlaywrightHealingPage = lazy(() => import('./PlaywrightHealingPage'))
+const SelfHealingPage = lazy(() => import('./SelfHealingPage'))
+const ProductionSandboxPage = lazy(() => import('./ProductionSandboxPage'))
+const OrgMemoryPage = lazy(() => import('./OrgMemoryPage'))
+const AgentRulesPage = lazy(() => import('./AgentRulesPage'))
+const ServerComponentsPage = lazy(() => import('./ServerComponentsPage'))
+const CodeLintPage = lazy(() => import('./CodeLintPage'))
+const VectorSearchPage = lazy(() => import('./VectorSearchPage'))
+const ReplTestPage = lazy(() => import('./ReplTestPage'))
+const AgentTerminalPage = lazy(() => import('./AgentTerminalPage'))
+const ComposerPage = lazy(() => import('./ComposerPage'))
+const DotnetPerfPage = lazy(() => import('./DotnetPerfPage'))
+const MultiModelRoutingPage = lazy(() => import('./MultiModelRoutingPage'))
+const BiomeLintPage = lazy(() => import('./BiomeLintPage'))
+const DeepWikiPage = lazy(() => import('./DeepWikiPage'))
+const BuildToolchainPage = lazy(() => import('./BuildToolchainPage'))
+const VisionToCodePage = lazy(() => import('./VisionToCodePage'))
+const DotnetUpgradePage = lazy(() => import('./DotnetUpgradePage'))
+const ParallelAgentsPage = lazy(() => import('./ParallelAgentsPage'))
+const WebMcpPage = lazy(() => import('./WebMcpPage'))
+const AgentSdkPage = lazy(() => import('./AgentSdkPage'))
+const TerminalExecutionPage = lazy(() => import('./TerminalExecutionPage'))
+const TursoDatabasePage = lazy(() => import('./TursoDatabasePage'))
+const WorkersAiPage = lazy(() => import('./WorkersAiPage'))
+const ReactUseHookPage = lazy(() => import('./ReactUseHookPage'))
+const EditPredictionPage = lazy(() => import('./EditPredictionPage'))
+const BrowserIdePage = lazy(() => import('./BrowserIdePage'))
+const GovernancePage = lazy(() => import('./GovernancePage'))
+const InferenceCostPage = lazy(() => import('./InferenceCostPage'))
+const LanguageExpansionPage = lazy(() => import('./LanguageExpansionPage'))
+const HybridValidationPage = lazy(() => import('./HybridValidationPage'))
+const AgentMessagesPage = lazy(() => import('./AgentMessagesPage'))
+const AgentTracePage = lazy(() => import('./AgentTracePage'))
+const AgenticWorkflowsPage = lazy(() => import('./AgenticWorkflowsPage'))
+const ConfidenceScorePage = lazy(() => import('./ConfidenceScorePage'))
+const AiModelMarketplacePage = lazy(() => import('./AiModelMarketplacePage'))
+const AgentInboxPage = lazy(() => import('./AgentInboxPage'))
+const AgentSkillsPage = lazy(() => import('./AgentSkillsPage'))
+const AgentBuilderPage = lazy(() => import('./AgentBuilderPage'))
+const PlaywrightMcpPage = lazy(() => import('./PlaywrightMcpPage'))
+const VisualWorkflowPage = lazy(() => import('./VisualWorkflowPage'))
+const PatentAgentPage = lazy(() => import('./PatentAgentPage'))
+const StreamingCodeGenPage = lazy(() => import('./StreamingCodeGenPage'))
+const ManagedBackendPage = lazy(() => import('./ManagedBackendPage'))
+
+const TabFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" /></div>
 
 type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing' | 'context-index' | 'deployment-health' | 'generative-ui' | 'mobile-app' | 'background-agents' | 'platform-upgrade' | 'visual-prompt' | 'multi-framework' | 'view-transitions' | 'nl-schema' | 'query-config' | 'agentic-planning' | 'visual-regression' | 'mcp-gateway' | 'codebase-memory' | 'figma-import' | 'arena' | 'visual-overlay' | 'semantic-search' | 'planning-mode' | 'project-docs' | 'ai-elements' | 'review-pipeline' | 'oauth-connectors' | 'mcp-tools' | 'ai-model' | 'bidir-sync' | 'self-healing-test' | 'multi-agent-test' | 'database-branching' | 'sandbox' | 'dynamic-intelligence' | 'agent-automation' | 'usage-dashboard' | 'orchestration' | 'langgraph' | 'hybrid-cache' | 'playwright-healing' | 'self-healing-code' | 'production-sandboxes' | 'org-memory' | 'agent-rules' | 'server-components' | 'code-lint' | 'vector-search' | 'repl-test' | 'agent-terminal' | 'composer' | 'dotnet-perf' | 'multi-model' | 'biome-lint' | 'deepwiki' | 'build-toolchain' | 'vision-to-code' | 'dotnet10-upgrade' | 'parallel-agents' | 'webmcp' | 'agent-sdk' | 'auto-terminal' | 'turso-database' | 'workers-ai' | 'react-use-hook' | 'edit-predictions' | 'browser-ide' | 'governance' | 'inference-cost' | 'language-expansion' | 'hybrid-validation' | 'agent-messages' | 'agentic-workflows' | 'agent-trace' | 'confidence-scoring' | 'ai-marketplace' | 'agent-inbox' | 'agent-skills' | 'agent-builder' | 'playwright-mcp' | 'visual-workflow' | 'patent-agent' | 'streaming-codegen' | 'managed-backend'
 
@@ -511,6 +515,7 @@ export default function SettingsLayout() {
 
         {/* Content area */}
         <div className="flex-1 min-w-0">
+          <Suspense fallback={TabFallback}>
       {settingsTab === 'tokens' && <SettingsPage onBalanceChange={(b) => setTokenBalance(b)} />}
       {settingsTab === 'usage' && <UsagePage />}
       {settingsTab === 'billing' && <BillingPage />}
@@ -628,6 +633,7 @@ export default function SettingsLayout() {
       {settingsTab === 'patent-agent' && <PatentAgentPage />}
       {settingsTab === 'streaming-codegen' && <StreamingCodeGenPage />}
       {settingsTab === 'managed-backend' && <ManagedBackendPage />}
+          </Suspense>
         </div>
       </div>
     </section>

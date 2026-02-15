@@ -34,6 +34,12 @@ public record CreateDevRequestDto
     /// Preferred AI model: claude:claude-opus-4-6, claude:claude-sonnet-4-5-20250929, claude:claude-haiku-4-5-20251001 (default: user config)
     /// </summary>
     public string? PreferredModel { get; init; }
+
+    /// <summary>
+    /// Anonymous user ID for unauthenticated submissions (from localStorage).
+    /// Used to associate requests with a browser session before the user signs up.
+    /// </summary>
+    public string? AnonymousUserId { get; init; }
 }
 
 public record DevRequestResponseDto

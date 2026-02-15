@@ -5101,5 +5101,9 @@
   "privacy.s12.intro": "For privacy-related questions or to exercise your rights, contact us at:",
   "privacy.s12.emailLabel": "Email: ",
   "privacy.s12.dpoLabel": "Data Protection Officer: ",
-  "privacy.s12.supportLabel": "Support: "
+  "privacy.s12.supportLabel": "Support: ",
+  "guest.signupPrompt.title": "Sign up to unlock the full experience",
+  "guest.signupPrompt.description": "Create a free account to get detailed proposals, build your project, and export it. Your analysis results will be preserved.",
+  "guest.signupPrompt.button": "Create Free Account",
+  "guest.signupToContinue": "Sign Up to Continue"
 }

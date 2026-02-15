@@ -78,6 +78,30 @@ public class RequestsController : ControllerBase
         User.FindFirst(ClaimTypes.NameIdentifier)?.Value
             ?? throw new InvalidOperationException("User not authenticated.");
 
+    private string? TryGetUserId() =>
+        User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    private async Task<(DevRequest? entity, ActionResult? error)> GetOwnedEntityAllowAnonAsync(Guid id, string? anonymousUserId)
+    {
+        var entity = await _context.DevRequests.FindAsync(id);
+        if (entity == null)
+            return (null, NotFound());
+
+        var userId = TryGetUserId();
+        if (userId != null)
+        {
+            if (entity.UserId != userId)
+                return (null, StatusCode(403, new { error = "이 요청에 대한 접근 권한이 없습니다." }));
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(anonymousUserId) || entity.UserId != $"anon:{anonymousUserId}")
+                return (null, StatusCode(403, new { error = "이 요청에 대한 접근 권한이 없습니다." }));
+        }
+
+        return (entity, null);
+    }
+
     private async Task<(DevRequest? entity, ActionResult? error)> GetOwnedEntityAsync(Guid id)
     {
         var entity = await _context.DevRequests.FindAsync(id);
@@ -91,12 +115,20 @@ public class RequestsController : ControllerBase
     /// <summary>
     /// Create a new development request
     /// </summary>
+    [AllowAnonymous]
     [HttpPost]
     [ProducesResponseType(typeof(DevRequestResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<DevRequestResponseDto>> CreateRequest([FromBody] CreateDevRequestDto dto)
     {
-        var userId = GetUserId();
+        var userId = TryGetUserId();
+        if (userId == null)
+        {
+            if (string.IsNullOrWhiteSpace(dto.AnonymousUserId))
+                return BadRequest(new { error = "Anonymous submissions require an anonymousUserId." });
+            userId = $"anon:{dto.AnonymousUserId}";
+        }
+
         var entity = dto.ToEntity(userId);
 
         _context.DevRequests.Add(entity);
@@ -157,27 +189,36 @@ public class RequestsController : ControllerBase
     /// <summary>
     /// Analyze a development request using AI
     /// </summary>
+    [AllowAnonymous]
     [HttpPost("{id:guid}/analyze")]
     [ProducesResponseType(typeof(AnalysisResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AnalysisResponseDto>> AnalyzeRequest(Guid id)
+    public async Task<ActionResult<AnalysisResponseDto>> AnalyzeRequest(Guid id, [FromQuery] string? anonymousUserId = null)
     {
-        var (entity, error) = await GetOwnedEntityAsync(id);
+        var isAnonymous = TryGetUserId() == null;
+
+        var (entity, error) = isAnonymous
+            ? await GetOwnedEntityAllowAnonAsync(id, anonymousUserId)
+            : await GetOwnedEntityAsync(id);
         if (error != null) return error;
 
-        // Token gating: check balance before executing
-        var userId = GetUserId();
-        var (hasEnough, cost, balance) = await _tokenService.CheckBalance(userId, "analysis");
-        if (!hasEnough)
+        var userId = isAnonymous ? entity!.UserId : GetUserId();
+
+        // Token gating: only for authenticated users (anonymous users get free first analysis)
+        if (!isAnonymous)
         {
-            return StatusCode(402, new
+            var (hasEnough, cost, balance) = await _tokenService.CheckBalance(userId, "analysis");
+            if (!hasEnough)
             {
-                error = "Insufficient tokens.",
-                required = cost,
-                balance,
-                shortfall = cost - balance,
-                action = "analysis"
-            });
+                return StatusCode(402, new
+                {
+                    error = "Insufficient tokens.",
+                    required = cost,
+                    balance,
+                    shortfall = cost - balance,
+                    action = "analysis"
+                });
+            }
         }
 
         // Update status to analyzing
@@ -205,8 +246,15 @@ public class RequestsController : ControllerBase
 
             await _context.SaveChangesAsync();
 
-            // Deduct tokens only after successful completion
-            var transaction = await _tokenService.DebitTokens(userId, "analysis", id.ToString());
+            // Deduct tokens only after successful completion (skip for anonymous users)
+            int tokensUsed = 0;
+            int newBalance = 0;
+            if (!isAnonymous)
+            {
+                var transaction = await _tokenService.DebitTokens(userId, "analysis", id.ToString());
+                tokensUsed = transaction.Amount;
+                newBalance = transaction.BalanceAfter;
+            }
 
             _logger.LogInformation("Analysis completed for request {RequestId}: {Category}, {Complexity}",
                 id, entity.Category, entity.Complexity);
@@ -221,8 +269,8 @@ public class RequestsController : ControllerBase
                 Feasibility = analysisResult.Feasibility,
                 EstimatedDays = analysisResult.EstimatedDays,
                 SuggestedStack = analysisResult.SuggestedStack,
-                TokensUsed = transaction.Amount,
-                NewBalance = transaction.BalanceAfter
+                TokensUsed = tokensUsed,
+                NewBalance = newBalance
             });
         }
         catch (Exception ex)

@@ -8,7 +8,9 @@ import type { SiteResponse } from '../api/sites'
 import type { DevRequestResponse, AnalysisResponse, ProposalResponse, ProductionResponse, GitHubExportResponse, ProjectVersion, ProjectTemplate, GitHubSyncStatus, SubTaskDto } from '../api/requests'
 import { checkTokens, getPricingPlans } from '../api/settings'
 import type { TokenCheck, PricingPlanData } from '../api/settings'
+import { isAuthenticated } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
+
 import { detectCurrency, formatCurrency as formatCurrencyUtil } from '../utils/currency'
 import PlanSelectionDialog from '../components/PlanSelectionDialog'
 import RefinementChat from '../components/RefinementChat'
@@ -36,7 +38,7 @@ export default function HomePage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { setTokenBalance, requireAuth } = useAuth()
+  const { setTokenBalance, setShowLogin } = useAuth()
 
   const [request, setRequest] = useState('')
   const [email, setEmail] = useState('')
@@ -287,7 +289,6 @@ export default function HomePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!request.trim()) return
-    if (!requireAuth()) return
 
     setViewState('submitting')
     setErrorMessage('')
@@ -823,15 +824,39 @@ export default function HomePage() {
               completedSteps={['analysis']}
             />
 
+            {!isAuthenticated() && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-r from-accent-blue/20 to-accent-purple/10 border border-accent-blue/30 rounded-2xl p-6 mb-4"
+              >
+                <h4 className="text-lg font-bold mb-2">{t('guest.signupPrompt.title')}</h4>
+                <p className="text-warm-300 text-sm mb-4">{t('guest.signupPrompt.description')}</p>
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="w-full py-3 bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue rounded-xl font-semibold transition-all btn-premium"
+                >
+                  {t('guest.signupPrompt.button')}
+                </button>
+              </motion.div>
+            )}
+
             <div className="flex gap-4">
               <button onClick={handleReset}
                 className="flex-1 py-3 bg-warm-800 hover:bg-warm-700 rounded-xl font-medium transition-colors">
                 {t('button.newRequest')}
               </button>
-              <button onClick={handleGenerateProposal}
-                className="flex-1 py-3 bg-accent-blue hover:bg-accent-blue/90 rounded-xl font-medium transition-colors">
-                {t('button.getProposal')}
-              </button>
+              {isAuthenticated() ? (
+                <button onClick={handleGenerateProposal}
+                  className="flex-1 py-3 bg-accent-blue hover:bg-accent-blue/90 rounded-xl font-medium transition-colors">
+                  {t('button.getProposal')}
+                </button>
+              ) : (
+                <button onClick={() => setShowLogin(true)}
+                  className="flex-1 py-3 bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue rounded-xl font-semibold transition-all">
+                  {t('guest.signupToContinue')}
+                </button>
+              )}
             </div>
           </div>
         )}

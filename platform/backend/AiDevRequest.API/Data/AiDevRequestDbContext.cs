@@ -2100,7 +2100,6 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.ReferredUserId);
             entity.HasIndex(e => e.Status);
         });
-    }
 
         modelBuilder.Entity<ScreenshotToCode>(entity =>
         {

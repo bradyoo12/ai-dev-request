@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 109 Controllers | 96 Services | 120 Entities | 106 Pages | 98 API modules | 33 Components
+**Counts**: 109 Controllers | 96 Services | 120 Entities | 106 Pages | 98 API modules | 34 Components
 
 ---
 
@@ -792,6 +792,7 @@ All under `platform/frontend/src/components/`.
 | TemplatesSection | Featured templates on homepage (3 templates) |
 | StatsSection | Platform statistics |
 | FooterSection | Footer with links |
+| PaymentDisclaimer | Collapsible credit & refund policy disclaimer with optional agreement checkbox |
 
 ### Code & Preview
 

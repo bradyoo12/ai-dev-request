@@ -127,8 +127,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const redirectUri = `${window.location.origin}/auth/callback/${provider}`
     socialLogin(provider, code, redirectUri)
-      .then((result) => {
-        handleLogin(result.user)
+      .then(() => {
+        // Force page reload to load stored auth from localStorage
+        // This ensures React state is properly initialized with the authenticated user
+        window.location.href = '/'
       })
       .catch((err) => {
         console.error('Social login failed:', err)

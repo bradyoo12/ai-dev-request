@@ -57,12 +57,26 @@ public class ClaudeProviderService : IModelProviderService
             _logger.LogInformation("Claude API call: model={Model}, effortLevel={EffortLevel}, hasSchema={HasSchema}",
                 modelId, effortLevel, outputSchema != null);
 
+            // Configure prompt caching with 1-hour TTL for cost reduction
+            var systemMessages = new List<SystemMessage>
+            {
+                new SystemMessage(
+                    "You are an expert AI development assistant. Analyze requirements, generate code, and provide detailed technical solutions.",
+                    new CacheControl
+                    {
+                        Type = CacheControlType.ephemeral,
+                        TTL = CacheDuration.OneHour
+                    })
+            };
+
             var parameters = new MessageParameters
             {
+                System = systemMessages,
                 Messages = new List<Message> { new Message(RoleType.User, prompt) },
                 Model = modelId,
                 MaxTokens = 4096,
-                Temperature = 0.7m
+                Temperature = 0.7m,
+                PromptCaching = PromptCacheType.AutomaticToolsAndSystem
             };
 
             // Add adaptive thinking configuration if effort level is specified
@@ -99,7 +113,16 @@ public class ClaudeProviderService : IModelProviderService
             var response = await _client.Messages.GetClaudeMessageAsync(parameters, ct);
             var content = response.Content.FirstOrDefault()?.ToString() ?? "";
 
-            _logger.LogInformation("Claude API success: model={Model}, responseLength={Length}", modelId, content.Length);
+            // Log cache metrics for monitoring cost savings
+            _logger.LogInformation(
+                "Claude API success: model={Model}, responseLength={Length}, " +
+                "cacheCreated={CacheCreated}, cacheRead={CacheRead}, standardInput={StandardInput}",
+                modelId,
+                content.Length,
+                response.Usage.CacheCreationInputTokens,
+                response.Usage.CacheReadInputTokens,
+                response.Usage.InputTokens);
+
             return content;
         }
         catch (Exception ex)

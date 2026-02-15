@@ -164,13 +164,9 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
             >
               {plan.priceMonthly < 0
                 ? t('pricing.contactUs')
-                : plan.id === 'free'
+                : plan.priceMonthly === 0
                   ? t('pricing.startFree')
-                  : plan.id === 'starter'
-                    ? t('pricing.chooseStarter')
-                    : plan.id === 'pro'
-                      ? t('pricing.choosePro')
-                      : t('pricing.getStarted')}
+                  : t('pricing.choosePlan', { plan: getName(plan) })}
             </motion.button>
           </motion.div>
         ))}

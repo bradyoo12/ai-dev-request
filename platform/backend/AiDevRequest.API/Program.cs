@@ -122,6 +122,7 @@ builder.Services.AddScoped<ISandboxExecutionService, SandboxExecutionService>();
 builder.Services.AddScoped<IUsageMeteringService, UsageMeteringService>();
 builder.Services.AddScoped<IAgentInboxService, AgentInboxService>();
 builder.Services.AddScoped<IAgentSkillService, AgentSkillService>();
+builder.Services.AddScoped<IAgentTeamService, AgentTeamService>();
 builder.Services.AddScoped<IAgentBuilderService, AgentBuilderService>();
 builder.Services.AddScoped<ISubtaskService, SubtaskService>();
 builder.Services.AddScoped<IAutonomousTestingService, AutonomousTestingService>();

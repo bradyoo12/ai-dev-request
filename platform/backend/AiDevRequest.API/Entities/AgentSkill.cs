@@ -11,6 +11,8 @@ public class AgentSkill
     public string? ScriptsJson { get; set; }
     public string? ResourcesJson { get; set; }
     public string? TagsJson { get; set; }
+    // Skill type for team role assignment: code-gen, review, test, docs, deploy, frontend, backend, general
+    public string? SkillType { get; set; }
     public bool IsBuiltIn { get; set; }
     public bool IsPublic { get; set; }
     public int DownloadCount { get; set; }

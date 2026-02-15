@@ -69,6 +69,7 @@ public class AgentSkillService : IAgentSkillService
         existing.ScriptsJson = update.ScriptsJson;
         existing.ResourcesJson = update.ResourcesJson;
         existing.TagsJson = update.TagsJson;
+        existing.SkillType = update.SkillType;
         existing.IsPublic = update.IsPublic;
         existing.Version = update.Version;
         existing.Author = update.Author;

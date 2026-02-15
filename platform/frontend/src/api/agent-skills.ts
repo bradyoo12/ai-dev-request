@@ -21,6 +21,7 @@ export interface AgentSkill {
   scriptsJson?: string | null
   resourcesJson?: string | null
   tagsJson?: string | null
+  skillType?: string | null
   isBuiltIn: boolean
   isPublic: boolean
   downloadCount: number
@@ -39,6 +40,7 @@ export interface CreateAgentSkillPayload {
   scriptsJson?: string
   resourcesJson?: string
   tagsJson?: string
+  skillType?: string
   isPublic?: boolean
   version?: string
   author?: string
@@ -53,6 +55,7 @@ export interface UpdateAgentSkillPayload {
   scriptsJson?: string
   resourcesJson?: string
   tagsJson?: string
+  skillType?: string
   isPublic?: boolean
   version?: string
   author?: string

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { createRequest, analyzeRequest, generateProposal, approveProposal, startBuild, exportZip, exportToGitHub, getVersions, rollbackToVersion, getTemplates, getGitHubStatus, syncToGitHub, InsufficientTokensError, generateSubtasks, approveSubtask, rejectSubtask, approveAllSubtasks } from '../api/requests'
@@ -45,6 +46,7 @@ export default function HomePage() {
   const [framework, setFramework] = useState('')
   const [selectedModel, setSelectedModel] = useState('claude:claude-sonnet-4-5-20250929')
   const [powerLevel, setPowerLevel] = useState<PowerLevel>('standard')
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const [viewState, setViewState] = useState<ViewState>('form')
   const [submittedRequest, setSubmittedRequest] = useState<DevRequestResponse | null>(null)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null)
@@ -583,83 +585,114 @@ export default function HomePage() {
                 className="w-full p-3 bg-warm-950/80 border border-warm-700/50 rounded-xl text-warm-100 placeholder-warm-500 focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue/30 transition-all" />
             </div>
             <div className="mt-6">
-              <label className="block text-sm font-medium mb-2 text-warm-400">{t('screenshot.label')}</label>
-              {screenshotPreview ? (
-                <div className="relative inline-block">
-                  <img src={screenshotPreview} alt={screenshotFile?.name ? `Uploaded screenshot: ${screenshotFile.name}` : 'Screenshot preview'} className="max-h-48 rounded-xl border border-warm-700" />
-                  <button type="button" onClick={handleScreenshotRemove}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full text-xs flex items-center justify-center transition-colors"
-                    aria-label={t('screenshot.remove', 'Remove screenshot')}>
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <div
-                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-                  onDragLeave={() => setIsDragging(false)}
-                  onDrop={handleDrop}
-                  onClick={() => document.getElementById('screenshot-input')?.click()}
-                  className={`w-full p-6 border-2 border-dashed rounded-2xl text-center cursor-pointer transition-all ${
-                    isDragging ? 'border-accent-blue bg-accent-blue/10' : 'border-warm-700/50 hover:border-warm-500/50 hover:bg-warm-900/50'
-                  }`}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center gap-1.5 text-sm text-warm-400 hover:text-warm-200 transition-colors"
+                aria-expanded={showAdvanced}
+                aria-controls="advanced-options"
+              >
+                <motion.span
+                  animate={{ rotate: showAdvanced ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="inline-block text-xs"
                 >
-                  <div className="text-warm-400 text-sm">
-                    <div className="text-2xl mb-2">📸</div>
-                    {t('screenshot.dropzone')}
-                  </div>
-                  <input id="screenshot-input" type="file" accept="image/*" className="hidden"
-                    onChange={(e) => { if (e.target.files?.[0]) handleScreenshotSelect(e.target.files[0]) }} />
+                  ▼
+                </motion.span>
+                {t('form.advancedOptions')}
+              </button>
+            </div>
+            <AnimatePresence initial={false}>
+              {showAdvanced && (
+                <motion.div
+                  id="advanced-options"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="mt-6">
+                    <label className="block text-sm font-medium mb-2 text-warm-400">{t('screenshot.label')}</label>
+                  {screenshotPreview ? (
+                    <div className="relative inline-block">
+                      <img src={screenshotPreview} alt={screenshotFile?.name ? `Uploaded screenshot: ${screenshotFile.name}` : 'Screenshot preview'} className="max-h-48 rounded-xl border border-warm-700" />
+                      <button type="button" onClick={handleScreenshotRemove}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-700 rounded-full text-xs flex items-center justify-center transition-colors"
+                        aria-label={t('screenshot.remove', 'Remove screenshot')}>
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={handleDrop}
+                      onClick={() => document.getElementById('screenshot-input')?.click()}
+                      className={`w-full p-6 border-2 border-dashed rounded-2xl text-center cursor-pointer transition-all ${
+                        isDragging ? 'border-accent-blue bg-accent-blue/10' : 'border-warm-700/50 hover:border-warm-500/50 hover:bg-warm-900/50'
+                      }`}
+                    >
+                      <div className="text-warm-400 text-sm">
+                        <div className="text-2xl mb-2">📸</div>
+                        {t('screenshot.dropzone')}
+                      </div>
+                      <input id="screenshot-input" type="file" accept="image/*" className="hidden"
+                        onChange={(e) => { if (e.target.files?.[0]) handleScreenshotSelect(e.target.files[0]) }} />
+                    </div>
+                  )}
+                  <p className="mt-1 text-xs text-warm-500">{t('screenshot.hint')}</p>
                 </div>
+                <div className="mt-6">
+                  <label className="block text-sm font-medium mb-2 text-warm-400">{t('framework.label')}</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <button type="button" onClick={() => setFramework('')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        framework === '' ? 'bg-gradient-to-r from-accent-blue to-accent-purple text-white shadow-glow-blue' : 'bg-warm-800/80 text-warm-300 hover:bg-warm-700 border border-warm-700/30'
+                      }`}>
+                      {t('framework.auto')}
+                    </button>
+                  </div>
+                  <div className="text-xs text-warm-500 mb-1">{t('framework.web')}</div>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {[
+                      { value: 'react', label: 'React' },
+                      { value: 'vue', label: 'Vue' },
+                      { value: 'svelte', label: 'Svelte' },
+                      { value: 'nextjs', label: 'Next.js' },
+                      { value: 'nuxt', label: 'Nuxt' },
+                      { value: 'angular', label: 'Angular' },
+                    ].map((fw) => (
+                      <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          framework === fw.value ? 'bg-accent-blue text-white' : 'bg-warm-800/80 text-warm-300 hover:bg-warm-700 border border-warm-700/30'
+                        }`}>
+                        {fw.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="text-xs text-warm-500 mb-1">{t('framework.mobile')}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 'flutter', label: 'Flutter' },
+                      { value: 'react-native', label: 'React Native' },
+                    ].map((fw) => (
+                      <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          framework === fw.value ? 'bg-accent-purple text-white' : 'bg-warm-800/80 text-warm-300 hover:bg-warm-700 border border-warm-700/30'
+                        }`}>
+                        {fw.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-warm-500">{t('framework.hint')}</p>
+                </div>
+                  <ModelQuickSelector value={selectedModel} onChange={setSelectedModel} />
+                  <PowerLevelSelector value={powerLevel} onChange={setPowerLevel} />
+                  <CreditEstimatePreview />
+                </motion.div>
               )}
-              <p className="mt-1 text-xs text-warm-500">{t('screenshot.hint')}</p>
-            </div>
-            <div className="mt-6">
-              <label className="block text-sm font-medium mb-2 text-warm-400">{t('framework.label')}</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                <button type="button" onClick={() => setFramework('')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    framework === '' ? 'bg-gradient-to-r from-accent-blue to-accent-purple text-white shadow-glow-blue' : 'bg-warm-800/80 text-warm-300 hover:bg-warm-700 border border-warm-700/30'
-                  }`}>
-                  {t('framework.auto')}
-                </button>
-              </div>
-              <div className="text-xs text-warm-500 mb-1">{t('framework.web')}</div>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {[
-                  { value: 'react', label: 'React' },
-                  { value: 'vue', label: 'Vue' },
-                  { value: 'svelte', label: 'Svelte' },
-                  { value: 'nextjs', label: 'Next.js' },
-                  { value: 'nuxt', label: 'Nuxt' },
-                  { value: 'angular', label: 'Angular' },
-                ].map((fw) => (
-                  <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      framework === fw.value ? 'bg-accent-blue text-white' : 'bg-warm-800/80 text-warm-300 hover:bg-warm-700 border border-warm-700/30'
-                    }`}>
-                    {fw.label}
-                  </button>
-                ))}
-              </div>
-              <div className="text-xs text-warm-500 mb-1">{t('framework.mobile')}</div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { value: 'flutter', label: 'Flutter' },
-                  { value: 'react-native', label: 'React Native' },
-                ].map((fw) => (
-                  <button key={fw.value} type="button" onClick={() => setFramework(fw.value)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      framework === fw.value ? 'bg-accent-purple text-white' : 'bg-warm-800/80 text-warm-300 hover:bg-warm-700 border border-warm-700/30'
-                    }`}>
-                    {fw.label}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-2 text-xs text-warm-500">{t('framework.hint')}</p>
-            </div>
-            <ModelQuickSelector value={selectedModel} onChange={setSelectedModel} />
-            <PowerLevelSelector value={powerLevel} onChange={setPowerLevel} />
-            <CreditEstimatePreview />
+            </AnimatePresence>
             <button type="submit" disabled={!request.trim()}
               className="mt-6 w-full py-4 bg-gradient-to-r from-accent-blue to-accent-purple hover:shadow-glow-blue disabled:from-warm-700 disabled:to-warm-700 disabled:cursor-not-allowed rounded-2xl font-semibold text-lg transition-all btn-premium">
               {t('form.submit')}

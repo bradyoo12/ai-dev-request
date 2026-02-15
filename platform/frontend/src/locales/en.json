@@ -19,6 +19,7 @@
   "form.placeholder": "e.g., I need a salon website where customers can book appointments...",
   "form.emailLabel": "Contact email (optional)",
   "form.submit": "🔍 Start AI Analysis",
+  "form.advancedOptions": "Advanced Options",
   "form.example.shopping": "Build me a shopping mall",
   "form.example.automation": "I need a task automation bot",
   "form.example.dashboard": "I want a data dashboard",

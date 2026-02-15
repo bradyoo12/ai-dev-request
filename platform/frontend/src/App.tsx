@@ -41,8 +41,6 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 const FaqPage = lazy(() => import('./pages/FaqPage'))
 const ReferralPage = lazy(() => import('./pages/ReferralPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
-const DiscussionsPage = lazy(() => import('./pages/DiscussionsPage'))
-const DiscussionDetailPage = lazy(() => import('./pages/DiscussionDetailPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 /**

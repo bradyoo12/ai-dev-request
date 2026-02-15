@@ -19,6 +19,7 @@
   "form.placeholder": "예: 고객 예약을 받을 수 있는 미용실 웹사이트가 필요해요...",
   "form.emailLabel": "연락받으실 이메일 (선택)",
   "form.submit": "🔍 AI 분석 시작",
+  "form.advancedOptions": "고급 옵션",
   "form.example.shopping": "쇼핑몰 만들어주세요",
   "form.example.automation": "업무 자동화 봇 필요해요",
   "form.example.dashboard": "데이터 대시보드 원해요",

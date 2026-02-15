@@ -97,9 +97,9 @@ export function AppRoutes() {
             <Route path="/my-sites" element={<Navigate to="/sites" replace />} />
             <Route path="/suggestions" element={<Suspense fallback={LazyFallback}><SuggestionsPage /></Suspense>} />
             <Route path="/suggestions/:id" element={<Suspense fallback={LazyFallback}><SuggestionDetailPage /></Suspense>} />
-            <Route path="/admin/churn" element={<Suspense fallback={LazyFallback}><AdminChurnPage /></Suspense>} />
-            <Route path="/admin/suggestions" element={<Suspense fallback={LazyFallback}><AdminSuggestionPage /></Suspense>} />
-            <Route path="/a2a" element={<Suspense fallback={LazyFallback}><A2APage /></Suspense>} />
+            <Route path="/admin/churn" element={<ProtectedRoute requireAdmin><Suspense fallback={LazyFallback}><AdminChurnPage /></Suspense></ProtectedRoute>} />
+            <Route path="/admin/suggestions" element={<ProtectedRoute requireAdmin><Suspense fallback={LazyFallback}><AdminSuggestionPage /></Suspense></ProtectedRoute>} />
+            <Route path="/a2a" element={<ProtectedRoute requireAdmin><Suspense fallback={LazyFallback}><A2APage /></Suspense></ProtectedRoute>} />
             <Route path="/recommendations" element={<Suspense fallback={LazyFallback}><RecommendationsPage /></Suspense>} />
             <Route path="/project-health" element={<Suspense fallback={LazyFallback}><ProjectHealthPage /></Suspense>} />
             <Route path="/teams" element={<Suspense fallback={LazyFallback}><TeamPage /></Suspense>} />
@@ -107,8 +107,8 @@ export function AppRoutes() {
             <Route path="/whitelabel" element={<Suspense fallback={LazyFallback}><WhiteLabelPage /></Suspense>} />
             <Route path="/admin/growth" element={<Suspense fallback={LazyFallback}><GrowthDashboardPage /></Suspense>} />
             <Route path="/preview" element={<Suspense fallback={LazyFallback}><PreviewPage /></Suspense>} />
-            <Route path="/compliance" element={<Suspense fallback={LazyFallback}><CompliancePage /></Suspense>} />
-            <Route path="/infrastructure" element={<Suspense fallback={LazyFallback}><InfrastructurePage /></Suspense>} />
+            <Route path="/compliance" element={<ProtectedRoute><Suspense fallback={LazyFallback}><CompliancePage /></Suspense></ProtectedRoute>} />
+            <Route path="/infrastructure" element={<ProtectedRoute><Suspense fallback={LazyFallback}><InfrastructurePage /></Suspense></ProtectedRoute>} />
             <Route path="/buy-credits" element={<Suspense fallback={LazyFallback}><BuyCreditsPage /></Suspense>} />
             <Route path="/templates" element={<Suspense fallback={LazyFallback}><TemplatesPage /></Suspense>} />
             <Route path="/support" element={<Suspense fallback={LazyFallback}><SupportBoardPage /></Suspense>} />

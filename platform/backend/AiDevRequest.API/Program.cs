@@ -411,25 +411,39 @@ app.UseExceptionHandler(errorApp =>
 
         // Ensure project_templates table exists — this table was missing from the initial
         // migration and may not exist on databases created before it was added.
-        await dbContext.Database.ExecuteSqlRawAsync("""
-            CREATE TABLE IF NOT EXISTS project_templates (
-                "Id" uuid NOT NULL,
-                "Name" character varying(100) NOT NULL DEFAULT '',
-                "Description" character varying(255) NOT NULL DEFAULT '',
-                "Category" character varying(50) NOT NULL DEFAULT 'general',
-                "Framework" character varying(50) NOT NULL DEFAULT 'react',
-                "Tags" character varying(500) NOT NULL DEFAULT '',
-                "PromptTemplate" text NOT NULL DEFAULT '',
-                "CreatedBy" character varying(100) NOT NULL DEFAULT 'system',
-                "UsageCount" integer NOT NULL DEFAULT 0,
-                "IsPublished" boolean NOT NULL DEFAULT true,
-                "CreatedAt" timestamp with time zone NOT NULL DEFAULT now(),
-                "UpdatedAt" timestamp with time zone NOT NULL DEFAULT now(),
-                CONSTRAINT "PK_project_templates" PRIMARY KEY ("Id")
-            );
-            CREATE INDEX IF NOT EXISTS "IX_project_templates_Category" ON project_templates ("Category");
-            CREATE INDEX IF NOT EXISTS "IX_project_templates_Framework" ON project_templates ("Framework");
-            """);
+        // Use a fresh connection to avoid any bad state from MigrateAsync failure.
+        try
+        {
+            var connString = dbContext.Database.GetConnectionString();
+            using var rawConn = new Npgsql.NpgsqlConnection(connString);
+            await rawConn.OpenAsync();
+            using var cmd = rawConn.CreateCommand();
+            cmd.CommandText = """
+                CREATE TABLE IF NOT EXISTS project_templates (
+                    "Id" uuid NOT NULL,
+                    "Name" character varying(100) NOT NULL DEFAULT '',
+                    "Description" character varying(255) NOT NULL DEFAULT '',
+                    "Category" character varying(50) NOT NULL DEFAULT 'general',
+                    "Framework" character varying(50) NOT NULL DEFAULT 'react',
+                    "Tags" character varying(500) NOT NULL DEFAULT '',
+                    "PromptTemplate" text NOT NULL DEFAULT '',
+                    "CreatedBy" character varying(100) NOT NULL DEFAULT 'system',
+                    "UsageCount" integer NOT NULL DEFAULT 0,
+                    "IsPublished" boolean NOT NULL DEFAULT true,
+                    "CreatedAt" timestamp with time zone NOT NULL DEFAULT now(),
+                    "UpdatedAt" timestamp with time zone NOT NULL DEFAULT now(),
+                    CONSTRAINT "PK_project_templates" PRIMARY KEY ("Id")
+                );
+                CREATE INDEX IF NOT EXISTS "IX_project_templates_Category" ON project_templates ("Category");
+                CREATE INDEX IF NOT EXISTS "IX_project_templates_Framework" ON project_templates ("Framework");
+                """;
+            await cmd.ExecuteNonQueryAsync();
+            logger.LogInformation("Ensured project_templates table exists.");
+        }
+        catch (Exception tableEx)
+        {
+            logger.LogWarning(tableEx, "Failed to ensure project_templates table. Templates endpoint may not work.");
+        }
 
         // Auto-seed translations if the table is empty
         if (!await dbContext.Translations.AnyAsync())

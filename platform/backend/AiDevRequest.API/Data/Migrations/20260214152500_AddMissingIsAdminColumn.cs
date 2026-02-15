@@ -10,14 +10,14 @@ namespace AiDevRequest.API.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Add IsAdmin column if it doesn't exist
+            // Add IsAdmin column if it doesn't exist (case-insensitive check)
             migrationBuilder.Sql(@"
                 DO $$
                 BEGIN
                     IF NOT EXISTS (
                         SELECT 1
                         FROM information_schema.columns
-                        WHERE table_name='users' AND column_name='IsAdmin'
+                        WHERE table_name='users' AND lower(column_name)='isadmin'
                     ) THEN
                         ALTER TABLE users ADD COLUMN ""IsAdmin"" boolean NOT NULL DEFAULT FALSE;
                     END IF;

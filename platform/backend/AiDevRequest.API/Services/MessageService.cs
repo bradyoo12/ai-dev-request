@@ -9,7 +9,7 @@ public interface IMessageService
     Task<UserMessage> SendMessageAsync(string senderId, string receiverId, string content);
     Task<List<UserMessage>> GetMessagesAsync(string userId);
     Task<List<UserMessage>> GetConversationAsync(string userId1, string userId2);
-    Task<UserUserMessage?> MarkAsReadAsync(Guid messageId, string userId);
+    Task<UserMessage?> MarkAsReadAsync(Guid messageId, string userId);
     Task<int> GetUnreadCountAsync(string userId);
     Task<List<ConversationSummary>> GetConversationListAsync(string userId);
 }
@@ -77,7 +77,7 @@ public class MessageService : IMessageService
             .ToListAsync();
     }
 
-    public async Task<UserUserMessage?> MarkAsReadAsync(Guid messageId, string userId)
+    public async Task<UserMessage?> MarkAsReadAsync(Guid messageId, string userId)
     {
         var message = await _db.Messages.FindAsync(messageId);
         if (message == null) return null;

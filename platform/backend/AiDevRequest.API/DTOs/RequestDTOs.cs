@@ -125,3 +125,24 @@ public static class DevRequestMappings
         };
     }
 }
+
+public record CreateDiscussionDto
+{
+    public string? Title { get; init; }
+    public Guid? DevRequestId { get; init; }
+}
+
+public record AddDiscussionMessageDto
+{
+    [Required]
+    public required string Role { get; init; }
+
+    [Required]
+    public required string Content { get; init; }
+}
+
+public record DiscussionWithMessagesDto
+{
+    public required Discussion Discussion { get; init; }
+    public required List<DiscussionMessage> Messages { get; init; }
+}

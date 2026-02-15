@@ -192,6 +192,8 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<PatentInnovation> PatentInnovations => Set<PatentInnovation>();
     public DbSet<StreamingCodeGenSession> StreamingCodeGenSessions => Set<StreamingCodeGenSession>();
     public DbSet<ManagedBackend> ManagedBackends => Set<ManagedBackend>();
+    public DbSet<Referral> Referrals => Set<Referral>();
+    public DbSet<AgentFrameworkConfig> AgentFrameworkConfigs => Set<AgentFrameworkConfig>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2076,6 +2078,21 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.CurrentMonthCost).HasPrecision(10, 2);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<Referral>(entity =>
+        {
+            entity.ToTable("referrals");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ReferrerId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.ReferredUserId).HasMaxLength(100);
+            entity.Property(e => e.ReferralCode).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).HasConversion<string>().HasMaxLength(20);
+            entity.Property(e => e.PaymentBonusPercent).HasPrecision(5, 2);
+            entity.HasIndex(e => e.ReferralCode).IsUnique();
+            entity.HasIndex(e => e.ReferrerId);
+            entity.HasIndex(e => e.ReferredUserId);
             entity.HasIndex(e => e.Status);
         });
     }

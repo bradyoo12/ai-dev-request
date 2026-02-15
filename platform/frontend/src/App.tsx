@@ -39,6 +39,7 @@ const LiveGenerationPage = lazy(() => import('./pages/LiveGenerationPage'))
 const TermsPage = lazy(() => import('./pages/TermsPage'))
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
 const FaqPage = lazy(() => import('./pages/FaqPage'))
+const ReferralPage = lazy(() => import('./pages/ReferralPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 /**
@@ -116,6 +117,7 @@ export function AppRoutes() {
             <Route path="/terms" element={<Suspense fallback={LazyFallback}><TermsPage /></Suspense>} />
             <Route path="/privacy" element={<Suspense fallback={LazyFallback}><PrivacyPage /></Suspense>} />
             <Route path="/faq" element={<Suspense fallback={LazyFallback}><FaqPage /></Suspense>} />
+            <Route path="/referrals" element={<ProtectedRoute><Suspense fallback={LazyFallback}><ReferralPage /></Suspense></ProtectedRoute>} />
             <Route path="/requests/:id/refine" element={<Suspense fallback={LazyFallback}><IterativeRefinementPage /></Suspense>} />
             <Route path="/live-generation/:requestId" element={<ProtectedRoute><Suspense fallback={LazyFallback}><LiveGenerationPage /></Suspense></ProtectedRoute>} />
             <Route path="/settings/orchestration" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />

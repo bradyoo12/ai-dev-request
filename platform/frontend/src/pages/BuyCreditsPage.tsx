@@ -7,6 +7,7 @@ import {
   createCreditCheckout,
 } from '../api/credits'
 import type { CreditPackage, CreditPackagesResponse, CreditBalance } from '../api/credits'
+import PaymentDisclaimer from '../components/PaymentDisclaimer'
 
 type Currency = 'USD' | 'KRW' | 'JPY' | 'EUR'
 
@@ -67,6 +68,7 @@ export default function BuyCreditsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [purchasingId, setPurchasingId] = useState<number | null>(null)
+  const [policyAgreed, setPolicyAgreed] = useState(false)
 
   const loadData = useCallback(async (cur: Currency) => {
     try {
@@ -178,6 +180,13 @@ export default function BuyCreditsPage() {
         </div>
       )}
 
+      {/* Credit & Refund Policy Disclaimer */}
+      <PaymentDisclaimer
+        requireAgreement
+        agreed={policyAgreed}
+        onAgreementChange={setPolicyAgreed}
+      />
+
       {/* Package cards */}
       {packagesData && packagesData.packages.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -226,7 +235,7 @@ export default function BuyCreditsPage() {
               {/* Purchase button */}
               <button
                 onClick={() => handlePurchase(pkg)}
-                disabled={purchasingId !== null}
+                disabled={purchasingId !== null || !policyAgreed}
                 className={`mt-4 w-full py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                   pkg.isPopular
                     ? 'bg-blue-600 hover:bg-blue-500 text-white'

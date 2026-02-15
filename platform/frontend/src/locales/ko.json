@@ -5123,5 +5123,19 @@
   "privacy.s12.intro": "개인정보 보호 관련 질문이나 권리 행사를 위해 다음으로 문의해 주세요:",
   "privacy.s12.emailLabel": "이메일: ",
   "privacy.s12.dpoLabel": "데이터 보호 책임자: ",
-  "privacy.s12.supportLabel": "고객지원: "
+  "privacy.s12.supportLabel": "고객지원: ",
+  "billing.disclaimer.title": "크레딧 및 환불 정책",
+  "billing.disclaimer.nonRefundable": "플랜에 명시된 모든 목표(target goals)가 달성된 경우, 완료된 작업에 사용된 크레딧은 환불할 수 없습니다.",
+  "billing.disclaimer.claims": "결과물에 불만이 있는 경우, 클레임을 접수하려면 어떤 목표가 충족되지 않았는지 구체적으로 명시해야 합니다.",
+  "billing.disclaimer.agree": "크레딧 및 환불 정책에 동의합니다",
+  "billing.disclaimer.refundableTitle": "환불 가능한 경우",
+  "billing.disclaimer.nonRefundableTitle": "환불 불가능한 경우",
+  "billing.disclaimer.scenarios.refundable.targetGoalsNotMet": "플랜에 명시된 목표가 충족되지 않은 경우",
+  "billing.disclaimer.scenarios.refundable.serviceError": "생성 과정에서 서비스 오류 또는 시스템 장애가 발생한 경우",
+  "billing.disclaimer.scenarios.refundable.partialDelivery": "부분 인도 — 플랜의 상당 부분이 전달되지 않은 경우",
+  "billing.disclaimer.scenarios.refundable.scopeMismatch": "전달된 결과물이 합의된 범위와 일치하지 않는 경우",
+  "billing.disclaimer.scenarios.nonRefundable.completedTargetGoals": "플랜의 모든 목표가 성공적으로 완료된 경우",
+  "billing.disclaimer.scenarios.nonRefundable.changeOfMind": "작업 완료 후 변심한 경우",
+  "billing.disclaimer.scenarios.nonRefundable.cosmeticPreference": "외관 또는 스타일 취향 차이",
+  "billing.disclaimer.scenarios.nonRefundable.thirdPartyIssue": "서드파티 서비스 또는 사용자 제공 설정으로 인한 문제"
 }

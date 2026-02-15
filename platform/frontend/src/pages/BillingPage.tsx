@@ -21,6 +21,7 @@ import type {
   PricingPlan,
 } from '../api/billing'
 import type { TokenPackage } from '../api/settings'
+import PaymentDisclaimer from '../components/PaymentDisclaimer'
 
 export default function BillingPage() {
   const { t } = useTranslation()
@@ -296,6 +297,9 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      {/* Credit & Refund Policy Disclaimer */}
+      <PaymentDisclaimer />
 
       {/* Plan Comparison */}
       {plans.length > 0 && (

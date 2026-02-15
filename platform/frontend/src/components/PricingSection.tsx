@@ -12,6 +12,7 @@ import {
   convertCurrency,
   type Currency,
 } from '../utils/currency'
+import PaymentDisclaimer from './PaymentDisclaimer'
 
 interface PricingSectionProps {
   plans: PricingPlanData[]
@@ -171,6 +172,13 @@ export default function PricingSection({ plans, onSelectPlan }: PricingSectionPr
           </motion.div>
         ))}
       </StaggerChildren>
+
+      {/* Credit & Refund Policy Disclaimer */}
+      <FadeIn delay={0.3}>
+        <div className="max-w-2xl mx-auto mt-8 text-left">
+          <PaymentDisclaimer />
+        </div>
+      </FadeIn>
     </section>
   )
 }

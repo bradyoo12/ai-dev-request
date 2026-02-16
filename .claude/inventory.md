@@ -326,6 +326,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | SandboxExecutionService | Sandboxed code execution |
 | DatabaseBranchService | Database branching |
 | CiCdService | CI/CD pipeline generation |
+| ServiceDefaults (Extensions) | Shared OpenTelemetry tracing, metrics, health checks, service discovery |
 
 ### Integrations
 
@@ -684,6 +685,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | SandboxExecutionPage | /settings/sandbox | Sandbox execution |
 | DatabaseBranchPage | /settings/database-branching | Database branching |
 | ManagedBackendPage | /settings/managed-backend | Auto-provisioned managed backend with 4-tab interface (backends, provision, health, stats) |
+| AspireDashboardPage | /settings/aspire-dashboard | .NET Aspire observability dashboard (overview, health checks, tracing) |
 
 ### Billing & Payments
 
@@ -967,6 +969,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | preview.ts | PreviewController | Preview deployment |
 | promotion.ts | PreviewController | Promote preview to production |
 | managed-backend.ts | ManagedBackendController | Auto-provisioned managed backend (create, list, health, delete) |
+| aspireDashboard.ts | (none - uses /health endpoint) | Aspire observability dashboard |
 
 ### Billing & Payments
 

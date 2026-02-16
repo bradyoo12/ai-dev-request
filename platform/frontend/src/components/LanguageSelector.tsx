@@ -25,6 +25,11 @@ export default function LanguageSelector() {
         setLanguages([
           { code: 'ko', name: 'Korean', nativeName: '한국어', isDefault: true },
           { code: 'en', name: 'English', nativeName: 'English', isDefault: false },
+          { code: 'es', name: 'Spanish', nativeName: 'Español', isDefault: false },
+          { code: 'zh', name: 'Chinese', nativeName: '简体中文', isDefault: false },
+          { code: 'fr', name: 'French', nativeName: 'Français', isDefault: false },
+          { code: 'de', name: 'German', nativeName: 'Deutsch', isDefault: false },
+          { code: 'ja', name: 'Japanese', nativeName: '日本語', isDefault: false },
         ])
       })
   }, [])

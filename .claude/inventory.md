@@ -736,6 +736,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | AdminChurnPage | /admin/churn | Churn analysis |
 | ObservabilityPage | /settings/observability | Observability tracing |
 | PerformanceProfilePage | /settings/performance | Performance profiling |
+| ReactPerformancePage | /settings/react-performance | React 19 performance, code splitting, bundle analysis |
 
 ### Collaboration & Community
 
@@ -1015,6 +1016,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | admin.ts | AdminChurnController | Churn analysis |
 | observability.ts | ObservabilityController | Observability |
 | performance-profile.ts | PerformanceController | Performance |
+| reactperformance.ts | (frontend-only) | React 19 perf config/stats |
 
 ### Collaboration & Community
 

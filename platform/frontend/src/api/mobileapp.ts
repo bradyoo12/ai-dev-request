@@ -99,3 +99,74 @@ export async function getBuilds(projectId: string): Promise<{ builds: BuildRecor
   if (!res.ok) throw new Error('Failed to fetch builds')
   return res.json()
 }
+
+// --- TestFlight Deployment Pipeline ---
+
+export interface MobileDeployment {
+  id: string
+  devRequestId: string
+  deploymentType: string
+  status: string
+  appDescription: string | null
+  generatedCodeJson: string | null
+  expoQrCodeUrl: string | null
+  testFlightUrl: string | null
+  appleBundleId: string | null
+  appleTeamId: string | null
+  appVersion: string | null
+  buildNumber: number | null
+  buildLogsJson: string | null
+  errorMessage: string | null
+  submittedAt: string | null
+  completedAt: string | null
+  createdAt: string
+}
+
+export interface ExpoPreviewResult {
+  previewUrl: string
+  snackUrl: string
+  success: boolean
+  error: string | null
+}
+
+export async function generateNativeCode(devRequestId: string, appDescription: string): Promise<MobileDeployment> {
+  const res = await authFetch('/api/mobile-app/generate-native', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ devRequestId, appDescription }),
+  })
+  if (!res.ok) throw new Error('Failed to generate native code')
+  return res.json()
+}
+
+export async function deployToTestFlight(deploymentId: string): Promise<MobileDeployment> {
+  const res = await authFetch('/api/mobile-app/deploy-testflight', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ deploymentId }),
+  })
+  if (!res.ok) throw new Error('Failed to deploy to TestFlight')
+  return res.json()
+}
+
+export async function generateExpoPreview(devRequestId: string, appDescription?: string): Promise<ExpoPreviewResult> {
+  const res = await authFetch('/api/mobile-app/expo-preview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ devRequestId, appDescription }),
+  })
+  if (!res.ok) throw new Error('Failed to generate Expo preview')
+  return res.json()
+}
+
+export async function getDeployStatus(deploymentId: string): Promise<MobileDeployment> {
+  const res = await authFetch(`/api/mobile-app/deploy-status/${deploymentId}`)
+  if (!res.ok) throw new Error('Failed to get deployment status')
+  return res.json()
+}
+
+export async function getDeployments(projectId: string): Promise<{ deployments: MobileDeployment[] }> {
+  const res = await authFetch(`/api/mobile-app/deployments/${projectId}`)
+  if (!res.ok) throw new Error('Failed to get deployments')
+  return res.json()
+}

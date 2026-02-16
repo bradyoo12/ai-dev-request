@@ -1,5 +1,6 @@
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
+using AiDevRequest.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,12 @@ namespace AiDevRequest.API.Controllers;
 public class MobileAppController : ControllerBase
 {
     private readonly AiDevRequestDbContext _db;
+    private readonly IMobileDeploymentService _deploymentService;
 
-    public MobileAppController(AiDevRequestDbContext db)
+    public MobileAppController(AiDevRequestDbContext db, IMobileDeploymentService deploymentService)
     {
         _db = db;
+        _deploymentService = deploymentService;
     }
 
     private string GetUserId() =>
@@ -195,6 +198,70 @@ public class MobileAppController : ControllerBase
         return Ok(new { builds });
     }
 
+    // --- TestFlight Deployment Pipeline Endpoints ---
+
+    [HttpPost("deploy-testflight")]
+    public async Task<IActionResult> DeployToTestFlight([FromBody] DeployTestFlightDto dto)
+    {
+        var userId = GetUserId();
+        var deployment = await _deploymentService.DeployToTestFlightAsync(userId, dto.DeploymentId);
+        return Ok(ToDeploymentDto(deployment));
+    }
+
+    [HttpPost("expo-preview")]
+    public async Task<IActionResult> GenerateExpoPreview([FromBody] ExpoPreviewDto dto)
+    {
+        var userId = GetUserId();
+        var result = await _deploymentService.GenerateExpoPreviewAsync(userId, dto.DevRequestId, dto.AppDescription);
+        return Ok(result);
+    }
+
+    [HttpGet("deploy-status/{id}")]
+    public async Task<IActionResult> GetDeployStatus(Guid id)
+    {
+        var userId = GetUserId();
+        var deployment = await _deploymentService.GetDeploymentStatusAsync(userId, id);
+        if (deployment == null) return NotFound();
+        return Ok(ToDeploymentDto(deployment));
+    }
+
+    [HttpPost("generate-native")]
+    public async Task<IActionResult> GenerateNativeCode([FromBody] GenerateNativeDto dto)
+    {
+        var userId = GetUserId();
+        var deployment = await _deploymentService.GenerateNativeCodeAsync(userId, dto.DevRequestId, dto.AppDescription);
+        return Ok(ToDeploymentDto(deployment));
+    }
+
+    [HttpGet("deployments/{projectId}")]
+    public async Task<IActionResult> GetDeployments(Guid projectId)
+    {
+        var userId = GetUserId();
+        var deployments = await _deploymentService.GetDeploymentsAsync(userId, projectId);
+        return Ok(new { deployments = deployments.Select(ToDeploymentDto) });
+    }
+
+    private static MobileDeploymentDto ToDeploymentDto(MobileDeployment d) => new()
+    {
+        Id = d.Id,
+        DevRequestId = d.DevRequestId,
+        DeploymentType = d.DeploymentType,
+        Status = d.Status,
+        AppDescription = d.AppDescription,
+        GeneratedCodeJson = d.GeneratedCodeJson,
+        ExpoQrCodeUrl = d.ExpoQrCodeUrl,
+        TestFlightUrl = d.TestFlightUrl,
+        AppleBundleId = d.AppleBundleId,
+        AppleTeamId = d.AppleTeamId,
+        AppVersion = d.AppVersion,
+        BuildNumber = d.BuildNumber,
+        BuildLogsJson = d.BuildLogsJson,
+        ErrorMessage = d.ErrorMessage,
+        SubmittedAt = d.SubmittedAt,
+        CompletedAt = d.CompletedAt,
+        CreatedAt = d.CreatedAt
+    };
+
     private static MobileAppDto ToDto(MobileAppConfig c) => new()
     {
         Id = c.Id,
@@ -311,4 +378,42 @@ public class ScreenRecord
     public string Route { get; set; } = "";
     public string Type { get; set; } = "";
     public int ComponentCount { get; set; }
+}
+
+public record DeployTestFlightDto
+{
+    public Guid DeploymentId { get; init; }
+}
+
+public record ExpoPreviewDto
+{
+    public Guid DevRequestId { get; init; }
+    public string? AppDescription { get; init; }
+}
+
+public record GenerateNativeDto
+{
+    public Guid DevRequestId { get; init; }
+    public string AppDescription { get; init; } = "";
+}
+
+public record MobileDeploymentDto
+{
+    public Guid Id { get; init; }
+    public Guid DevRequestId { get; init; }
+    public string DeploymentType { get; init; } = "";
+    public string Status { get; init; } = "";
+    public string? AppDescription { get; init; }
+    public string? GeneratedCodeJson { get; init; }
+    public string? ExpoQrCodeUrl { get; init; }
+    public string? TestFlightUrl { get; init; }
+    public string? AppleBundleId { get; init; }
+    public string? AppleTeamId { get; init; }
+    public string? AppVersion { get; init; }
+    public int? BuildNumber { get; init; }
+    public string? BuildLogsJson { get; init; }
+    public string? ErrorMessage { get; init; }
+    public DateTime? SubmittedAt { get; init; }
+    public DateTime? CompletedAt { get; init; }
+    public DateTime CreatedAt { get; init; }
 }

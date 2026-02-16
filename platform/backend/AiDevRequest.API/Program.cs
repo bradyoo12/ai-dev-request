@@ -83,6 +83,7 @@ builder.Services.AddScoped<IMicroserviceService, MicroserviceService>();
 builder.Services.AddScoped<IWhiteLabelService, WhiteLabelService>();
 builder.Services.AddScoped<IGrowthService, GrowthService>();
 builder.Services.AddScoped<IExpoPreviewService, ExpoPreviewService>();
+builder.Services.AddScoped<IMobileDeploymentService, MobileDeploymentService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICodeValidationService, CodeValidationService>();
 builder.Services.AddScoped<ISelfHealingService, SelfHealingService>();

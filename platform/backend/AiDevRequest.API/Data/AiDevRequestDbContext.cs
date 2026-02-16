@@ -96,6 +96,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DeploymentHealth> DeploymentHealths => Set<DeploymentHealth>();
     public DbSet<GenerativeUiSession> GenerativeUiSessions => Set<GenerativeUiSession>();
     public DbSet<MobileAppConfig> MobileAppConfigs => Set<MobileAppConfig>();
+    public DbSet<MobileDeployment> MobileDeployments => Set<MobileDeployment>();
     public DbSet<BackgroundAgent> BackgroundAgents => Set<BackgroundAgent>();
     public DbSet<PlatformUpgrade> PlatformUpgrades => Set<PlatformUpgrade>();
     public DbSet<VisualPromptUi> VisualPromptUis => Set<VisualPromptUi>();
@@ -1621,6 +1622,26 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.PublishHistoryJson).HasColumnType("text");
             // Note: FK to User removed — UserId is string but User.Id is Guid after migration
             entity.HasIndex(e => new { e.UserId, e.DevRequestId }).IsUnique();
+        });
+
+        modelBuilder.Entity<MobileDeployment>(entity =>
+        {
+            entity.ToTable("mobile_deployments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DeploymentType).HasMaxLength(50);
+            entity.Property(e => e.Status).HasMaxLength(30);
+            entity.Property(e => e.AppDescription).HasMaxLength(200);
+            entity.Property(e => e.GeneratedCodeJson).HasColumnType("text");
+            entity.Property(e => e.ExpoQrCodeUrl).HasColumnType("text");
+            entity.Property(e => e.TestFlightUrl).HasMaxLength(500);
+            entity.Property(e => e.AppleBundleId).HasMaxLength(200);
+            entity.Property(e => e.AppleTeamId).HasMaxLength(200);
+            entity.Property(e => e.AppVersion).HasMaxLength(20);
+            entity.Property(e => e.BuildLogsJson).HasColumnType("text");
+            entity.Property(e => e.ErrorMessage).HasColumnType("text");
+            entity.Property(e => e.MetadataJson).HasColumnType("text");
+            entity.HasIndex(e => new { e.UserId, e.DevRequestId });
         });
 
         modelBuilder.Entity<BackgroundAgent>(entity =>

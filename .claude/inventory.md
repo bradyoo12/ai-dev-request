@@ -159,6 +159,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | SupportController | /api/support | Support posts, feedback presets, credit rewards |
 | SuggestionsController | /api/suggestions | Feature suggestions |
 | AgentInboxController | /api/agent-inbox | Agent inbox end-user feedback |
+| TesterController | /api/testers | Beta tester program (apply, approve, dashboard, contributions, leaderboard) |
 
 ### Project Management
 
@@ -382,6 +383,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | MicroserviceService | Microservice architecture |
 | WhiteLabelService | White-label tenancy |
 | AgentInboxService | Agent inbox feedback management |
+| TesterService | Beta tester program (applications, approvals, tiers, contributions, leaderboard) |
 | SubtaskService | Subtask CRUD, AI generation, plan approval |
 
 ---
@@ -550,6 +552,9 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 | ArenaComparison | Model arena comparison |
 | MarketplaceTemplate | Marketplace template listing |
 | AgentInboxItem | End-user feedback item |
+| TesterApplication | Beta tester application (name, email, motivation, status) |
+| TesterProfile | Approved tester profile (tier, points, credits, stats) |
+| TesterContribution | Tester contribution record (type, points, credits awarded) |
 
 ### Analytics & Content
 
@@ -761,6 +766,8 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | PreferencePage | /settings/preferences | User preferences |
 | RecommendationsPage | /recommendations | App recommendations |
 | AgentInboxPage | /settings/agent-inbox | Agent inbox |
+| TesterLandingPage | /testers | Beta tester recruitment (public) |
+| TesterDashboardPage | /testers/dashboard | Beta tester dashboard (protected) |
 | TemplatesPage | /templates | App/website templates gallery with category filtering |
 | TicketProgressPage | /tickets | User ticket progress tracking with status filtering, search, expandable detail with timeline |
 
@@ -1043,6 +1050,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | recommendations.ts | RecommendationController | Recommendations |
 | trends.ts | TechTrendController | Tech trends |
 | agent-inbox.ts | AgentInboxController | Agent inbox |
+| tester.ts | TesterController | Beta tester program |
 
 ### Config & Misc
 

@@ -5,6 +5,7 @@ using System.Text.Json;
 using AiDevRequest.API.Data;
 using AiDevRequest.API.Entities;
 using AiDevRequest.API.Services;
+using AiDevRequest.ServiceDefaults;
 using Docker.DotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,9 @@ using System.Threading.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Aspire service defaults (OpenTelemetry, health checks, service discovery)
+builder.AddServiceDefaults();
 
 // Load local settings (secrets, API keys - not committed to git)
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
@@ -673,11 +677,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Map Aspire default endpoints (health, liveness)
+app.MapDefaultEndpoints();
+
 // Map SignalR hubs
 app.MapHub<AiDevRequest.API.Hubs.PreviewLogsHub>("/hubs/preview-logs");
-
-// Health check endpoint with DB verification
-app.MapHealthChecks("/health");
 
 // Root endpoint for diagnostics
 app.MapGet("/", () => new

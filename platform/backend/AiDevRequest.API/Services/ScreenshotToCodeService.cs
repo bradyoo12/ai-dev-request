@@ -176,12 +176,12 @@ public class ScreenshotToCodeService : IScreenshotToCodeService
                 heading = new { fontFamily = "Inter", fontSize = "24px", fontWeight = "700" },
                 body = new { fontFamily = "Inter", fontSize = "16px", fontWeight = "400" }
             },
-            components = new[]
+            components = new object[]
             {
-                new { type = "header", props = new { title = "Page Title", subtitle = "Page description" } },
-                new { type = "card-grid", props = new { columns = 3, gap = "16px" } },
-                new { type = "card", props = new { hasImage = true, hasTitle = true, hasDescription = true, hasAction = true } },
-                new { type = "footer", props = new { links = 4 } }
+                new { type = "header", props = (object)new { title = "Page Title", subtitle = "Page description" } },
+                new { type = "card-grid", props = (object)new { columns = 3, gap = "16px" } },
+                new { type = "card", props = (object)new { hasImage = true, hasTitle = true, hasDescription = true, hasAction = true } },
+                new { type = "footer", props = (object)new { links = 4 } }
             },
             spacing = new { padding = "24px", gap = "16px", borderRadius = "8px" }
         });

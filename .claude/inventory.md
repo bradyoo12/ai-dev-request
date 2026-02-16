@@ -178,7 +178,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | Controller | Route | Purpose |
 |---|---|---|
 | VoiceController | /api/voice | Voice-driven development input |
-| MobileAppController | /api/mobile-app | Mobile app generation |
+| MobileAppController | /api/mobile-app | Mobile app generation, TestFlight deployment, Expo preview, native code generation |
 | ViewTransitionController | /api/view-transitions | React view transitions |
 | QueryConfigController | /api/query-config | TanStack Query configuration |
 | SemanticSearchController | /api/semantic-search | pgvector semantic search |
@@ -320,6 +320,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | PreviewDeploymentService | Edge preview deployments |
 | PromoteToProductionService | Promote preview to production |
 | ExpoPreviewService | Expo mobile preview |
+| MobileDeploymentService | TestFlight deployment, native code generation, deployment tracking |
 | SandboxExecutionService | Sandboxed code execution |
 | DatabaseBranchService | Database branching |
 | CiCdService | CI/CD pipeline generation |
@@ -457,6 +458,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 | ViewTransitionConfig | View transition config |
 | VoiceConfig | Voice input config |
 | MobileAppConfig | Mobile app generation config |
+| MobileDeployment | Mobile deployment tracking (TestFlight, Expo) |
 
 ### Code Quality & Security
 
@@ -641,7 +643,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | CodeMergePage | /settings/code-merge | Incremental code regen |
 | PlanningModePage | /settings/planning | Planning/discussion mode |
 | VoicePage | /settings/voice | Voice input config |
-| MobileAppPage | /settings/mobile-app | Mobile app generation |
+| MobileAppPage | /settings/mobile-app | Mobile app generation, TestFlight deployment, Expo preview |
 | ViewTransitionPage | /settings/view-transitions | View transitions |
 | QueryConfigPage | /settings/query-config | TanStack Query config |
 | DynamicIntelligencePage | /settings/dynamic-intelligence | Dynamic intelligence |
@@ -920,7 +922,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | refinement.ts | RefinementController | Refinement chat |
 | codemerge.ts | CodeMergeController | Code merge |
 | voice.ts | VoiceController | Voice input |
-| mobileapp.ts | MobileAppController | Mobile app gen |
+| mobileapp.ts | MobileAppController | Mobile app gen, TestFlight deploy, Expo preview |
 | viewtransition.ts | ViewTransitionController | View transitions |
 | queryconfig.ts | QueryConfigController | Query config |
 | agenticplan.ts | AgenticPlanController | Agentic planning |

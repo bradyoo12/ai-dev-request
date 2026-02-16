@@ -54,6 +54,7 @@ public class AgentSkillController : ControllerBase
                 ScriptsJson = dto.ScriptsJson,
                 ResourcesJson = dto.ResourcesJson,
                 TagsJson = dto.TagsJson,
+                SkillType = dto.SkillType,
                 IsPublic = dto.IsPublic,
                 Version = dto.Version,
                 Author = dto.Author,
@@ -85,6 +86,7 @@ public class AgentSkillController : ControllerBase
                 ScriptsJson = dto.ScriptsJson,
                 ResourcesJson = dto.ResourcesJson,
                 TagsJson = dto.TagsJson,
+                SkillType = dto.SkillType,
                 IsPublic = dto.IsPublic,
                 Version = dto.Version,
                 Author = dto.Author,
@@ -183,6 +185,7 @@ public class AgentSkillController : ControllerBase
         ScriptsJson = s.ScriptsJson,
         ResourcesJson = s.ResourcesJson,
         TagsJson = s.TagsJson,
+        SkillType = s.SkillType,
         IsBuiltIn = s.IsBuiltIn,
         IsPublic = s.IsPublic,
         DownloadCount = s.DownloadCount,
@@ -204,6 +207,7 @@ public record AgentSkillDto
     public string? ScriptsJson { get; init; }
     public string? ResourcesJson { get; init; }
     public string? TagsJson { get; init; }
+    public string? SkillType { get; init; }
     public bool IsBuiltIn { get; init; }
     public bool IsPublic { get; init; }
     public int DownloadCount { get; init; }
@@ -223,6 +227,7 @@ public record CreateAgentSkillDto
     public string? ScriptsJson { get; init; }
     public string? ResourcesJson { get; init; }
     public string? TagsJson { get; init; }
+    public string? SkillType { get; init; }
     public bool IsPublic { get; init; }
     public string? Version { get; init; }
     public string? Author { get; init; }
@@ -238,6 +243,7 @@ public record UpdateAgentSkillDto
     public string? ScriptsJson { get; init; }
     public string? ResourcesJson { get; init; }
     public string? TagsJson { get; init; }
+    public string? SkillType { get; init; }
     public bool IsPublic { get; init; }
     public string? Version { get; init; }
     public string? Author { get; init; }

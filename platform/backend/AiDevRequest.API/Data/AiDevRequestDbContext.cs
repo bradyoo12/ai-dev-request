@@ -271,6 +271,11 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.FixHistory)
                 .HasColumnType("jsonb");
 
+            entity.Property(e => e.ProjectMode)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .HasDefaultValue(ProjectMode.Standard);
+
             // FK to User removed: UserId is string but User.Id is Guid (type mismatch after migration)
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);

@@ -43,6 +43,8 @@ const ReferralPage = lazy(() => import('./pages/ReferralPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const DiscussionsPage = lazy(() => import("./pages/DiscussionsPage"))
 const DiscussionDetailPage = lazy(() => import("./pages/DiscussionDetailPage"))
+const ModeSelectionPage = lazy(() => import('./pages/ModeSelectionPage'))
+const ProModePlaceholder = lazy(() => import('./pages/ProModePlaceholder'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 /**
@@ -62,6 +64,8 @@ export function AppRoutes() {
       <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Suspense fallback={LazyFallback}><HomePage /></Suspense>} />
+            <Route path="/mode-select" element={<Suspense fallback={LazyFallback}><ModeSelectionPage /></Suspense>} />
+            <Route path="/pro" element={<Suspense fallback={LazyFallback}><ProModePlaceholder /></Suspense>} />
             <Route path="/settings" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/specifications" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/github-sync" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />

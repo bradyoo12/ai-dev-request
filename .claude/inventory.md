@@ -63,6 +63,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | ComplianceController | /api/compliance | OAuth compliance reporting |
 | OAuthComplianceController | /api/oauth-compliance | OAuth security compliance |
 | SecretDetectionController | /api/projects/{id}/secrets | Secret detection & config |
+| CodeReviewAgentController | /api/code-review-agent | Automated AI code review with pattern-matching analysis |
 
 ### Testing & Validation
 
@@ -277,6 +278,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | AccessibilityService | Accessibility compliance checking |
 | SelfHealingService | Self-healing code fixes |
 | SelfHealingTestService | Self-healing test execution |
+| CodeReviewAgentService | Pattern-matching code review (security, quality, best practices) |
 
 ### Testing
 
@@ -660,6 +662,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | OAuthCompliancePage | /settings/oauth-compliance | OAuth compliance detail |
 | SecretDetectionPage | /settings/secret-detection | Secret detection |
 | SemanticSearchPage | /settings/semantic-search | Semantic search |
+| CodeReviewAgentPage | /code-review | Automated AI code review agent |
 
 ### Testing
 
@@ -941,6 +944,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 | oauth-compliance.ts | OAuthComplianceController | OAuth compliance |
 | secrets.ts | SecretDetectionController | Secret detection |
 | semantic-search.ts | SemanticSearchController | Semantic search |
+| codeReviewAgent.ts | CodeReviewAgentController | AI code review agent |
 
 ### Testing
 

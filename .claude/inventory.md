@@ -811,7 +811,7 @@ All under `platform/frontend/src/components/`.
 | StepIndicator | Multi-step progress indicator |
 | ValidationProgress | Validation progress display |
 | PowerLevelSelector | AI power level (model) selector |
-| LanguageSelector | Programming language picker |
+| LanguageSelector | UI language picker (7 languages: ko, en, es, zh, fr, de, ja) |
 | PlanSelectionDialog | Plan/subscription selection modal |
 | CreditEstimatePreview | Compact credit cost preview in request form |
 | CreditEstimateCard | Detailed credit usage summary with step breakdown |
@@ -858,6 +858,21 @@ All under `platform/frontend/src/components/`.
 |---|---|
 | FadeIn | Fade-in animation wrapper |
 | StaggerChildren | Staggered children animation |
+
+---
+
+## Frontend i18n (Internationalization)
+
+| File | Purpose |
+|------|---------|
+| `src/i18n.ts` | i18next configuration with 7 languages |
+| `src/locales/ko.json` | Korean translations (default, 5096 keys) |
+| `src/locales/en.json` | English translations (5096 keys) |
+| `src/locales/es.json` | Spanish translations (5096 keys) |
+| `src/locales/zh.json` | Chinese Simplified translations (5096 keys) |
+| `src/locales/fr.json` | French translations (5096 keys) |
+| `src/locales/de.json` | German translations (5096 keys) |
+| `src/locales/ja.json` | Japanese translations (5096 keys) |
 
 ---
 

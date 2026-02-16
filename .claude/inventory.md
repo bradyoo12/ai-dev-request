@@ -2,7 +2,7 @@
 
 Complete map of all existing code in the ai-dev-request platform. Use this to find existing code and avoid creating duplicates.
 
-**Counts**: 109 Controllers | 96 Services | 120 Entities | 106 Pages | 98 API modules | 34 Components
+**Counts**: 110 Controllers | 97 Services | 121 Entities | 107 Pages | 99 API modules | 34 Components
 
 ---
 
@@ -127,6 +127,7 @@ All under `platform/backend/AiDevRequest.API/Controllers/`. Route prefix: `/api/
 | McpIntegrationController | /api/mcp | MCP tool exposure & server connections |
 | McpGatewayController | /api/mcp-gateway | MCP gateway for multi-agent tool orchestration |
 | McpToolIntegrationController | /api/mcp-tools | MCP tool integration for code gen |
+| McpServerController | /api/mcp-server | MCP server management, tools, resources, stats |
 | GitHubSyncController | /api/projects/{id}/github | Bidirectional GitHub sync |
 | BidirectionalGitSyncController | /api/bidir-sync | Full bidirectional git sync |
 | GitBranchController | /api/git-branch | Git branch per chat |
@@ -335,6 +336,7 @@ All under `platform/backend/AiDevRequest.API/Services/`.
 | GitHubSyncService | GitHub bidirectional sync |
 | GitBranchService | Git branch management |
 | McpIntegrationService | MCP tool integration |
+| McpServerService | MCP server management, tools, resources, connection testing |
 | DomainService | Custom domain management |
 
 ### Agents & Orchestration
@@ -529,6 +531,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 |---|---|
 | McpConnection | MCP server connection |
 | McpGatewayServer | MCP gateway server config |
+| McpServer | MCP server config (type, endpoint, tools, resources, capabilities) |
 | McpToolIntegration | MCP tool integration |
 | GitHubSync | GitHub sync configuration |
 | BidirectionalGitSync | Bidirectional git sync config |
@@ -718,6 +721,7 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 |---|---|---|
 | McpIntegrationPage | /settings/mcp-integration | MCP integration |
 | McpGatewayPage | /settings/mcp-gateway | MCP gateway |
+| McpServerPage | /settings/mcp-server | MCP server management (overview, servers, tools & resources) |
 | McpToolIntegrationPage | /settings/mcp-tools | MCP tool integration |
 | GitHubSyncPage | /settings/github-sync | GitHub sync |
 | BidirectionalGitSyncPage | /settings/bidir-sync | Bidirectional git sync |
@@ -1000,6 +1004,7 @@ All under `platform/frontend/src/api/`. 92 modules total.
 |---|---|---|
 | mcp-integration.ts | McpIntegrationController | MCP integration |
 | mcpgateway.ts | McpGatewayController | MCP gateway |
+| mcpserver.ts | McpServerController | MCP server management |
 | mcp-tools.ts | McpToolIntegrationController | MCP tools |
 | github-sync.ts | GitHubSyncController | GitHub sync |
 | bidir-sync.ts | BidirectionalGitSyncController | Bidirectional sync |

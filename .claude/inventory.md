@@ -389,7 +389,7 @@ All under `platform/backend/AiDevRequest.API/Entities/`. 112 entities total.
 
 | Entity | Purpose |
 |---|---|
-| DevRequest | Development request (main entity) |
+| DevRequest | Development request (main entity, includes ProjectMode: Standard/Pro) |
 | User | User account |
 | Project | Deployed project with URL, cost, and logs |
 | ProjectLog | Real-time project logs (debug, info, warning, error) |
@@ -594,6 +594,8 @@ All under `platform/frontend/src/pages/`. 102 pages total.
 | Page | Route | Purpose |
 |---|---|---|
 | HomePage | / | Landing page with hero, features, pricing, subtask generation/approval in proposal view |
+| ModeSelectionPage | /mode-select | Standard/Pro mode selection with animated cards (Framer Motion) |
+| ProModePlaceholder | /pro | Pro mode "Coming Soon" placeholder with GitHub integration teaser |
 | LoginPage | (modal) | Login/register modal |
 | NotFoundPage | * | 404 page |
 | PatentsPage | /patents | Platform patent innovations showcase (20 patents, 3 tiers) |

@@ -149,6 +149,7 @@ builder.Services.AddScoped<IReferralService, ReferralService>();
 builder.Services.AddScoped<IAgentFrameworkService, AgentFrameworkService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddSingleton<ICodeReviewAgentService, CodeReviewAgentService>();
+builder.Services.AddScoped<ITesterService, TesterService>();
 
 // Add SSR (Server-Side Rendering) service for pre-rendered page delivery
 builder.Services.AddSingleton<ISsrService, SsrService>();

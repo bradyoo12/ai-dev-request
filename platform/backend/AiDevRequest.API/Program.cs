@@ -197,12 +197,28 @@ if (string.IsNullOrEmpty(connectionString))
     }
 }
 
+// Configure connection pooling to prevent pool exhaustion on Azure PostgreSQL Basic tier
+var csBuilder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString)
+{
+    MaxPoolSize = 20,
+    MinPoolSize = 2,
+    ConnectionIdleLifetime = 300,
+    ConnectionPruningInterval = 10,
+    Timeout = 30,
+    CommandTimeout = 30
+};
+var pooledConnectionString = csBuilder.ToString();
+
 builder.Services.AddDbContext<AiDevRequestDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(pooledConnectionString, npgsqlOptions =>
+        npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 3,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
+            errorCodesToAdd: null)));
 
 // Add health checks with DB verification
 builder.Services.AddHealthChecks()
-    .AddNpgSql(connectionString, name: "database", tags: ["ready"]);
+    .AddNpgSql(pooledConnectionString, name: "database", tags: ["ready"]);
 
 // Add Rate Limiting for auth endpoints
 builder.Services.AddRateLimiter(options =>

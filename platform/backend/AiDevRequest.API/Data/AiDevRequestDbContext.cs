@@ -2149,7 +2149,6 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.Framework).HasMaxLength(50);
             entity.Property(e => e.StylingLib).HasMaxLength(50);
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
         });
 
@@ -2165,7 +2164,6 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ToolsJson).HasColumnType("text");
             entity.Property(e => e.ResourcesJson).HasColumnType("text");
             entity.Property(e => e.CapabilitiesJson).HasColumnType("text");
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.ServerType);

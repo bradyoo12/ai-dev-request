@@ -23,9 +23,16 @@ public class McpServerController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] Guid? projectId)
     {
-        var userId = GetUserId();
-        var servers = await _service.GetByProjectAsync(userId, projectId);
-        return Ok(servers);
+        try
+        {
+            var userId = GetUserId();
+            var servers = await _service.GetByProjectAsync(userId, projectId);
+            return Ok(servers);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message, inner = ex.InnerException?.Message });
+        }
     }
 
     // GET /api/mcp-server/{id}
@@ -98,8 +105,15 @@ public class McpServerController : ControllerBase
     [HttpGet("stats")]
     public async Task<IActionResult> GetStats()
     {
-        var userId = GetUserId();
-        var stats = await _service.GetServerStatsAsync(userId);
-        return Ok(stats);
+        try
+        {
+            var userId = GetUserId();
+            var stats = await _service.GetServerStatsAsync(userId);
+            return Ok(stats);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message, inner = ex.InnerException?.Message });
+        }
     }
 }

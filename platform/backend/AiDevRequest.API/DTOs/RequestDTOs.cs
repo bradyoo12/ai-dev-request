@@ -40,6 +40,11 @@ public record CreateDevRequestDto
     /// Used to associate requests with a browser session before the user signs up.
     /// </summary>
     public string? AnonymousUserId { get; init; }
+
+    /// <summary>
+    /// Project creation mode: Standard (default) or Pro
+    /// </summary>
+    public ProjectMode ProjectMode { get; init; } = ProjectMode.Standard;
 }
 
 public record DevRequestResponseDto
@@ -121,7 +126,8 @@ public static class DevRequestMappings
             ScreenshotMediaType = dto.ScreenshotMediaType,
             Framework = dto.Framework,
             PowerLevel = powerLevel,
-            PreferredModel = dto.PreferredModel
+            PreferredModel = dto.PreferredModel,
+            ProjectMode = dto.ProjectMode
         };
     }
 }

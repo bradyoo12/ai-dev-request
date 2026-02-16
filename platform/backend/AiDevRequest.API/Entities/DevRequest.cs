@@ -28,6 +28,9 @@ public class DevRequest
     // AI power level for dynamic intelligence
     public PowerLevel PowerLevel { get; set; } = PowerLevel.Standard;
 
+    // Project creation mode (Standard or Pro)
+    public ProjectMode ProjectMode { get; set; } = ProjectMode.Standard;
+
     // Preferred AI model (provider-qualified format: "claude:claude-sonnet-4-5-20250929")
     public string? PreferredModel { get; set; }
 
@@ -127,4 +130,10 @@ public enum PowerLevel
     Standard = 0,   // 표준 - 빠른 분석
     Extended = 1,   // 확장 사고 - 단계별 추론
     HighPower = 2   // 고성능 - 최고 성능 모델
+}
+
+public enum ProjectMode
+{
+    Standard = 0,
+    Pro = 1
 }

@@ -46,6 +46,8 @@ const DiscussionDetailPage = lazy(() => import("./pages/DiscussionDetailPage"))
 const ModeSelectionPage = lazy(() => import('./pages/ModeSelectionPage'))
 const ProModePlaceholder = lazy(() => import('./pages/ProModePlaceholder'))
 const CodeReviewAgentPage = lazy(() => import('./pages/CodeReviewAgentPage'))
+const TesterLandingPage = lazy(() => import('./pages/TesterLandingPage'))
+const TesterDashboardPage = lazy(() => import('./pages/TesterDashboardPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 /**
@@ -185,6 +187,8 @@ export function AppRoutes() {
             <Route path="/settings/react-performance" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/mcp-server" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
             <Route path="/settings/aspire-dashboard" element={<ProtectedRoute><Suspense fallback={LazyFallback}><SettingsLayout /></Suspense></ProtectedRoute>} />
+            <Route path="/testers" element={<Suspense fallback={LazyFallback}><TesterLandingPage /></Suspense>} />
+            <Route path="/testers/dashboard" element={<ProtectedRoute><Suspense fallback={LazyFallback}><TesterDashboardPage /></Suspense></ProtectedRoute>} />
             <Route path="/code-review" element={<ProtectedRoute><Suspense fallback={LazyFallback}><CodeReviewAgentPage /></Suspense></ProtectedRoute>} />
             <Route path="/auth/callback/:provider" element={<div className="flex items-center justify-center py-24"><div className="animate-spin w-10 h-10 border-4 border-accent-blue border-t-transparent rounded-full" /></div>} />
             <Route path="*" element={<Suspense fallback={LazyFallback}><NotFoundPage /></Suspense>} />

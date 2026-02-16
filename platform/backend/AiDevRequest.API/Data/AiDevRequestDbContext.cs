@@ -202,6 +202,9 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<DiscussionMessage> DiscussionMessages => Set<DiscussionMessage>();
     public DbSet<ScreenshotToCode> ScreenshotToCodeConversions => Set<ScreenshotToCode>();
     public DbSet<McpServer> McpServers => Set<McpServer>();
+    public DbSet<TesterApplication> TesterApplications => Set<TesterApplication>();
+    public DbSet<TesterProfile> TesterProfiles => Set<TesterProfile>();
+    public DbSet<TesterContribution> TesterContributions => Set<TesterContribution>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2167,6 +2170,41 @@ public class AiDevRequestDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => e.ServerType);
+        });
+
+        modelBuilder.Entity<TesterApplication>(entity =>
+        {
+            entity.ToTable("tester_applications");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Motivation).IsRequired().HasMaxLength(5000);
+            entity.Property(e => e.ExperienceLevel).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.InterestedAreas).HasMaxLength(500);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.UserId).IsUnique();
+            entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<TesterProfile>(entity =>
+        {
+            entity.ToTable("tester_profiles");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Tier).IsRequired().HasMaxLength(50);
+            entity.HasIndex(e => e.UserId).IsUnique();
+            entity.HasIndex(e => e.ContributionPoints);
+        });
+
+        modelBuilder.Entity<TesterContribution>(entity =>
+        {
+            entity.ToTable("tester_contributions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(2000);
+            entity.HasIndex(e => e.TesterProfileId);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

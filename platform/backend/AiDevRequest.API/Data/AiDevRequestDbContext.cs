@@ -201,6 +201,7 @@ public class AiDevRequestDbContext : DbContext
     public DbSet<Discussion> Discussions => Set<Discussion>();
     public DbSet<DiscussionMessage> DiscussionMessages => Set<DiscussionMessage>();
     public DbSet<ScreenshotToCode> ScreenshotToCodeConversions => Set<ScreenshotToCode>();
+    public DbSet<McpServer> McpServers => Set<McpServer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -2150,6 +2151,24 @@ public class AiDevRequestDbContext : DbContext
             entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
             entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
+        });
+
+        modelBuilder.Entity<McpServer>(entity =>
+        {
+            entity.ToTable("mcp_servers");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.ServerType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Endpoint).HasMaxLength(500);
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.ToolsJson).HasColumnType("text");
+            entity.Property(e => e.ResourcesJson).HasColumnType("text");
+            entity.Property(e => e.CapabilitiesJson).HasColumnType("text");
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.ServerType);
         });
     }
 }

@@ -97,7 +97,7 @@ When any rate limit drops below 20% remaining OR hits 403/429 errors:
 - **Step 3a**: Check before claiming ticket (GraphQL operations)
 - **Step 4**: Check before merging PR and moving status
 - **Step 5c**: Check before moving ticket to Done
-- **Step 6d/7c**: Check before creating multiple tickets
+- **Step 6c**: Check before creating multiple tickets
 
 ## Overview
 
@@ -114,9 +114,8 @@ This command orchestrates the entire development workflow using Agent Teams for 
 │  4b. GitHub Actions health check → find & fix CI failures        │
 │  5. b-review team → parallel test + verify on staging            │
 │  5e. Doc maintenance → update inventory/design if changed        │
-│  6. b-modernize team → parallel research + create suggestions    │
-│  7. Site audit → visit live site, find errors, create tickets    │
-│  8. Report status, check stop signal, start from Step 1          │
+│  6. Site audit → visit live site, find errors, create tickets    │
+│  7. Report status, check stop signal, start from Step 1          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -130,7 +129,6 @@ Teams are used within a single ticket to parallelize independent work:
 | b-progress | No team | Single operation | Simple merge, no parallelism needed |
 | Actions check | No team | Single operation | Diagnose & fix CI failures sequentially |
 | b-review | `review-<ticket#>` | test-runner + ai-verifier | E2E tests and AI verification run independently |
-| b-modernize | `modernize` | tech-scout + competitor-scout | Independent web searches |
 | site-audit | `site-audit` | error-checker + ux-reviewer | Error checking and UX review run independently |
 
 **Rule: ONE ticket at a time.** Teams work collaboratively on the SAME ticket. Never process multiple tickets simultaneously.
@@ -434,7 +432,7 @@ Implement and locally test ONE Ready ticket using an Agent Team.
    echo "$PROJECT_ITEMS" | jq '...'
    ```
 2. Filter for issues with "Ready" status and no `on hold` label
-3. If no ticket found, skip to Step 4. **If Steps 3–5 all find no tickets to process** (no Ready, no In Progress with PRs, no In Review), **jump directly to Step 6 (b-modernize)** to use idle time productively researching technologies and competitors.
+3. If no ticket found, skip to Step 4.
 4. **Check GraphQL rate limit before claiming** (claiming uses GraphQL):
    ```bash
    GRAPHQL_REMAINING=$(gh api rate_limit --jq '.resources.graphql.remaining')
@@ -1060,15 +1058,13 @@ After a ticket is verified and completed, update the project documentation to re
 
 **After completing this step, continue to Step 6.**
 
-### Step 6: b-modernize — Research with Agent Team
+### Step 6: UI Testing and Site Audit
 
-Search for recent technologies and create suggestion tickets using parallel researchers.
-
-**This step also runs as an idle fallback:** If Steps 3–5 all found no tickets to process (no Ready tickets, no In Progress PRs to merge, no In Review tickets to verify), b-modernize runs automatically so the pipeline stays productive instead of looping empty cycles.
+Test all links and buttons on the live UI, then audit for errors, bugs, and UX improvements.
 
 #### Step 6a: Playwright UI Smoke Test (Idle Pre-check)
 
-Before researching new technologies, use Playwright to test all links and buttons on the live UI to catch any errors or unexpected results.
+Before auditing the site, use Playwright to test all links and buttons on the live UI to catch any errors or unexpected results.
 
 1. Pull latest and install deps (worktree-safe):
    ```bash
@@ -1124,106 +1120,9 @@ Before researching new technologies, use Playwright to test all links and button
      bash .claude/scripts/gh-project-cache.sh invalidate
      ```
 
-4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to b-modernize research.
+4. If new Ready tickets were created from UI issues, **loop back to Step 3** to process them instead of continuing to site audit.
 
-#### Step 6b: Pre-check
-
-1. Check existing open suggestion tickets (REST):
-   ```bash
-   gh api "repos/bradyoo12/ai-dev-request/issues?state=open&labels=suggestion&per_page=50" --jq '[.[] | {number, title}]'
-   ```
-2. If 4+ suggestion tickets exist in Backlog, skip b-modernize entirely
-
-#### Step 6c: Create Research Team
-
-1. Create the team:
-   ```
-   TeamCreate: modernize
-   ```
-
-2. **Spawn BOTH scouts in parallel and wait** (use parallel synchronous Task - see "How to Wait for Agents" above):
-
-   In a SINGLE message, spawn both agents with two Task calls:
-   ```
-   Task(subagent_type: "general-purpose", team_name: "modernize", name: "tech-scout", prompt: "...")
-   Task(subagent_type: "general-purpose", team_name: "modernize", name: "competitor-scout", prompt: "...")
-   ```
-
-   **tech-scout** agent:
-   - Searches for recent technologies: AI code generation, agent frameworks, .NET innovations, React ecosystem, DevOps tools
-   - Evaluates relevance, effort, and impact scores
-   - Reports top findings with scores
-
-   **competitor-scout** agent:
-   - Researches competitor features: Replit, Base44, Bolt.new, v0.dev, Cursor
-   - Evaluates differentiation, user value, feasibility
-   - Reports top findings with scores
-
-   **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
-
-#### Step 6d: Create Tickets
-
-After collecting findings from both scouts:
-1. Filter for qualifying technologies (relevance >= 3, impact >= 3, effort <= 4)
-2. Deduplicate against existing tickets
-3. Create suggestion tickets for qualifying findings (REST):
-   ```bash
-   gh api --method POST "repos/bradyoo12/ai-dev-request/issues" -f title="{title}" -f body="{body}" -f "labels[]=suggestion"
-   ```
-4. Add each ticket to the project and set status to **Ready** (with error handling):
-   ```bash
-   # Add to project
-   ITEM_ID=$(gh project item-add 26 --owner bradyoo12 --url {issue_url} --format json --jq '.id')
-
-   if [ -z "$ITEM_ID" ]; then
-     echo "❌ ERROR: Failed to add suggestion ticket to project board"
-   else
-     # Set status to Ready with error handling
-     if ! gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id "$ITEM_ID" \
-          --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c 2>&1; then
-
-       # Failed - try switching accounts
-       CURRENT_USER=$(gh api user --jq '.login' 2>/dev/null)
-       echo "❌ Failed to set status (account: $CURRENT_USER), retrying..."
-
-       [ "$CURRENT_USER" = "bradyoo12" ] && gh auth switch -u byooxbert || gh auth switch -u bradyoo12
-
-       # Retry
-       gh project item-edit --project-id PVT_kwHNf9fOATn4hA --id "$ITEM_ID" \
-         --field-id PVTSSF_lAHNf9fOATn4hM4PS3yh --single-select-option-id 61e4505c 2>&1 \
-         && echo "✓ Retry succeeded" || echo "❌ Retry failed - ticket has No Status"
-     else
-       echo "✓ Status set to Ready"
-     fi
-
-     # Move to top (best-effort)
-     gh api graphql -f query="mutation { updateProjectV2ItemPosition(input: { projectId: \"PVT_kwHNf9fOATn4hA\", itemId: \"$ITEM_ID\" }) { item { id } } }" 2>/dev/null
-   fi
-   ```
-5. Invalidate cache after adding tickets:
-   ```bash
-   bash .claude/scripts/gh-project-cache.sh invalidate
-   ```
-
-#### Step 6e: Cleanup
-
-Shut down all agents, delete the team.
-
-**After completing this step, continue to Step 7.**
-
-### Step 7: Site Audit — Find Errors and Improvements
-
-After modernization research, audit the live site to catch errors, bugs, and UX improvements.
-
-#### Step 7a: Pre-check
-
-1. Check existing open bug/improvement tickets to avoid duplicates (REST):
-   ```bash
-   gh api "repos/bradyoo12/ai-dev-request/issues?state=open&per_page=100" --paginate --jq '[.[] | {number, title, labels: [.labels[].name]}]'
-   ```
-2. Note all existing titles for dedup
-
-#### Step 7b: Create Audit Team
+#### Step 6b: Create Audit Team
 
 1. Create the team:
    ```
@@ -1265,7 +1164,7 @@ After modernization research, audit the live site to catch errors, bugs, and UX 
 
    **WAIT**: Both Task calls execute in parallel. The message blocks until BOTH agents complete. You will receive TWO tool results (one from each agent).
 
-#### Step 7c: Create Tickets
+#### Step 6c: Create Tickets
 
 After collecting findings from both agents:
 
@@ -1314,13 +1213,13 @@ After collecting findings from both agents:
    bash .claude/scripts/gh-project-cache.sh invalidate
    ```
 
-#### Step 7d: Cleanup
+#### Step 6d: Cleanup
 
 Shut down all agents, delete the team.
 
-**After completing this step, continue to Step 8.**
+**After completing this step, continue to Step 7.**
 
-### Step 8: Report Cycle Status and Loop
+### Step 7: Report Cycle Status and Loop
 
 Log the current status of the project board, check for stop signal, then start the next cycle:
 
@@ -1416,7 +1315,7 @@ Log the current status of the project board, check for stop signal, then start t
 - **Rate Limit Optimization** — The project board is fetched in Step 1.5 and cached in `$PROJECT_ITEMS` for reuse throughout the cycle. Only re-fetch when necessary:
   - After claiming a ticket in Step 3a (to verify the claim)
   - Before Step 5a (after Step 4 made changes)
-  - Before Step 8 (to get final state for reporting)
+  - Before Step 7 (to get final state for reporting)
   This reduces GraphQL API calls from ~4-5 per cycle to ~2-3 per cycle, preventing rate limit exhaustion.
 - **Move to top on status change** — After every `gh project item-edit` that changes a ticket's status, immediately move the item to the top of the column so it's visible on the board:
   ```bash
@@ -1432,66 +1331,6 @@ Log the current status of the project board, check for stop signal, then start t
 - Tickets out of alignment get `on hold` label automatically
 - Human removes `on hold` label to signal approval/readiness
 
-## Self-Update Protocol (MANDATORY)
+## Historical Issues and Resolutions
 
-**After EVERY run** of this command, update this file:
-
-### When to Update
-- After encountering an error that took multiple attempts to resolve
-- After discovering a missing prerequisite or undocumented dependency
-- After finding a workaround for an environment or tooling issue
-- After a successful run if you noticed something that could be improved
-
-### How to Update
-1. Append a new entry to the `## Lessons Learned` section below
-2. Use this format:
-   ```
-   ### [YYYY-MM-DD] <Short Title>
-   - **Problem**: What went wrong or was time-consuming
-   - **Solution**: What fixed it or the workaround used
-   - **Prevention**: What to do differently next time
-   ```
-
----
-
-## Lessons Learned
-
-### [2026-02-07] Azure App Service auto-disables after startup crashes
-- **Problem**: After deploying a backend change that caused the .NET app to crash on startup (migration bootstrap logic tried to INSERT into nonexistent `__EFMigrationsHistory` table), Azure auto-disabled the App Service entirely. Subsequent deployments then fail with "Site Disabled (CODE: 403)" and cannot deploy the fix.
-- **Solution**: The code fix (ensure `__EFMigrationsHistory` table exists before INSERT, and don't crash on migration failure) was merged to main. However, someone with Azure portal access must manually re-enable the App Service before the fix can be deployed.
-- **Prevention**: Always ensure migration bootstrap logic handles missing tables gracefully. Never let migration failures crash the application startup — log and continue so the app remains accessible for diagnostics. Consider adding a health check endpoint that works even when migrations fail.
-
-### [2026-02-07] EnsureCreatedAsync vs MigrateAsync for existing databases
-- **Problem**: The original code used `EnsureCreatedAsync()` which only creates a new database from scratch and cannot apply incremental schema changes. When new entities were added, the staging database (which already existed) never got the new tables, causing 500 errors on all database-dependent endpoints.
-- **Solution**: Replaced with `MigrateAsync()` plus EF Core migrations. Added bootstrap logic to detect legacy databases (created by `EnsureCreatedAsync`) and insert the initial migration record so `MigrateAsync()` doesn't try to re-create existing tables.
-- **Prevention**: Always use EF Core migrations from the start. Never use `EnsureCreatedAsync()` in any environment beyond initial prototyping.
-
-### [2026-02-07] Duplicate tickets (#41 and #43) addressing same issue
-- **Problem**: Tickets #41 and #43 both described the same staging 500 error from different angles. Both were in Ready status.
-- **Solution**: Treated #41 as the primary ticket (migration fix) and #43 as a follow-up (startup crash fix + error handling). Both ended up being processed sequentially.
-- **Prevention**: During audit, identify duplicates early and close/merge them before entering the b-ready phase.
-
-### [2026-02-07] Azure App Service Free tier (F1) quota exceeded blocks all deployments
-- **Problem**: The Free F1 App Service Plan has a 60 CPU-minutes/day quota. Repeated startup crashes burned through the quota, causing "QuotaExceeded" state and 403 "Site Disabled" on all deployment attempts. Quota resets at midnight UTC (~19 hours away).
-- **Solution**: Scaled the App Service Plan from F1 (Free) to B1 (Basic, ~$13/month) using `az appservice plan update --sku B1`. This immediately lifted the quota restriction.
-- **Prevention**: Use at least B1 tier for staging environments. F1 is only suitable for static sites or minimal testing.
-
-### [2026-02-07] No database configured for Azure deployment
-- **Problem**: The backend had no database connection string configured in Azure App Settings. It fell back to `Host=localhost` which doesn't work on Azure. The error handling in controllers returned default/empty data, masking the real issue (no database).
-- **Solution**: Created an `ai_dev_request` database on the existing `db-bradyoo-staging` PostgreSQL Flexible Server. Configured the connection string via Azure REST API (to avoid bash escaping issues with special characters in the password).
-- **Prevention**: Always verify database infrastructure exists BEFORE deploying a new service. Add connection string configuration to the deployment workflow or IaC. Consider adding a startup check that logs a clear warning if the database is unreachable.
-
-### [2026-02-07] Bash escaping mangles special characters in Azure CLI settings
-- **Problem**: Setting ConnectionStrings__DefaultConnection via "az webapp config appsettings set" mangled the password — the "!" character was escaped to "\!" by bash history expansion, even with single quotes.
-- **Solution**: Used `az rest --method PUT --body @file.json` with the connection string in a JSON file to bypass all shell escaping.
-- **Prevention**: For Azure App Settings containing special characters, always use `az rest` with a JSON body file instead of `az webapp config appsettings set`.
-
-### [2026-02-14] Startup allTables check blocks MigrateAsync from creating new tables
-- **Problem**: Adding new tables to the `allTables` array in `Program.cs` causes the startup partial-database detection to throw `InvalidOperationException` in staging/production before `MigrateAsync` runs. This creates a chicken-and-egg problem: migrations can't create new tables because the startup crashes when those tables don't exist.
-- **Solution**: Changed the partial-database path in staging/production from throwing to logging a warning and proceeding with `MigrateAsync`. Also made migrations idempotent (IF EXISTS/IF NOT EXISTS) and made SupportController fault-tolerant for schema mismatches.
-- **Prevention**: Never throw before `MigrateAsync` for missing tables — missing tables are usually just pending migrations. Always make migrations idempotent with IF EXISTS/IF NOT EXISTS guards. Make controllers fault-tolerant with try-catch for database queries that may fail due to schema differences.
-
-### [2026-02-15] Silent GraphQL rate limit failures left 13 tickets with "No Status"
-- **Problem**: 13 tickets (created Feb 13-14 by b-modernize and site-audit) were successfully added to the project board but had "No Status" instead of "Ready". The `gh project item-add` succeeded, but the subsequent `gh project item-edit` (to set status) failed silently due to GraphQL rate limit exhaustion. Bash scripts without strict error handling (`set -e`) continued execution despite the failure.
-- **Solution**: Added comprehensive error handling to all ticket creation sections (Steps 4b-3, 6a, 6d, 7c): 1) Check if ITEM_ID is empty after item-add, 2) Check exit code of item-edit command, 3) On failure, switch GitHub accounts (bradyoo12 ↔ byooxbert) and retry once, 4) Log clear error messages if both attempts fail. Manually fixed the 13 affected tickets by switching to byooxbert account (which had remaining GraphQL quota) and setting their status to Ready.
-- **Prevention**: Always check exit codes and capture stderr for GitHub API commands. Use the account switching pattern when rate limits are hit. Add retry logic with alternate account for all GraphQL project operations. Monitor for "No Status" tickets in Step 2 audit and auto-fix them. Consider implementing a periodic cleanup job that finds and fixes tickets with missing status.
+For a historical record of issues encountered during b-start runs and their solutions, see [b-start-lessons.md](b-start-lessons.md).

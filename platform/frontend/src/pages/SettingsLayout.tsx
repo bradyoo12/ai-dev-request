@@ -27,6 +27,7 @@ const AnalyticsDashboardPage = lazy(() => import('./AnalyticsDashboardPage'))
 const MarketplacePage = lazy(() => import('./MarketplacePage'))
 const ContainerizationPage = lazy(() => import('./ContainerizationPage'))
 const TestGenerationPage = lazy(() => import('./TestGenerationPage'))
+const AutonomousTestingPage = lazy(() => import('./AutonomousTestingPage'))
 const CollaborativeEditingPage = lazy(() => import('./CollaborativeEditingPage'))
 const OnboardingPage = lazy(() => import('./OnboardingPage'))
 const ProjectVersionPage = lazy(() => import('./ProjectVersionPage'))
@@ -123,12 +124,13 @@ const PatentAgentPage = lazy(() => import('./PatentAgentPage'))
 const StreamingCodeGenPage = lazy(() => import('./StreamingCodeGenPage'))
 const ManagedBackendPage = lazy(() => import('./ManagedBackendPage'))
 const AgentFrameworkPage = lazy(() => import('./AgentFrameworkPage'))
+const ScreenshotToCodePage = lazy(() => import('./ScreenshotToCodePage'))
 
 const TabFallback = <div className="flex items-center justify-center py-12"><div className="animate-spin w-8 h-8 border-4 border-accent-blue border-t-transparent rounded-full" /></div>
 
-type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing' | 'context-index' | 'deployment-health' | 'generative-ui' | 'mobile-app' | 'background-agents' | 'platform-upgrade' | 'visual-prompt' | 'multi-framework' | 'view-transitions' | 'nl-schema' | 'query-config' | 'agentic-planning' | 'visual-regression' | 'mcp-gateway' | 'codebase-memory' | 'figma-import' | 'arena' | 'visual-overlay' | 'semantic-search' | 'planning-mode' | 'project-docs' | 'ai-elements' | 'review-pipeline' | 'oauth-connectors' | 'mcp-tools' | 'ai-model' | 'bidir-sync' | 'self-healing-test' | 'multi-agent-test' | 'database-branching' | 'sandbox' | 'dynamic-intelligence' | 'agent-automation' | 'usage-dashboard' | 'orchestration' | 'langgraph' | 'hybrid-cache' | 'playwright-healing' | 'self-healing-code' | 'production-sandboxes' | 'org-memory' | 'agent-rules' | 'server-components' | 'code-lint' | 'vector-search' | 'repl-test' | 'agent-terminal' | 'composer' | 'dotnet-perf' | 'multi-model' | 'biome-lint' | 'deepwiki' | 'build-toolchain' | 'vision-to-code' | 'dotnet10-upgrade' | 'parallel-agents' | 'webmcp' | 'agent-sdk' | 'auto-terminal' | 'turso-database' | 'workers-ai' | 'react-use-hook' | 'edit-predictions' | 'browser-ide' | 'governance' | 'inference-cost' | 'language-expansion' | 'hybrid-validation' | 'agent-messages' | 'agentic-workflows' | 'agent-trace' | 'confidence-scoring' | 'ai-marketplace' | 'agent-inbox' | 'agent-skills' | 'agent-teams' | 'agent-builder' | 'playwright-mcp' | 'visual-workflow' | 'patent-agent' | 'streaming-codegen' | 'managed-backend' | 'agent-framework'
+type SettingsTab = 'tokens' | 'usage' | 'billing' | 'payments' | 'memories' | 'preferences' | 'infrastructure' | 'secrets' | 'preview' | 'generation' | 'oauth' | 'compiler' | 'observability' | 'workflows' | 'specifications' | 'github-sync' | 'code-review' | 'streaming-generation' | 'mcp-integration' | 'analytics' | 'marketplace' | 'containerization' | 'test-generation' | 'autonomous-testing' | 'collaborative-editing' | 'onboarding' | 'version-history' | 'component-preview' | 'variant-comparison' | 'performance' | 'schema-designer' | 'api-cli' | 'pipeline-builder' | 'api-docs' | 'code-merge' | 'voice-input' | 'model-routing' | 'context-index' | 'deployment-health' | 'generative-ui' | 'mobile-app' | 'background-agents' | 'platform-upgrade' | 'visual-prompt' | 'multi-framework' | 'view-transitions' | 'nl-schema' | 'query-config' | 'agentic-planning' | 'visual-regression' | 'mcp-gateway' | 'codebase-memory' | 'figma-import' | 'arena' | 'visual-overlay' | 'semantic-search' | 'planning-mode' | 'project-docs' | 'ai-elements' | 'review-pipeline' | 'oauth-connectors' | 'mcp-tools' | 'ai-model' | 'bidir-sync' | 'self-healing-test' | 'multi-agent-test' | 'database-branching' | 'sandbox' | 'dynamic-intelligence' | 'agent-automation' | 'usage-dashboard' | 'orchestration' | 'langgraph' | 'hybrid-cache' | 'playwright-healing' | 'self-healing-code' | 'production-sandboxes' | 'org-memory' | 'agent-rules' | 'server-components' | 'code-lint' | 'vector-search' | 'repl-test' | 'agent-terminal' | 'composer' | 'dotnet-perf' | 'multi-model' | 'biome-lint' | 'deepwiki' | 'build-toolchain' | 'vision-to-code' | 'dotnet10-upgrade' | 'parallel-agents' | 'webmcp' | 'agent-sdk' | 'auto-terminal' | 'turso-database' | 'workers-ai' | 'react-use-hook' | 'edit-predictions' | 'browser-ide' | 'governance' | 'inference-cost' | 'language-expansion' | 'hybrid-validation' | 'agent-messages' | 'agentic-workflows' | 'agent-trace' | 'confidence-scoring' | 'ai-marketplace' | 'agent-inbox' | 'agent-skills' | 'agent-teams' | 'agent-builder' | 'playwright-mcp' | 'visual-workflow' | 'patent-agent' | 'streaming-codegen' | 'managed-backend' | 'agent-framework' | 'screenshot-to-code'
 
-const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index', 'deployment-health', 'generative-ui', 'mobile-app', 'background-agents', 'platform-upgrade', 'visual-prompt', 'multi-framework', 'view-transitions', 'nl-schema', 'query-config', 'agentic-planning', 'visual-regression', 'mcp-gateway', 'codebase-memory', 'figma-import', 'arena', 'visual-overlay', 'semantic-search', 'planning-mode', 'project-docs', 'ai-elements', 'review-pipeline', 'oauth-connectors', 'mcp-tools', 'ai-model', 'bidir-sync', 'self-healing-test', 'multi-agent-test', 'database-branching', 'sandbox', 'dynamic-intelligence', 'agent-automation', 'usage-dashboard', 'orchestration', 'langgraph', 'hybrid-cache', 'playwright-healing', 'self-healing-code', 'production-sandboxes', 'org-memory', 'agent-rules', 'server-components', 'code-lint', 'vector-search', 'repl-test', 'agent-terminal', 'composer', 'dotnet-perf', 'multi-model', 'biome-lint', 'deepwiki', 'build-toolchain', 'vision-to-code', 'dotnet10-upgrade', 'parallel-agents', 'webmcp', 'agent-sdk', 'auto-terminal', 'turso-database', 'workers-ai', 'react-use-hook', 'edit-predictions', 'browser-ide', 'governance', 'inference-cost', 'language-expansion', 'hybrid-validation', 'agent-messages', 'agentic-workflows', 'agent-trace', 'confidence-scoring', 'ai-marketplace', 'agent-inbox', 'agent-skills', 'agent-teams', 'agent-builder', 'playwright-mcp', 'visual-workflow', 'patent-agent', 'streaming-codegen', 'managed-backend', 'agent-framework']
+const VALID_TABS: SettingsTab[] = ['tokens', 'usage', 'billing', 'payments', 'memories', 'preferences', 'infrastructure', 'secrets', 'preview', 'generation', 'oauth', 'compiler', 'observability', 'workflows', 'specifications', 'github-sync', 'code-review', 'streaming-generation', 'mcp-integration', 'analytics', 'marketplace', 'containerization', 'test-generation', 'autonomous-testing', 'collaborative-editing', 'onboarding', 'version-history', 'component-preview', 'variant-comparison', 'performance', 'schema-designer', 'api-cli', 'pipeline-builder', 'api-docs', 'code-merge', 'voice-input', 'model-routing', 'context-index', 'deployment-health', 'generative-ui', 'mobile-app', 'background-agents', 'platform-upgrade', 'visual-prompt', 'multi-framework', 'view-transitions', 'nl-schema', 'query-config', 'agentic-planning', 'visual-regression', 'mcp-gateway', 'codebase-memory', 'figma-import', 'arena', 'visual-overlay', 'semantic-search', 'planning-mode', 'project-docs', 'ai-elements', 'review-pipeline', 'oauth-connectors', 'mcp-tools', 'ai-model', 'bidir-sync', 'self-healing-test', 'multi-agent-test', 'database-branching', 'sandbox', 'dynamic-intelligence', 'agent-automation', 'usage-dashboard', 'orchestration', 'langgraph', 'hybrid-cache', 'playwright-healing', 'self-healing-code', 'production-sandboxes', 'org-memory', 'agent-rules', 'server-components', 'code-lint', 'vector-search', 'repl-test', 'agent-terminal', 'composer', 'dotnet-perf', 'multi-model', 'biome-lint', 'deepwiki', 'build-toolchain', 'vision-to-code', 'dotnet10-upgrade', 'parallel-agents', 'webmcp', 'agent-sdk', 'auto-terminal', 'turso-database', 'workers-ai', 'react-use-hook', 'edit-predictions', 'browser-ide', 'governance', 'inference-cost', 'language-expansion', 'hybrid-validation', 'agent-messages', 'agentic-workflows', 'agent-trace', 'confidence-scoring', 'ai-marketplace', 'agent-inbox', 'agent-skills', 'agent-teams', 'agent-builder', 'playwright-mcp', 'visual-workflow', 'patent-agent', 'streaming-codegen', 'managed-backend', 'agent-framework', 'screenshot-to-code']
 
 type TabGroup = {
   key: string
@@ -170,7 +172,7 @@ const TAB_GROUPS: TabGroup[] = [
   {
     key: 'testing',
     i18nKey: 'settings.groups.testing',
-    tabs: ['test-generation', 'visual-regression', 'self-healing-code', 'playwright-healing', 'playwright-mcp', 'repl-test'],
+    tabs: ['test-generation', 'autonomous-testing', 'visual-regression', 'self-healing-code', 'playwright-healing', 'playwright-mcp', 'repl-test'],
   },
   {
     key: 'data-search',
@@ -180,7 +182,7 @@ const TAB_GROUPS: TabGroup[] = [
   {
     key: 'dev-tools',
     i18nKey: 'settings.groups.devTools',
-    tabs: ['specifications', 'github-sync', 'bidir-sync', 'collaborative-editing', 'version-history', 'performance', 'observability', 'build-toolchain', 'vision-to-code', 'edit-predictions', 'browser-ide', 'dotnet-perf', 'dotnet10-upgrade', 'figma-import', 'visual-overlay', 'planning-mode', 'project-docs', 'api-cli', 'api-docs', 'pipeline-builder', 'view-transitions', 'voice-input', 'mobile-app'],
+    tabs: ['specifications', 'github-sync', 'bidir-sync', 'collaborative-editing', 'version-history', 'performance', 'observability', 'build-toolchain', 'vision-to-code', 'screenshot-to-code', 'edit-predictions', 'browser-ide', 'dotnet-perf', 'dotnet10-upgrade', 'figma-import', 'visual-overlay', 'planning-mode', 'project-docs', 'api-cli', 'api-docs', 'pipeline-builder', 'view-transitions', 'voice-input', 'mobile-app'],
   },
   {
     key: 'integrations',
@@ -229,6 +231,7 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'marketplace': ['settings.tabs.marketplace', 'Marketplace'],
   'containerization': ['settings.tabs.containerization', 'Containers'],
   'test-generation': ['settings.tabs.testGeneration', 'Tests'],
+  'autonomous-testing': ['settings.tabs.autonomousTesting', 'Auto Testing'],
   'collaborative-editing': ['settings.tabs.collaborativeEditing', 'Collab'],
   'onboarding': ['settings.tabs.onboarding', 'Onboarding'],
   'version-history': ['settings.tabs.versionHistory', 'Versions'],
@@ -325,6 +328,7 @@ const TAB_LABELS: Record<SettingsTab, [string, string]> = {
   'patent-agent': ['settings.tabs.patentAgent', 'Patent Agent'],
   'streaming-codegen': ['settings.tabs.streamingCodegen', 'Live Code Gen'],
   'managed-backend': ['settings.tabs.managedBackend', 'Managed Backend'],
+  'screenshot-to-code': ['settings.tabs.screenshotToCode', 'Screenshot to Code'],
 }
 
 /** Find which group a tab belongs to */
@@ -543,6 +547,7 @@ export default function SettingsLayout() {
       {settingsTab === 'marketplace' && <MarketplacePage />}
       {settingsTab === 'containerization' && <ContainerizationPage />}
       {settingsTab === 'test-generation' && <TestGenerationPage />}
+      {settingsTab === 'autonomous-testing' && <AutonomousTestingPage />}
       {settingsTab === 'collaborative-editing' && <CollaborativeEditingPage />}
       {settingsTab === 'onboarding' && <OnboardingPage />}
       {settingsTab === 'version-history' && <ProjectVersionPage />}
@@ -639,6 +644,7 @@ export default function SettingsLayout() {
       {settingsTab === 'patent-agent' && <PatentAgentPage />}
       {settingsTab === 'streaming-codegen' && <StreamingCodeGenPage />}
       {settingsTab === 'managed-backend' && <ManagedBackendPage />}
+      {settingsTab === 'screenshot-to-code' && <ScreenshotToCodePage />}
           </Suspense>
         </div>
       </div>
